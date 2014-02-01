@@ -56,7 +56,7 @@ JOINT = '''
       <parent>{parent}</parent>
       <axis>
         <xyz>{axis_x:f} {axis_y:f} {axis_z:f}</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.5</damping><friction>0.5</friction></dynamics>
       </axis>
     </joint>
 '''
@@ -128,7 +128,7 @@ def main():
                      'child' : 'femur%d' % leg_num,
                      'parent' : 'coxa%d' % leg_num,
                      'axis_x' : 0.0,
-                     'axis_y' : 1.0,
+                     'axis_y' : leg_x_sign[leg_num] * 1.0,
                      'axis_z' : 0.0}))
 
         print LINK.format(
@@ -154,7 +154,7 @@ def main():
                      'child' : 'tibia%d' % leg_num,
                      'parent' : 'femur%d' % leg_num,
                      'axis_x' : 0.0,
-                     'axis_y' : 1.0,
+                     'axis_y' : leg_x_sign[leg_num] * 1.0,
                      'axis_z' : 0.0}))
 
     print SUFFIX

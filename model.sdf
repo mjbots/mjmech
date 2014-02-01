@@ -196,7 +196,7 @@
       <child>femur2</child>
       <parent>coxa2</parent>
       <axis>
-        <xyz>0.000000 1.000000 0.000000</xyz>
+        <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
       </axis>
     </joint>
@@ -219,7 +219,7 @@
       <child>tibia2</child>
       <parent>femur2</parent>
       <axis>
-        <xyz>0.000000 1.000000 0.000000</xyz>
+        <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
       </axis>
     </joint>
@@ -265,7 +265,7 @@
       <child>femur3</child>
       <parent>coxa3</parent>
       <axis>
-        <xyz>0.000000 1.000000 0.000000</xyz>
+        <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
       </axis>
     </joint>
@@ -288,7 +288,7 @@
       <child>tibia3</child>
       <parent>femur3</parent>
       <axis>
-        <xyz>0.000000 1.000000 0.000000</xyz>
+        <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
       </axis>
     </joint>

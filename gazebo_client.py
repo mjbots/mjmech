@@ -292,21 +292,25 @@ if __name__ == '__main__':
     joint_cmd.name = 'mj_mech::coxa_hinge1'
     joint_cmd.axis = 0
     joint_cmd.position.target = 0
-    joint_cmd.position.p_gain = 5.0
+    joint_cmd.position.p_gain = 20.0
     joint_cmd.position.i_gain = 0.01
-    joint_cmd.position.d_gain = 2.0
+    joint_cmd.position.d_gain = 15.0
 
     eventlet.sleep(0.1)
 
     joints = []
-    for x in range(1, 5):
-        joints += ['body_hinge%d' % x,
-                   'coxa_hinge%d' % x,
-                   'femur_hinge%d' % x]
+    for x in range(0, 4):
+        joints += ['coxa_hinge%d' % x,
+                   'femur_hinge%d' % x,
+                   'tibia_hinge%d' % x]
 
     while True:
         for name in joints:
             joint_cmd.name = 'mj_mech::' + name
+            if 'femur' in name:
+                joint_cmd.position.target = 1.0
+            else:
+                joint_cmd.position.target = 0.0
             joint_cmd_publisher.publish(joint_cmd)
         eventlet.sleep(1)
 

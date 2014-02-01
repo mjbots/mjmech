@@ -1,0 +1,14 @@
+ * Get NUKE and pypose to operate the thing with oracular commands
+
+ * Simulate herkuleX servo physical characteristics
+ * Simulate herkuleX serial protocol
+
+ * Get physics to be more realistic
+   * gravity seems to act really slowly
+   * things seem to bounce off the ground more than they should
+   * the contact point on the mech's legs may be better represented as
+     a sphere?
+
+ * Model turret
+ * Switch gazebo_client to using eventlet Event instead of sleeps for
+   cross-coroutine synchronization
