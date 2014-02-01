@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <model name="mj_mech">
+    <static>false</static>
+
+    <link name="chassis">
+      <pose>0 0 0.1 0 0 0</pose>
+      <inertial><mass>0.4</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>.2 .2 .04</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>.2 .2 .04</size></box></geometry>
+      </visual>
+    </link>
+
+
+    <!-- First leg -->
+
+    <link name="body_bracket1">
+      <pose>0.13 0.1 0.1 0 0 0</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="body_hinge1">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>body_bracket1</child>
+      <parent>chassis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="coxa1">
+      <pose>0.19 0.1 0.115 0 -0.4 0</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="coxa_hinge1">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>coxa1</child>
+      <parent>body_bracket1</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="femur1">
+      <pose>0.25 0.1 0.095 0 1.0 0</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="femur_hinge1">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>femur1</child>
+      <parent>coxa1</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+
+    <!-- Second leg -->
+
+    <link name="body_bracket2">
+      <pose>0.13 -0.1 0.1 0 0 0</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="body_hinge2">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>body_bracket2</child>
+      <parent>chassis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="coxa2">
+      <pose>0.19 -0.1 0.115 0 -0.4 0</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="coxa_hinge2">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>coxa2</child>
+      <parent>body_bracket2</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="femur2">
+      <pose>0.25 -0.1 0.095 0 1.0 0</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="femur_hinge2">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>femur2</child>
+      <parent>coxa2</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <!-- Third leg -->
+
+    <link name="body_bracket3">
+      <pose>-0.13 0.1 0.1 0 0 3.14159</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="body_hinge3">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>body_bracket3</child>
+      <parent>chassis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="coxa3">
+      <pose>-0.19 0.1 0.115 0 -0.4 3.14159</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="coxa_hinge3">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>coxa3</child>
+      <parent>body_bracket3</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="femur3">
+      <pose>-0.25 0.1 0.095 0 1.0 3.14159</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="femur_hinge3">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>femur3</child>
+      <parent>coxa3</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <!-- Fourth leg -->
+
+    <link name="body_bracket4">
+      <pose>-0.13 -0.1 0.1 0 0 3.14159</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.03 0.035</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="body_hinge4">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>body_bracket4</child>
+      <parent>chassis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="coxa4">
+      <pose>-0.19 -0.1 0.115 0 -0.4 3.14159</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.06 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="coxa_hinge4">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>coxa4</child>
+      <parent>body_bracket4</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+
+    <link name="femur4">
+      <pose>-0.25 -0.1 0.095 0 1.0 3.14159</pose>
+      <inertial><mass>0.05</mass></inertial>
+      <collision name="collision">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.08 0.035 0.03</size></box></geometry>
+      </visual>
+    </link>
+
+    <joint type="revolute" name="femur_hinge4">
+      <pose>-0.03 0.0 0.0 0 0 0</pose>
+      <child>femur4</child>
+      <parent>coxa4</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+      </axis>
+    </joint>
+  </model>
+</sdf>
