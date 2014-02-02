@@ -6,6 +6,7 @@
 network server.'''
 
 import eventlet
+import logging
 import math
 import time
 
@@ -14,6 +15,8 @@ import msg.gz_string_v_pb2
 import msg.packet_pb2
 import msg.publishers_pb2
 import msg.subscribe_pb2
+
+logger = logging.getLogger(__name__)
 
 class ParseError(RuntimeError):
     pass
@@ -53,26 +56,28 @@ class Publisher(object):
         pass
 
 class Subscriber(object):
-    def __init__(self):
-        # TODO
+    def __init__(self, local_host, local_port):
+        logger.debug('Subscriber.__init__', local_host, local_port)
         self.topic = None
         self.msg_type = None
         self.callback = None
+        self.local_host = local_host
+        self.local_port = local_port
         self._connections = []
 
     def start_connect(self, pub):
-        assert False
         eventlet.spawn_n(self.connect, pub)
 
     def connect(self, pub):
         connection = Connection()
+
         connection.connect((pub.host, pub.port))
         self._connections.append(connection)
 
         to_send = msg.subscribe_pb2.Subscribe()
         to_send.topic = pub.topic
-        to_send.host = connection.local_host
-        to_send.port = connection.local_port
+        to_send.host = self.local_host
+        to_send.port = self.local_port
         to_send.msg_type = pub.msg_type
         to_send.latching = False
 
@@ -98,11 +103,9 @@ class Connection(object):
         self._local_ready = eventlet.event.Event()
 
     def connect(self, address):
-        print 'Connection.connect'
+        logger.debug('Connection.connect')
         self.address = address
         self.socket = eventlet.connect(self.address)
-        self._local_host, self._local_port = self.socket.getsockname()
-        self._local_ready.send(True)
         self._socket_ready.send(True)
 
     def serve(self, callback):
@@ -112,7 +115,7 @@ class Connection(object):
         eventlet.serve(self.socket, callback)
 
     def read_raw(self):
-        print 'Connection.read_raw'
+        logger.debug('Connection.read_raw')
         header = self.socket.recv(8)
         if len(header) < 8:
             return None
@@ -128,7 +131,7 @@ class Connection(object):
         return data
 
     def read(self):
-        print 'Connection.read'
+        logger.debug('Connection.read')
         data = self.read_raw()
         if data is None:
             return None
@@ -183,13 +186,13 @@ class Manager(object):
         self.publishers = {}
         self.subscribers = {}
 
-        eventlet.spawn_n(self.run)
+        eventlet.spawn_n(self._run)
 
-    def run(self):
-        '''Call to start the connection and process events.  It is
-        expected to be invoked from an eventlet spawn, and will only
-        return when the connection is closed or an error occurs.'''
-        print 'Manager.run'
+    def _run(self):
+        '''Starts the connection and processes events.  It is expected
+        to be invoked from an eventlet spawn, and will only return
+        when the connection is closed or an error occurs.'''
+        logger.debug('Manager.run')
         self.master.connect(self.address)
         eventlet.spawn_n(self.server.serve, self._handle_server_connection)
 
@@ -217,7 +220,7 @@ class Manager(object):
             msg.publishers_pb2.Publishers.FromString(
                 publishersData.serialized_data))
 
-        print 'Connection: initialized!'
+        logger.debug('Connection: initialized!')
         self.initialized = True
 
         # Enter the normal message dispatch loop.
@@ -266,7 +269,8 @@ class Manager(object):
 
         self.master.write_packet('subscribe', to_send)
 
-        result = Subscriber()
+        result = Subscriber(local_host=to_send.host,
+                            local_port=to_send.port)
         result.topic = topic_name
         result.msg_type = msg_type
         result.callback = callback
@@ -288,78 +292,87 @@ class Manager(object):
                     msg.subscribe_pb2.Subscribe.FromString(
                         message.serialized_data))
             else:
-                print 'Manager.handle_server_connection unknown msg:', msg.type
+                logger.warn('Manager.handle_server_connection unknown msg:',
+                            msg.type)
 
     def _handle_server_sub(self, this_connection, msg):
         if not msg.topic in self.publishers:
-            print 'Manager.handle_server_sub unknown topic:', msg.topic
+            logger.warn('Manager.handle_server_sub unknown topic:', msg.topic)
             return
 
         publisher = self.publishers[msg.topic]
         if publisher.msg_type != msg.msg_type:
-            print ('Manager.handle_server_sub type mismatch ' +
-                   'requested=%d publishing=%s') % (
-                publisher.msg_type, msg.msg_type)
+            logger.error(('Manager.handle_server_sub type mismatch ' +
+                          'requested=%d publishing=%s') % (
+                    publisher.msg_type, msg.msg_type))
             return
 
         publisher._connect(this_connection)
 
     def _process_message(self, packet):
-        print 'Manager.process_message', packet
+        logger.debug('Manager.process_message', packet)
         if packet.type in Manager._MSG_HANDLERS:
             handler, packet_type = Manager._MSG_HANDLERS[packet.type]
             handler(self, packet_type.FromString(packet.serialized_data))
         else:
-            print 'unhandled message type: ' + packet.type
+            logger.warn('unhandled message type: ' + packet.type)
 
     def _handle_version_init(self, msg):
-        print 'Manager.handle_version_init' + msg.data
+        logger.debug('Manager.handle_version_init' + msg.data)
         version = float(msg.data.split(' ')[1])
         if version < 2.2:
             raise ParseError('Unsupported gazebo version: ' + msg.data)
 
     def _handle_topic_namespaces_init(self, msg):
         self.namespaces = msg.data
-        print 'Manager.handle_topic_namespaces_init', self.namespaces
+        logger.debug('Manager.handle_topic_namespaces_init', self.namespaces)
 
     def _handle_publishers_init(self, msg):
-        print 'Manager.handle_publishers_init'
+        logger.debug('Manager.handle_publishers_init')
         for publisher in msg.publisher:
             self.publisher_records.add(_PublisherRecord(publisher))
-            print '  %s - %s %s:%d' % (publisher.topic, publisher.msg_type,
-                                       publisher.host, publisher.port)
+            logger.debug('  %s - %s %s:%d' % (
+                    publisher.topic, publisher.msg_type,
+                    publisher.host, publisher.port))
 
     def _handle_publisher_add(self, msg):
-        print 'Manager.handle_publisher_add: %s - %s %s:%d' % (
-            msg.topic, msg.msg_type, msg.host, msg.port)
+        logger.debug('Manager.handle_publisher_add: %s - %s %s:%d' % (
+                msg.topic, msg.msg_type, msg.host, msg.port))
         self.publisher_records.add(_PublisherRecord(msg))
 
     def _handle_publisher_del(self, msg):
-        print 'Manager.handle_publisher_del', msg.topic
+        logger.debug('Manager.handle_publisher_del', msg.topic)
         self.publisher_records.remove(_PublisherRecord(msg))
 
     def _handle_namespace_add(self, msg):
-        print 'Manager.handle_namespace_add', msg.data
+        logger.debug('Manager.handle_namespace_add', msg.data)
         self.namespaces.append(msg.data)
 
     def _handle_publisher_subscribe(self, msg):
-        print 'Manager.handle_publisher_subscribe', msg.topic
+        logger.debug('Manager.handle_publisher_subscribe', msg.topic)
+        logger.debug(' our info: ',
+                     self.server.local_host, self.server.local_port)
         if not msg.topic in self.subscribers:
-            print 'no subscribers!'
+            logger.debug('no subscribers!')
             return
 
         # Check to see if this is ourselves... if so, then don't do
         # anything about it.
         if (msg.host == self.server.local_host and
             msg.port == self.server.local_port):
-            print 'got publisher_subscribe for ourselves'
+            logger.debug('got publisher_subscribe for ourselves')
             return
 
-        print 'CREATING subscriber for:', msg.topic, msg.host, host.port
+        logger.debug('creating subscriber for:', msg.topic, msg.host, msg.port)
 
         subscriber = self.subscribers[msg.topic]
         subscriber.start_connect(msg)
 
+    def _handle_unsubscribe(self, msg):
+        pass
+
+    def _handle_unadvertise(self, msg):
+        pass
 
     _MSG_HANDLERS = {
         'publisher_add' : (_handle_publisher_add, msg.publish_pb2.Publish),
@@ -367,6 +380,10 @@ class Manager(object):
         'namespace_add' : (_handle_namespace_add, msg.gz_string_pb2.GzString),
         'publisher_subscribe' : (_handle_publisher_subscribe,
                                  msg.publish_pb2.Publish),
+        'publisher_advertise' : (_handle_publisher_subscribe,
+                                 msg.publish_pb2.Publish),
+        'unsubscribe' : (_handle_unsubscribe, msg.subscribe_pb2.Subscribe),
+        'unadvertise' : (_handle_unadvertise, msg.publish_pb2.Publish),
         }
 
 import msg.joint_cmd_pb2
@@ -386,12 +403,13 @@ if __name__ == '__main__':
     joint_cmd.position.d_gain = 0.5
 
     def got_joint(data):
-        pass
+        jc = msg.joint_cmd_pb2.JointCmd.FromString(data)
+        print jc.name
 
-    # joint_sub = manager.subscribe(
-    #     '/gazebo/default/mj_mech/joint_cmd',
-    #     'gazebo.msgs.JointCmd',
-    #     got_joint)
+    joint_sub = manager.subscribe(
+        '/gazebo/default/mj_mech/joint_cmd',
+        'gazebo.msgs.JointCmd',
+        got_joint)
 
     joint_cmd_publisher.wait_for_listener()
 
