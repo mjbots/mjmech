@@ -381,7 +381,9 @@ if __name__ == '__main__':
     joint_cmd.name = 'mj_mech::coxa_hinge1'
     joint_cmd.axis = 0
     joint_cmd.position.target = 0
-    joint_cmd.reset = True
+    joint_cmd.position.p_gain = 2.0
+    joint_cmd.position.i_gain = 0.1
+    joint_cmd.position.d_gain = 0.5
 
     def got_joint(data):
         pass
