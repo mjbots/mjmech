@@ -29,8 +29,16 @@ class Publisher(object):
         self._publish_impl(msg)
 
     def _publish_impl(self, message):
+        to_remove = []
         for connection in self._listeners:
-            connection.write(message)
+            try:
+                connection.write(message)
+            except:
+                # Assume that the remote end closed.
+                connection.socket.close()
+                to_remove.append(connection)
+
+        [self._listeners.remove(x) for x in to_remove]
 
     def _connect(self, connection):
         self._listeners.append(connection)
@@ -50,6 +58,31 @@ class Subscriber(object):
         self.topic = None
         self.msg_type = None
         self.callback = None
+        self._connections = []
+
+    def start_connect(self, pub):
+        assert False
+        eventlet.spawn_n(self.connect, pub)
+
+    def connect(self, pub):
+        connection = Connection()
+        connection.connect((pub.host, pub.port))
+        self._connections.append(connection)
+
+        to_send = msg.subscribe_pb2.Subscribe()
+        to_send.topic = pub.topic
+        to_send.host = connection.local_host
+        to_send.port = connection.local_port
+        to_send.msg_type = pub.msg_type
+        to_send.latching = False
+
+        connection.write_packet('sub', to_send)
+        while True:
+            data = connection.read_raw()
+            if data is None:
+                self._connections.remove(connection)
+                return
+            self.callback(data)
 
     def remove(self):
         # TODO
@@ -62,22 +95,24 @@ class Connection(object):
         self._local_host = None
         self._local_port = None
         self._socket_ready = eventlet.event.Event()
-        self._server_ready = eventlet.event.Event()
+        self._local_ready = eventlet.event.Event()
 
     def connect(self, address):
         print 'Connection.connect'
         self.address = address
         self.socket = eventlet.connect(self.address)
+        self._local_host, self._local_port = self.socket.getsockname()
+        self._local_ready.send(True)
         self._socket_ready.send(True)
 
     def serve(self, callback):
         self.socket = eventlet.listen(('', 0))
         self._local_host, self._local_port = self.socket.getsockname()
-        self._server_ready.send(True)
+        self._local_ready.send(True)
         eventlet.serve(self.socket, callback)
 
-    def read(self):
-        print 'Connection.read'
+    def read_raw(self):
+        print 'Connection.read_raw'
         header = self.socket.recv(8)
         if len(header) < 8:
             return None
@@ -90,7 +125,13 @@ class Connection(object):
         data = self.socket.recv(size)
         if len(data) < size:
             return None
+        return data
 
+    def read(self):
+        print 'Connection.read'
+        data = self.read_raw()
+        if data is None:
+            return None
         packet = msg.packet_pb2.Packet.FromString(data)
         return packet
 
@@ -102,14 +143,23 @@ class Connection(object):
         header = '%08X' % len(data)
         self.socket.send(header + data)
 
+    def write_packet(self, name, message):
+        packet = msg.packet_pb2.Packet()
+        cur_time = time.time()
+        packet.stamp.sec = int(cur_time)
+        packet.stamp.nsec = int(math.fmod(cur_time, 1) * 1e9)
+        packet.type = name
+        packet.serialized_data = message.SerializeToString()
+        self.write(packet)
+
     @property
     def local_host(self):
-        self._server_ready.wait()
+        self._local_ready.wait()
         return self._local_host
 
     @property
     def local_port(self):
-        self._server_ready.wait()
+        self._local_ready.wait()
         return self._local_port
 
 class _PublisherRecord(object):
@@ -131,6 +181,7 @@ class Manager(object):
         self.namespaces = []
         self.publisher_records = set()
         self.publishers = {}
+        self.subscribers = {}
 
         eventlet.spawn_n(self.run)
 
@@ -190,7 +241,7 @@ class Manager(object):
         to_send.host = self.server.local_host
         to_send.port = self.server.local_port
 
-        self._write_packet('advertise', to_send)
+        self.master.write_packet('advertise', to_send)
         result = Publisher()
         result.topic = topic_name
         result.msg_type = msg_type
@@ -202,17 +253,25 @@ class Manager(object):
         '''Request to receive updates on a topic.
 
         @returns a Subscriber instance'''
-        assert False
-        pass
 
-    def _write_packet(self, name, message):
-        packet = msg.packet_pb2.Packet()
-        cur_time = time.time()
-        packet.stamp.sec = int(cur_time)
-        packet.stamp.nsec = int(math.fmod(cur_time, 1) * 1e9)
-        packet.type = name
-        packet.serialized_data = message.SerializeToString()
-        self.master.write(packet)
+        if topic_name in self.subscribers:
+            raise RuntimeError('multiple subscribers for: ' + topic_name)
+
+        to_send = msg.subscribe_pb2.Subscribe()
+        to_send.topic = topic_name
+        to_send.msg_type = msg_type
+        to_send.host = self.server.local_host
+        to_send.port = self.server.local_port
+        to_send.latching = False
+
+        self.master.write_packet('subscribe', to_send)
+
+        result = Subscriber()
+        result.topic = topic_name
+        result.msg_type = msg_type
+        result.callback = callback
+        self.subscribers[topic_name] = result
+        return result
 
     def _handle_server_connection(self, socket, remote_address):
         this_connection = Connection()
@@ -223,7 +282,7 @@ class Manager(object):
             message = this_connection.read()
             if message is None:
                 return
-            if message.type == "sub":
+            if message.type == 'sub':
                 self._handle_server_sub(
                     this_connection,
                     msg.subscribe_pb2.Subscribe.FromString(
@@ -283,10 +342,31 @@ class Manager(object):
         print 'Manager.handle_namespace_add', msg.data
         self.namespaces.append(msg.data)
 
+    def _handle_publisher_subscribe(self, msg):
+        print 'Manager.handle_publisher_subscribe', msg.topic
+        if not msg.topic in self.subscribers:
+            print 'no subscribers!'
+            return
+
+        # Check to see if this is ourselves... if so, then don't do
+        # anything about it.
+        if (msg.host == self.server.local_host and
+            msg.port == self.server.local_port):
+            print 'got publisher_subscribe for ourselves'
+            return
+
+        print 'CREATING subscriber for:', msg.topic, msg.host, host.port
+
+        subscriber = self.subscribers[msg.topic]
+        subscriber.start_connect(msg)
+
+
     _MSG_HANDLERS = {
         'publisher_add' : (_handle_publisher_add, msg.publish_pb2.Publish),
         'publisher_del' : (_handle_publisher_del, msg.publish_pb2.Publish),
         'namespace_add' : (_handle_namespace_add, msg.gz_string_pb2.GzString),
+        'publisher_subscribe' : (_handle_publisher_subscribe,
+                                 msg.publish_pb2.Publish),
         }
 
 import msg.joint_cmd_pb2
@@ -302,6 +382,14 @@ if __name__ == '__main__':
     joint_cmd.axis = 0
     joint_cmd.position.target = 0
     joint_cmd.reset = True
+
+    def got_joint(data):
+        pass
+
+    # joint_sub = manager.subscribe(
+    #     '/gazebo/default/mj_mech/joint_cmd',
+    #     'gazebo.msgs.JointCmd',
+    #     got_joint)
 
     joint_cmd_publisher.wait_for_listener()
 
