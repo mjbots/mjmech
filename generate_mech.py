@@ -10,8 +10,7 @@ PARAMETERS = {
     'height' : 0.04,
     }
 
-PREAMBLE = '''
-<?xml version="1.0"?>
+PREAMBLE = '''<?xml version="1.0"?>
 <sdf version="1.4">
   <model name="mj_mech">
     <static>false</static>
@@ -26,7 +25,17 @@ SUFFIX = '''
 CHASSIS = '''
     <link name="chassis">
       <pose>0 0 {height:f} 0 0 0</pose>
-      <inertial><mass>{chassis_mass:f}</mass></inertial>
+      <inertial>
+        <mass>{chassis_mass:f}</mass>
+        <inertia>
+          <ixx>0.1</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.1</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.1</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>{chassis_length:f} {chassis_length:f} {height:f}</size></box></geometry>
       </collision>
@@ -39,7 +48,17 @@ CHASSIS = '''
 LINK = '''
     <link name="{name}">
       <pose>{x:f} {y:f} {z:f} {roll_rad:f} {pitch_rad:f} {yaw_rad:f}</pose>
-      <inertial><mass>{mass:f}</mass></inertial>
+      <inertial>
+        <mass>{mass:f}</mass>
+        <inertia>
+          <ixx>0.005</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.005</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.005</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>{length:f} {width:f} {height:f}</size></box></geometry>
       </collision>
@@ -56,7 +75,7 @@ JOINT = '''
       <parent>{parent}</parent>
       <axis>
         <xyz>{axis_x:f} {axis_y:f} {axis_z:f}</xyz>
-        <dynamics><damping>0.5</damping><friction>0.5</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 '''

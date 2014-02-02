@@ -23,6 +23,7 @@ class Publisher(object):
         self.topic = None
         self.msg_type = None
         self._listeners = []
+        self._first_listener_ready = eventlet.event.Event()
 
     def publish(self, msg):
         self._publish_impl(msg)
@@ -33,6 +34,11 @@ class Publisher(object):
 
     def _connect(self, connection):
         self._listeners.append(connection)
+        if not self._first_listener_ready.ready():
+            self._first_listener_ready.send()
+
+    def wait_for_listener(self):
+        self._first_listener_ready.wait()
 
     def remove(self):
         # TODO
@@ -55,15 +61,19 @@ class Connection(object):
         self.socket = None
         self._local_host = None
         self._local_port = None
+        self._socket_ready = eventlet.event.Event()
+        self._server_ready = eventlet.event.Event()
 
     def connect(self, address):
         print 'Connection.connect'
         self.address = address
         self.socket = eventlet.connect(self.address)
+        self._socket_ready.send(True)
 
     def serve(self, callback):
         self.socket = eventlet.listen(('', 0))
         self._local_host, self._local_port = self.socket.getsockname()
+        self._server_ready.send(True)
         eventlet.serve(self.socket, callback)
 
     def read(self):
@@ -85,8 +95,7 @@ class Connection(object):
         return packet
 
     def write(self, message):
-        while self.socket is None:
-            eventlet.sleep(0.1)
+        self._socket_ready.wait()
 
         data = message.SerializeToString()
 
@@ -95,14 +104,12 @@ class Connection(object):
 
     @property
     def local_host(self):
-        while self._local_host is None:
-            eventlet.sleep(0.1)
+        self._server_ready.wait()
         return self._local_host
 
     @property
     def local_port(self):
-        while self._local_port is None:
-            eventlet.sleep(0.1)
+        self._server_ready.wait()
         return self._local_port
 
 class _PublisherRecord(object):
@@ -124,6 +131,8 @@ class Manager(object):
         self.namespaces = []
         self.publisher_records = set()
         self.publishers = {}
+
+        eventlet.spawn_n(self.run)
 
     def run(self):
         '''Call to start the connection and process events.  It is
@@ -208,6 +217,7 @@ class Manager(object):
     def _handle_server_connection(self, socket, remote_address):
         this_connection = Connection()
         this_connection.socket = socket
+        this_connection._socket_ready.send(True)
 
         while True:
             message = this_connection.read()
@@ -283,7 +293,6 @@ import msg.joint_cmd_pb2
 
 if __name__ == '__main__':
     manager = Manager(('localhost', 11345))
-    eventlet.spawn_n(manager.run)
     joint_cmd_publisher = manager.advertise(
         '/gazebo/default/mj_mech/joint_cmd',
         'gazebo.msgs.JointCmd')
@@ -292,11 +301,9 @@ if __name__ == '__main__':
     joint_cmd.name = 'mj_mech::coxa_hinge1'
     joint_cmd.axis = 0
     joint_cmd.position.target = 0
-    joint_cmd.position.p_gain = 20.0
-    joint_cmd.position.i_gain = 0.01
-    joint_cmd.position.d_gain = 15.0
+    joint_cmd.reset = True
 
-    eventlet.sleep(0.1)
+    joint_cmd_publisher.wait_for_listener()
 
     joints = []
     for x in range(0, 4):

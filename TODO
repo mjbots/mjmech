@@ -1,14 +1,24 @@
  * Get NUKE and pypose to operate the thing with oracular commands
+   * add subscription support
+   * make pypose gazebo driver read other commands and report those as
+     current pose
 
  * Simulate herkuleX servo physical characteristics
  * Simulate herkuleX serial protocol
 
  * Get physics to be more realistic
-   * gravity seems to act really slowly
-   * things seem to bounce off the ground more than they should
    * the contact point on the mech's legs may be better represented as
      a sphere?
+   * Figure out what the moments of inertia should likely be for what
+     we're talking about
 
  * Model turret
+
+DONE 2014-02-02
  * Switch gazebo_client to using eventlet Event instead of sleeps for
    cross-coroutine synchronization
+
+DONE 2014-02-01
+ * Most of the physics problem was that rotational inertia needs to be
+   separate specified, as it defaults to something large and independent
+   of the mass you chose.

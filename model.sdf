@@ -8,7 +8,17 @@
 
     <link name="chassis">
       <pose>0 0 0.040000 0 0 0</pose>
-      <inertial><mass>0.400000</mass></inertial>
+      <inertial>
+        <mass>0.400000</mass>
+        <inertia>
+          <ixx>0.1</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.1</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.1</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.200000 0.200000 0.040000</size></box></geometry>
       </collision>
@@ -20,7 +30,17 @@
 
     <link name="coxa0">
       <pose>0.130000 0.100000 0.040000 0.000000 0.000000 0.000000</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
       </collision>
@@ -36,14 +56,24 @@
       <parent>chassis</parent>
       <axis>
         <xyz>0.000000 0.000000 1.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="femur0">
       <pose>0.190000 0.100000 0.040000 0.000000 0.000000 0.000000</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -59,14 +89,24 @@
       <parent>coxa0</parent>
       <axis>
         <xyz>0.000000 1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="tibia0">
       <pose>0.260000 0.100000 0.040000 0.000000 0.000000 0.000000</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.080000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -82,14 +122,24 @@
       <parent>femur0</parent>
       <axis>
         <xyz>0.000000 1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="coxa1">
       <pose>0.130000 -0.100000 0.040000 0.000000 0.000000 0.000000</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
       </collision>
@@ -105,14 +155,24 @@
       <parent>chassis</parent>
       <axis>
         <xyz>0.000000 0.000000 1.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="femur1">
       <pose>0.190000 -0.100000 0.040000 0.000000 0.000000 0.000000</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -128,14 +188,24 @@
       <parent>coxa1</parent>
       <axis>
         <xyz>0.000000 1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="tibia1">
       <pose>0.260000 -0.100000 0.040000 0.000000 0.000000 0.000000</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.080000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -151,14 +221,24 @@
       <parent>femur1</parent>
       <axis>
         <xyz>0.000000 1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="coxa2">
       <pose>-0.130000 -0.100000 0.040000 0.000000 0.000000 3.141593</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
       </collision>
@@ -174,14 +254,24 @@
       <parent>chassis</parent>
       <axis>
         <xyz>0.000000 0.000000 1.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="femur2">
       <pose>-0.190000 -0.100000 0.040000 0.000000 0.000000 3.141593</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -197,14 +287,24 @@
       <parent>coxa2</parent>
       <axis>
         <xyz>0.000000 -1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="tibia2">
       <pose>-0.260000 -0.100000 0.040000 0.000000 0.000000 3.141593</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.080000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -220,14 +320,24 @@
       <parent>femur2</parent>
       <axis>
         <xyz>0.000000 -1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="coxa3">
       <pose>-0.130000 0.100000 0.040000 0.000000 0.000000 3.141593</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
       </collision>
@@ -243,14 +353,24 @@
       <parent>chassis</parent>
       <axis>
         <xyz>0.000000 0.000000 1.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="femur3">
       <pose>-0.190000 0.100000 0.040000 0.000000 0.000000 3.141593</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -266,14 +386,24 @@
       <parent>coxa3</parent>
       <axis>
         <xyz>0.000000 -1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
 
     <link name="tibia3">
       <pose>-0.260000 0.100000 0.040000 0.000000 0.000000 3.141593</pose>
-      <inertial><mass>0.050000</mass></inertial>
+      <inertial>
+        <mass>0.050000</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <geometry><box><size>0.080000 0.035000 0.030000</size></box></geometry>
       </collision>
@@ -289,7 +419,7 @@
       <parent>femur3</parent>
       <axis>
         <xyz>0.000000 -1.000000 0.000000</xyz>
-        <dynamics><damping>0.1</damping><friction>0.2</friction></dynamics>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
       </axis>
     </joint>
 
