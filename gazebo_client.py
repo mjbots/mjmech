@@ -342,7 +342,10 @@ class Manager(object):
 
     def _handle_publisher_del(self, msg):
         logger.debug('Manager.handle_publisher_del', msg.topic)
-        self.publisher_records.remove(_PublisherRecord(msg))
+        try:
+            self.publisher_records.remove(_PublisherRecord(msg))
+        except KeyError:
+            logger.debug('got publisher_del for unknown: ' + msg.topic)
 
     def _handle_namespace_add(self, msg):
         logger.debug('Manager.handle_namespace_add', msg.data)
