@@ -1,3 +1,20 @@
+ * Verify torque capability of servo
+ * Verify current draw under torque load
+   * Measure steady state temperature
+   * What torque can be used continuously?
+
+ * Design chassis plate
+ * Design turret plate
+   * mounting for at least camera, maybe computer
+   * mounting on pitch axis for weapon
+   
+ * Order full complement of servos
+ * Order electrical driver for AEG
+ * Order batteries
+ * Build power distribution board
+ 
+ 
+
  * Simulate herkuleX serial protocol
 
  * Model turret
@@ -9,6 +26,8 @@ DONE 2014-02-15
      a sphere?
    * Figure out what the moments of inertia should likely be for what
      we're talking about
+ * Ordered test battery
+ * Wrote up work plan
  
 DONE 2014-02-14
  * Get NUKE and pypose to operate the thing with oracular commands
