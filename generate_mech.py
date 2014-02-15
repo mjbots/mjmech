@@ -3,11 +3,11 @@
 import math
 
 CHASSIS_LENGTH = 0.2
-CHASSIS_MASS = 1.5
+CHASSIS_MASS = 1.8
 COXA_LENGTH = 0.06
 FEMUR_LENGTH = 0.04
 TIBIA_LENGTH = 0.06
-
+LIMB_MASS = 0.05
 
 def sphere_inertia(mass, radius):
     return (2. / 5) * mass * (radius **2)
@@ -30,6 +30,7 @@ PARAMETERS = {
     'chassis_height' : 0.04,
     'height' : 0.4,
     'surface' : '',
+    'effort' : 1.2,
     }
 
 PREAMBLE = '''<?xml version="1.0"?>
@@ -108,7 +109,7 @@ JOINT = '''
         <xyz>{axis_x:f} {axis_y:f} {axis_z:f}</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>1.2</effort>
+          <effort>{effort:f}</effort>
           <velocity>1.0</velocity>
         </limit>
       </axis>
@@ -179,8 +180,8 @@ def main():
                      'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + 0.5 * COXA_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
-                     'mass' : 0.08,
-                     'inertia' : 10 * sphere_inertia(0.08, 0.06),
+                     'mass' : LIMB_MASS,
+                     'inertia' : 10 * sphere_inertia(LIMB_MASS, 0.06),
                      'roll_rad' : 0,
                      'pitch_rad' : 0,
                      'yaw_rad' : leg_yaw[leg_num],
@@ -204,8 +205,8 @@ def main():
                      'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + 0.5 * FEMUR_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
-                     'mass' : 0.08,
-                     'inertia' : 10 * sphere_inertia(0.08, 0.06),
+                     'mass' : LIMB_MASS,
+                     'inertia' : 10 * sphere_inertia(LIMB_MASS, 0.06),
                      'roll_rad' : 0,
                      'pitch_rad' : 0,
                      'yaw_rad' : leg_yaw[leg_num],
@@ -231,8 +232,8 @@ def main():
                      'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH + 0.5 * TIBIA_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
-                     'mass' : 0.08,
-                     'inertia' : 10 * sphere_inertia(0.08, 0.06),
+                     'mass' : LIMB_MASS,
+                     'inertia' : 10 * sphere_inertia(LIMB_MASS, 0.06),
                      'roll_rad' : 0.0,
                      'pitch_rad' : 0.0,
                      'yaw_rad' : leg_yaw[leg_num],
