@@ -3,11 +3,33 @@
 import math
 
 CHASSIS_LENGTH = 0.2
+CHASSIS_MASS = 1.5
+COXA_LENGTH = 0.06
+FEMUR_LENGTH = 0.04
+TIBIA_LENGTH = 0.06
+
+
+def sphere_inertia(mass, radius):
+    return (2. / 5) * mass * (radius **2)
+
+SURFACE = '''
+        <surface>
+          <contact>
+            <ode>
+              <kp>100.0</kp>
+              <kd>100.0</kd>
+            </ode>
+          </contact>
+        </surface>
+'''
 
 PARAMETERS = {
-    'chassis_mass' : 0.4,
+    'chassis_mass' : CHASSIS_MASS,
+    'chassis_inertia' : sphere_inertia(CHASSIS_MASS, 0.5 * CHASSIS_LENGTH),
     'chassis_length' : CHASSIS_LENGTH,
-    'height' : 0.04,
+    'chassis_height' : 0.04,
+    'height' : 0.4,
+    'surface' : '',
     }
 
 PREAMBLE = '''<?xml version="1.0"?>
@@ -28,22 +50,23 @@ CHASSIS = '''
       <inertial>
         <mass>{chassis_mass:f}</mass>
         <inertia>
-          <ixx>0.1</ixx>
+          <ixx>{chassis_inertia:f}</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.1</iyy>
+          <iyy>{chassis_inertia:f}</iyy>
           <iyz>0.00</iyz>
-          <izz>0.1</izz>
+          <izz>{chassis_inertia:f}</izz>
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><box><size>{chassis_length:f} {chassis_length:f} {height:f}</size></box></geometry>
+        <geometry><box><size>{chassis_length:f} {chassis_length:f} {chassis_height:f}</size></box></geometry>
       </collision>
       <visual name="visual">
-        <geometry><box><size>{chassis_length:f} {chassis_length:f} {height:f}</size></box></geometry>
+        <geometry><box><size>{chassis_length:f} {chassis_length:f} {chassis_height:f}</size></box></geometry>
       </visual>
     </link>
 '''
+
 
 LINK = '''
     <link name="{name}">
@@ -51,21 +74,29 @@ LINK = '''
       <inertial>
         <mass>{mass:f}</mass>
         <inertia>
-          <ixx>0.005</ixx>
+          <ixx>{inertia:f}</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.005</iyy>
+          <iyy>{inertia:f}</iyy>
           <iyz>0.00</iyz>
-          <izz>0.005</izz>
+          <izz>{inertia:f}</izz>
         </inertia>
       </inertial>
       <collision name="collision">
         <geometry><box><size>{length:f} {width:f} {height:f}</size></box></geometry>
+      {surface}
       </collision>
       <visual name="visual">
         <geometry><box><size>{length:f} {width:f} {height:f}</size></box></geometry>
       </visual>
     </link>
+'''
+
+LIMIT = '''
+        <limit>
+          <effort>100</effort>
+          <velocity>1.0</velocity>
+        </limit>
 '''
 
 JOINT = '''
@@ -76,18 +107,60 @@ JOINT = '''
       <axis>
         <xyz>{axis_x:f} {axis_y:f} {axis_z:f}</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
+        <limit>
+          <effort>1.2</effort>
+          <velocity>1.0</velocity>
+        </limit>
       </axis>
     </joint>
 '''
+
+TIP = '''
+    <link name="{name}">
+      <pose>{x:f} {y:f} {z:f} 0 0 0</pose>
+      <inertial>
+        <mass>{mass:f}</mass>
+        <inertia>
+          <ixx>{inertia:f}</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>{inertia:f}</iyy>
+          <iyz>0.00</iyz>
+          <izz>{inertia:f}</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry><sphere><radius>{radius:f}</radius></sphere></geometry>
+        {surface}
+      </collision>
+      <visual name="visual">
+        <geometry><sphere><radius>{radius:f}</radius></sphere></geometry>
+      </visual>
+    </link>
+'''
+
+TIP_JOINT = '''
+    <joint type="revolute" name="{name}">
+      <pose>{x:f} {y:f} {z:f} 0 0 0</pose>
+      <child>{child}</child>
+      <parent>{parent}</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+        <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
+      </axis>
+    </joint>
+'''
+
+
 
 def merge(dict1, dict2):
     copy = dict1.copy()
     copy.update(dict2)
     return copy
-
-COXA_LENGTH = 0.06
-FEMUR_LENGTH = 0.06
-TIBIA_LENGTH = 0.08
 
 def main():
     print PREAMBLE
@@ -106,7 +179,8 @@ def main():
                      'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + 0.5 * COXA_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
-                     'mass' : 0.05,
+                     'mass' : 0.08,
+                     'inertia' : 10 * sphere_inertia(0.08, 0.06),
                      'roll_rad' : 0,
                      'pitch_rad' : 0,
                      'yaw_rad' : leg_yaw[leg_num],
@@ -130,7 +204,8 @@ def main():
                      'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + 0.5 * FEMUR_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
-                     'mass' : 0.05,
+                     'mass' : 0.08,
+                     'inertia' : 10 * sphere_inertia(0.08, 0.06),
                      'roll_rad' : 0,
                      'pitch_rad' : 0,
                      'yaw_rad' : leg_yaw[leg_num],
@@ -156,7 +231,8 @@ def main():
                      'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH + 0.5 * TIBIA_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
-                     'mass' : 0.05,
+                     'mass' : 0.08,
+                     'inertia' : 10 * sphere_inertia(0.08, 0.06),
                      'roll_rad' : 0.0,
                      'pitch_rad' : 0.0,
                      'yaw_rad' : leg_yaw[leg_num],
@@ -175,6 +251,26 @@ def main():
                      'axis_x' : 0.0,
                      'axis_y' : leg_x_sign[leg_num] * 1.0,
                      'axis_z' : 0.0}))
+
+        print TIP.format(
+            **merge(PARAMETERS,
+                    {'name' : 'tip%d' % leg_num,
+                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH + TIBIA_LENGTH),
+                     'y' : leg_y_sign[leg_num] * (0.5 * CHASSIS_LENGTH),
+                     'z' : PARAMETERS['height'],
+                     'mass' : 0.02,
+                     'inertia' : sphere_inertia(0.02, 0.017),
+                     'radius' : 0.017}))
+
+        print TIP_JOINT.format(
+            **merge(PARAMETERS,
+                    {'name' : 'tip_hinge%d' % leg_num,
+                     'x' : 0.0,
+                     'y' : 0.0,
+                     'z' : 0.0,
+                     'child' : 'tip%d' % leg_num,
+                     'parent' : 'tibia%d' % leg_num,
+                     }))
 
     print SUFFIX
 

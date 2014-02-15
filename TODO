@@ -1,8 +1,3 @@
- * Get NUKE and pypose to operate the thing with oracular commands
-   * add subscription support
-   * make pypose gazebo driver read other commands and report those as
-     current pose
-
  * Simulate herkuleX servo physical characteristics
  * Simulate herkuleX serial protocol
 
@@ -13,6 +8,12 @@
      we're talking about
 
  * Model turret
+
+DONE 2014-02-14
+ * Get NUKE and pypose to operate the thing with oracular commands
+   * add subscription support
+   * make pypose gazebo driver read other commands and report those as
+     current pose
 
 DONE 2014-02-02
  * Switch gazebo_client to using eventlet Event instead of sleeps for
