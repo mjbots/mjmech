@@ -9,15 +9,17 @@
    * mounting on pitch axis for weapon
    
  * Order full complement of servos
- * Order electrical driver for AEG
- * Order batteries
  * Build power distribution board
  
- 
-
  * Simulate herkuleX serial protocol
 
  * Model turret
+
+DONE 2014-02-16
+ * Test fired AEG from lab supply
+   * Needed 4.5A before it would run... worked just fine at 5V, higher
+     input voltage would probably need PWM
+   * Ordered pololu motor driver
 
 DONE 2014-02-15
  * Simulate herkuleX servo physical characteristics
