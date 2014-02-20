@@ -1,8 +1,3 @@
- * Verify torque capability of servo
- * Verify current draw under torque load
-   * Measure steady state temperature
-   * What torque can be used continuously?
-
  * Design chassis plate
  * Design turret plate
    * mounting for at least camera, maybe computer
@@ -14,6 +9,11 @@
  * Simulate herkuleX serial protocol
 
  * Model turret
+
+DONE 2014-02-18
+ * Characterized DRS-0101 servo
+ * Assembled mock leg with brackets
+ * Ordered rubber bumper cushion for leg tip from McMcaster
 
 DONE 2014-02-16
  * Test fired AEG from lab supply

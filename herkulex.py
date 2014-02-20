@@ -54,7 +54,7 @@ class Response(object):
                   '  >\n')
         Response.indent -= 2
         return result
-    
+
 
 class StatusResponse(Response):
     def __init__(self, reg48, reg49):
@@ -65,7 +65,7 @@ class StatusResponse(Response):
         self.overload_detected = (reg48 & 0x10) != 0
         self.driver_fault_detected = (reg48 & 0x20) != 0
         self.eep_reg_distorted = (reg48 & 0x40) != 0
-        
+
         self.moving = (reg49 & 0x01) != 0
         self.inposition = (reg49 & 0x02) != 0
         self.checksum_error = (reg49 & 0x04) != 0
@@ -104,7 +104,9 @@ class HerkuleX(object):
     LED_GREEN = 0x01
     LED_BLUE = 0x02
     LED_RED = 0x04
-    
+
+    REG_TORQUE_CONTROL = 52
+
     def __init__(self, serial_port):
         self.raw_serial = serial.Serial(
             port=serial_port, baudrate=115200, timeout=0)
@@ -112,11 +114,19 @@ class HerkuleX(object):
         self.serial = EventletSerial(self.raw_serial)
 
     def enumerate(self):
-        """Enumerate the list of servos on the bus.
+        """Enumerate the list of servos on the bus.  Note, this will
+        take approximately 5s to complete.  Spawn a new eventlet
+        greenthread if you can't block that long.
 
         :returns: a list of integer servo IDs
         """
-        pass
+        result = []
+        for servo in range(0xfe):
+            with eventlet.timeout.Timeout(0.02, False):
+                self.status(servo)
+                result.append(servo)
+
+        return result
 
     def _cksum1(self, size, servo, cmd, data):
         return (size ^ servo ^ cmd ^
@@ -162,14 +172,14 @@ class HerkuleX(object):
 
         if not result.cksum_good:
             raise ChecksumError(result)
-        
+
         return result
 
     def mem_read(self, cmd, servo, reg, length):
         assert cmd >= 0 and cmd <= 0xff
         assert reg >= 0 and reg <= 0xff
         assert length >= 0 and length <= 0x7f
-        
+
         self.send_packet(servo, cmd, chr(reg) + chr(length))
         received = self.recv_packet()
         assert received.servo == servo or servo == self.BROADCAST
@@ -188,7 +198,7 @@ class HerkuleX(object):
         self.send_packet(servo, cmd,
                          chr(reg) + chr(len(data)) +
                          ''.join([chr(x) for x in data]))
-    
+
     def eep_read(self, servo, reg, length):
         return self.mem_read(self.CMD_EEP_READ, servo, reg, length)
 
@@ -222,7 +232,7 @@ class HerkuleX(object):
                     chr(int(target[3] / self.PERIOD_MS)))
 
         servo = self.BROADCAST if len(targets) != 1 else targets[0][0]
-            
+
         self.send_packet(
             servo, self.CMD_I_JOG,
             ''.join([build_frame(x) for x in targets]))
@@ -235,7 +245,7 @@ class HerkuleX(object):
         :type targets: list of tuples (servo, position, led)
         """
         assert time_ms >= 0 and time_ms <= (self.PERIOD_MS * 255)
-        
+
         for target in targets:
             assert target[0] >= 0 and target[0] <= 0xff
             assert target[1] >= 0 and target[1] <= 0x7fff
@@ -265,11 +275,35 @@ class HerkuleX(object):
         reg49 = ord(received.data[1])
 
         result = StatusResponse(reg48, reg49)
-        
+
         return result
 
     def reboot(self, servo):
         self.send_packet(servo, self.CMD_REBOOT, '')
+
+    def temperature_C(self, servo):
+        value = self.ram_read(servo, 55, 1).data[0]
+        # Note, this formula was derived from the Dongbu lookup table,
+        # and becomes terribly inaccurate below -20C.
+        return (value - 40) * 0.5125 - 19.38
+
+    def position(self, servo):
+        # NOTE: The datasheet appears to be off here.
+        value = self.ram_read(servo, 60, 2).data
+        return value[1] << 8 | value[0]
+
+    def pwm(self, servo):
+        # NOTE: The datasheet says this should be at RAM register 62,
+        # however, nothing much ever shows up there, and something
+        # which looks a lot like PWM is at the reserved RAM address
+        # 64.
+        value = self.ram_read(servo, 64, 2).data
+        result = value[1] << 8 | value[0]
+        if result > 32767:
+            result = result - 65536
+        return result
+
+
 
 if __name__ == '__main__':
     port = HerkuleX('/dev/ttyUSB0')
