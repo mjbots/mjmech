@@ -1,11 +1,21 @@
+ * Build simple QT app to:
+   * Use generic servo controller to provide a UI for everything in
+     servo_controller
+   * Integrate eventlet with QT... probably run each processEvents in
+     a separate greenlet with a limit on the total number of
+     outstanding processEvents?
+   * Port over the IK routines, initially a straight copy
+   * Connect up a second tab or somesuch which allows controlling IK
+     for a single leg.
+
  * Design chassis plate
  * Design turret plate
    * mounting for at least camera, maybe computer
    * mounting on pitch axis for weapon
-   
+
  * Order full complement of servos
  * Build power distribution board
- 
+
  * Simulate herkuleX serial protocol
 
  * Model turret
@@ -30,7 +40,7 @@ DONE 2014-02-15
      we're talking about
  * Ordered test battery
  * Wrote up work plan
- 
+
 DONE 2014-02-14
  * Get NUKE and pypose to operate the thing with oracular commands
    * add subscription support
