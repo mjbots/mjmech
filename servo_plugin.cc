@@ -22,7 +22,6 @@ class ServoPlugin : public ModelPlugin {
   }
 
   virtual void OnUpdate(const common::UpdateInfo& update_info) {
-    model_->GetJoints()[0]->SetForce(0,
   }
 
  private:

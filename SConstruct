@@ -10,3 +10,7 @@ SOURCES = [
     ]
 
 result = env.SharedLibrary('servo_plugin', SOURCES)
+
+env.Command('mtool_main_window.py',
+            'mtool_main_window.ui',
+            'pyside-uic $SOURCE -o $TARGET')

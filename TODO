@@ -1,9 +1,6 @@
  * Build simple QT app to:
    * Use generic servo controller to provide a UI for everything in
      servo_controller
-   * Integrate eventlet with QT... probably run each processEvents in
-     a separate greenlet with a limit on the total number of
-     outstanding processEvents?
    * Port over the IK routines, initially a straight copy
    * Connect up a second tab or somesuch which allows controlling IK
      for a single leg.
@@ -19,6 +16,10 @@
  * Simulate herkuleX serial protocol
 
  * Model turret
+
+DONE 2014-02-20
+   * Integrated eventlet with QT in a hacky way
+   * Started building simple GUI to drive servos and show IK
 
 DONE 2014-02-18
  * Characterized DRS-0101 servo

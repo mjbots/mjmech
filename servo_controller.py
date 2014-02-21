@@ -20,11 +20,11 @@ class HerculeXController(object):
         if serial_port is None:
             raise RuntimeError('serial port required')
 
-        self.port = herkulex.Herkulex(serial_port=serial_port)
+        self.port = herkulex.HerkuleX(serial_port=serial_port)
         self.default_pose_time = 0.03
 
     def _angle_to_counts(self, angle_deg):
-        return min(1023, max(0, int(512 + angle / 0.325)))
+        return min(1023, max(0, int(512 + angle_deg / 0.325)))
 
     def _counts_to_angle(self, counts):
         return (counts - 512) * 0.325
