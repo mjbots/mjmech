@@ -18,13 +18,13 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="servoTab">
        <attribute name="title">
         <string>Servo Control</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QGroupBox" name="configurationGroup">
           <property name="title">
@@ -244,18 +244,32 @@
             <widget class="QListWidget" name="poseList"/>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QPushButton" name="poseAdd">
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <widget class="QPushButton" name="addPoseButton">
                <property name="text">
-                <string>+</string>
+                <string>Add Pose</string>
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QPushButton" name="poseRemove">
+             <item row="0" column="1">
+              <widget class="QPushButton" name="removePoseButton">
                <property name="text">
-                <string>-</string>
+                <string>Remove Pose</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="moveToPoseButton">
+               <property name="text">
+                <string>Move to Pose</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="updatePoseButton">
+               <property name="text">
+                <string>Update Pose</string>
                </property>
               </widget>
              </item>

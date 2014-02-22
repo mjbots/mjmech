@@ -4,7 +4,6 @@
 
 # TODO
 #  * Implement single leg IK window
-#  * Implement saving and restoring poses
 
 import eventlet
 import functools
@@ -62,6 +61,12 @@ class ServoTab(object):
             spawn(self.handle_capture_current))
 
         self.update_connected(False)
+
+        self.ui.addPoseButton.clicked.connect(self.handle_add_pose)
+        self.ui.removePoseButton.clicked.connect(self.handle_remove_pose)
+        self.ui.moveToPoseButton.clicked.connect(
+            spawn(self.handle_move_to_pose))
+        self.ui.updatePoseButton.clicked.connect(self.handle_update_pose)
 
         self.controller = None
         self.servo_update = BoolContext()
@@ -166,6 +171,62 @@ class ServoTab(object):
                 control['slider'].setSliderPosition(int(angle))
                 control['doublespin'].setValue(angle)
 
+    def add_list_pose(self, name):
+        self.ui.poseList.addItem(name)
+        item = self.ui.poseList.item(self.ui.poseList.count() - 1)
+        item.setFlags(QtCore.Qt.ItemIsEnabled |
+                      QtCore.Qt.ItemIsSelectable |
+                      QtCore.Qt.ItemIsEditable |
+                      QtCore.Qt.ItemIsSelectable)
+        return item
+
+    def get_new_pose_name(self):
+        poses = set([self.ui.poseList.item(x).text()
+                     for x in range(self.ui.poseList.count())])
+        count = 0
+        while True:
+            name = 'new_pose_%d' % count
+            if name not in poses:
+                return name
+            count += 1
+
+    def generate_pose_data(self):
+        return dict(
+            [ (i, control['doublespin'].value())
+              for i, control in enumerate(self.servo_controls) ])
+
+    def handle_add_pose(self):
+        pose_name = self.get_new_pose_name()
+        item = self.add_list_pose(pose_name)
+        item.setData(QtCore.Qt.UserRole, self.generate_pose_data())
+        self.ui.poseList.editItem(item)
+
+    def handle_remove_pose(self):
+        if self.ui.poseList.currentRow() < 0:
+            return
+        pose_name = self.ui.poseList.currentItem().text()
+        del self.poses[pose_name]
+        self.ui.poseList.takeItem(self.ui.poseList.currentRow())
+
+    def handle_move_to_pose(self):
+        if self.ui.poseList.currentRow() < 0:
+            return
+
+        values = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
+        self.controller.set_pose(values)
+        with self.servo_update:
+            for ident, angle_deg in values.iteritems():
+                control = self.servo_controls[ident]
+                control['slider'].setSliderPosition(int(angle_deg))
+                control['doublespin'].setValue(angle_deg)
+
+    def handle_update_pose(self):
+        if self.ui.poseList.currentRow() < 0:
+            return
+
+        self.ui.poseList.currentItem().setData(
+            QtCore.Qt.UserRole, self.generate_pose_data())
+
     def read_settings(self, config):
         if not config.has_section('servo'):
             return
@@ -175,13 +236,35 @@ class ServoTab(object):
         self.ui.modelEdit.setText(config.get('servo', 'model'))
         self.ui.servoCountSpin.setValue(config.getint('servo', 'count'))
 
+        if not config.has_section('servo.poses'):
+            return
+
+        for name, value in config.items('servo.poses'):
+            this_data = {}
+            for element in value.split(','):
+                ident, angle_deg = element.split('=')
+                this_data[int(ident)] = float(angle_deg)
+            item = self.add_list_pose(name)
+            item.setData(QtCore.Qt.UserRole, this_data)
+
+
     def write_settings(self, config):
         config.add_section('servo')
+        config.add_section('servo.poses')
 
         config.set('servo', 'type', self.ui.typeCombo.currentIndex())
         config.set('servo', 'port', self.ui.serialPortCombo.currentText())
         config.set('servo', 'model', self.ui.modelEdit.text())
         config.set('servo', 'count', self.ui.servoCountSpin.value())
+
+        for row in range(self.ui.poseList.count()):
+            item = self.ui.poseList.item(row)
+            pose_name = item.text()
+            values = item.data(QtCore.Qt.UserRole)
+            config.set(
+                'servo.poses', pose_name,
+                ','.join(['%d=%.2f' % (ident, angle_deg)
+                          for ident, angle_deg in values.iteritems()]))
 
 class Mtool(QtGui.QMainWindow):
     CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
