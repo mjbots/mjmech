@@ -44,10 +44,14 @@ class Mtool(QtGui.QMainWindow):
         servo_layout.setContentsMargins(0, 0, 0, 0)
         self.ui.scrollContents.setLayout(servo_layout)
 
-
         self.ui.servoCountSpin.valueChanged.connect(self.handle_servo_count)
         self.handle_servo_count()
 
+        self.ui.powerCombo.currentIndexChanged.connect(
+            spawn(self.handle_power))
+
+        self.ui.captureCurrentButton.clicked.connect(
+            spawn(self.handle_capture_current))
 
         self.update_connected(False)
 
@@ -105,10 +109,25 @@ class Mtool(QtGui.QMainWindow):
                     'slider': slider,
                     'doublespin': doublespin})
 
+    def handle_power(self):
+        text = self.ui.powerCombo.currentText().lower()
+        value = None
+        if text == 'free':
+            value = servo_controller.POWER_FREE
+        elif text == 'brake':
+            value = servo_controller.POWER_BRAKE
+        elif text == 'drive':
+            value = servo_controller.POWER_ENABLE
+        else:
+            raise NotImplementedError()
+
+        self.controller.enable_power(value)
 
     def update_connected(self, value):
         self.ui.controlGroup.setEnabled(value)
         self.ui.posesGroup.setEnabled(value)
+        if value:
+            self.handle_power()
 
     def handle_servo_slider(self, servo_id):
         control = self.servo_controls[servo_id]
@@ -122,12 +141,18 @@ class Mtool(QtGui.QMainWindow):
         control['slider'].setSliderPosition(int(value))
         self.controller.set_single_pose(servo_id, value)
 
+    def handle_capture_current(self):
+        results = self.controller.get_pose(range(len(self.servo_controls)))
+        for ident, angle in results.iteritems():
+            self.servo_controls[ident]['slider'].setSliderPosition(int(angle))
+            self.servo_controls[ident]['doublespin'].setValue(angle)
+
 def eventlet_pyside_mainloop(app):
     timer = QtCore.QTimer()
     def on_timeout():
         eventlet.sleep()
     timer.timeout.connect(on_timeout)
-    timer.start(50)
+    timer.start(10)
     app.exec_()
 
 def main():

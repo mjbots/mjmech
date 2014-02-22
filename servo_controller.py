@@ -2,6 +2,7 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import eventlet
 import pygazebo
 
 import herkulex
@@ -14,7 +15,7 @@ import herkulex
  # Power is used to maintain position
  POWER_ENABLE) = range(3)
 
-class HerculeXController(object):
+class HerkuleXController(object):
 
     def __init__(self, serial_port=None):
         if serial_port is None:
@@ -61,19 +62,21 @@ class HerculeXController(object):
 
         for ident in idents:
             self.port.ram_write(
-                ident, self.port.REG_TORQUE_CONTROL, value)
+                ident, self.port.REG_TORQUE_CONTROL, [value])
 
     def get_pose(self, idents=[]):
         """Determine the current pose of the requested servos.
 
         :returns: a dictionary mapping identifier to angle in degrees
         """
+        print "get_pose: idents=", idents
         result = {}
 
         for ident in idents:
             counts = self.port.position(ident)
             result[ident] = self._counts_to_angle(counts)
 
+        print "get_pose: result=", result
         return result
 
     def get_torque(self, idents=[]):
@@ -173,7 +176,7 @@ class GazeboController(object):
 
 def servo_controller(servo_type, **kwargs):
     if servo_type == 'herkulex':
-        return HerculeXController(**kwargs)
+        return HerkuleXController(**kwargs)
     elif servo_type == 'gazebo':
         return GazeboController(**kwargs)
     else:

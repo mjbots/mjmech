@@ -17,8 +17,10 @@ class ChecksumError(RuntimeError):
 class EventletSerial(object):
     def __init__(self, raw_serial):
         self.raw_serial = raw_serial
+        self.sem = eventlet.semaphore.Semaphore()
 
     def write(self, data):
+        assert self.sem.locked()
         logger.debug('writing:' + ' '.join(['%02x' % ord(x) for x in data]))
         to_write = data
         while len(to_write):
@@ -27,6 +29,7 @@ class EventletSerial(object):
             to_write = to_write[written:]
 
     def read(self, size):
+        assert self.sem.locked()
         bytes_remaining = size
         read_so_far = ""
         while bytes_remaining > 0:
@@ -111,7 +114,9 @@ class HerkuleX(object):
         self.raw_serial = serial.Serial(
             port=serial_port, baudrate=115200, timeout=0)
 
+        self.baud_rate = 115200
         self.serial = EventletSerial(self.raw_serial)
+        self._port_sem = eventlet.semaphore.Semaphore(1)
 
     def enumerate(self):
         """Enumerate the list of servos on the bus.  Note, this will
@@ -122,9 +127,11 @@ class HerkuleX(object):
         """
         result = []
         for servo in range(0xfe):
-            with eventlet.timeout.Timeout(0.02, False):
+            try:
                 self.status(servo)
                 result.append(servo)
+            except eventlet.timeout.Timeout:
+                pass
 
         return result
 
@@ -132,7 +139,7 @@ class HerkuleX(object):
         return (size ^ servo ^ cmd ^
                 reduce(lambda a, b: a ^ b, [ord(x) for x in data], 0x00))
 
-    def send_packet(self, servo, cmd, data):
+    def _raw_send_packet(self, servo, cmd, data):
         assert servo >= 0 and servo <= 0xfe
         assert cmd >= 0 and cmd <= 0xff
 
@@ -144,21 +151,27 @@ class HerkuleX(object):
 
         self.serial.write(to_write)
 
-    def recv_packet(self):
-        # Read until we get a frame header.
-        maybe_header = ''
-        while maybe_header != '\xff\xff':
-            maybe_header += self.serial.read(1)
-            if len(maybe_header) > 2:
-                maybe_header = maybe_header[-2:]
+    def send_packet(self, servo, cmd, data):
+        with self.serial.sem:
+            self._raw_send_packet(servo, cmd, data)
 
-        # Got a header.  Now read the rest.
-        size = ord(self.serial.read(1))
-        servo = ord(self.serial.read(1))
-        cmd = ord(self.serial.read(1))
-        cksum1 = ord(self.serial.read(1))
-        cksum2 = ord(self.serial.read(1))
-        data = self.serial.read(size - 7)
+    def _raw_recv_packet(self):
+        with eventlet.timeout.Timeout(max(1.0, 6*10 / self.baud_rate + 0.01)):
+            # Read until we get a frame header.
+            maybe_header = ''
+            while maybe_header != '\xff\xff':
+                maybe_header += self.serial.read(1)
+                if len(maybe_header) > 2:
+                    maybe_header = maybe_header[-2:]
+
+        with eventlet.timeout.Timeout(max(1.0, 5*10 / self.baud_rate + 0.005)):
+            # Got a header.  Now read the rest.
+            size, servo, cmd, cksum1, cksum2 = \
+                [ord(x) for x in self.serial.read(5)]
+
+        with eventlet.timeout.Timeout(max(1.0, (size - 7) * 10 /
+                                          self.baud_rate + 0.005)):
+            data = self.serial.read(size - 7)
 
         expected_cksum1 = self._cksum1(size, servo, cmd, data)
         expected_cksum2 = expected_cksum1 ^ 0xff
@@ -175,13 +188,23 @@ class HerkuleX(object):
 
         return result
 
+    def recv_packet(self):
+        with self.serial.sem:
+            return self._raw_recv_packet()
+
+    def send_recv_packet(self, servo, cmd, data):
+        with self.serial.sem:
+            self._raw_send_packet(servo, cmd, data)
+            return self._raw_recv_packet()
+
+
     def mem_read(self, cmd, servo, reg, length):
         assert cmd >= 0 and cmd <= 0xff
         assert reg >= 0 and reg <= 0xff
         assert length >= 0 and length <= 0x7f
 
-        self.send_packet(servo, cmd, chr(reg) + chr(length))
-        received = self.recv_packet()
+        received = self.send_recv_packet(servo, cmd, chr(reg) + chr(length))
+        print "mem_read:", servo, received.servo
         assert received.servo == servo or servo == self.BROADCAST
         assert received.cmd == (0x40 | cmd)
         assert len(received.data) == length + 4
@@ -265,8 +288,7 @@ class HerkuleX(object):
             ''.join(build_frame(x) for x in targets))
 
     def status(self, servo):
-        self.send_packet(servo, self.CMD_STAT, '')
-        received = self.recv_packet()
+        received = self.send_recv_packet(servo, self.CMD_STAT, '')
         assert received.servo == servo or servo == self.BROADCAST
         assert received.cmd == (0x40 | self.CMD_STAT)
         assert len(received.data) == 2
