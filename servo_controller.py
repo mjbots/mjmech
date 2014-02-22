@@ -69,7 +69,6 @@ class HerkuleXController(object):
 
         :returns: a dictionary mapping identifier to angle in degrees
         """
-        print "get_pose: idents=", idents
         result = {}
 
         for ident in idents:
@@ -78,7 +77,6 @@ class HerkuleXController(object):
                 continue
             result[ident] = self._counts_to_angle(counts)
 
-        print "get_pose: result=", result
         return result
 
     def get_torque(self, idents=[]):

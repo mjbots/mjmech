@@ -203,7 +203,6 @@ class HerkuleX(object):
         assert length >= 0 and length <= 0x7f
 
         received = self.send_recv_packet(servo, cmd, chr(reg) + chr(length))
-        print "mem_read:", servo, received.servo
         assert received.servo == servo or servo == self.BROADCAST
         assert received.cmd == (0x40 | cmd)
         assert len(received.data) == length + 4

@@ -3,9 +3,7 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 # TODO
-#  * Populate servo controls
-#  * Save and restore settings in persistent way
-#  * Connect up servo controls to live devices
+#  * Implement single leg IK window
 #  * Implement saving and restoring poses
 
 import eventlet
@@ -25,6 +23,17 @@ def spawn(callback):
         eventlet.spawn(callback)
 
     return task
+
+class BoolContext(object):
+    def __init__(self, ):
+        self.value = False
+
+    def __enter__(self):
+        self.value = True
+
+    def __exit__(self, type, value, traceback):
+        self.value = False
+
 
 class Mtool(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -58,6 +67,7 @@ class Mtool(QtGui.QMainWindow):
         self.update_connected(False)
 
         self.controller = None
+        self.servo_update = BoolContext()
 
     def closeEvent(self, event):
         self.write_settings()
@@ -124,9 +134,9 @@ class Mtool(QtGui.QMainWindow):
             layout.addWidget(doublespin)
 
             slider.valueChanged.connect(
-                spawn(functools.partial(self.handle_servo_slider, servo_id)))
+                functools.partial(self.handle_servo_slider, servo_id))
             doublespin.valueChanged.connect(
-                spawn(functools.partial(self.handle_servo_spin, servo_id)))
+                functools.partial(self.handle_servo_spin, servo_id))
 
             self.ui.scrollContents.layout().addWidget(widget)
 
@@ -156,23 +166,33 @@ class Mtool(QtGui.QMainWindow):
         if value:
             self.handle_power()
 
-    def handle_servo_slider(self, servo_id):
-        control = self.servo_controls[servo_id]
-        value = control['slider'].value()
-        control['doublespin'].setValue(value)
-        self.controller.set_single_pose(servo_id, value)
+    def handle_servo_slider(self, servo_id, event):
+        if self.servo_update.value:
+            return
 
-    def handle_servo_spin(self, servo_id):
-        control = self.servo_controls[servo_id]
-        value = control['doublespin'].value()
-        control['slider'].setSliderPosition(int(value))
-        self.controller.set_single_pose(servo_id, value)
+        with self.servo_update:
+            control = self.servo_controls[servo_id]
+            value = control['slider'].value()
+            control['doublespin'].setValue(value)
+            eventlet.spawn(self.controller.set_single_pose, servo_id, value)
+
+    def handle_servo_spin(self, servo_id, event):
+        if self.servo_update.value:
+            return
+
+        with self.servo_update:
+            control = self.servo_controls[servo_id]
+            value = control['doublespin'].value()
+            control['slider'].setSliderPosition(int(value))
+            eventlet.spawn(self.controller.set_single_pose, servo_id, value)
 
     def handle_capture_current(self):
-        results = self.controller.get_pose(range(len(self.servo_controls)))
-        for ident, angle in results.iteritems():
-            self.servo_controls[ident]['slider'].setSliderPosition(int(angle))
-            self.servo_controls[ident]['doublespin'].setValue(angle)
+        with self.servo_update:
+            results = self.controller.get_pose(range(len(self.servo_controls)))
+            for ident, angle in results.iteritems():
+                control = self.servo_controls[ident]
+                control['slider'].setSliderPosition(int(angle))
+                control['doublespin'].setValue(angle)
 
 def eventlet_pyside_mainloop(app):
     timer = QtCore.QTimer()
