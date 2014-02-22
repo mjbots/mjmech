@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>901</width>
-    <height>598</height>
+    <width>949</width>
+    <height>586</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>mtool</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_4">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="servoTab">
        <attribute name="title">
@@ -156,7 +156,7 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>288</height>
+               <height>276</height>
               </size>
              </property>
             </spacer>
@@ -224,8 +224,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>277</width>
-                <height>414</height>
+                <width>301</width>
+                <height>402</height>
                </rect>
               </property>
              </widget>
@@ -266,9 +266,448 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="singleIkTab">
+      <widget class="QWidget" name="ikConfigTab">
        <attribute name="title">
-        <string>Single Leg IK</string>
+        <string>IK Configuration</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QGroupBox" name="configurationGroup_2">
+            <property name="title">
+             <string>Configuration</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="legLabel">
+               <property name="text">
+                <string>Leg:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QSpinBox" name="legSpin">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>6</number>
+               </property>
+               <property name="value">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="3">
+              <widget class="Line" name="line_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QComboBox" name="legPresentCombo">
+               <item>
+                <property name="text">
+                 <string>Present</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Not Present</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="coxaLabel">
+               <property name="text">
+                <string>Coxa:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="coxaServoSpin"/>
+             </item>
+             <item row="3" column="2">
+              <widget class="QComboBox" name="coxaSignCombo">
+               <item>
+                <property name="text">
+                 <string>+ Fwd</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>- Fwd</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="femurLabel">
+               <property name="text">
+                <string>Femur:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="femurServoSpin"/>
+             </item>
+             <item row="4" column="2">
+              <widget class="QComboBox" name="femurSignCombo">
+               <item>
+                <property name="text">
+                 <string>+ Up</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>- Up</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="tibiaLabel">
+               <property name="text">
+                <string>Tibia:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QSpinBox" name="tibiaServoSpin"/>
+             </item>
+             <item row="5" column="2">
+              <widget class="QComboBox" name="tibiaSignCombo">
+               <item>
+                <property name="text">
+                 <string>+ Out</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>- Out</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>47</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="limitPosesGroup">
+            <property name="title">
+             <string>Limit Poses</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QLabel" name="idleLabel">
+               <property name="text">
+                <string>Idle:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="idleCombo"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="minimumLabel">
+               <property name="text">
+                <string>Minimum:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="minimumCombo"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="maximumLabel">
+               <property name="text">
+                <string>Maximum:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="maximumCombo"/>
+             </item>
+             <item row="3" column="1">
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="title">
+             <string>IK Offset</string>
+            </property>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="xOffsetLabel">
+               <property name="text">
+                <string>X (right) (mm):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="xOffsetSpin"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="yOffsetLabel">
+               <property name="text">
+                <string>Y (forward) (mm):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="yOffsetSpin"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="zOffsetLabel">
+               <property name="text">
+                <string>Z (up) (mm):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="zOffsetSpin"/>
+             </item>
+             <item row="3" column="1">
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>65</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>Geometry</string>
+            </property>
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="coxaLengthLabel">
+               <property name="text">
+                <string>Coxa Length (mm):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="coxaLengthSpin">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>200.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>50.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="femurLengthLabel">
+               <property name="text">
+                <string>Femur Length (mm):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="femurLengthSpin">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>200.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>50.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="tibiaLengthLabel">
+               <property name="text">
+                <string>Tibia Length (mm):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="tibiaLengthSpin">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>200.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>50.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>49</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string>IK Test (click/hold to actuate)</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="planeLabel">
+               <property name="text">
+                <string>Plane:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="planeCombo">
+               <item>
+                <property name="text">
+                 <string>X/Y (Right/Forward)</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>X/Z (Right/Up)</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Y/Z (Forward/Up)</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGraphicsView" name="ikTestView"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Gait Configuration</string>
        </attribute>
       </widget>
      </widget>
@@ -280,7 +719,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>901</width>
+     <width>949</width>
      <height>20</height>
     </rect>
    </property>

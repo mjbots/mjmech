@@ -8,7 +8,10 @@
 
 import eventlet
 import functools
+import os
 import sys
+
+import ConfigParser
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
@@ -34,17 +37,11 @@ class BoolContext(object):
     def __exit__(self, type, value, traceback):
         self.value = False
 
-
-class Mtool(QtGui.QMainWindow):
-    def __init__(self, parent=None):
-        super(Mtool, self).__init__(parent)
+class ServoTab(object):
+    def __init__(self, ui):
+        self.ui = ui
 
         self.servo_controls = []
-
-        self.ui = mtool_main_window.Ui_MtoolMainWindow()
-        self.ui.setupUi(self)
-
-        self.read_settings()
 
         self.ui.statusText.setText('not connected')
         self.ui.connectButton.clicked.connect(
@@ -68,31 +65,6 @@ class Mtool(QtGui.QMainWindow):
 
         self.controller = None
         self.servo_update = BoolContext()
-
-    def closeEvent(self, event):
-        self.write_settings()
-        event.accept()
-
-    def read_settings(self):
-        settings = QtCore.QSettings()
-        settings.beginGroup('servo')
-        self.ui.typeCombo.setCurrentIndex(int(settings.value('type', 0)))
-        if settings.contains('port'):
-            self.ui.serialPortCombo.setEditText(settings.value('port'))
-        if settings.contains('model'):
-            self.ui.modelEdit.setText(settings.value('model'))
-        if settings.contains('count'):
-            self.ui.servoCountSpin.setValue(int(settings.value('count')))
-        settings.endGroup()
-
-    def write_settings(self):
-        settings = QtCore.QSettings()
-        settings.beginGroup('servo')
-        settings.setValue('type', self.ui.typeCombo.currentIndex())
-        settings.setValue('port', self.ui.serialPortCombo.currentText())
-        settings.setValue('model', self.ui.modelEdit.text())
-        settings.setValue('count', self.ui.servoCountSpin.value())
-        settings.endGroup()
 
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
@@ -194,6 +166,56 @@ class Mtool(QtGui.QMainWindow):
                 control['slider'].setSliderPosition(int(angle))
                 control['doublespin'].setValue(angle)
 
+    def read_settings(self, config):
+        if not config.has_section('servo'):
+            return
+
+        self.ui.typeCombo.setCurrentIndex(config.getint('servo', 'type'))
+        self.ui.serialPortCombo.setEditText(config.get('servo', 'port'))
+        self.ui.modelEdit.setText(config.get('servo', 'model'))
+        self.ui.servoCountSpin.setValue(config.getint('servo', 'count'))
+
+    def write_settings(self, config):
+        config.add_section('servo')
+
+        config.set('servo', 'type', self.ui.typeCombo.currentIndex())
+        config.set('servo', 'port', self.ui.serialPortCombo.currentText())
+        config.set('servo', 'model', self.ui.modelEdit.text())
+        config.set('servo', 'count', self.ui.servoCountSpin.value())
+
+class Mtool(QtGui.QMainWindow):
+    CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
+
+    def __init__(self, parent=None):
+        super(Mtool, self).__init__(parent)
+
+        self.ui = mtool_main_window.Ui_MtoolMainWindow()
+        self.ui.setupUi(self)
+
+        self.servo_tab = ServoTab(self.ui)
+
+        self.read_settings()
+
+    def closeEvent(self, event):
+        self.write_settings()
+        event.accept()
+
+    def read_settings(self):
+        config = ConfigParser.ConfigParser()
+        config.read(self.CONFIG_FILE)
+
+        self.servo_tab.read_settings(config)
+
+    def write_settings(self):
+        config = ConfigParser.ConfigParser()
+
+        self.servo_tab.write_settings(config)
+
+        config_dir = os.path.dirname(self.CONFIG_FILE)
+        if not os.path.exists(config_dir):
+            os.mkdir(config_dir)
+        config.write(open(self.CONFIG_FILE, 'w'))
+
 def eventlet_pyside_mainloop(app):
     timer = QtCore.QTimer()
     def on_timeout():
@@ -204,8 +226,6 @@ def eventlet_pyside_mainloop(app):
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    app.setOrganizationName('MikhailJosh')
-    app.setOrganizationDomain('jpieper.net')
     app.setApplicationName('mtool')
 
     mtool = Mtool()
