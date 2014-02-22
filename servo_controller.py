@@ -74,6 +74,8 @@ class HerkuleXController(object):
 
         for ident in idents:
             counts = self.port.position(ident)
+            if counts is None:
+                continue
             result[ident] = self._counts_to_angle(counts)
 
         print "get_pose: result=", result

@@ -127,11 +127,9 @@ class HerkuleX(object):
         """
         result = []
         for servo in range(0xfe):
-            try:
+            with eventlet.timeout.Timeout(0.02, false):
                 self.status(servo)
                 result.append(servo)
-            except eventlet.timeout.Timeout:
-                pass
 
         return result
 
@@ -156,20 +154,21 @@ class HerkuleX(object):
             self._raw_send_packet(servo, cmd, data)
 
     def _raw_recv_packet(self):
-        with eventlet.timeout.Timeout(max(1.0, 6*10 / self.baud_rate + 0.01)):
+        with eventlet.timeout.Timeout(max(0.1, 6*10 / self.baud_rate + 0.01)):
             # Read until we get a frame header.
             maybe_header = ''
             while maybe_header != '\xff\xff':
-                maybe_header += self.serial.read(1)
+                maybe_header += self.serial.read(
+                    max(1, min(2, 2 - len(maybe_header))))
                 if len(maybe_header) > 2:
                     maybe_header = maybe_header[-2:]
 
-        with eventlet.timeout.Timeout(max(1.0, 5*10 / self.baud_rate + 0.005)):
+        with eventlet.timeout.Timeout(max(0.1, 5*10 / self.baud_rate + 0.005)):
             # Got a header.  Now read the rest.
             size, servo, cmd, cksum1, cksum2 = \
                 [ord(x) for x in self.serial.read(5)]
 
-        with eventlet.timeout.Timeout(max(1.0, (size - 7) * 10 /
+        with eventlet.timeout.Timeout(max(0.1, (size - 7) * 10 /
                                           self.baud_rate + 0.005)):
             data = self.serial.read(size - 7)
 
@@ -304,26 +303,40 @@ class HerkuleX(object):
         self.send_packet(servo, self.CMD_REBOOT, '')
 
     def temperature_C(self, servo):
-        value = self.ram_read(servo, 55, 1).data[0]
-        # Note, this formula was derived from the Dongbu lookup table,
-        # and becomes terribly inaccurate below -20C.
-        return (value - 40) * 0.5125 - 19.38
+        try:
+            value = self.ram_read(servo, 55, 1).data[0]
+
+            # Note, this formula was derived from the Dongbu lookup table,
+            # and becomes terribly inaccurate below -20C.
+            return (value - 40) * 0.5125 - 19.38
+        except eventlet.timeout.Timeout:
+            return None
 
     def position(self, servo):
-        # NOTE: The datasheet appears to be off here.
-        value = self.ram_read(servo, 60, 2).data
-        return value[1] << 8 | value[0]
+        try:
+            # NOTE: The datasheet appears to be off here.
+            value = self.ram_read(servo, 60, 2).data
+            if value is None:
+                return None
+            return value[1] << 8 | value[0]
+        except eventlet.timeout.Timeout:
+            return None
 
     def pwm(self, servo):
-        # NOTE: The datasheet says this should be at RAM register 62,
-        # however, nothing much ever shows up there, and something
-        # which looks a lot like PWM is at the reserved RAM address
-        # 64.
-        value = self.ram_read(servo, 64, 2).data
-        result = value[1] << 8 | value[0]
-        if result > 32767:
-            result = result - 65536
-        return result
+        try:
+            # NOTE: The datasheet says this should be at RAM register 62,
+            # however, nothing much ever shows up there, and something
+            # which looks a lot like PWM is at the reserved RAM address
+            # 64.
+            value = self.ram_read(servo, 64, 2).data
+            if value is None:
+                return None
+            result = value[1] << 8 | value[0]
+            if result > 32767:
+                result = result - 65536
+            return result
+        except eventlet.timeout.Timeout:
+            return None
 
 
 

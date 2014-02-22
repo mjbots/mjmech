@@ -35,6 +35,8 @@ class Mtool(QtGui.QMainWindow):
         self.ui = mtool_main_window.Ui_MtoolMainWindow()
         self.ui.setupUi(self)
 
+        self.read_settings()
+
         self.ui.statusText.setText('not connected')
         self.ui.connectButton.clicked.connect(
             spawn(self.handle_connect_clicked))
@@ -56,6 +58,31 @@ class Mtool(QtGui.QMainWindow):
         self.update_connected(False)
 
         self.controller = None
+
+    def closeEvent(self, event):
+        self.write_settings()
+        event.accept()
+
+    def read_settings(self):
+        settings = QtCore.QSettings()
+        settings.beginGroup('servo')
+        self.ui.typeCombo.setCurrentIndex(int(settings.value('type', 0)))
+        if settings.contains('port'):
+            self.ui.serialPortCombo.setEditText(settings.value('port'))
+        if settings.contains('model'):
+            self.ui.modelEdit.setText(settings.value('model'))
+        if settings.contains('count'):
+            self.ui.servoCountSpin.setValue(int(settings.value('count')))
+        settings.endGroup()
+
+    def write_settings(self):
+        settings = QtCore.QSettings()
+        settings.beginGroup('servo')
+        settings.setValue('type', self.ui.typeCombo.currentIndex())
+        settings.setValue('port', self.ui.serialPortCombo.currentText())
+        settings.setValue('model', self.ui.modelEdit.text())
+        settings.setValue('count', self.ui.servoCountSpin.value())
+        settings.endGroup()
 
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
@@ -157,6 +184,9 @@ def eventlet_pyside_mainloop(app):
 
 def main():
     app = QtGui.QApplication(sys.argv)
+    app.setOrganizationName('MikhailJosh')
+    app.setOrganizationDomain('jpieper.net')
+    app.setApplicationName('mtool')
 
     mtool = Mtool()
     mtool.show()
