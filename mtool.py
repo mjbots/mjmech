@@ -71,6 +71,12 @@ class ServoTab(object):
         self.controller = None
         self.servo_update = BoolContext()
 
+    def poses(self):
+        result = []
+        for i in range(self.ui.poseList.count()):
+            result.append(self.ui.poseList.item(i).text())
+        return result
+
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
         self.controller = servo_controller.servo_controller(
@@ -266,6 +272,280 @@ class ServoTab(object):
                 ','.join(['%d=%.2f' % (ident, angle_deg)
                           for ident, angle_deg in values.iteritems()]))
 
+class LegConfig(object):
+    present = False
+    coxa_ident = 0
+    coxa_sign = 1
+    femur_ident = 0
+    femur_sign = 1
+    tibia_ident = 0
+    tibia_sign = 1
+
+    def __str__(self):
+        return '%s,%d,%d,%d,%d,%d,%d' % (
+            self.present,
+            self.coxa_ident, self.coxa_sign,
+            self.femur_ident, self.femur_sign,
+            self.tibia_ident, self.femur_sign)
+
+    @staticmethod
+    def from_string(data):
+        fields = data.split(',')
+
+        result = LegConfig()
+
+        result.present = True if fields[0].lower() == 'true' else False
+        (result.coxa_ident, result.coxa_sign,
+         result.femur_ident, result.femur_sign,
+         result.tibia_ident, result.tibia_sign) = [int(x) for x in fields[1:]]
+
+        return result
+
+
+class IkTester(object):
+    def __init__(self, graphics_view):
+        self.graphics_scene = QtGui.QGraphicsScene()
+        self.graphics_view = graphics_view
+
+        self.graphics_view.setTransform(QtGui.QTransform().scale(1, -1))
+        self.graphics_view.setScene(self.graphics_scene)
+
+        self.graphics_scene.addLine(-1, 0, 1, 0)
+        self.graphics_scene.addLine(0, -1, 0, 1)
+        for x in range(-10, 11):
+            self.graphics_scene.addLine(-0.02, x / 10., 0.02, x / 10.0)
+            self.graphics_scene.addLine(x / 10., -0.02, x / 10.0, 0.02)
+
+        labels = [self.graphics_scene.addText('') for x in range(4)]
+        for label in labels:
+            label.setFlag(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+
+        (self.label_x_plus,
+         self.label_x_minus,
+         self.label_y_plus,
+         self.label_y_minus) = labels
+
+        # Apparently it is really hard to get QGraphicsTextItems to be
+        # aligned anything other than left|upper.  Thus, just hack in
+        # some offsets which kind of work on my monitor for now.
+        self.label_x_plus.setPlainText('+10mm')
+        self.label_x_plus.setPos(0.7, 0)
+
+        self.label_x_minus.setPlainText('-10mm')
+        self.label_x_minus.setPos(-1, 0)
+
+        self.label_y_plus.setPlainText('+10mm')
+        self.label_y_plus.setPos(0, 1)
+
+        self.label_y_minus.setPlainText('-10mm')
+        self.label_y_minus.setPos(0, -.9)
+
+    def fit_in_view(self):
+        self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
+
+    def set_config(self, coxa_servo, coxa_sign,
+                   femur_servo, femur_sign,
+                   tibia_servo, tibia_sign,
+                   idle_values, minimum_values, maximum_values,
+                   x_offset_mm, y_offset_mm, z_offset_mm,
+                   coxa_length_mm, femur_length_mm, tibia_length_mm,
+                   plane):
+        self.coxa_servo = coxa_servo
+        self.coxa_sign = coxa_sign
+        self.femur_servo = femur_servo
+        self.femur_sign = femur_sign
+        self.tibia_servo = tibia_servo
+        self.tibia_sign = tibia_sign
+
+        self.idle_values = idle_values
+        self.minimum_values = minimum_values
+        self.maximum_values = maximum_values
+        self.x_offset_mm = x_offset_mm
+        self.y_offset_mm = y_offset_mm
+        self.z_offset_mm = z_offset_mm
+        self.coxa_length_mm = coxa_length_mm
+        self.femur_length_mm = femur_length_mm
+        self.tibia_length_mm = tibia_length_mm
+        self.plane = plane
+
+        self.update_scene()
+
+    def update_scene(self):
+        pass
+
+
+
+class IkConfigTab(object):
+    def __init__(self, ui, servo_tab):
+        self.ui = ui
+        self.servo_tab = servo_tab
+        self.legs = {}
+        self.in_number_changed = BoolContext()
+
+        self.ik_tester = IkTester(self.ui.ikTestView)
+
+        self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
+        self.handle_current_changed()
+
+        self.ui.legSpin.valueChanged.connect(self.handle_leg_number_changed)
+        self.handle_leg_number_changed()
+
+        for combo in [self.ui.legPresentCombo,
+                      self.ui.coxaSignCombo,
+                      self.ui.femurSignCombo,
+                      self.ui.tibiaSignCombo]:
+            combo.currentIndexChanged.connect(self.handle_leg_data_change)
+
+        for spin in [self.ui.coxaServoSpin,
+                     self.ui.femurServoSpin,
+                     self.ui.tibiaServoSpin]:
+            spin.valueChanged.connect(self.handle_leg_data_change)
+
+        for combo in [self.ui.idleCombo,
+                      self.ui.minimumCombo,
+                      self.ui.maximumCombo,
+                      self.ui.planeCombo]:
+            combo.currentIndexChanged.connect(self.handle_ik_config_change)
+
+        for spin in [self.ui.xOffsetSpin,
+                     self.ui.yOffsetSpin,
+                     self.ui.zOffsetSpin,
+                     self.ui.coxaLengthSpin,
+                     self.ui.femurLengthSpin,
+                     self.ui.tibiaLengthSpin]:
+            spin.valueChanged.connect(self.handle_ik_config_change)
+
+    def handle_current_changed(self, index=1):
+        if index != 1:
+            return
+
+        # Our tab is now current.  Make sure any links to the servo
+        # tab are updated properly.
+        poses = self.servo_tab.poses()
+        combos = [self.ui.idleCombo,
+                  self.ui.minimumCombo,
+                  self.ui.maximumCombo]
+        for pose in poses:
+            for combo in combos:
+                if combo.findText(pose) < 0:
+                    combo.addItem(pose)
+
+        self.ik_tester.fit_in_view()
+
+    def update_config_enable(self):
+        enable = self.ui.legPresentCombo.currentIndex() == 0
+
+        for x in [self.ui.coxaServoSpin, self.ui.coxaSignCombo,
+                  self.ui.femurServoSpin, self.ui.femurSignCombo,
+                  self.ui.tibiaServoSpin, self.ui.tibiaSignCombo]:
+            x.setEnabled(enable)
+
+    def handle_leg_data_change(self):
+        if self.in_number_changed.value:
+            return
+
+        leg_num = self.ui.legSpin.value()
+        leg_config = self.legs.get(leg_num, LegConfig())
+
+        leg_config.present = (True
+                              if self.ui.legPresentCombo.currentIndex() == 0
+                              else False)
+
+        def combo_sign(combo):
+            return 1 if combo.currentIndex() == 0 else -1
+
+        leg_config.coxa_ident = self.ui.coxaServoSpin.value()
+        leg_config.coxa_sign = combo_sign(self.ui.coxaSignCombo)
+        leg_config.femur_ident = self.ui.femurServoSpin.value()
+        leg_config.femur_sign = combo_sign(self.ui.femurSignCombo)
+        leg_config.tibia_ident = self.ui.tibiaServoSpin.value()
+        leg_config.tibia_sign = combo_sign(self.ui.tibiaSignCombo)
+
+        self.update_config_enable()
+
+        self.legs[leg_num] = leg_config
+
+
+    def handle_leg_number_changed(self):
+        with self.in_number_changed:
+            leg_config = self.legs.get(self.ui.legSpin.value(), LegConfig())
+
+            self.ui.legPresentCombo.setCurrentIndex(
+                0 if leg_config.present else 1)
+
+            self.ui.coxaServoSpin.setValue(leg_config.coxa_ident)
+            self.ui.coxaSignCombo.setCurrentIndex(
+                0 if leg_config.coxa_sign > 0 else 1)
+
+            self.ui.femurServoSpin.setValue(leg_config.femur_ident)
+            self.ui.femurSignCombo.setCurrentIndex(
+                0 if leg_config.femur_sign > 0 else 1)
+
+            self.ui.tibiaServoSpin.setValue(leg_config.tibia_ident)
+            self.ui.tibiaSignCombo.setCurrentIndex(
+                0 if leg_config.tibia_sign > 0 else 1)
+
+            self.update_config_enable()
+
+    def handle_ik_config_change(self):
+        # Update the visualization and the IK solver with our new
+        # configuration.
+        pass
+
+    def get_float_configs(self):
+        return [(self.ui.xOffsetSpin, 'x_offset'),
+                (self.ui.yOffsetSpin, 'y_offset'),
+                (self.ui.zOffsetSpin, 'z_offset'),
+                (self.ui.coxaLengthSpin, 'coxa_length'),
+                (self.ui.femurLengthSpin, 'femur_length'),
+                (self.ui.tibiaLengthSpin, 'tibia_length')]
+
+    def read_settings(self, config):
+        self.handle_current_changed()
+
+        if config.has_section('ikconfig'):
+            def set_combo(combo, name):
+                value = config.get('ikconfig', name)
+                for i in range(combo.count()):
+                    if combo.itemText(i) == value:
+                        combo.setCurrentIndex(i)
+                        break
+
+            set_combo(self.ui.idleCombo, 'idle_pose')
+            set_combo(self.ui.minimumCombo, 'minimum_pose')
+            set_combo(self.ui.maximumCombo, 'maximum_pose')
+
+            for spin, name in self.get_float_configs():
+                spin.setValue(config.getfloat('ikconfig', name))
+
+        if config.has_section('ikconfig.legs'):
+            for leg_name, value in config.items('ikconfig.legs'):
+                leg_num = int(leg_name.split('.')[1])
+                self.legs[leg_num] = LegConfig.from_string(value)
+
+        for i in range(6):
+            if i not in self.legs:
+                self.legs[i] = LegConfig()
+
+        self.handle_leg_number_changed()
+
+    def write_settings(self, config):
+        config.add_section('ikconfig')
+
+        config.set('ikconfig', 'idle_pose', self.ui.idleCombo.currentText())
+        config.set('ikconfig', 'minimum_pose',
+                   self.ui.minimumCombo.currentText())
+        config.set('ikconfig', 'maximum_pose',
+                   self.ui.maximumCombo.currentText())
+
+        for spin, name in self.get_float_configs():
+            config.set('ikconfig', name, spin.value())
+
+        config.add_section('ikconfig.legs')
+        for leg_num, leg_config in self.legs.iteritems():
+            config.set('ikconfig.legs', 'leg.%d' % leg_num, str(leg_config))
+
+
 class Mtool(QtGui.QMainWindow):
     CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
 
@@ -276,6 +556,7 @@ class Mtool(QtGui.QMainWindow):
         self.ui.setupUi(self)
 
         self.servo_tab = ServoTab(self.ui)
+        self.ikconfig_tab = IkConfigTab(self.ui, self.servo_tab)
 
         self.read_settings()
 
@@ -288,11 +569,13 @@ class Mtool(QtGui.QMainWindow):
         config.read(self.CONFIG_FILE)
 
         self.servo_tab.read_settings(config)
+        self.ikconfig_tab.read_settings(config)
 
     def write_settings(self):
         config = ConfigParser.ConfigParser()
 
         self.servo_tab.write_settings(config)
+        self.ikconfig_tab.write_settings(config)
 
         config_dir = os.path.dirname(self.CONFIG_FILE)
         if not os.path.exists(config_dir):

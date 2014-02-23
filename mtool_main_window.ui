@@ -303,13 +303,13 @@
              <item row="0" column="2">
               <widget class="QSpinBox" name="legSpin">
                <property name="minimum">
-                <number>1</number>
+                <number>0</number>
                </property>
                <property name="maximum">
-                <number>6</number>
+                <number>5</number>
                </property>
                <property name="value">
-                <number>1</number>
+                <number>0</number>
                </property>
               </widget>
              </item>
@@ -712,7 +712,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QGraphicsView" name="ikTestView"/>
+            <widget class="QGraphicsView" name="ikTestView">
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
