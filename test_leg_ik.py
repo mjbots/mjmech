@@ -18,28 +18,28 @@ def test_lizard_3dof():
     config.tibia_min_deg = -90
     config.tibia_max_deg = 90
 
-    point = leg_ik.Point3D(90, 0, 30)
+    point = leg_ik.Point3D(90, 0, -30)
     result = leg_ik.lizard_3dof_ik(point, config)
 
     assert abs(result.coxa_deg) < 0.01
     assert abs(result.femur_deg) < 0.01
     assert abs(result.tibia_deg) < 0.01
 
-    point = leg_ik.Point3D(90, 0, 25)
+    point = leg_ik.Point3D(90, 0, -25)
     result = leg_ik.lizard_3dof_ik(point, config)
 
     assert abs(result.coxa_deg) < 0.01
     assert abs(result.femur_deg - 7.18) < 0.01
     assert abs(result.tibia_deg + 6.58) < 0.01
 
-    point = leg_ik.Point3D(90, 0, 35)
+    point = leg_ik.Point3D(90, 0, -35)
     result = leg_ik.lizard_3dof_ik(point, config)
 
     assert abs(result.coxa_deg) < 0.01
     assert abs(result.femur_deg + 7.18) < 0.01
     assert abs(result.tibia_deg - 7.78) < 0.01
 
-    point = leg_ik.Point3D(95, 0, 30)
+    point = leg_ik.Point3D(95, 0, -30)
     result = leg_ik.lizard_3dof_ik(point, config)
 
     assert abs(result.coxa_deg) < 0.01
@@ -48,14 +48,14 @@ def test_lizard_3dof():
 
     # Now test some with coxa.
 
-    point = leg_ik.Point3D(87.75, 20, 30)
+    point = leg_ik.Point3D(87.75, 20, -30)
     result = leg_ik.lizard_3dof_ik(point, config)
 
     assert abs(result.coxa_deg - 12.84) < 0.01
     assert abs(result.femur_deg) < 0.01
     assert abs(result.tibia_deg) < 0.01
 
-    point = leg_ik.Point3D(87.75, 20, 25)
+    point = leg_ik.Point3D(87.75, 20, -25)
     result = leg_ik.lizard_3dof_ik(point, config)
 
     assert abs(result.coxa_deg - 12.84) < 0.01

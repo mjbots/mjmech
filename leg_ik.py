@@ -2,6 +2,10 @@
 
 import math
 
+# Nominal body coordinate convention is
+#   * x - right
+#   * y - forward
+#   * z - up
 class Point3D(object):
     def __init__(self, x, y, z):
         self.x = x
@@ -27,14 +31,17 @@ class Configuration(object):
     coxa_min_deg = None
     coxa_max_deg = None
     coxa_length_mm = None
+    coxa_sign = 1
 
     femur_min_deg = None
     femur_max_deg = None
     femur_length_mm = None
+    femur_sign = 1
 
     tibia_min_deg = None
     tibia_max_deg = None
     tibia_length_mm = None
+    tibia_sign = 1
 
 class JointAngles(object):
     coxa_deg = None
@@ -49,7 +56,8 @@ def lizard_3dof_ik(point_mm, config):
     If no solution is possible, return None.
     '''
     # Solve for the coxa first, as it has only a single solution.
-    coxa_deg = math.degrees(math.atan2(point_mm.y, point_mm.x))
+    coxa_deg = (config.coxa_sign *
+                math.degrees(math.atan2(point_mm.y, point_mm.x)))
 
     if (coxa_deg < config.coxa_min_deg or
         coxa_deg > config.coxa_max_deg):
@@ -94,7 +102,8 @@ def lizard_3dof_ik(point_mm, config):
 
     # For our purposes, a 0 tibia angle should equate to a right angle
     # with the femur, so subtract off 90 degrees.
-    tibia_deg = math.degrees(0.5 * math.pi - math.acos(tibia_cos))
+    tibia_deg = (config.tibia_sign *
+                 math.degrees(0.5 * math.pi - math.acos(tibia_cos)))
 
     if (tibia_deg < config.tibia_min_deg or
         tibia_deg > config.tibia_max_deg):
@@ -102,7 +111,7 @@ def lizard_3dof_ik(point_mm, config):
 
     # To solve for the femur angle, we first get the angle opposite
     # true_x, then the angle opposite the tibia.
-    true_x_deg = math.degrees(math.atan2(true_x, point_mm.z))
+    true_x_deg = math.degrees(math.atan2(true_x, -point_mm.z))
 
     # Then the angle opposite the tibia is also found the via the law
     # of cosines.
@@ -120,7 +129,7 @@ def lizard_3dof_ik(point_mm, config):
 
     femur_im_deg = math.degrees(math.acos(femur_im_cos))
 
-    femur_deg = (femur_im_deg + true_x_deg) - 90.0
+    femur_deg = config.femur_sign * ((femur_im_deg + true_x_deg) - 90.0)
 
     if (femur_deg < config.femur_min_deg or
         femur_deg > config.femur_max_deg):

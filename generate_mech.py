@@ -30,7 +30,7 @@ PARAMETERS = {
     'chassis_height' : 0.04,
     'height' : 0.4,
     'surface' : '',
-    'effort' : 1.2,
+    'effort' : 2.4,
     }
 
 PREAMBLE = '''<?xml version="1.0"?>

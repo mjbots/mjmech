@@ -3,7 +3,9 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import eventlet
+import math
 import pygazebo
+from pygazebo.msg import joint_cmd_pb2
 
 import herkulex
 
@@ -97,10 +99,12 @@ class GazeboController(object):
         self.manager = pygazebo.Manager()
 
         self.publisher = self.manager.advertise(
-            '/gazebo/default/%s/joint_cmd', 'gazebo.msgs.JointCmd')
+            '/gazebo/default/%s/joint_cmd' % model_name,
+            'gazebo.msgs.JointCmd')
 
         self.subscriber = self.manager.subscribe(
-            '/gazebo/default/%s/joint_cmd', 'gazebo.msgs.JointCmd',
+            '/gazebo/default/%s/joint_cmd' % model_name,
+            'gazebo.msgs.JointCmd',
             self._receive_joint_cmd)
 
         self._servo_names = reduce(
@@ -131,10 +135,10 @@ class GazeboController(object):
 
         self._servo_angles[index] = joint_cmd.position.target
 
-    def set_pose(self, id_to_deg_map):
+    def set_pose(self, id_to_deg_map, pose_time=None):
         for ident, angle in id_to_deg_map.iteritems():
-            self.joint_cmd.name = self.servo_names[ident]
-            self.joint_cmd.position.target = angle
+            self.joint_cmd.name = self._servo_names[ident]
+            self.joint_cmd.position.target = math.radians(angle)
             self.publisher.publish(self.joint_cmd)
             self._servo_angles[ident] = angle
 
@@ -176,8 +180,10 @@ class GazeboController(object):
 
 def servo_controller(servo_type, **kwargs):
     if servo_type == 'herkulex':
+        del kwargs['model_name']
         return HerkuleXController(**kwargs)
     elif servo_type == 'gazebo':
+        del kwargs['serial_port']
         return GazeboController(**kwargs)
     else:
         raise RuntimeError('unknown servo type: ' + servo_type)

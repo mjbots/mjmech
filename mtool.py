@@ -2,10 +2,6 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-# TODO
-#  * Implement single leg IK window
-#    * fix sign on z values
-
 import eventlet
 import functools
 import os
@@ -88,7 +84,9 @@ class ServoTab(object):
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
         self.controller = servo_controller.servo_controller(
-            val, serial_port=self.ui.serialPortCombo.currentText())
+            val,
+            serial_port=self.ui.serialPortCombo.currentText(),
+            model_name=self.ui.modelEdit.text())
         self.ui.statusText.setText('connected')
         self.update_connected(True)
 
@@ -452,17 +450,32 @@ class IkTester(object):
     def update_scene(self):
         self.ik_config = leg_ik.Configuration()
 
-        self.ik_config.coxa_min_deg = self.minimum_values[self.coxa_servo]
-        self.ik_config.coxa_max_deg = self.maximum_values[self.coxa_servo]
+        self.ik_config.coxa_min_deg = (
+            self.minimum_values[self.coxa_servo] -
+            self.idle_values[self.coxa_servo])
+        self.ik_config.coxa_max_deg = (
+            self.maximum_values[self.coxa_servo] -
+            self.idle_values[self.coxa_servo])
         self.ik_config.coxa_length_mm = self.coxa_length_mm
+        self.ik_config.coxa_sign = self.coxa_sign
 
-        self.ik_config.femur_min_deg = self.minimum_values[self.femur_servo]
-        self.ik_config.femur_max_deg = self.maximum_values[self.femur_servo]
+        self.ik_config.femur_min_deg = (
+            self.minimum_values[self.femur_servo] -
+            self.idle_values[self.femur_servo])
+        self.ik_config.femur_max_deg = (
+            self.maximum_values[self.femur_servo] -
+            self.idle_values[self.femur_servo])
         self.ik_config.femur_length_mm = self.femur_length_mm
+        self.ik_config.femur_sign = self.femur_sign
 
-        self.ik_config.tibia_min_deg = self.minimum_values[self.tibia_servo]
-        self.ik_config.tibia_max_deg = self.maximum_values[self.tibia_servo]
+        self.ik_config.tibia_min_deg = (
+            self.minimum_values[self.tibia_servo] -
+            self.idle_values[self.tibia_servo])
+        self.ik_config.tibia_max_deg = (
+            self.maximum_values[self.tibia_servo] -
+            self.idle_values[self.tibia_servo])
         self.ik_config.tibia_length_mm = self.tibia_length_mm
+        self.ik_config.tibia_sign = self.tibia_sign
 
         for (x, y), rect in self.usable_rects.iteritems():
             point_mm = self.coord_to_point((float(x) / self.grid_count,
@@ -486,6 +499,10 @@ class IkTester(object):
         if result is None:
             # This option isn't possible
             return
+
+        result.coxa_deg += self.idle_values[self.coxa_servo]
+        result.femur_deg += self.idle_values[self.femur_servo]
+        result.tibia_deg += self.idle_values[self.tibia_servo]
 
         self.servo_tab.controller.set_pose({
                 self.coxa_servo: result.coxa_deg,
