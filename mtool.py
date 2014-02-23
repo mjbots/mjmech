@@ -4,6 +4,9 @@
 
 # TODO
 #  * Implement single leg IK window
+#    * make plane combo work
+#    * make scale be configurable
+#    * render allowable zone
 
 import eventlet
 import functools
@@ -15,6 +18,7 @@ import ConfigParser
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+import leg_ik
 import mtool_main_window
 import servo_controller
 
@@ -76,6 +80,12 @@ class ServoTab(object):
         for i in range(self.ui.poseList.count()):
             result.append(self.ui.poseList.item(i).text())
         return result
+
+    def pose(self, name):
+        for i in range(self.ui.poseList.count()):
+            if self.ui.poseList.item(i).text() == name:
+                return self.ui.poseList.item(i).data(QtCore.Qt.UserRole)
+        return dict([(i, 0.0) for i in range(self.ui.servoCountSpin.value())])
 
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
@@ -301,10 +311,28 @@ class LegConfig(object):
 
         return result
 
+class IkGraphicsScene(QtGui.QGraphicsScene):
+    sceneMouseMoveEvent = QtCore.Signal(QtCore.QPointF)
+
+    def __init__(self, parent=None):
+        super(IkGraphicsScene, self).__init__(parent)
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() & QtCore.Qt.LeftButton:
+            self.sceneMouseMoveEvent.emit(event.scenePos())
+
+    def mousePressEvent(self, event):
+        pass
+
+    def mouseReleaseEvent(self, event):
+        pass
+
 
 class IkTester(object):
-    def __init__(self, graphics_view):
-        self.graphics_scene = QtGui.QGraphicsScene()
+    def __init__(self, servo_tab, graphics_view):
+        self.servo_tab = servo_tab
+        self.graphics_scene = IkGraphicsScene()
+        self.graphics_scene.sceneMouseMoveEvent.connect(self.handle_mouse_move)
         self.graphics_view = graphics_view
 
         self.graphics_view.setTransform(QtGui.QTransform().scale(1, -1))
@@ -328,17 +356,19 @@ class IkTester(object):
         # Apparently it is really hard to get QGraphicsTextItems to be
         # aligned anything other than left|upper.  Thus, just hack in
         # some offsets which kind of work on my monitor for now.
-        self.label_x_plus.setPlainText('+10mm')
+        self.label_x_plus.setPlainText('+50mm')
         self.label_x_plus.setPos(0.7, 0)
 
-        self.label_x_minus.setPlainText('-10mm')
+        self.label_x_minus.setPlainText('-50mm')
         self.label_x_minus.setPos(-1, 0)
 
-        self.label_y_plus.setPlainText('+10mm')
+        self.label_y_plus.setPlainText('+50mm')
         self.label_y_plus.setPos(0, 1)
 
-        self.label_y_minus.setPlainText('-10mm')
+        self.label_y_minus.setPlainText('-50mm')
         self.label_y_minus.setPos(0, -.9)
+
+        self.ik_config = None
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
@@ -371,8 +401,29 @@ class IkTester(object):
         self.update_scene()
 
     def update_scene(self):
-        pass
+        self.ik_config = leg_ik.Configuration()
 
+        self.ik_config.coxa_min_deg = self.minimum_values[self.coxa_servo]
+        self.ik_config.coxa_max_deg = self.maximum_values[self.coxa_servo]
+        self.ik_config.coxa_length_mm = self.coxa_length_mm
+
+        self.ik_config.femur_min_deg = self.minimum_values[self.femur_servo]
+        self.ik_config.femur_max_deg = self.maximum_values[self.femur_servo]
+        self.ik_config.femur_length_mm = self.femur_length_mm
+
+        self.ik_config.tibia_min_deg = self.minimum_values[self.tibia_servo]
+        self.ik_config.tibia_max_deg = self.maximum_values[self.tibia_servo]
+        self.ik_config.tibia_length_mm = self.tibia_length_mm
+
+    def handle_mouse_move(self, cursor):
+        point_mm = leg_ik.Point3D(self.x_offset_mm + cursor.x() * 50,
+                                  self.y_offset_mm + cursor.y() * 50,
+                                  self.z_offset_mm)
+        result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
+        self.servo_tab.controller.set_pose({
+                self.coxa_servo: result.coxa_deg,
+                self.femur_servo: result.femur_deg,
+                self.tibia_servo: result.tibia_deg})
 
 
 class IkConfigTab(object):
@@ -382,7 +433,7 @@ class IkConfigTab(object):
         self.legs = {}
         self.in_number_changed = BoolContext()
 
-        self.ik_tester = IkTester(self.ui.ikTestView)
+        self.ik_tester = IkTester(servo_tab, self.ui.ikTestView)
 
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
         self.handle_current_changed()
@@ -415,6 +466,8 @@ class IkConfigTab(object):
                      self.ui.tibiaLengthSpin]:
             spin.valueChanged.connect(self.handle_ik_config_change)
 
+        self.handle_ik_config_change()
+
     def handle_current_changed(self, index=1):
         if index != 1:
             return
@@ -440,6 +493,9 @@ class IkConfigTab(object):
                   self.ui.tibiaServoSpin, self.ui.tibiaSignCombo]:
             x.setEnabled(enable)
 
+    def combo_sign(self, combo):
+        return 1 if combo.currentIndex() == 0 else -1
+
     def handle_leg_data_change(self):
         if self.in_number_changed.value:
             return
@@ -451,15 +507,12 @@ class IkConfigTab(object):
                               if self.ui.legPresentCombo.currentIndex() == 0
                               else False)
 
-        def combo_sign(combo):
-            return 1 if combo.currentIndex() == 0 else -1
-
         leg_config.coxa_ident = self.ui.coxaServoSpin.value()
-        leg_config.coxa_sign = combo_sign(self.ui.coxaSignCombo)
+        leg_config.coxa_sign = self.combo_sign(self.ui.coxaSignCombo)
         leg_config.femur_ident = self.ui.femurServoSpin.value()
-        leg_config.femur_sign = combo_sign(self.ui.femurSignCombo)
+        leg_config.femur_sign = self.combo_sign(self.ui.femurSignCombo)
         leg_config.tibia_ident = self.ui.tibiaServoSpin.value()
-        leg_config.tibia_sign = combo_sign(self.ui.tibiaSignCombo)
+        leg_config.tibia_sign = self.combo_sign(self.ui.tibiaSignCombo)
 
         self.update_config_enable()
 
@@ -490,7 +543,27 @@ class IkConfigTab(object):
     def handle_ik_config_change(self):
         # Update the visualization and the IK solver with our new
         # configuration.
-        pass
+        self.ik_tester.set_config(
+            coxa_servo=self.ui.coxaServoSpin.value(),
+            coxa_sign=self.combo_sign(self.ui.coxaSignCombo),
+            femur_servo=self.ui.femurServoSpin.value(),
+            femur_sign=self.combo_sign(self.ui.femurSignCombo),
+            tibia_servo=self.ui.tibiaServoSpin.value(),
+            tibia_sign=self.combo_sign(self.ui.tibiaSignCombo),
+            idle_values=self.servo_tab.pose(
+                self.ui.idleCombo.currentText()),
+            minimum_values=self.servo_tab.pose(
+                self.ui.minimumCombo.currentText()),
+            maximum_values=self.servo_tab.pose(
+                self.ui.maximumCombo.currentText()),
+            x_offset_mm=self.ui.xOffsetSpin.value(),
+            y_offset_mm=self.ui.yOffsetSpin.value(),
+            z_offset_mm=self.ui.zOffsetSpin.value(),
+            coxa_length_mm=self.ui.coxaLengthSpin.value(),
+            femur_length_mm=self.ui.femurLengthSpin.value(),
+            tibia_length_mm=self.ui.tibiaLengthSpin.value(),
+            plane=0
+            )
 
     def get_float_configs(self):
         return [(self.ui.xOffsetSpin, 'x_offset'),
@@ -528,6 +601,7 @@ class IkConfigTab(object):
                 self.legs[i] = LegConfig()
 
         self.handle_leg_number_changed()
+        self.handle_ik_config_change()
 
     def write_settings(self, config):
         config.add_section('ikconfig')
