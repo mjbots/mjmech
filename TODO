@@ -1,12 +1,5 @@
  * herkulex: Limit maximum angle commanded to be in range for servos
 
- * Build simple QT app to:
-   * Use generic servo controller to provide a UI for everything in
-     servo_controller
-   * Port over the IK routines, initially a straight copy
-   * Connect up a second tab or somesuch which allows controlling IK
-     for a single leg.
-
  * Design chassis plate
  * Design turret plate
    * mounting for at least camera, maybe computer
