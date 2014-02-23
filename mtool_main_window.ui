@@ -506,6 +506,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="xOffsetSpin">
+               <property name="minimum">
+                <double>-500.000000000000000</double>
+               </property>
                <property name="maximum">
                 <double>500.000000000000000</double>
                </property>
@@ -520,6 +523,9 @@
              </item>
              <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="yOffsetSpin">
+               <property name="minimum">
+                <double>-500.000000000000000</double>
+               </property>
                <property name="maximum">
                 <double>500.000000000000000</double>
                </property>
@@ -534,6 +540,9 @@
              </item>
              <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="zOffsetSpin">
+               <property name="minimum">
+                <double>-500.000000000000000</double>
+               </property>
                <property name="maximum">
                 <double>500.000000000000000</double>
                </property>
@@ -546,7 +555,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>65</width>
+                 <width>69</width>
                  <height>40</height>
                 </size>
                </property>
@@ -637,7 +646,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>49</width>
+                 <width>53</width>
                  <height>40</height>
                 </size>
                </property>

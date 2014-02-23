@@ -4,9 +4,10 @@
 
 # TODO
 #  * Implement single leg IK window
-#    * make plane combo work
 #    * make scale be configurable
 #    * render allowable zone
+#    * fix sign on z values
+#    * Add a mechanism to switch drive modes on the IK config tab
 
 import eventlet
 import functools
@@ -329,6 +330,10 @@ class IkGraphicsScene(QtGui.QGraphicsScene):
 
 
 class IkTester(object):
+    (PLANE_XY,
+     PLANE_XZ,
+     PLANE_YZ) = range(3)
+
     def __init__(self, servo_tab, graphics_view):
         self.servo_tab = servo_tab
         self.graphics_scene = IkGraphicsScene()
@@ -416,10 +421,26 @@ class IkTester(object):
         self.ik_config.tibia_length_mm = self.tibia_length_mm
 
     def handle_mouse_move(self, cursor):
-        point_mm = leg_ik.Point3D(self.x_offset_mm + cursor.x() * 50,
-                                  self.y_offset_mm + cursor.y() * 50,
+        coord1 = cursor.x() * 50
+        coord2 = cursor.y() * 50
+
+        point_mm = leg_ik.Point3D(self.x_offset_mm,
+                                  self.y_offset_mm,
                                   self.z_offset_mm)
+        if self.plane == self.PLANE_XY:
+            point_mm += leg_ik.Point3D(coord1, coord2, 0.0)
+        elif self.plane == self.PLANE_XZ:
+            point_mm += leg_ik.Point3D(coord1, 0.0, coord2)
+        elif self.plane == self.PLANE_YZ:
+            point_mm += leg_ik.Point3D(0.0, coord1, coord2)
+        else:
+            raise RuntimeError('invalid plane:' + str(self.plane))
+
         result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
+        if result is None:
+            # This option isn't possible
+            return
+
         self.servo_tab.controller.set_pose({
                 self.coxa_servo: result.coxa_deg,
                 self.femur_servo: result.femur_deg,
@@ -540,6 +561,18 @@ class IkConfigTab(object):
 
             self.update_config_enable()
 
+    def get_plane(self):
+        value = self.ui.planeCombo.currentIndex()
+        if value == 0:
+            result = IkTester.PLANE_XY
+        elif value == 1:
+            result = IkTester.PLANE_XZ
+        elif value == 2:
+            result = IkTester.PLANE_YZ
+        else:
+            raise RuntimeError('invalid plane:' + str(value))
+        return result
+
     def handle_ik_config_change(self):
         # Update the visualization and the IK solver with our new
         # configuration.
@@ -562,7 +595,7 @@ class IkConfigTab(object):
             coxa_length_mm=self.ui.coxaLengthSpin.value(),
             femur_length_mm=self.ui.femurLengthSpin.value(),
             tibia_length_mm=self.ui.tibiaLengthSpin.value(),
-            plane=0
+            plane=self.get_plane(),
             )
 
     def get_float_configs(self):
