@@ -4,7 +4,6 @@
 
 # TODO
 #  * Implement single leg IK window
-#    * render allowable zone
 #    * fix sign on z values
 
 import eventlet
@@ -356,6 +355,20 @@ class IkTester(object):
             self.graphics_scene.addLine(-0.02, x / 10., 0.02, x / 10.0)
             self.graphics_scene.addLine(x / 10., -0.02, x / 10.0, 0.02)
 
+        self.usable_rects = {}
+        self.grid_count = 20
+        for x in range(-self.grid_count, self.grid_count + 1):
+            for y in range(-self.grid_count, self.grid_count + 1):
+                self.usable_rects[(x, y)] = \
+                    self.graphics_scene.addRect(
+                    (x - 0.5) / self.grid_count,
+                    (y - 0.5) / self.grid_count,
+                    1.0 / self.grid_count, 1.0 / self.grid_count)
+
+        for rect in self.usable_rects.itervalues():
+            rect.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+            rect.setZValue(-20)
+
         labels = [self.graphics_scene.addText('') for x in range(4)]
         for label in labels:
             label.setFlag(QtGui.QGraphicsItem.ItemIgnoresTransformations)
@@ -418,6 +431,24 @@ class IkTester(object):
         self.update_labels()
         self.update_scene()
 
+    def coord_to_point(self, coord):
+        coord1 = coord[0] * self.scale
+        coord2 = coord[1] * self.scale
+
+        point_mm = leg_ik.Point3D(self.x_offset_mm,
+                                  self.y_offset_mm,
+                                  self.z_offset_mm)
+        if self.plane == self.PLANE_XY:
+            point_mm += leg_ik.Point3D(coord1, coord2, 0.0)
+        elif self.plane == self.PLANE_XZ:
+            point_mm += leg_ik.Point3D(coord1, 0.0, coord2)
+        elif self.plane == self.PLANE_YZ:
+            point_mm += leg_ik.Point3D(0.0, coord1, coord2)
+        else:
+            raise RuntimeError('invalid plane:' + str(self.plane))
+
+        return point_mm
+
     def update_scene(self):
         self.ik_config = leg_ik.Configuration()
 
@@ -433,6 +464,15 @@ class IkTester(object):
         self.ik_config.tibia_max_deg = self.maximum_values[self.tibia_servo]
         self.ik_config.tibia_length_mm = self.tibia_length_mm
 
+        for (x, y), rect in self.usable_rects.iteritems():
+            point_mm = self.coord_to_point((float(x) / self.grid_count,
+                                            float(y) / self.grid_count))
+            result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
+            if result is None:
+                rect.setBrush(QtGui.QBrush(QtCore.Qt.red))
+            else:
+                rect.setBrush(QtGui.QBrush())
+
     def handle_mouse_press(self):
         self.servo_tab.controller.enable_power(servo_controller.POWER_ENABLE)
 
@@ -440,20 +480,7 @@ class IkTester(object):
         self.servo_tab.controller.enable_power(servo_controller.POWER_BRAKE)
 
     def handle_mouse_move(self, cursor):
-        coord1 = cursor.x() * self.scale
-        coord2 = cursor.y() * self.scale
-
-        point_mm = leg_ik.Point3D(self.x_offset_mm,
-                                  self.y_offset_mm,
-                                  self.z_offset_mm)
-        if self.plane == self.PLANE_XY:
-            point_mm += leg_ik.Point3D(coord1, coord2, 0.0)
-        elif self.plane == self.PLANE_XZ:
-            point_mm += leg_ik.Point3D(coord1, 0.0, coord2)
-        elif self.plane == self.PLANE_YZ:
-            point_mm += leg_ik.Point3D(0.0, coord1, coord2)
-        else:
-            raise RuntimeError('invalid plane:' + str(self.plane))
+        point_mm = self.coord_to_point((cursor.x(), cursor.y()))
 
         result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
         if result is None:
