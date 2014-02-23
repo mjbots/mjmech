@@ -7,7 +7,6 @@
 #    * make scale be configurable
 #    * render allowable zone
 #    * fix sign on z values
-#    * Add a mechanism to switch drive modes on the IK config tab
 
 import eventlet
 import functools
@@ -314,6 +313,8 @@ class LegConfig(object):
 
 class IkGraphicsScene(QtGui.QGraphicsScene):
     sceneMouseMoveEvent = QtCore.Signal(QtCore.QPointF)
+    sceneMousePressEvent = QtCore.Signal()
+    sceneMouseReleaseEvent = QtCore.Signal()
 
     def __init__(self, parent=None):
         super(IkGraphicsScene, self).__init__(parent)
@@ -323,10 +324,12 @@ class IkGraphicsScene(QtGui.QGraphicsScene):
             self.sceneMouseMoveEvent.emit(event.scenePos())
 
     def mousePressEvent(self, event):
-        pass
+        if event.button() & QtCore.Qt.LeftButton:
+            self.sceneMousePressEvent.emit()
 
     def mouseReleaseEvent(self, event):
-        pass
+        if event.button() & QtCore.Qt.LeftButton:
+            self.sceneMouseReleaseEvent.emit()
 
 
 class IkTester(object):
@@ -337,7 +340,12 @@ class IkTester(object):
     def __init__(self, servo_tab, graphics_view):
         self.servo_tab = servo_tab
         self.graphics_scene = IkGraphicsScene()
-        self.graphics_scene.sceneMouseMoveEvent.connect(self.handle_mouse_move)
+        self.graphics_scene.sceneMouseMoveEvent.connect(
+            self.handle_mouse_move)
+        self.graphics_scene.sceneMousePressEvent.connect(
+            self.handle_mouse_press)
+        self.graphics_scene.sceneMouseReleaseEvent.connect(
+            self.handle_mouse_release)
         self.graphics_view = graphics_view
 
         self.graphics_view.setTransform(QtGui.QTransform().scale(1, -1))
@@ -419,6 +427,12 @@ class IkTester(object):
         self.ik_config.tibia_min_deg = self.minimum_values[self.tibia_servo]
         self.ik_config.tibia_max_deg = self.maximum_values[self.tibia_servo]
         self.ik_config.tibia_length_mm = self.tibia_length_mm
+
+    def handle_mouse_press(self):
+        self.servo_tab.controller.enable_power(servo_controller.POWER_ENABLE)
+
+    def handle_mouse_release(self):
+        self.servo_tab.controller.enable_power(servo_controller.POWER_BRAKE)
 
     def handle_mouse_move(self, cursor):
         coord1 = cursor.x() * 50
