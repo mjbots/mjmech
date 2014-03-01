@@ -12,6 +12,7 @@
 #include "enter_bootloader.h"
 #include "hw.h"
 #include "i2c.h"
+#include "pwm.h"
 #include "usb_serial.h"
 #include "util.h"
 #include "vcs_version.h"
@@ -248,6 +249,35 @@ static uint8_t cmd_gpc(char* extra_args, char* output, uint8_t output_len,
   return 0;
 }
 
+static uint8_t cmd_pwm(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  uint8_t channel = 0;
+  uint16_t value = 0;
+  uint16_t time_ms = 0;
+  int parsed = 0;
+  int len = strlen(extra_args);
+  if (sscanf_P(extra_args, PSTR(" %x %x %x%n"),
+               &channel, &value, &time_ms, &parsed) != 3 ||
+      parsed != len) {
+    strcpy_P(output, PSTR(STR_PARSE_ERROR));
+    return 1;
+  }
+
+  if (channel > 2) {
+    strcpy_P(output, PSTR(STR_INVALID_PORT));
+    return 1;
+  }
+
+  if (value > 1000) {
+    strcpy_P(output, PSTR(STR_INVALID_VALUE));
+    return 1;
+  }
+
+  pwm_start(channel, value, time_ms);
+  strcpy_P(output, PSTR(STR_OK));
+  return 0;
+}
+
 typedef uint8_t (*cmd_func_ptr)(char *, char*, uint8_t, uint8_t);
 
 struct fw_command_struct {
@@ -289,6 +319,7 @@ static struct fw_command_struct PROGMEM fw_command_table[] = {
   { "I2C", cmd_i2c, (1 << CMD_FLAGS_STREAMABLE) },
   { "GPQ", cmd_gpq, (1 << CMD_FLAGS_STREAMABLE) },
   { "GPC", cmd_gpc, 0 },
+  { "PWM", cmd_pwm, 0 },
 };
 
 #define NUM_FW_COMMAND (sizeof(fw_command_table) / sizeof(*fw_command_table))
@@ -639,6 +670,10 @@ int main(void) {
   DDRA = 0x00;
   PORTA = 0xff; // pull-ups all enabled
 
+  // PORTB are used for PWM out
+  PORTB = 0x00;
+  DDRB = 0xff;
+
   PORTD = 0xf0;
   DDRD = 0xf0;
   DDRF = 0x00; // These are ADC lines.
@@ -646,11 +681,13 @@ int main(void) {
 
   usb_init();
   i2c_init();
+  pwm_init();
 
   // Set up Timer 0 to match compare every 1ms.
   OCR0A = 250;
   TCCR0A = 0x02; // CTC
   TCCR0B = 0x03; // CK/64 (64 * 250 == 16000)
+
 
   wdt_enable(WDT_PERIOD);
 
@@ -700,6 +737,7 @@ int main(void) {
       TIFR0 |= (1 << OCF0A);
       g_timer++;
       stream_timer_update();
+      pwm_timer_update();
       if (g_arm_timer) {
         g_arm_timer--;
         if (!g_arm_timer) {

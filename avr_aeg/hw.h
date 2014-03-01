@@ -19,14 +19,14 @@
    A7 I -
 
   Port B:
-   B0 I -
-   B1 I -
-   B2 I -
-   B3 I -
-   B4 I -
-   B5 I -
-   B6 I -
-   B7 I -
+   B0 O -
+   B1 O -
+   B2 O -
+   B3 O -
+   B4 O -
+   B5 O - PWM OUT
+   B6 O - PWM OUT
+   B7 O - PWM OUT
 
   Port C:
    C0 O -
