@@ -1,0 +1,10 @@
+.dep
+*.eep
+*.hex
+*.elf
+*.map
+*.lst
+*.o
+*.sym
+vcs_version.h
+*.lss
