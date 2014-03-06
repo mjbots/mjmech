@@ -1,9 +1,20 @@
- * herkulex: Limit maximum angle commanded to be in range for servos
+ * Re-measure where AEG mounting holes are
+ * Iterate on AEG mounting plates
+   * fix camera geometry, both top and bottom surfaces are sloped
+     somewhat
+   * get servo holes to be fixed distance away from plate
+   * ensure that AEG mounting holes line up
+   * see if anything looks nice which shrouds the agitator motor
+   * make corners rounded
+   * put holes for spacer supports
+   * move plates to be 30mm apart
+   * switch plates to aluminum thickness
+   * re-draw camera jaw, include spacer support holes
+   * determine if there is room for M2 washers between plate and servo
+     bracket
+    
 
  * Design chassis plate
- * Design turret plate
-   * mounting for at least camera, maybe computer
-   * mounting on pitch axis for weapon
 
  * Order full complement of servos
  * Build power distribution board
@@ -12,9 +23,15 @@
 
  * Model turret
 
+DONE 2014-03-02
+ * First rough draft of turret freecad model
+
+DONE 2014-03-01
+ * Fired AEG from lipo with motor driver
+
 DONE 2014-02-20
-   * Integrated eventlet with QT in a hacky way
-   * Started building simple GUI to drive servos and show IK
+ * Integrated eventlet with QT in a hacky way
+ * Started building simple GUI to drive servos and show IK
 
 DONE 2014-02-18
  * Characterized DRS-0101 servo
