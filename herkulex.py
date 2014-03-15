@@ -4,8 +4,9 @@
 
 import eventlet
 import logging
-import serial
 import threading
+
+import eventlet_serial
 
 logger = logging.getLogger(__name__)
 
@@ -13,32 +14,6 @@ class ChecksumError(RuntimeError):
     def __init__(self, packet):
         super(ChecksumError, self).__init__()
         self.packet = packet
-
-class EventletSerial(object):
-    def __init__(self, raw_serial):
-        self.raw_serial = raw_serial
-        self.sem = eventlet.semaphore.Semaphore()
-
-    def write(self, data):
-        assert self.sem.locked()
-        logger.debug('writing:' + ' '.join(['%02x' % ord(x) for x in data]))
-        to_write = data
-        while len(to_write):
-            eventlet.hubs.trampoline(self.raw_serial.fileno(), write=True)
-            written = self.raw_serial.write(to_write)
-            to_write = to_write[written:]
-
-    def read(self, size):
-        assert self.sem.locked()
-        bytes_remaining = size
-        read_so_far = ""
-        while bytes_remaining > 0:
-            eventlet.hubs.trampoline(self.raw_serial.fileno(), read=True)
-            this_read = self.raw_serial.read(bytes_remaining)
-            bytes_remaining -= len(this_read)
-            read_so_far += this_read
-
-        return read_so_far
 
 class Packet(object):
     servo = None
@@ -111,12 +86,9 @@ class HerkuleX(object):
     REG_TORQUE_CONTROL = 52
 
     def __init__(self, serial_port):
-        self.raw_serial = serial.Serial(
-            port=serial_port, baudrate=115200, timeout=0)
-
         self.baud_rate = 115200
-        self.serial = EventletSerial(self.raw_serial)
-        self._port_sem = eventlet.semaphore.Semaphore(1)
+        self.serial = eventlet_serial.EventletSerial(
+            port=serial_port, baudrate=115200)
 
     def enumerate(self):
         """Enumerate the list of servos on the bus.  Note, this will

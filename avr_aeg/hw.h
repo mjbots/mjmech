@@ -43,7 +43,7 @@
    D1 X - I2C SDA
    D2 I -
    D3 I -
-   D4 O -
+   D4 O - LASER FET
    D5 O -
    D6 O -
 

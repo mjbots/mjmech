@@ -155,6 +155,9 @@ class ServoTab(object):
         if value:
             self.handle_power()
 
+    def set_single_pose(self, servo_id, value):
+        self.controller.set_single_pose(servo_id, value, pose_time=0.2)
+
     def handle_servo_slider(self, servo_id, event):
         if self.servo_update.value:
             return
@@ -163,7 +166,7 @@ class ServoTab(object):
             control = self.servo_controls[servo_id]
             value = control['slider'].value()
             control['doublespin'].setValue(value)
-            eventlet.spawn(self.controller.set_single_pose, servo_id, value)
+            eventlet.spawn(self.set_single_pose, servo_id, value)
 
     def handle_servo_spin(self, servo_id, event):
         if self.servo_update.value:
@@ -173,7 +176,7 @@ class ServoTab(object):
             control = self.servo_controls[servo_id]
             value = control['doublespin'].value()
             control['slider'].setSliderPosition(int(value))
-            eventlet.spawn(self.controller.set_single_pose, servo_id, value)
+            eventlet.spawn(self.set_single_pose, servo_id, value)
 
     def handle_capture_current(self):
         with self.servo_update:
@@ -225,7 +228,7 @@ class ServoTab(object):
             return
 
         values = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
-        self.controller.set_pose(values)
+        self.controller.set_pose(values, pose_time=1.0)
         with self.servo_update:
             for ident, angle_deg in values.iteritems():
                 control = self.servo_controls[ident]

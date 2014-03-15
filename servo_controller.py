@@ -180,10 +180,12 @@ class GazeboController(object):
 
 def servo_controller(servo_type, **kwargs):
     if servo_type == 'herkulex':
-        del kwargs['model_name']
+        if 'model_name' in kwargs:
+            kwargs.pop('model_name')
         return HerkuleXController(**kwargs)
     elif servo_type == 'gazebo':
-        del kwargs['serial_port']
+        if 'serial_port' in kwargs:
+            kwargs.pop('serial_port')
         return GazeboController(**kwargs)
     else:
         raise RuntimeError('unknown servo type: ' + servo_type)
