@@ -148,7 +148,7 @@ class ControlInterface(object):
             ['./send-video.sh', str(addr[0]), str(addr[1])], 
             flags=gobject.SPAWN_DO_NOT_REAP_CHILD)
         self.video_proc = pid
-        self.logger.info('PID %r' % pid)
+        self.logger.info('Started video process, PID %r' % pid)
         gobject.child_watch_add(pid, self._process_died)
 
     def _process_died(self, pid, condition):
