@@ -22,7 +22,7 @@ if test -f $LPID  && kill -0 $(cat $LPID); then
     else
         echo No process to kill
     fi
-    for x in `seq 30 -1 0`; do
+    for x in `seq 50 -1 0`; do
         vs_pid=$(pgrep vserver.py)
         if [[ "$vs_pid" != "" ]]; then break; fi
         if [[ -f /tmp/vserver.log ]]; then
@@ -34,13 +34,14 @@ if test -f $LPID  && kill -0 $(cat $LPID); then
     done
     if [[ "$vs_pid" == "" ]]; then
         echo new process failed to start
-        exit 1
+        EC=1
     else
         echo new process: $(ps --no-headers -l -p $vs_pid)
+        EC=0
     fi
     sleep 1 # give server time to start
     cat -n /tmp/vserver.log
-    exit 0
+    exit $EC
 fi
 
 echo No loop found, starting here

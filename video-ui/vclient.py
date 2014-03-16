@@ -102,15 +102,22 @@ class ControlInterface(object):
         self.logger = logging.getLogger('control')
         self.addr = (host, port)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
         self.sock.setblocking(0)
         self.logger.info('Connecting to %s:%d' % self.addr)
         self.sock.connect(self.addr)
+
         self.seq = 0
+        self.control_dict = dict(
+            video_port=self.VIDEO_PORT,
+            servo_x = 0.5, servo_y = 0.5,
+            )
        
         if opts.external_video:
             self.video = None
         else:
             self.video = VideoWindow(host, self.VIDEO_PORT)
+            self.video.on_video_click_1 = self._handle_video_click_1
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
                          self._on_send_timer)
@@ -121,12 +128,7 @@ class ControlInterface(object):
 
     @wrap_event
     def _on_send_timer(self):
-        self.seq += 1
-        pkt = dict(video_port=self.VIDEO_PORT,
-                   seq=self.seq)
-        self.sock.send(json.dumps(pkt))
-        if self.seq == 3 and self.video:
-            self.video.start()
+        self._send_control()
         return True
 
     @wrap_event
@@ -143,8 +145,24 @@ class ControlInterface(object):
             self._handle_packet(pkt)
         return True
 
+    def _send_control(self):
+        self.seq += 1
+        pkt = self.control_dict.copy()
+        pkt.update(seq=self.seq)
+        self.sock.send(json.dumps(pkt))
+        if self.seq == 3 and self.video:
+            self.video.start()
+
     def _handle_packet(self, pkt):
         self.logger.info('Remote packet: %r' % (pkt, ))
+
+    def _handle_video_click_1(self, pos):
+        """User clicked button 1 on video window.
+        pos is (x, y) tuple in 0..1 range"""
+        self.control_dict['servo_x'] = pos[0]
+        self.control_dict['servo_y'] = pos[1]
+        self._send_control()
+    
 
 class VideoWindow(object):
     def __init__(self, host, port):
@@ -162,7 +180,7 @@ class VideoWindow(object):
         self.drawingarea = Gtk.DrawingArea()
         self.drawingarea.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
                                     Gdk.EventMask.BUTTON_RELEASE_MASK)
-        self.drawingarea.connect("button-press-event", self.on_da_click)        
+        self.drawingarea.connect("button-press-event", self._on_da_click)        
         vbox.add(self.drawingarea)
         self.window.show_all()
         # You need to get the XID after window.show_all().  You shouldn't get it
@@ -198,15 +216,17 @@ class VideoWindow(object):
         for i in range(1, len(play_elements)):
             self.link_pads(play_elements[i-1], None, play_elements[i], None)
         self.play_elements = play_elements
-        self.rtpbin.connect("pad-added", self.on_new_rtpbin_pad)
+        self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
-        bus.connect("message::error", self.on_error)
-        bus.connect("message::eos", self.on_end_of_stream)
-        # TODO mafanasyev: add eos handling (quit)
+        bus.connect("message::error", self._on_error)
+        bus.connect("message::eos", self._on_end_of_stream)
         bus.enable_sync_message_emission()
-        bus.connect('sync-message::element', self.on_sync_message)
+        bus.connect('sync-message::element', self._on_sync_message)
+
+        # Callback functions
+        self.on_video_click_1 = None
 
     def make_element(self, etype, **kwargs):
         elt = Gst.ElementFactory.make(etype)        
@@ -233,20 +253,20 @@ class VideoWindow(object):
         Gtk.main_quit()
 
     @wrap_event
-    def on_new_rtpbin_pad(self, source, pad):
+    def _on_new_rtpbin_pad(self, source, pad):
         name = pad.get_name()
         self.logger.info('Got new rtpbin pad: %r' % (name, ))
         if name.startswith('recv_rtp_src'):
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
 
     @wrap_event
-    def on_sync_message(self, bus, msg):
+    def _on_sync_message(self, bus, msg):
         if msg.get_structure().get_name() == 'prepare-window-handle':
             self.logger.info('Embedding video window')
             msg.src.set_window_handle(self.xid)
 
     @wrap_event
-    def on_error(self, bus, msg):
+    def _on_error(self, bus, msg):
         err, debug = msg.parse_error()
         self.logger.error("GstError: %s" % err)
         if debug:
@@ -254,13 +274,39 @@ class VideoWindow(object):
                 self.logger.info('| %s' % line)
 
     @wrap_event
-    def on_end_of_stream(self, bus, msg):
+    def _on_end_of_stream(self, bus, msg):
         self.logger.info("End of stream: %r" % (msg, ))
 
     @wrap_event
-    def on_da_click(self, src, evt):
-        self.logger.info('Video click at (%d, %d) with button %d' % 
-                         (evt.x, evt.y, evt.button))
+    def _on_da_click(self, src, evt):
+        assert src == self.drawingarea, src
+
+        # Get size of window
+        alloc = self.drawingarea.get_allocation()
+        wnd_size = (alloc.width, alloc.height)
+        #wnd_size = (self.play_elements[-1].get_property('window-width'),
+        #            self.play_elements[-1].get_property('window-height'))
+
+        # Get original size of video stream
+        caps = self.play_elements[-1].sinkpad.get_current_caps()
+        if caps is None:
+            self.logger.info('Video click ignored -- no video is set up')
+            return True
+        struct = caps.get_structure(0)  # Assume these are simple caps with a single struct.
+        video_size = (struct.get_int('width')[1], struct.get_int('height')[1])
+
+        # Calculate image position in (-1..1) range (taking in the account that video is
+        # scaled, but aspect ratio is preserved)
+        scale = min(wnd_size[0] * 1.0 / video_size[0],
+                    wnd_size[1] * 1.0 / video_size[1])
+        rel_pos = (0.5 + (evt.x - wnd_size[0]/2.0) / scale / video_size[0],
+                   0.5 + (evt.y - wnd_size[1]/2.0) / scale / video_size[1])
+        valid=(0 <= rel_pos[0] <= 1 and 0 <= rel_pos[1] <= 1)
+
+        self.logger.info('Video click at wpt=(%d,%d) valid=%d rel=%.3f/%.3f button %d' % 
+                         (evt.x, evt.y, valid, rel_pos[0], rel_pos[1], evt.button))
+        if valid and evt.button == 1 and self.on_video_click_1:
+            self.on_video_click_1(rel_pos)
         return True
 
 def main(opts):
