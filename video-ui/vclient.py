@@ -179,8 +179,11 @@ class VideoWindow(object):
 
         self.drawingarea = Gtk.DrawingArea()
         self.drawingarea.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
-                                    Gdk.EventMask.BUTTON_RELEASE_MASK)
+                                    Gdk.EventMask.BUTTON_RELEASE_MASK |
+                                    Gdk.EventMask.POINTER_MOTION_MASK
+                                    )
         self.drawingarea.connect("button-press-event", self._on_da_click)        
+        self.drawingarea.connect("motion-notify-event", self._on_da_move)
         vbox.add(self.drawingarea)
         self.window.show_all()
         # You need to get the XID after window.show_all().  You shouldn't get it
@@ -204,10 +207,21 @@ class VideoWindow(object):
                                       sync=False, async=False)
         self.link_pads(self.rtpbin, "send_rtcp_src_0", rtcp_sink, None)
 
+        self.textoverlay = self.make_element(
+            "textoverlay",
+            shaded_background=True, font_desc="16", auto_resize=False,
+            valignment="bottom", halignment="left", line_alignment="left",
+            text="Video info\nNo data yet")
+
         play_elements = [
             self.make_element("rtph264depay"),
             self.make_element("h264parse"),
             self.make_element("avdec_h264"),
+            self.make_element("videoconvert"),
+            self.make_element("timeoverlay", shaded_background=True,
+                              font_desc="8",
+                              valignment="bottom", halignment="right"),
+            self.textoverlay,
             ]
         if rotate:
             play_elements.append(self.make_element(
@@ -223,7 +237,7 @@ class VideoWindow(object):
         bus.connect("message::error", self._on_error)
         bus.connect("message::eos", self._on_end_of_stream)
         bus.enable_sync_message_emission()
-        bus.connect('sync-message::element', self._on_sync_message)
+        bus.connect('sync-message::element', self._on_sync_message)       
 
         # Callback functions
         self.on_video_click_1 = None
@@ -277,10 +291,8 @@ class VideoWindow(object):
     def _on_end_of_stream(self, bus, msg):
         self.logger.info("End of stream: %r" % (msg, ))
 
-    @wrap_event
-    def _on_da_click(self, src, evt):
-        assert src == self.drawingarea, src
 
+    def _evt_get_video_coord(self, evt):
         # Get size of window
         alloc = self.drawingarea.get_allocation()
         wnd_size = (alloc.width, alloc.height)
@@ -290,8 +302,7 @@ class VideoWindow(object):
         # Get original size of video stream
         caps = self.play_elements[-1].sinkpad.get_current_caps()
         if caps is None:
-            self.logger.info('Video click ignored -- no video is set up')
-            return True
+            return None
         struct = caps.get_structure(0)  # Assume these are simple caps with a single struct.
         video_size = (struct.get_int('width')[1], struct.get_int('height')[1])
 
@@ -301,11 +312,34 @@ class VideoWindow(object):
                     wnd_size[1] * 1.0 / video_size[1])
         rel_pos = (0.5 + (evt.x - wnd_size[0]/2.0) / scale / video_size[0],
                    0.5 + (evt.y - wnd_size[1]/2.0) / scale / video_size[1])
-        valid=(0 <= rel_pos[0] <= 1 and 0 <= rel_pos[1] <= 1)
+        if (0 <= rel_pos[0] <= 1 and 0 <= rel_pos[1] <= 1):
+            return rel_pos
+        else:
+            return None
 
-        self.logger.info('Video click at wpt=(%d,%d) valid=%d rel=%.3f/%.3f button %d' % 
-                         (evt.x, evt.y, valid, rel_pos[0], rel_pos[1], evt.button))
-        if valid and evt.button == 1 and self.on_video_click_1:
+    @wrap_event
+    def _on_da_move(self, src, evt):
+        assert src == self.drawingarea, src
+        #self.logger.info('DrawingArea move: %r' % ((evt.x, evt.y, evt.state, ), ))
+
+        if evt.state & Gdk.ModifierType.BUTTON1_MASK:
+            # Button is being held.
+            rel_pos = self._evt_get_video_coord(evt)
+            if rel_pos and self.on_video_click_1:
+                self.on_video_click_1(rel_pos)
+
+    @wrap_event
+    def _on_da_click(self, src, evt):
+        assert src == self.drawingarea, src
+        rel_pos = self._evt_get_video_coord(evt)
+        if rel_pos is None:
+            self.logger.info('Video click outside of image at wpt=(%d,%d) button=%d state=%d' % 
+                             (evt.x, evt.y, evt.button, evt.state))
+            return True
+
+        self.logger.info('Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d' % 
+                         (evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state))
+        if evt.button == 1 and self.on_video_click_1:
             self.on_video_click_1(rel_pos)
         return True
 
