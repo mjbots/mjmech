@@ -165,7 +165,7 @@ class ControlInterface(object):
     
 
 class VideoWindow(object):
-    def __init__(self, host, port):
+    def __init__(self, host, port, rotate=False):
         self.host = host
         self.port = port
         self.logger = logging.getLogger('video')
@@ -209,7 +209,7 @@ class VideoWindow(object):
             self.make_element("h264parse"),
             self.make_element("avdec_h264"),
             ]
-        if 1:
+        if rotate:
             play_elements.append(self.make_element(
                     "videoflip", method="clockwise"))
         play_elements.append(self.make_element("xvimagesink"))

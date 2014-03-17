@@ -68,7 +68,7 @@ class SerialControl(object):
     BAUDRATE = 57600
 
     def __init__(self):
-        self.pos = (0.5, 0.5)
+        self.pos = None
         self.send_count = 0
 
         # We are not using dev's read/write methods, as they
@@ -84,24 +84,41 @@ class SerialControl(object):
     def on_timer(self):
         self._send_packet()
 
-    def set_pos(self, x, y):
-        new_pos = (min(1, max(0, x)),
-                   min(1, max(0, y)))
+    def set_pos(self, pos):
+        if pos is None:
+            if self.pos is not None:
+                self.send_count = 0
+            new_pos = None
+        else:
+            if self.pos is None:
+                self.send_count = 0
+            new_pos = (min(1, max(0, pos[0])),
+                       min(1, max(0, pos[1])))
         if new_pos == self.pos:
             return
         self.pos = new_pos
         self._send_packet()
 
     def _send_packet(self):
+        self.send_count += 1
         data = []
-        if (self.send_count % 20) == 0:
-            # Pins 3 and 5 to servo mode
-            data += [0xF4, 3, 4, 0xF4, 5, 4]
-        # map 0..1 positions to degrees for firmata
-        dvals = (int(60 + 60 * self.pos[0]),
-                 int(60 + 60 * self.pos[1]))
-        for pin, d_val in zip([3, 5], dvals):
-            data += [0xE0 | pin, d_val & 0x7F, (d_val >> 7) & 0x7F]
+        if self.pos is not None:
+            if (self.send_count % 20) == 1:
+                # Set pins 3 and 5 to servo mode
+                data += [0xF4, 3, 4, 0xF4, 5, 4]
+            # map 0..1 positions to degrees for firmata
+            dvals = (int(60 + 60 * self.pos[0]),
+                     int(60 + 60 * self.pos[1]))
+            for pin, d_val in zip([3, 5], dvals):
+                data += [0xE0 | pin, d_val & 0x7F, (d_val >> 7) & 0x7F]
+        else:
+            if (self.send_count % 20) == 1:
+                # Set pins 3 and 5 to output (DC) mode
+                data += [0xF4, 3, 1, 0xF4, 5, 1]
+            # No values
+
+        if not data:
+            return
         data_bin = ''.join(chr(x) for x in data)
         written = os.write(self.serial_fd, data_bin)
         assert written == len(data_bin), (written, len(data_bin))
@@ -169,6 +186,8 @@ class ControlInterface(object):
         self.logger.info('Remote peer address is now %r' % (addr, ))
         self.src_addr = addr
         self._set_video_dest(None)
+        if self.serial_control:
+            self.serial_control.set_pos(None)
 
     def _handle_packet(self, pkt_bin):
         self.recent_packets += 1
@@ -185,7 +204,7 @@ class ControlInterface(object):
         self.last_seq = pkt['seq']
 
         if 'servo_x' in pkt and 'servo_y' in pkt and self.serial_control:
-            self.serial_control.set_pos(pkt['servo_x'], pkt['servo_y'])
+            self.serial_control.set_pos((pkt['servo_x'], pkt['servo_y']))
 
         #self.logger.debug('Remote packet: %r' % (pkt, ))
 
