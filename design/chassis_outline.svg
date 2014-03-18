@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="New document 1">
+   sodipodi:docname="chassis_outline.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="407.86219"
-     inkscape:cy="378.32722"
+     inkscape:zoom="0.7"
+     inkscape:cx="306.38088"
+     inkscape:cy="370.03005"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -44,11 +44,11 @@
        id="guide3755" />
     <sodipodi:guide
        orientation="1,0"
-       position="708.66142,-184.28571"
+       position="637.79528,-184.28571"
        id="guide3757" />
     <sodipodi:guide
        orientation="0,1"
-       position="913.1779,708.66142"
+       position="913.1779,637.79528"
        id="guide3759" />
     <sodipodi:guide
        orientation="0,1"
@@ -74,10 +74,10 @@
     <rect
        style="fill:#ffcac8;fill-opacity:1;stroke:#000000;stroke-width:0.5573222;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3826"
-       width="708.66144"
-       height="708.66144"
+       width="637.79529"
+       height="637.79529"
        x="0"
-       y="343.70078"
+       y="414.56689"
        ry="0" />
     <text
        xml:space="preserve"
@@ -92,7 +92,7 @@
          y="262.36218" /></text>
     <g
        id="g3785"
-       transform="translate(63.808709,195.07329)">
+       transform="translate(-14.76272,255.07329)">
       <rect
          ry="0"
          y="176.47917"
@@ -115,7 +115,7 @@
     </g>
     <g
        id="g3790"
-       transform="translate(57.257571,323.29088)">
+       transform="translate(-11.313858,316.14802)">
       <rect
          y="527.95276"
          x="177.16534"
@@ -137,7 +137,7 @@
     </g>
     <g
        id="g3795"
-       transform="translate(-134.45603,-205.14509)">
+       transform="translate(-143.02746,-179.4308)">
       <rect
          y="811.4173"
          x="177.16534"
@@ -163,7 +163,7 @@
     </g>
     <g
        id="g3821"
-       transform="matrix(0.5,0.8660254,-0.8660254,0.5,1718.4364,74.847386)">
+       transform="matrix(0.5,0.8660254,-0.8660254,0.5,1659.865,150.56168)">
       <rect
          y="981.65137"
          x="-310.97119"
@@ -185,7 +185,7 @@
            sodipodi:role="line">Servo</tspan></text>
     </g>
     <g
-       transform="matrix(0.5,-0.8660254,0.8660254,0.5,-123.3693,260.19773)"
+       transform="matrix(0.5,-0.8660254,0.8660254,0.5,-181.94073,264.48344)"
        id="g3828">
       <rect
          style="fill:#81ff7e;fill-opacity:1;stroke:#000000;stroke-width:0.35433072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -209,7 +209,7 @@
     </g>
     <g
        id="g3836"
-       transform="matrix(0.5,-0.8660254,0.8660254,0.5,-741.97557,-387.51223)">
+       transform="matrix(0.5,-0.8660254,0.8660254,0.5,-740.02625,-317.51223)">
       <rect
          y="981.65137"
          x="-310.97119"
@@ -255,7 +255,7 @@
     </g>
     <g
        id="g3858"
-       transform="translate(1134.1174,-542.20594)">
+       transform="translate(1061.2603,-516.49165)">
       <rect
          y="1052.3622"
          x="-424.26407"
@@ -278,7 +278,7 @@
            sodipodi:role="line">Target</tspan></text>
     </g>
     <g
-       transform="translate(388.98985,-539.5221)"
+       transform="translate(390.71429,-499.5221)"
        id="g3863">
       <rect
          style="fill:#fbc8ff;fill-opacity:1;stroke:#000000;stroke-width:0.35433072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -303,7 +303,7 @@
     </g>
     <g
        id="g3871"
-       transform="matrix(0,1,-1,0,1599.5453,733.56782)">
+       transform="matrix(0,1,-1,0,1545.2596,804.99639)">
       <rect
          y="1052.3622"
          x="-424.26407"
@@ -326,7 +326,7 @@
            sodipodi:role="line">Target</tspan></text>
     </g>
     <g
-       transform="matrix(0,1,-1,0,1615.9529,1480.6861)"
+       transform="matrix(0,1,-1,0,1543.0958,1480.6861)"
        id="g3879">
       <rect
          style="fill:#fbc8ff;fill-opacity:1;stroke:#000000;stroke-width:0.35433072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -351,7 +351,7 @@
     </g>
     <g
        id="g3895"
-       transform="translate(898.22479,-582.4285)">
+       transform="translate(839.65336,-486.71421)">
       <rect
          y="1279.1338"
          x="-354.33072"
@@ -411,9 +411,61 @@
            style="font-size:20px" /></text>
     </g>
     <g
+       id="g3966"
+       transform="translate(430,-125.71429)">
+      <rect
+         y="509.50504"
+         x="547.14288"
+         height="157.14285"
+         width="120"
+         id="rect3958"
+         style="opacity:0.32618025;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:0.35433072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3960"
+         y="578.07648"
+         x="565.71429"
+         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
+         xml:space="preserve"><tspan
+           y="578.07648"
+           x="565.71429"
+           id="tspan3962"
+           sodipodi:role="line">Power</tspan><tspan
+           id="tspan3964"
+           y="613.07648"
+           x="565.71429"
+           sodipodi:role="line">Dist</tspan></text>
+    </g>
+    <g
+       id="g4009"
+       transform="translate(-74.285714,60)">
+      <rect
+         style="fill:#81ff7e;fill-opacity:1;stroke:#000000;stroke-width:0.35433072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="rect3993"
+         width="170.07874"
+         height="225.79303"
+         x="512.70929"
+         y="476.27225" />
+      <text
+         xml:space="preserve"
+         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
+         x="551.25824"
+         y="544.35999"
+         id="text3995"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           x="551.25824"
+           y="544.35999"
+           id="tspan3999">Power</tspan><tspan
+           id="tspan4007"
+           sodipodi:role="line"
+           x="551.25824"
+           y="579.35999">Dist</tspan></text>
+    </g>
+    <g
        id="g3948"
        style="opacity:0.32618025"
-       transform="translate(-111.49912,-604.93704)">
+       transform="translate(-164.35626,-573.50846)">
       <path
          sodipodi:end="3.1415927"
          sodipodi:start="0"
@@ -473,31 +525,6 @@
              x="-1098.7673"
              y="-258.49359">Servo</tspan></text>
       </g>
-    </g>
-    <g
-       id="g3966">
-      <rect
-         y="509.50504"
-         x="547.14288"
-         height="157.14285"
-         width="120"
-         id="rect3958"
-         style="opacity:0.32618025;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:0.35433072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text3960"
-         y="578.07648"
-         x="565.71429"
-         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
-         xml:space="preserve"><tspan
-           y="578.07648"
-           x="565.71429"
-           id="tspan3962"
-           sodipodi:role="line">Power</tspan><tspan
-           id="tspan3964"
-           y="613.07648"
-           x="565.71429"
-           sodipodi:role="line">Dist</tspan></text>
     </g>
   </g>
 </svg>
