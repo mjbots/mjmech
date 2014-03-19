@@ -41,8 +41,8 @@
   Port D:
    D0 X - I2C SCL
    D1 X - I2C SDA
-   D2 I -
-   D3 I -
+   D2 I - RXD
+   D3 O - TXD
    D4 O - LASER FET
    D5 O -
    D6 O -
