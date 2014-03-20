@@ -1,0 +1,28 @@
+installing packages in precise:
+
+pushd ~/proj/mjmech/
+sudo apt-get install python-gst
+sudo apt-get install python-gstreamer
+sudo apt-add-repository ppa:gstreamer-developers/ppa
+sudo apt-get update
+sudo apt-get upgrade
+
+cd gst-python1.0-1.1.90/
+sudo apt-get install gstreamer-1.0-dev
+sudo apt-get install gstreamer-1.0
+sudo apt-get install libgstreamer1.0-dev
+sudo apt-get install python-gi-dev python-gobject-2-dev
+ ./configure
+make
+sudo checkinstall
+
+sudo dpkg -i gst-python1.0_1.1.90-1_amd64.deb
+
+sudo apt-get install gstreamer1.0-plugins-{base,good}
+sudo apt-get install gstreamer1.0-plugins-{bad,ugly}
+sudo apt-get install gstreamer1.0-libav
+
+sudo apt-get install gstreamer1.0-tools
+sudo apt-get install python-gi-dbg
+sudo apt-get install libglib2.0-0-dbg
+sudo apt-get install libgstreamer1.0-0-dbg gstreamer1.0-plugins-good-dbg
