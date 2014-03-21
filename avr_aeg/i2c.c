@@ -39,30 +39,6 @@ static uint8_t i2c_transact(uint8_t cmd,
   return 0;
 }
 
-/** Parse 2 hex digits from the given string and stores them into
- * *val.  In unparseable, return non-zero. */
-static uint8_t parse_hex2(char**arg, uint8_t* val) {
-  uint8_t v;
-  *val = 0;
-  for (v = 0; v < 2; v++) {
-    // Skip some characters.
-    while (**arg == ' ' || **arg == ':') {
-      (*arg)++;
-    }
-    if (**arg >= '0' && **arg <= '9') {
-      *val = (*val << 4) | (**arg - '0');
-    } else if (**arg >= 'a' && **arg <= 'f') {
-      *val = (*val << 4) | (**arg - 'a' + 10);
-    } else if (**arg >= 'A' && **arg <= 'F') {
-      *val = (*val << 4) | (**arg - 'A' + 10);
-    } else {
-      return I2C_ERR_BADHEX;
-    }
-    (*arg)++;
-  }
-  return 0;
-}
-
 static uint8_t is_hex(char val) {
   return (val >= '0' && val <= '9') ||
       (val >= 'a' && val <= 'f') ||

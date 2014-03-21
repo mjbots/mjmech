@@ -13,6 +13,7 @@
 #include "hw.h"
 #include "i2c.h"
 #include "pwm.h"
+#include "serial.h"
 #include "usb_serial.h"
 #include "util.h"
 #include "vcs_version.h"
@@ -35,6 +36,13 @@
 #define STR_STREAM_ID_IN_USE " stream id in use"
 #define STR_STREAM_TABLE_FULL " stream table full"
 #define STR_STREAM_NOT_FOUND " stream not found"
+#define STR_INVALID_BAUD " invalid baud"
+#define STR_INVALID_PARITY " invalid parity"
+#define STR_INVALID_CHAR_SIZE " invalid char size"
+#define STR_INVALID_STOP_BITS " invalid stop bits"
+#define STR_UNKNOWN_SERIAL_ERROR " unknown serial err "
+#define STR_OVERFLOW " overflow"
+#define STR_SRD "!SRD "
 
 #define WDT_PERIOD WDTO_15MS
 
@@ -278,6 +286,127 @@ static uint8_t cmd_pwm(char* extra_args, char* output, uint8_t output_len,
   return 0;
 }
 
+static uint8_t cmd_src(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  uint32_t baud_rate = 0;
+  char char_size = 0;
+  char parity = 0;
+  char stop_bits = 0;
+  int parsed = 0;
+  int len = strlen(extra_args);
+  if (sscanf_P(extra_args, PSTR(" %ld %c%c%c%n"),
+               &baud_rate, &char_size, &parity, &stop_bits, &parsed) != 4 ||
+      parsed != len) {
+    strcpy_P(output, PSTR(STR_PARSE_ERROR));
+    return 1;
+  }
+
+  uint8_t parity_enum = 255;
+  if (parity == 'N') {
+    parity_enum = SERIAL_PARITY_NONE;
+  } else if (parity == 'E') {
+    parity_enum = SERIAL_PARITY_EVEN;
+  } else if (parity == 'O') {
+    parity_enum = SERIAL_PARITY_ODD;
+  }
+
+  uint8_t result =
+      serial_configure(baud_rate,
+                       char_size - '0',
+                       parity_enum,
+                       stop_bits - '0');
+  if (result != 0) {
+    switch (result) {
+      case SERIAL_ERR_INVALID_BAUD: {
+        strcpy_P(output, PSTR(STR_INVALID_BAUD));
+        break;
+      }
+      case SERIAL_ERR_INVALID_PARITY: {
+        strcpy_P(output, PSTR(STR_INVALID_PARITY));
+        break;
+      }
+      case SERIAL_ERR_INVALID_CHAR_SIZE: {
+        strcpy_P(output, PSTR(STR_INVALID_CHAR_SIZE));
+        break;
+      }
+      case SERIAL_ERR_INVALID_STOP_BITS: {
+        strcpy_P(output, PSTR(STR_INVALID_STOP_BITS));
+        break;
+      }
+      default: {
+        strcpy_P(output, PSTR(STR_UNKNOWN_SERIAL_ERROR));
+        uint8_t len = strlen(output);
+        char* ptr = output + len;
+        uint8_to_hex(&ptr, result);
+        output[len + 2] = 0;
+        break;
+      }
+    }
+    return 1;
+  }
+  strcpy_P(output, PSTR(STR_OK));
+  return 0;
+}
+
+static uint8_t cmd_srt(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  char* ptr = extra_args;
+  while (*ptr) {
+    uint8_t val = 0;
+    uint8_t result = parse_hex2(&ptr, &val);
+    if (result != 0) {
+      strcpy_P(output, PSTR(STR_PARSE_ERROR));
+      return 1;
+    }
+
+    result = serial_putchar(val);
+    if (result != 0) {
+      strcpy_P(output, PSTR(STR_OVERFLOW));
+      return 1;
+    }
+  }
+
+  strcpy_P(output, PSTR(STR_OK));
+  return 0;
+}
+
+static uint8_t cmd_srg(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  uint32_t baud_rate = serial_get_baud();
+  uint8_t parity = serial_get_parity();
+  uint8_t char_size = serial_get_char_size();
+  uint8_t stop_bits = serial_get_stop_bits();
+
+  uint8_t parity_char = 'N';
+  switch (parity) {
+    case SERIAL_PARITY_NONE: { parity_char = 'N'; break; }
+    case SERIAL_PARITY_EVEN: { parity_char = 'E'; break; }
+    case SERIAL_PARITY_ODD: { parity_char = 'O'; break; }
+  }
+  sprintf_P(output,
+            PSTR(" %ld %c%c%c"),
+            baud_rate, char_size + '0', parity_char, stop_bits + '0');
+  return 0;
+}
+
+static void check_serial_data(void) {
+  if (!serial_available()) { return; }
+
+  char buffer[64];
+  strcpy_P(buffer, PSTR(STR_SRD));
+  char *ptr = buffer + strlen(buffer);
+  char *end = buffer + sizeof(buffer);
+
+  while (serial_available() && (end - ptr) > 5) {
+    int16_t result = serial_getchar();
+    if (result < 0) { break; }
+    uint8_to_hex(&ptr, result);
+  }
+  *ptr = 0;
+  strcat_P(buffer, PSTR(EOL));
+  usb_serial_write((uint8_t*) buffer, strlen(buffer));
+}
+
 typedef uint8_t (*cmd_func_ptr)(char *, char*, uint8_t, uint8_t);
 
 struct fw_command_struct {
@@ -320,6 +449,9 @@ static struct fw_command_struct PROGMEM fw_command_table[] = {
   { "GPQ", cmd_gpq, (1 << CMD_FLAGS_STREAMABLE) },
   { "GPC", cmd_gpc, 0 },
   { "PWM", cmd_pwm, 0 },
+  { "SRC", cmd_src, 0 },
+  { "SRT", cmd_srt, 0 },
+  { "SRG", cmd_srg, 0 },
 };
 
 #define NUM_FW_COMMAND (sizeof(fw_command_table) / sizeof(*fw_command_table))
@@ -682,6 +814,7 @@ int main(void) {
   usb_init();
   i2c_init();
   pwm_init();
+  serial_init();
 
   // Set up Timer 0 to match compare every 1ms.
   OCR0A = 250;
@@ -752,5 +885,6 @@ int main(void) {
 
     stream_poll();
     usb_poll();
+    check_serial_data();
   }
 }

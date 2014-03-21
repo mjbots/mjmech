@@ -231,3 +231,31 @@ channel.  Both 'duty' and 'length_ms' are input in hex.  'duty' is
 specified between 0 and 3e8 (0-1000 decimal).  Length is between 0 and
 ffff (0ms and 65.535s).  Channel is either 0, 1, or 2, corresponding
 to B5, B6, or B7.
+
+== Serial ==
+
+Command: SRC baud format
+Example: "SRC 115200 8N1\n"
+Response: "<SRC OK\n"
+
+Configure the external asynchronous serial stream.
+
+
+Command: SRT data
+Example: "SRT 68656C6C6F\n"
+Response: "<SRT OK\n"
+
+Transmit serial data.  The data itself should be hex encoded.
+
+
+Spontaneous: !SRD data
+Example: "!SRD 7468657265\n"
+
+Spontaneous emitted when asynchronous serial data is received.
+
+
+Command: SRG
+Example: "SRG\n"
+Response: "<SRG 9600 8N1\n"
+
+Retrieve the current serial configuration.
