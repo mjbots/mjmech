@@ -859,7 +859,7 @@ int main(void) {
   PORTB = 0x00;
   DDRB = 0xff;
 
-  PORTD = 0xf0;
+  PORTD = 0x00;
   DDRD = 0xf0;
   DDRF = 0x00; // These are ADC lines.
   PORTF = 0x00;
