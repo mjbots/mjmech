@@ -1,5 +1,6 @@
 // Copyright 2012-2014 Josh Pieper.  All rights reserved.
 
+#include <avr/eeprom.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -426,6 +427,25 @@ static void check_serial_data(void) {
   usb_serial_write((uint8_t*) buffer, strlen(buffer));
 }
 
+static uint8_t cmd_wdt(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  for (;;);
+  return 0;
+}
+
+static uint8_t cmd_wpc(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  char* ptr = output;
+  *ptr++ = ' ';
+  uint16_t val = eeprom_read_word(0);
+  /* The PC is stored in reverse order, and is off by a factor of 2
+   * from what avr-objdump reports. */
+  val = 2 * (((val & 0xff) << 8) | (val >> 8));
+  uint16_to_hex(&ptr, val);
+  *ptr = 0;
+  return 0;
+}
+
 typedef uint8_t (*cmd_func_ptr)(char *, char*, uint8_t, uint8_t);
 
 struct fw_command_struct {
@@ -471,6 +491,8 @@ static struct fw_command_struct PROGMEM fw_command_table[] = {
   { "SRC", cmd_src, 0 },
   { "SRT", cmd_srt, 0 },
   { "SRG", cmd_srg, 0 },
+  { "WDT", cmd_wdt, 0 },
+  { "WPC", cmd_wpc, 0 },
 };
 
 #define NUM_FW_COMMAND (sizeof(fw_command_table) / sizeof(*fw_command_table))
@@ -811,6 +833,18 @@ void get_mcusr(void)
   wdt_disable();
 }
 
+ISR(WDT_vect) {
+  // Whoops, we hit the watchdog.
+
+  /* Try to save the PC on the stack into EEPROM for later analysis.
+   * The offset was determined by examining the generated assembly and
+   * some trial and error. */
+  uint16_t *ptr = (uint16_t *) (SP + 17);
+  eeprom_write_word(0, *ptr);
+
+  for (;;);
+}
+
 /** The MAIN loop. */
 int main(void) {
   // Turn off the CPU prescale.
@@ -840,8 +874,12 @@ int main(void) {
   TCCR0A = 0x02; // CTC
   TCCR0B = 0x03; // CK/64 (64 * 250 == 16000)
 
-
-  wdt_enable(WDT_PERIOD);
+  /* We enable the watchdog manually, in order to configure it for
+   * interrupt and system reset mode. */
+  cli();
+  wdt_reset();
+  WDTCSR = (1 << WDCE) | (1 << WDE);
+  WDTCSR = (1 << WDE) | (1 << WDIF) | (1 << WDIE) | WDT_PERIOD;
 
   sei();
   char line_buf[64];

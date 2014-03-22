@@ -162,6 +162,21 @@ characters the limit may be less.  If an overflow or faulty string is
 encountered, the valid results up until that point are emitted, and
 any streaming is stopped.
 
+
+Command: WDT
+Example: "WDT\n"
+Response: None
+
+Exercise the watchdog timer by entering an infinite loop.
+
+
+Command: WPC
+Example: "WPC\n"
+Response: "<WPC 06E4\n"
+
+Return the program counter observed during the last watchdog system
+reset.
+
 == I2C ==
 
 Command: I2C command
