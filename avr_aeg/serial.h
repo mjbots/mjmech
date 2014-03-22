@@ -32,7 +32,8 @@ void serial_init(void);
 uint8_t serial_configure(uint32_t baud_rate,
                          uint8_t char_size,
                          uint8_t parity,
-                         uint8_t stop_bits);
+                         uint8_t stop_bits,
+                         uint8_t full_duplex);
 
 /** Return non-zero if data is available to read. */
 uint8_t serial_available(void);
@@ -51,3 +52,4 @@ uint32_t serial_get_baud(void);
 uint8_t serial_get_char_size(void);
 uint8_t serial_get_parity(void);
 uint8_t serial_get_stop_bits(void);
+uint8_t serial_get_full_duplex(void);

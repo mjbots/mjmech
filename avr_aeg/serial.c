@@ -9,6 +9,7 @@ static uint32_t g_baud_rate;
 static uint8_t g_char_size;
 static uint8_t g_parity;
 static uint8_t g_stop_bits;
+static uint8_t g_full_duplex;
 
 #define BUFFER_SIZE 64
 static uint8_t g_recv_buffer[BUFFER_SIZE];
@@ -20,7 +21,7 @@ static uint8_t g_send_buffer_start, g_send_buffer_end;
 static uint8_t g_error;
 
 void serial_init(void) {
-  serial_configure(115200, 8, SERIAL_PARITY_NONE, 1);
+  serial_configure(115200, 8, SERIAL_PARITY_NONE, 1, 0);
 }
 
 static uint32_t abs32(int32_t value) {
@@ -31,7 +32,8 @@ static uint32_t abs32(int32_t value) {
 uint8_t serial_configure(uint32_t baud_rate,
                          uint8_t char_size,
                          uint8_t parity,
-                         uint8_t stop_bits) {
+                         uint8_t stop_bits,
+                         uint8_t full_duplex) {
   if (baud_rate < 300) {
     return SERIAL_ERR_INVALID_BAUD;
   }
@@ -75,7 +77,7 @@ uint8_t serial_configure(uint32_t baud_rate,
 
   UBRR1 = best_ubrr;
   UCSR1A = (1 << U2X1);
-  UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);
+  UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1) | (1 << TXCIE1);
   UCSR1C = (parity << UPM10) |
            ((stop_bits == 2 ? 1 : 0) << USBS1) |
            ((char_size - 5) << UCSZ10);
@@ -138,6 +140,10 @@ uint8_t serial_putchar(uint8_t data) {
   /* If there is some data in the buffer now, then start the interrupt
    * back up. */
   if (g_send_buffer_end != g_send_buffer_start) {
+    // If we are half duplex, disable the receiver.
+    if (!g_full_duplex) {
+      UCSR1B &= ~(1 << RXEN1);
+    }
     UCSR1B |= (1 << UDRIE1);
   }
 
@@ -169,6 +175,10 @@ uint8_t serial_get_stop_bits(void) {
   return g_stop_bits;
 }
 
+uint8_t serial_get_full_duplex(void) {
+  return g_full_duplex;
+}
+
 ISR(USART1_RX_vect) {
   uint8_t next = (g_recv_buffer_end + 1) % BUFFER_SIZE;
   uint8_t data = UDR1;
@@ -189,5 +199,15 @@ ISR(USART1_UDRE_vect) {
   if (g_send_buffer_end == g_send_buffer_start) {
     // Turn off this interrupt because we're all done.
     UCSR1B &= ~(1 << UDRIE1);
+  }
+}
+
+ISR(USART1_TX_vect) {
+  if (g_send_buffer_end == g_send_buffer_start) {
+    /* If we have finished transmitting, with nothing left to send,
+     * then re-enable the receiver. */
+    if (!g_full_duplex) {
+      UCSR1B |= (1 << RXEN1);
+    }
   }
 }

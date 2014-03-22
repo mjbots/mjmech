@@ -235,10 +235,13 @@ to B5, B6, or B7.
 == Serial ==
 
 Command: SRC baud format
-Example: "SRC 115200 8N1\n"
+Example: "SRC 115200 8N1H\n"
 Response: "<SRC OK\n"
 
-Configure the external asynchronous serial stream.
+Configure the external asynchronous serial stream.  The baud rate,
+character size, parity, and stop bits follows standard formatting
+conventions.  The final character is 'H' for half duplex or 'F' for
+full duplex.
 
 
 Command: SRT data
@@ -256,6 +259,6 @@ Spontaneous emitted when asynchronous serial data is received.
 
 Command: SRG
 Example: "SRG\n"
-Response: "<SRG 9600 8N1\n"
+Response: "<SRG 9600 8N1F\n"
 
 Retrieve the current serial configuration.

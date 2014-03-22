@@ -292,10 +292,12 @@ static uint8_t cmd_src(char* extra_args, char* output, uint8_t output_len,
   char char_size = 0;
   char parity = 0;
   char stop_bits = 0;
+  char duplex = 0;
   int parsed = 0;
   int len = strlen(extra_args);
-  if (sscanf_P(extra_args, PSTR(" %ld %c%c%c%n"),
-               &baud_rate, &char_size, &parity, &stop_bits, &parsed) != 4 ||
+  if (sscanf_P(extra_args, PSTR(" %ld %c%c%c%c%n"),
+               &baud_rate, &char_size, &parity, &stop_bits, &duplex,
+               &parsed) != 4 ||
       parsed != len) {
     strcpy_P(output, PSTR(STR_PARSE_ERROR));
     return 1;
@@ -308,13 +310,27 @@ static uint8_t cmd_src(char* extra_args, char* output, uint8_t output_len,
     parity_enum = SERIAL_PARITY_EVEN;
   } else if (parity == 'O') {
     parity_enum = SERIAL_PARITY_ODD;
+  } else {
+    strcpy_P(output, PSTR(STR_PARSE_ERROR));
+    return 1;
+  }
+
+  uint8_t duplex_enum = 0;
+  if (duplex == 'F') {
+    duplex_enum = 1;
+  } else if (duplex == 'H') {
+    duplex_enum = 0;
+  } else {
+    strcpy_P(output, PSTR(STR_PARSE_ERROR));
+    return 1;
   }
 
   uint8_t result =
       serial_configure(baud_rate,
                        char_size - '0',
                        parity_enum,
-                       stop_bits - '0');
+                       stop_bits - '0',
+                       duplex_enum);
   if (result != 0) {
     switch (result) {
       case SERIAL_ERR_INVALID_BAUD: {
@@ -376,6 +392,7 @@ static uint8_t cmd_srg(char* extra_args, char* output, uint8_t output_len,
   uint8_t parity = serial_get_parity();
   uint8_t char_size = serial_get_char_size();
   uint8_t stop_bits = serial_get_stop_bits();
+  uint8_t duplex = serial_get_full_duplex();
 
   uint8_t parity_char = 'N';
   switch (parity) {
@@ -383,9 +400,11 @@ static uint8_t cmd_srg(char* extra_args, char* output, uint8_t output_len,
     case SERIAL_PARITY_EVEN: { parity_char = 'E'; break; }
     case SERIAL_PARITY_ODD: { parity_char = 'O'; break; }
   }
+  uint8_t duplex_char = duplex ? 'F' : 'H';
   sprintf_P(output,
-            PSTR(" %ld %c%c%c"),
-            baud_rate, char_size + '0', parity_char, stop_bits + '0');
+            PSTR(" %ld %c%c%c%x"),
+            baud_rate, char_size + '0', parity_char, stop_bits + '0',
+            duplex_char);
   return 0;
 }
 
@@ -871,6 +890,7 @@ int main(void) {
       g_timer++;
       stream_timer_update();
       pwm_timer_update();
+      check_serial_data();
       if (g_arm_timer) {
         g_arm_timer--;
         if (!g_arm_timer) {
@@ -885,6 +905,5 @@ int main(void) {
 
     stream_poll();
     usb_poll();
-    check_serial_data();
   }
 }
