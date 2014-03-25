@@ -313,8 +313,14 @@ class HerkuleX(object):
         except eventlet.timeout.Timeout:
             return None
 
+    def set_position_kp(self, servo, value):
+        self.ram_write(servo, 24, [ value & 0xff, (value >> 8) & 0xff ])
+
     def set_position_kd(self, servo, value):
         self.ram_write(servo, 26, [ value & 0xff, (value >> 8) & 0xff ])
+
+    def set_position_ki(self, servo, value):
+        self.ram_write(servo, 28, [ value & 0xff, (value >> 8) & 0xff ])
 
 
 if __name__ == '__main__':
