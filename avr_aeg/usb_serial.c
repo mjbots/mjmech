@@ -30,6 +30,8 @@
 // Version 1.6: fix zero length packet bug
 // Version 1.7: fix usb_serial_set_control
 
+#include <string.h>
+
 #define USB_SERIAL_PRIVATE_INCLUDE
 #include "usb_serial.h"
 
@@ -306,6 +308,8 @@ static uint8_t transmit_previous_timeout=0;
 static uint8_t cdc_line_coding[7]={0x00, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x08};
 static uint8_t cdc_line_rtsdtr=0;
 
+static uint8_t g_buffer[256];
+static uint8_t g_buffer_len;
 
 /**************************************************************************
  *
@@ -445,6 +449,18 @@ int8_t usb_serial_putchar_nowait(uint8_t c)
   return 0;
 }
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+int8_t usb_serial_write(const uint8_t* buffer, uint16_t size)
+{
+  uint16_t size_to_buffer = MIN(size, sizeof(g_buffer) - g_buffer_len);
+  memcpy(g_buffer + g_buffer_len, buffer, size_to_buffer);
+  g_buffer_len += size_to_buffer;
+
+  return 0;
+}
+
+
 // transmit a buffer.
 //  0 returned on success, -1 on error
 // This function is optimized for speed!  Each call takes approx 6.1 us overhead
@@ -457,7 +473,7 @@ int8_t usb_serial_putchar_nowait(uint8_t c)
 // controller in the PC will not allocate bandwitdh without a pending read request.
 // (thanks to Victor Suarez for testing and feedback and initial code)
 
-int8_t usb_serial_write(const uint8_t *buffer, uint16_t size)
+int8_t write_buffer(const uint8_t *buffer, uint16_t size)
 {
   uint8_t timeout, write_size;
 
@@ -588,6 +604,35 @@ void usb_serial_flush_output(void)
     UENUM = CDC_TX_ENDPOINT;
     UEINTX = 0x3A;
     transmit_flush_timer = 0;
+  }
+}
+
+static void write_poll(void)
+{
+  if (!usb_configuration) return;
+
+  if (g_buffer_len == 0) return;
+
+  UENUM = CDC_TX_ENDPOINT;
+
+  const uint8_t* ptr = g_buffer;
+  while (g_buffer_len) {
+    // would transmitting block?
+    if (!(UEINTX & (1 << RWAL))) break;
+
+    uint8_t max_write_size = CDC_TX_SIZE - UEBCLX;
+
+    // Nope, so empty out our buffer.
+    uint8_t to_write = MIN(g_buffer_len, max_write_size);
+    write_buffer(ptr, to_write);
+    ptr += to_write;
+    g_buffer_len -= to_write;
+
+    UENUM = CDC_TX_ENDPOINT;
+  }
+
+  if (ptr != g_buffer) {
+    memmove(g_buffer, ptr, g_buffer_len);
   }
 }
 
@@ -882,4 +927,6 @@ void usb_poll() {
   if (UDINT & ((1 << EORSTE) | (1 << SOFE))) { isr_USB_GEN_vect(); }
   UENUM = 0;
   if (UEINTX & (1 << RXSTPE)) { isr_USB_COM_vect(); }
+
+  write_poll();
 }

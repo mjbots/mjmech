@@ -45,7 +45,7 @@
 #define STR_OVERFLOW " overflow"
 #define STR_SRD "!SRD "
 
-#define WDT_PERIOD WDTO_120MS
+#define WDT_PERIOD WDTO_15MS
 
 static uint16_t g_timer;
 static uint16_t g_main_loop_count;
