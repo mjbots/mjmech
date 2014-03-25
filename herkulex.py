@@ -87,8 +87,12 @@ class HerkuleX(object):
 
     def __init__(self, serial_port):
         self.baud_rate = 115200
-        self.serial = eventlet_serial.EventletSerial(
-            port=serial_port, baudrate=115200)
+        if isinstance(serial_port, str):
+            self.serial = eventlet_serial.EventletSerial(
+                port=serial_port, baudrate=115200)
+        else:
+            # Assume it is a file like object.
+            self.serial = serial_port
 
     def enumerate(self):
         """Enumerate the list of servos on the bus.  Note, this will
@@ -122,7 +126,7 @@ class HerkuleX(object):
         self.serial.write(to_write)
 
     def send_packet(self, servo, cmd, data):
-        with self.serial.sem:
+        with self.serial.sem_write:
             self._raw_send_packet(servo, cmd, data)
 
     def _raw_recv_packet(self):
@@ -160,11 +164,11 @@ class HerkuleX(object):
         return result
 
     def recv_packet(self):
-        with self.serial.sem:
+        with self.serial.sem_read:
             return self._raw_recv_packet()
 
     def send_recv_packet(self, servo, cmd, data):
-        with self.serial.sem:
+        with self.serial.sem_write, self.serial.sem_read:
             self._raw_send_packet(servo, cmd, data)
             return self._raw_recv_packet()
 
