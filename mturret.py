@@ -408,6 +408,10 @@ class MechTurret(object):
 
         eventlet.spawn(self._read_avr)
 
+        for servo in [self.servo_config.servo_pan_id,
+                      self.servo_config.servo_tilt_id]:
+            self.controller.port.set_position_kd(servo, 500)
+
         self.controller.enable_power(servo_controller.POWER_ENABLE)
 
         self.imu = Imu(self.fake_imu_port)
@@ -438,7 +442,7 @@ class MechTurret(object):
             elif line == '':
                 pass
             elif not 'OK' in line:
-                print 'possible error: "%s"' % line
+                print >> sys.stderr, 'possible error: "%s"' % line
 
     def set_orientation(self, yaw_deg, pitch_deg):
         self.controller.set_pose(
@@ -448,7 +452,7 @@ class MechTurret(object):
                 self.servo_config.servo_tilt_id :
                     pitch_deg * self.servo_config.servo_tilt_sign,
                 },
-            pose_time=0.2)
+            pose_time=0.3)
 
     def _toggle_laser(self):
         with self.avr.sem_write:
@@ -528,8 +532,8 @@ def main():
         if abs(y_move) < 0.1:
             y_move = 0.0
 
-        pan += x_move * 50.0 * delta
-        tilt += y_move * 50.0 * delta
+        pan += x_move * 100.0 * delta
+        tilt += y_move * 100.0 * delta
 
         pan = max(-50.0, min(50.0, pan))
         tilt = max(-25.0, min(25.0, tilt))

@@ -103,7 +103,7 @@ class HerkuleX(object):
         """
         result = []
         for servo in range(0xfe):
-            with eventlet.timeout.Timeout(0.02, false):
+            with eventlet.timeout.Timeout(0.02, False):
                 self.status(servo)
                 result.append(servo)
 
@@ -313,6 +313,8 @@ class HerkuleX(object):
         except eventlet.timeout.Timeout:
             return None
 
+    def set_position_kd(self, servo, value):
+        self.ram_write(servo, 26, [ value & 0xff, (value >> 8) & 0xff ])
 
 
 if __name__ == '__main__':
