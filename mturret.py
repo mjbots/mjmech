@@ -8,7 +8,6 @@ import numpy
 import optparse
 import os
 import pygame
-import pykalman
 import sys
 import time
 
@@ -19,6 +18,7 @@ import eventlet_serial
 from quaternion import Euler
 from quaternion import Quaternion
 import servo_controller
+import ukf_filter
 
 def parsehex(hexdata):
     result = ''
@@ -26,21 +26,6 @@ def parsehex(hexdata):
         result += chr(int(hexdata[0:2], 16))
         hexdata = hexdata[2:]
     return result
-
-def make_positive_definite(matrix):
-    eigenval, eigenvect = numpy.linalg.eigh(matrix)
-    modified = False
-
-    for x in range(eigenval.size):
-        if eigenval[x] < 1e-6:
-            eigenval[x] = 1e-6
-            modified = True
-
-    if not modified:
-        return matrix
-
-    return numpy.dot(numpy.dot(eigenvect, numpy.diag(eigenval)),
-                     eigenvect.transpose())
 
 class ServoConfig(object):
     def __init__(self, config):
@@ -94,7 +79,7 @@ class Pipe(object):
         for x in data:
             self.queue.put(x, block=True)
 
-IMU_UPDATE_PERIOD = 0.01
+IMU_UPDATE_PERIOD = 1.0 / 95
 
 class AttitudeEstimator(object):
     # States are:
@@ -106,7 +91,7 @@ class AttitudeEstimator(object):
     # 5: gyro pitch bias
     # 6: gyro roll bias
 
-    def state_function(self, state):
+    def state_function(self, state, dt):
         result = state
 
         this_attitude = Quaternion(
@@ -117,7 +102,7 @@ class AttitudeEstimator(object):
                 x.roll + result[4],
                 x.pitch + result[5],
                 x.yaw + result[6],
-                IMU_UPDATE_PERIOD)
+                dt)
             delta = delta * advance
 
         next_attitude = (this_attitude * delta).normalized()
@@ -128,7 +113,7 @@ class AttitudeEstimator(object):
         return result
 
     def attitude(self):
-        return Quaternion(*self.state[0:4])
+        return Quaternion(*self.ukf.state[0:4,0])
 
     def __init__(self):
         self.current_gyro = []
@@ -151,12 +136,14 @@ class AttitudeEstimator(object):
     def orientation_to_accel(quaternion):
         gravity = numpy.array([0, 0, 1.0])
         expected = quaternion.conjugated().rotate(gravity)
-        return expected
+        return numpy.array([[expected[0]],
+                            [expected[1]],
+                            [expected[2]]])
 
     @staticmethod
     def accel_measurement(state):
         quaternion = Quaternion(
-            state[0], state[1], state[2], state[3]).normalized()
+            state[0,0], state[1,0], state[2,0], state[3,0]).normalized()
 
         return AttitudeEstimator.orientation_to_accel(quaternion)
 
@@ -174,6 +161,19 @@ class AttitudeEstimator(object):
         quat = Quaternion.from_euler(roll, pitch, 0)
         return quat
 
+    @staticmethod
+    def covariance_limit(P):
+        for x in range(7):
+            if P[x, x] < 1e-9:
+                P[x, x] = 1e-9
+        for x in range(0, 4):
+            if P[x, x] > .15:
+                P[x, x] = .15
+        for x in range(4, 7):
+            if P[x, x] > math.radians(50):
+                P[x, x] = math.radians(50)
+        return P
+
     def process_accel(self, x, y, z):
         # First, normalize.
         norm = math.sqrt(x * x + y * y + z * z)
@@ -188,52 +188,32 @@ class AttitudeEstimator(object):
             self.init = True
 
             quat = self.accel_to_orientation(x, y, z)
-            self.state = numpy.array([quat.w, quat.x, quat.y, quat.z,
-                                      0., 0., 0.])
-            self.covariance = numpy.diag([1e-3, 1e-3, 1e-3, 1e-3,
-                                          math.radians(1),
-                                          math.radians(1),
-                                          math.radians(1)])
+            state = numpy.array([[quat.w],
+                                 [quat.x],
+                                 [quat.y],
+                                 [quat.z],
+                                 [0.],
+                                 [0.],
+                                 [0.]])
+            covariance = numpy.diag([1e-3, 1e-3, 1e-3, 1e-3,
+                                     math.radians(1),
+                                     math.radians(1),
+                                     math.radians(1)])
 
-            self.ukf = pykalman.AdditiveUnscentedKalmanFilter(
-                self.state_function,
-                transition_covariance=IMU_UPDATE_PERIOD * numpy.diag(
-                    [1e-4, 1e-4, 1e-4, 1e-4,
-                     math.radians(0.01),
-                     math.radians(0.01),
-                     math.radians(0.01)]))
+            self.ukf = ukf_filter.UkfFilter(
+                initial_state=state,
+                initial_covariance=covariance,
+                process_function=self.state_function,
+                process_noise=numpy.diag([1e-4, 1e-4, 1e-4, 1e-4,
+                                          math.radians(0.01),
+                                          math.radians(0.01),
+                                          math.radians(0.01)]),
+                measurement_function=self.accel_measurement,
+                measurement_noise=numpy.diag([10.0, 10.0, 10.0]),
+                covariance_limit=self.covariance_limit)
 
-        try:
-            old1, old2 = self.state, self.covariance
-            self.state, self.covariance = self.ukf.filter_update(
-                self.state, self.covariance,
-                observation=numpy.array([x, y, z]),
-                observation_function=self.accel_measurement,
-                observation_covariance=numpy.diag([10.0, 10.0, 10.0]))
-
-            # self.state, self.covariance = self.ukf.filter_update(
-            #     self.state, self.covariance,
-            #     observation=numpy.array([0.0]),
-            #     observation_function=self.yaw_measurement,
-            #     observation_covariance=numpy.array([0.5]))
-        except:
-            print >> sys.stderr, "Error with state:", old1
-            print >> sys.stderr, "current_gyro:", self.current_gyro
-            print >> sys.stderr, "accel:", x, y, z
-            print >> sys.stderr, "and covariance:", numpy.diag(old2), old2
-            raise
-
-        for x in range(7):
-            if self.covariance[x, x] < 1e-9:
-                self.covariance[x, x] = 1e-9
-        for x in range(0, 4):
-            if self.covariance[x, x] > .15:
-                self.covariance[x, x] = .15
-        for x in range(4, 7):
-            if self.covariance[x, x] > math.radians(50):
-                self.covariance[x, x] = math.radians(50)
-        self.covariance = 0.5 * (self.covariance + self.covariance.transpose())
-        self.covariance = make_positive_definite(self.covariance)
+        self.ukf.update_state(IMU_UPDATE_PERIOD)
+        self.ukf.update_measurement(numpy.array([[x],[y],[z]]))
 
         self.current_gyro = []
         #self.emit_log()
@@ -335,12 +315,12 @@ class Imu(object):
             apitch_rps = pitch_rps - self._bias[1]
             ayaw_rps = yaw_rps - self._bias[2]
 
-            this_delta = Quaternion.integrate_rotation_rate(
-                aroll_rps,
-                apitch_rps,
-                ayaw_rps,
-                IMU_UPDATE_PERIOD)
-            self._attitude = self._attitude * this_delta
+            # this_delta = Quaternion.integrate_rotation_rate(
+            #     aroll_rps,
+            #     apitch_rps,
+            #     ayaw_rps,
+            #     IMU_UPDATE_PERIOD)
+            # self._attitude = self._attitude * this_delta
 
             euler = self._attitude.euler()
             if 0:
@@ -435,9 +415,14 @@ class MechTurret(object):
                 line = self.avr.readline().strip()
             line = line.strip()
             if line.startswith('!SRD'):
-                hexdata = line[5:]
-                data = parsehex(hexdata)
-                self.fake_servo_port.fill_read(data)
+                # The current servo commands used in mturret never
+                # read from the servos, so if any data is emitted,
+                # this just blocks forever.  Thus, just ignore all
+                # data received from the servos here.
+                if 0:
+                    hexdata = line[5:]
+                    data = parsehex(hexdata)
+                    self.fake_servo_port.fill_read(data)
             elif line.startswith('!STM'):
                 self.fake_imu_port.fill_read(line + '\n')
             elif line == '':
