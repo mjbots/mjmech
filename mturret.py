@@ -115,6 +115,12 @@ class AttitudeEstimator(object):
     def attitude(self):
         return Quaternion(*self.ukf.state[0:4,0])
 
+    def gyro_bias(self):
+        return list(self.ukf.state[4:7,0])
+
+    def gyro_bias_uncertainty(self):
+        return [math.sqrt(x) for x in list(numpy.diag(self.ukf.covariance)[4:7])]
+
     def __init__(self):
         self.current_gyro = []
         self.init = False
@@ -204,7 +210,7 @@ class AttitudeEstimator(object):
                 initial_state=state,
                 initial_covariance=covariance,
                 process_function=self.state_function,
-                process_noise=numpy.diag([1e-4, 1e-4, 1e-4, 1e-4,
+                process_noise=numpy.diag([1e-6, 1e-6, 1e-6, 1e-6,
                                           math.radians(0.01),
                                           math.radians(0.01),
                                           math.radians(0.01)]),
@@ -241,6 +247,9 @@ class Imu(object):
         self._attitude = Quaternion()
         self._estimator = AttitudeEstimator()
         self._display_count = 0
+        self._mounting = (
+            Quaternion.from_euler(math.radians(-90), 0, 0) *
+            Quaternion.from_euler(0, math.radians(-60), 0))
 
     def run(self):
         with self.stream.sem_write:
@@ -324,7 +333,7 @@ class Imu(object):
 
             euler = self._attitude.euler()
             if 0:
-                sys.stderr.write('%6.2f %6.2f %6.2f  %6.2f %6.2f %6.2f\r' % (
+                sys.stderr.write('%6.2f %6.2f %6.2f  %6.2f %6.2f %6.2f  \r' % (
                         apitch, aroll, ayaw,
                         math.degrees(euler.yaw),
                         math.degrees(euler.pitch),
@@ -349,15 +358,18 @@ class Imu(object):
 
         self._estimator.process_accel(right, forward, up)
 
-        euler = self._estimator.attitude().euler()
+        euler = (self._estimator.attitude() * self._mounting).euler()
+        bias_deg = [math.degrees(x) for x in self._estimator.gyro_bias()]
+        bias_unc = [math.degrees(x) for x in self._estimator.gyro_bias_uncertainty()]
         self._display_count += 1
         if (self._display_count % 10) == 0:
-            sys.stderr.write('%10f %10f %10f %8.2f %8.2f %8.2f %10d\r' % (
-                    right, forward, up,
+            sys.stderr.write('y/p/r= %6.2f %6.2f %6.2f  bias=%5.3f %5.3f %5.3f  u=%6.2f %6.2f %6.2f  \r' % (
                     math.degrees(euler.yaw),
                     math.degrees(euler.pitch),
                     math.degrees(euler.roll),
-                    len(self._estimator.current_gyro)))
+                    bias_deg[0], bias_deg[1], bias_deg[2],
+                    bias_unc[0], bias_unc[1], bias_unc[2]))
+
             sys.stderr.flush()
 
     def parse_accel(self, high, low):
