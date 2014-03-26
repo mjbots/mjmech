@@ -22,9 +22,11 @@ import ukf_filter
 
 def parsehex(hexdata):
     result = ''
-    while len(hexdata) >= 2:
-        result += chr(int(hexdata[0:2], 16))
-        hexdata = hexdata[2:]
+    pos = 0
+    length = len(hexdata)
+    while pos < length:
+        result += chr(int(hexdata[pos:pos+2], 16))
+        pos += 2
     return result
 
 class ServoConfig(object):
@@ -126,6 +128,7 @@ class AttitudeEstimator(object):
         self.init = False
         self.log = open('/tmp/attitude.csv', 'w')
         self.emit_header()
+        self.ukf = None
 
     def emit_header(self):
         self.log.write(','.join(['state_%d' % x for x in range(7)] +
@@ -180,6 +183,21 @@ class AttitudeEstimator(object):
                 P[x, x] = math.radians(50)
         return P
 
+    def process_yaw(self, mounting, yaw):
+        if self.ukf is None:
+            return
+
+        def yaw_meas(state):
+            this_attitude = Quaternion(
+                state[0], state[1], state[2], state[3]).normalized()
+            offset = this_attitude * mounting
+            return numpy.array([[offset.euler().yaw]])
+
+        self.ukf.update_measurement(
+            numpy.array([[yaw]]),
+            measurement_function=yaw_meas,
+            measurement_noise=numpy.array([[math.radians(5)]]))
+
     def process_accel(self, x, y, z):
         # First, normalize.
         norm = math.sqrt(x * x + y * y + z * z)
@@ -210,10 +228,10 @@ class AttitudeEstimator(object):
                 initial_state=state,
                 initial_covariance=covariance,
                 process_function=self.state_function,
-                process_noise=numpy.diag([1e-6, 1e-6, 1e-6, 1e-6,
-                                          math.radians(0.01),
-                                          math.radians(0.01),
-                                          math.radians(0.01)]),
+                process_noise=numpy.diag([1e-8, 1e-8, 1e-8, 1e-8,
+                                          math.radians(1e-6),
+                                          math.radians(1e-6),
+                                          math.radians(1e-6)]),
                 measurement_function=self.accel_measurement,
                 measurement_noise=numpy.diag([10.0, 10.0, 10.0]),
                 covariance_limit=self.covariance_limit)
@@ -247,6 +265,7 @@ class Imu(object):
         self._attitude = Quaternion()
         self._estimator = AttitudeEstimator()
         self._display_count = 0
+        self._accel_count = 0
         self._mounting = (
             Quaternion.from_euler(math.radians(-90), 0, 0) *
             Quaternion.from_euler(0, math.radians(-60), 0))
@@ -291,6 +310,9 @@ class Imu(object):
                 except:
                     print >> sys.stderr, 'when handling:', line
                     raise
+
+    def process_yaw(self, pan):
+        self._estimator.process_yaw(self._mounting, pan)
 
     def handle_gyro(self, hexdata):
         data = parsehex(hexdata)
@@ -351,6 +373,12 @@ class Imu(object):
         return value * 0.00875 # 250dps sensitivity
 
     def handle_accel(self, hexdata):
+        # Python is too slow.  Decimate the accelerometer input to get
+        # it to fit on one CPU.
+        self._accel_count += 1
+        if (self._accel_count % 2 != 0):
+            return
+
         data = parsehex(hexdata)
         forward = -self.parse_accel(data[3], data[4])
         up = self.parse_accel(data[5], data[6])
@@ -362,7 +390,7 @@ class Imu(object):
         bias_deg = [math.degrees(x) for x in self._estimator.gyro_bias()]
         bias_unc = [math.degrees(x) for x in self._estimator.gyro_bias_uncertainty()]
         self._display_count += 1
-        if (self._display_count % 10) == 0:
+        if (self._display_count % 5) == 0:
             sys.stderr.write('y/p/r= %6.2f %6.2f %6.2f  bias=%5.3f %5.3f %5.3f  u=%6.2f %6.2f %6.2f  \r' % (
                     math.degrees(euler.yaw),
                     math.degrees(euler.pitch),
@@ -537,6 +565,7 @@ def main():
         tilt = max(-25.0, min(25.0, tilt))
 
         turret.set_orientation(pan, tilt)
+        turret.imu.process_yaw(math.radians(pan))
 
         eventlet.sleep(0.05)
         clock.tick(50)
