@@ -430,8 +430,9 @@ class MechTurret(object):
 
         for servo in [self.servo_config.servo_pan_id,
                       self.servo_config.servo_tilt_id]:
-            self.controller.port.set_position_kd(servo, 500)
-            self.controller.port.set_position_ki(servo, 200)
+            self.controller.port.set_position_kp(servo, 200)
+            self.controller.port.set_position_kd(servo, 1000)
+            self.controller.port.set_position_ki(servo, 400)
 
         self.controller.enable_power(servo_controller.POWER_ENABLE)
 
