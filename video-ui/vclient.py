@@ -295,8 +295,8 @@ class VideoWindow(object):
         if msg.get_structure().get_name() == 'prepare-window-handle':
             self.logger.info('Embedding video window')
             print dir(msg.src)
-            #msg.src.set_window_handle(self.xid)
-            msg.src.set_xwindow_id(self.xid)
+            msg.src.set_window_handle(self.xid)
+            #msg.src.set_xwindow_id(self.xid)
 
     @wrap_event
     def _on_error(self, bus, msg):
