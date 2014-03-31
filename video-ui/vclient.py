@@ -10,18 +10,15 @@ import errno
 import time
 
 import gi
-gi.require_version('Gst', '1.0')  # apt-get install python-gst-1.0
+gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import GObject, GLib
-from gi.repository import GdkX11, Gtk, Gdk
-from gi.repository import GstVideo
+from gi.repository import GdkX11, GstVideo, Gtk, Gdk
 
 # based on example at:
 # http://bazaar.launchpad.net/~jderose/+junk/gst-examples/view/head:/video-player-1.0
 # docs:
 # http://pygstdocs.berlios.de/pygst-reference/gst-class-reference.html
-
-GLIB_VERSION = (GLib.MAJOR_VERSION, GLib.MINOR_VERSION)
 
 def wrap_event(callback):
     """Wrap event callback so the app exit if it crashes"""
@@ -34,20 +31,6 @@ def wrap_event(callback):
             Gtk.main_quit()
             raise
     return wrapped
-
-def io_add_watch(sock, callback, read=True, write=False):
-    """Wrapper around io_add_watch, because various glib versions want different
-    things."""
-    cond = GLib.IO_ERR | GLib.IO_HUP
-    if read: cond |= GLib.IO_IN
-    if write: cond |= GLib.IO_OUT
-    if GLIB_VERSION > (2, 32):
-        # ubuntu 14.02
-        GLib.io_add_watch(sock, GLib.PRIORITY_DEFAULT,
-                          cond, callback)
-    else:
-        # ubuntu 12.04
-        GLib.io_add_watch(sock, cond, callback)
 
 class UdpAnnounceReceiver(object):
     PORT = 13355
@@ -62,13 +45,16 @@ class UdpAnnounceReceiver(object):
         self.sock.bind(('', self.PORT))
 
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        io_add_watch(self.sock.fileno(), self._on_readable)
+        GLib.io_add_watch(self.sock.fileno(), 
+                          GLib.PRIORITY_DEFAULT,
+                          GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
+                          self._on_readable)
         self.logger.info('Waiting for address broadcast')
         # active server info
         self.server = None
         self.recent_sources = list()
         self.control = None
-
+        
     @wrap_event
     def _on_readable(self, source, cond):
         while True:
@@ -79,7 +65,7 @@ class UdpAnnounceReceiver(object):
                     raise
                 break
             data = json.loads(pkt)
-            if (self.server is None or
+            if (self.server is None or 
                 self.server['host'] != data['host'] or
                 self.server['start_time'] != data['start_time'] or
                 addr not in self.recent_sources):
@@ -87,7 +73,7 @@ class UdpAnnounceReceiver(object):
                 server = dict(host=data['host'],
                               start_time=data['start_time'],
                               cport=data['cport'], # control port
-                              addr=addr[0],
+                              addr=addr[0], 
                               aport=addr[1] # announce port
                               )
                 self._on_new_server(server)
@@ -98,13 +84,13 @@ class UdpAnnounceReceiver(object):
 
     def _on_new_server(self, info):
         self.logger.info('Found a server at %s:%d (a-port %s, host %r, started %s)' % (
-                info['addr'], info['cport'], info['aport'], info['host'],
+                info['addr'], info['cport'], info['aport'], info['host'], 
                 time.strftime('%F_%T', time.localtime(info['start_time']))))
         assert self.server is None or self.server['addr'] == info['addr'], \
             'IP change not supported'
         self.server = info
         if self.control is None:
-            self.control = ControlInterface(self.opts, self.server['addr'],
+            self.control = ControlInterface(self.opts, self.server['addr'], 
                                             self.server['cport'])
 
 class ControlInterface(object):
@@ -124,10 +110,9 @@ class ControlInterface(object):
         self.seq = 0
         self.control_dict = dict(
             video_port=self.VIDEO_PORT,
+            servo_x = 0.5, servo_y = 0.5,
             )
-        # We set no servo position by default. It will be set on first mouse
-        # click.
-
+       
         if opts.external_video:
             self.video = None
         else:
@@ -136,7 +121,10 @@ class ControlInterface(object):
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
                          self._on_send_timer)
-        io_add_watch(self.sock.fileno(), self._on_readable)
+        GLib.io_add_watch(self.sock.fileno(), 
+                          GLib.PRIORITY_DEFAULT,
+                          GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
+                          self._on_readable)
 
     @wrap_event
     def _on_send_timer(self):
@@ -174,7 +162,7 @@ class ControlInterface(object):
         self.control_dict['servo_x'] = pos[0]
         self.control_dict['servo_y'] = pos[1]
         self._send_control()
-
+    
 
 class VideoWindow(object):
     def __init__(self, host, port, rotate=False):
@@ -194,7 +182,7 @@ class VideoWindow(object):
                                     Gdk.EventMask.BUTTON_RELEASE_MASK |
                                     Gdk.EventMask.POINTER_MOTION_MASK
                                     )
-        self.drawingarea.connect("button-press-event", self._on_da_click)
+        self.drawingarea.connect("button-press-event", self._on_da_click)        
         self.drawingarea.connect("motion-notify-event", self._on_da_move)
         vbox.add(self.drawingarea)
         self.window.show_all()
@@ -204,10 +192,8 @@ class VideoWindow(object):
         self.xid = self.drawingarea.get_property('window').get_xid()
 
         self.pipeline = Gst.Pipeline()
-        self.rtpbin = self.make_element("rtpbin",
-#            do_retransmission=True
-        )
-
+        self.rtpbin = self.make_element("rtpbin", do_retransmission=True)
+        
         #caps = Gst.Caps("application/x-rtp",
         #                media="video", clock_rate=90000, encoding_name="H264")
         caps = Gst.Caps.from_string("application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264")
@@ -216,7 +202,7 @@ class VideoWindow(object):
 
         rtcp_src = self.make_element("udpsrc", port=self.port + 1)
         self.link_pads(rtcp_src, None, self.rtpbin, "recv_rtcp_sink_0")
-
+        
         rtcp_sink = self.make_element("udpsink", host=self.host, port=self.port + 2,
                                       sync=False, async=False)
         self.link_pads(self.rtpbin, "send_rtcp_src_0", rtcp_sink, None)
@@ -250,16 +236,15 @@ class VideoWindow(object):
         bus.add_signal_watch()
         bus.connect("message::error", self._on_error)
         bus.connect("message::eos", self._on_end_of_stream)
-        #bus.connect("message", self._on_any_message)  # produces ton of junk
         bus.enable_sync_message_emission()
-        bus.connect('sync-message::element', self._on_sync_message)
+        bus.connect('sync-message::element', self._on_sync_message)       
 
         # Callback functions
         self.on_video_click_1 = None
 
     def make_element(self, etype, **kwargs):
-        elt = Gst.ElementFactory.make(etype)
-        assert elt, "Failed to make %r" % etype
+        elt = Gst.ElementFactory.make(etype)        
+        assert elt
         self.pipeline.add(elt)
         for n, v in sorted(kwargs.items()):
             elt.set_property(n.replace('_', '-'), v)
@@ -270,7 +255,7 @@ class VideoWindow(object):
             res = elt1.link(elt2)
         else:
             res = elt1.link_pads(pad1, elt2, pad2)
-        assert res, (elt1, pad1, elt2, pad2)
+        assert res, (elt1, pad1, elt2, pad2)    
 
     def start(self):
         self.logger.info('Starting video')
@@ -284,19 +269,15 @@ class VideoWindow(object):
     @wrap_event
     def _on_new_rtpbin_pad(self, source, pad):
         name = pad.get_name()
+        self.logger.info('Got new rtpbin pad: %r' % (name, ))
         if name.startswith('recv_rtp_src'):
-            self.logger.info('Got new rtpbin data pad: %r' % (name, ))
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
-        else:
-            self.logger.warn('Ignoring strange rtpbin pad: %r' % (name, ))
 
     @wrap_event
     def _on_sync_message(self, bus, msg):
         if msg.get_structure().get_name() == 'prepare-window-handle':
             self.logger.info('Embedding video window')
-            print dir(msg.src)
             msg.src.set_window_handle(self.xid)
-            #msg.src.set_xwindow_id(self.xid)
 
     @wrap_event
     def _on_error(self, bus, msg):
@@ -305,12 +286,6 @@ class VideoWindow(object):
         if debug:
             for line in debug.split('\n'):
                 self.logger.info('| %s' % line)
-
-    @wrap_event
-    def _on_any_message(self, bus, msg):
-        """Debug only. Callback might not be installed."""
-        self.logger.info("Got message struct=%s" % (
-                msg.get_structure().get_name()))
 
     @wrap_event
     def _on_end_of_stream(self, bus, msg):
@@ -358,11 +333,11 @@ class VideoWindow(object):
         assert src == self.drawingarea, src
         rel_pos = self._evt_get_video_coord(evt)
         if rel_pos is None:
-            self.logger.info('Video click outside of image at wpt=(%d,%d) button=%d state=%d' %
+            self.logger.info('Video click outside of image at wpt=(%d,%d) button=%d state=%d' % 
                              (evt.x, evt.y, evt.button, evt.state))
             return True
 
-        self.logger.info('Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d' %
+        self.logger.info('Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d' % 
                          (evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state))
         if evt.button == 1 and self.on_video_click_1:
             self.on_video_click_1(rel_pos)
@@ -378,8 +353,7 @@ def main(opts):
         logging.info('Check passed')
         return
 
-    if GLIB_VERSION <= (2, 32):
-        GObject.threads_init()
+    #GObject.threads_init()
     Gst.init(None)
 
     if opts.addr is None:
