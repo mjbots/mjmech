@@ -8,36 +8,36 @@
     <link name="chassis">
       <pose>0 0 0.400000 0 0 0</pose>
       <inertial>
-        <mass>1.800000</mass>
+        <mass>1.600000</mass>
         <inertia>
-          <ixx>0.007200</ixx>
+          <ixx>0.005776</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.007200</iyy>
+          <iyy>0.005776</iyy>
           <iyz>0.00</iyz>
-          <izz>0.007200</izz>
+          <izz>0.005776</izz>
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><box><size>0.200000 0.200000 0.040000</size></box></geometry>
+        <geometry><box><size>0.190000 0.190000 0.034000</size></box></geometry>
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.200000 0.200000 0.040000</size></box></geometry>
+        <geometry><mesh><uri>file://chassis.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <link name="coxa0">
-      <pose>0.130000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.100000 0.081000 0.411000 0.000000 0.000000 0.000000</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -45,13 +45,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
+        <geometry><mesh><uri>file://coxa.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="coxa_hinge0">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>coxa0</child>
       <parent>chassis</parent>
       <axis>
@@ -66,16 +66,16 @@
 
 
     <link name="femur0">
-      <pose>0.160000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.160000 0.081000 0.411000 0.000000 0.000000 0.000000</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -104,16 +104,16 @@
 
 
     <link name="tibia0">
-      <pose>0.220000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.220000 0.081000 0.411000 0.000000 0.000000 0.000000</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -142,7 +142,7 @@
 
 
     <link name="tip0">
-      <pose>0.280000 0.100000 0.400000 0 0 0</pose>
+      <pose>0.280000 0.081000 0.411000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -180,16 +180,16 @@
 
 
     <link name="coxa1">
-      <pose>0.130000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.100000 -0.081000 0.411000 0.000000 0.000000 0.000000</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -197,13 +197,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
+        <geometry><mesh><uri>file://coxa.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="coxa_hinge1">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>coxa1</child>
       <parent>chassis</parent>
       <axis>
@@ -218,16 +218,16 @@
 
 
     <link name="femur1">
-      <pose>0.160000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.160000 -0.081000 0.411000 0.000000 0.000000 0.000000</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -256,16 +256,16 @@
 
 
     <link name="tibia1">
-      <pose>0.220000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.220000 -0.081000 0.411000 0.000000 0.000000 0.000000</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -294,7 +294,7 @@
 
 
     <link name="tip1">
-      <pose>0.280000 -0.100000 0.400000 0 0 0</pose>
+      <pose>0.280000 -0.081000 0.411000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -332,16 +332,16 @@
 
 
     <link name="coxa2">
-      <pose>-0.130000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.100000 -0.081000 0.411000 0.000000 0.000000 3.141593</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -349,13 +349,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
+        <geometry><mesh><uri>file://coxa.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="coxa_hinge2">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>coxa2</child>
       <parent>chassis</parent>
       <axis>
@@ -370,16 +370,16 @@
 
 
     <link name="femur2">
-      <pose>-0.160000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.160000 -0.081000 0.411000 0.000000 0.000000 3.141593</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -408,16 +408,16 @@
 
 
     <link name="tibia2">
-      <pose>-0.220000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.220000 -0.081000 0.411000 0.000000 0.000000 3.141593</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -446,7 +446,7 @@
 
 
     <link name="tip2">
-      <pose>-0.280000 -0.100000 0.400000 0 0 0</pose>
+      <pose>-0.280000 -0.081000 0.411000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -484,16 +484,16 @@
 
 
     <link name="coxa3">
-      <pose>-0.130000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.100000 0.081000 0.411000 0.000000 0.000000 3.141593</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -501,13 +501,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.030000 0.035000</size></box></geometry>
+        <geometry><mesh><uri>file://coxa.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="coxa_hinge3">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>coxa3</child>
       <parent>chassis</parent>
       <axis>
@@ -522,16 +522,16 @@
 
 
     <link name="femur3">
-      <pose>-0.160000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.160000 0.081000 0.411000 0.000000 0.000000 3.141593</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -560,16 +560,16 @@
 
 
     <link name="tibia3">
-      <pose>-0.220000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.220000 0.081000 0.411000 0.000000 0.000000 3.141593</pose>
       <inertial>
-        <mass>0.050000</mass>
+        <mass>0.067000</mass>
         <inertia>
-          <ixx>0.000720</ixx>
+          <ixx>0.000965</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.000720</iyy>
+          <iyy>0.000965</iyy>
           <iyz>0.00</iyz>
-          <izz>0.000720</izz>
+          <izz>0.000965</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -598,7 +598,7 @@
 
 
     <link name="tip3">
-      <pose>-0.280000 0.100000 0.400000 0 0 0</pose>
+      <pose>-0.280000 0.081000 0.411000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>

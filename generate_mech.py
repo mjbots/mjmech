@@ -2,12 +2,12 @@
 
 import math
 
-CHASSIS_LENGTH = 0.2
-CHASSIS_MASS = 1.8
+CHASSIS_LENGTH = 0.19
+CHASSIS_MASS = 1.6
 COXA_LENGTH = 0.06
 FEMUR_LENGTH = 0.06
 TIBIA_LENGTH = 0.06
-LIMB_MASS = 0.05
+LIMB_MASS = 0.067
 
 def sphere_inertia(mass, radius):
     return (2. / 5) * mass * (radius **2)
@@ -27,7 +27,7 @@ PARAMETERS = {
     'chassis_mass' : CHASSIS_MASS,
     'chassis_inertia' : sphere_inertia(CHASSIS_MASS, 0.5 * CHASSIS_LENGTH),
     'chassis_length' : CHASSIS_LENGTH,
-    'chassis_height' : 0.04,
+    'chassis_height' : 0.034,
     'height' : 0.4,
     'surface' : '',
     'effort' : 2.4,
@@ -63,7 +63,7 @@ CHASSIS = '''
         <geometry><box><size>{chassis_length:f} {chassis_length:f} {chassis_height:f}</size></box></geometry>
       </collision>
       <visual name="visual">
-        <geometry><box><size>{chassis_length:f} {chassis_length:f} {chassis_height:f}</size></box></geometry>
+        <geometry><mesh><uri>file://chassis.dae</uri></mesh></geometry>
       </visual>
     </link>
 '''
@@ -196,14 +196,18 @@ def main():
     leg_y_sign = [ 1, -1, -1, 1]
     leg_yaw = [ 0, 0, math.pi, math.pi ]
 
+    half_chassis_width = 0.5 * CHASSIS_LENGTH + 0.005
+    half_chassis_length = 0.5 * CHASSIS_LENGTH - 0.014
+    leg_z = 0.011
+
     for leg_num in range(4):
 
-        print LINK.format(
+        print MESH_LINK.format(
             **merge(PARAMETERS,
                     {'name' : 'coxa%d' % leg_num,
-                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + 0.5 * COXA_LENGTH),
-                     'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
-                     'z' : PARAMETERS['height'],
+                     'x' : leg_x_sign[leg_num] * half_chassis_width,
+                     'y' : leg_y_sign[leg_num] * half_chassis_length,
+                     'z' : PARAMETERS['height'] + leg_z,
                      'mass' : LIMB_MASS,
                      'inertia' : 10 * sphere_inertia(LIMB_MASS, 0.06),
                      'roll_rad' : 0,
@@ -211,10 +215,11 @@ def main():
                      'yaw_rad' : leg_yaw[leg_num],
                      'length' : COXA_LENGTH,
                      'width' : 0.03,
-                     'height' : 0.035}))
+                     'height' : 0.035,
+                     'mesh_name' : 'file://coxa.dae'}))
         print JOINT.format(
             **merge(PARAMETERS, {'name' : 'coxa_hinge%d' % leg_num,
-                                 'x' : -0.5 * COXA_LENGTH,
+                                 'x' : 0.0,
                                  'y' : 0.0,
                                  'z' : 0.0,
                                  'child' : 'coxa%d' % leg_num,
@@ -226,9 +231,9 @@ def main():
         print MESH_LINK.format(
             **merge(PARAMETERS,
                     {'name' : 'femur%d' % leg_num,
-                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH),
-                     'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
-                     'z' : PARAMETERS['height'],
+                     'x' : leg_x_sign[leg_num] * (half_chassis_width + COXA_LENGTH),
+                     'y' : leg_y_sign[leg_num] * half_chassis_length,
+                     'z' : PARAMETERS['height'] + leg_z,
                      'mass' : LIMB_MASS,
                      'inertia' : 10 * sphere_inertia(LIMB_MASS, 0.06),
                      'roll_rad' : 0,
@@ -254,9 +259,9 @@ def main():
         print MESH_LINK.format(
             **merge(PARAMETERS,
                     {'name' : 'tibia%d' % leg_num,
-                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH),
-                     'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
-                     'z' : PARAMETERS['height'],
+                     'x' : leg_x_sign[leg_num] * (half_chassis_width + COXA_LENGTH + FEMUR_LENGTH),
+                     'y' : leg_y_sign[leg_num] * half_chassis_length,
+                     'z' : PARAMETERS['height'] + leg_z,
                      'mass' : LIMB_MASS,
                      'inertia' : 10 * sphere_inertia(LIMB_MASS, 0.06),
                      'roll_rad' : 0.0,
@@ -282,9 +287,9 @@ def main():
         print TIP.format(
             **merge(PARAMETERS,
                     {'name' : 'tip%d' % leg_num,
-                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH + TIBIA_LENGTH),
-                     'y' : leg_y_sign[leg_num] * (0.5 * CHASSIS_LENGTH),
-                     'z' : PARAMETERS['height'],
+                     'x' : leg_x_sign[leg_num] * (half_chassis_width + COXA_LENGTH + FEMUR_LENGTH + TIBIA_LENGTH),
+                     'y' : leg_y_sign[leg_num] * (half_chassis_length),
+                     'z' : PARAMETERS['height'] + leg_z,
                      'mass' : 0.02,
                      'inertia' : sphere_inertia(0.02, 0.017),
                      'radius' : 0.012}))
