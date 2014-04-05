@@ -117,9 +117,9 @@ class GazeboController(object):
         self.joint_cmd = joint_cmd_pb2.JointCmd()
         self.joint_cmd.axis = 0
         self.joint_cmd.position.target = 0
-        self.joint_cmd.position.p_gain = 140.0
-        self.joint_cmd.position.i_gain = 1.0
-        self.joint_cmd.position.d_gain = 2.0
+        self.joint_cmd.position.p_gain = 10.0
+        self.joint_cmd.position.i_gain = 2.0
+        self.joint_cmd.position.d_gain = 0.2
 
         self._servo_angles = {}
 

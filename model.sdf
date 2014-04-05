@@ -10,12 +10,12 @@
       <inertial>
         <mass>1.600000</mass>
         <inertia>
-          <ixx>0.005776</ixx>
+          <ixx>0.023104</ixx>
           <ixy>0.00</ixy>
           <ixz>0.00</ixz>
-          <iyy>0.005776</iyy>
+          <iyy>0.023104</iyy>
           <iyz>0.00</iyz>
-          <izz>0.005776</izz>
+          <izz>0.023104</izz>
         </inertia>
       </inertial>
       <collision name="collision">
@@ -58,8 +58,8 @@
         <xyz>0.000000 0.000000 1.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -96,8 +96,8 @@
         <xyz>0.000000 1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -134,8 +134,8 @@
         <xyz>0.000000 1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -210,8 +210,8 @@
         <xyz>0.000000 0.000000 1.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -248,8 +248,8 @@
         <xyz>0.000000 1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -286,8 +286,8 @@
         <xyz>0.000000 1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -362,8 +362,8 @@
         <xyz>0.000000 0.000000 1.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -400,8 +400,8 @@
         <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -438,8 +438,8 @@
         <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -514,8 +514,8 @@
         <xyz>0.000000 0.000000 1.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -552,8 +552,8 @@
         <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
@@ -590,8 +590,8 @@
         <xyz>0.000000 -1.000000 0.000000</xyz>
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
-          <effort>2.400000</effort>
-          <velocity>1.0</velocity>
+          <effort>1.200000</effort>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>

@@ -25,12 +25,12 @@ SURFACE = '''
 
 PARAMETERS = {
     'chassis_mass' : CHASSIS_MASS,
-    'chassis_inertia' : sphere_inertia(CHASSIS_MASS, 0.5 * CHASSIS_LENGTH),
+    'chassis_inertia' : sphere_inertia(4 * CHASSIS_MASS, 0.5 * CHASSIS_LENGTH),
     'chassis_length' : CHASSIS_LENGTH,
     'chassis_height' : 0.034,
     'height' : 0.4,
     'surface' : '',
-    'effort' : 2.4,
+    'effort' : 1.2,
     }
 
 PREAMBLE = '''<?xml version="1.0"?>
@@ -134,7 +134,7 @@ JOINT = '''
         <dynamics><damping>0.1</damping><friction>0.1</friction></dynamics>
         <limit>
           <effort>{effort:f}</effort>
-          <velocity>1.0</velocity>
+          <velocity>3.0</velocity>
         </limit>
       </axis>
     </joint>
