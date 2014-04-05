@@ -5,7 +5,7 @@ import math
 CHASSIS_LENGTH = 0.2
 CHASSIS_MASS = 1.8
 COXA_LENGTH = 0.06
-FEMUR_LENGTH = 0.04
+FEMUR_LENGTH = 0.06
 TIBIA_LENGTH = 0.06
 LIMB_MASS = 0.05
 
@@ -93,6 +93,30 @@ LINK = '''
     </link>
 '''
 
+MESH_LINK = '''
+    <link name="{name}">
+      <pose>{x:f} {y:f} {z:f} {roll_rad:f} {pitch_rad:f} {yaw_rad:f}</pose>
+      <inertial>
+        <mass>{mass:f}</mass>
+        <inertia>
+          <ixx>{inertia:f}</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>{inertia:f}</iyy>
+          <iyz>0.00</iyz>
+          <izz>{inertia:f}</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry><box><size>{length:f} {width:f} {height:f}</size></box></geometry>
+      {surface}
+      </collision>
+      <visual name="visual">
+        <geometry><mesh><uri>{mesh_name:s}</uri></mesh></geometry>
+      </visual>
+    </link>
+'''
+
 LIMIT = '''
         <limit>
           <effort>100</effort>
@@ -135,7 +159,7 @@ TIP = '''
         {surface}
       </collision>
       <visual name="visual">
-        <geometry><sphere><radius>{radius:f}</radius></sphere></geometry>
+        <geometry><empty/></geometry>
       </visual>
     </link>
 '''
@@ -199,10 +223,10 @@ def main():
                                  'axis_y' : 0.0,
                                  'axis_z' : 1.0}))
 
-        print LINK.format(
+        print MESH_LINK.format(
             **merge(PARAMETERS,
                     {'name' : 'femur%d' % leg_num,
-                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + 0.5 * FEMUR_LENGTH),
+                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
                      'mass' : LIMB_MASS,
@@ -212,12 +236,13 @@ def main():
                      'yaw_rad' : leg_yaw[leg_num],
                      'length' : FEMUR_LENGTH,
                      'width' : 0.035,
-                     'height' : 0.030}))
+                     'height' : 0.030,
+                     'mesh_name' : 'file://femur.dae'}))
 
         print JOINT.format(
             **merge(PARAMETERS,
                     {'name' : 'femur_hinge%d' % leg_num,
-                     'x' : -0.5 * FEMUR_LENGTH,
+                     'x' : 0.0,
                      'y' : 0.0,
                      'z' : 0.0,
                      'child' : 'femur%d' % leg_num,
@@ -226,10 +251,10 @@ def main():
                      'axis_y' : leg_x_sign[leg_num] * 1.0,
                      'axis_z' : 0.0}))
 
-        print LINK.format(
+        print MESH_LINK.format(
             **merge(PARAMETERS,
                     {'name' : 'tibia%d' % leg_num,
-                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH + 0.5 * TIBIA_LENGTH),
+                     'x' : leg_x_sign[leg_num] * (0.5 * CHASSIS_LENGTH + COXA_LENGTH + FEMUR_LENGTH),
                      'y' : leg_y_sign[leg_num] * 0.5 * CHASSIS_LENGTH,
                      'z' : PARAMETERS['height'],
                      'mass' : LIMB_MASS,
@@ -239,12 +264,13 @@ def main():
                      'yaw_rad' : leg_yaw[leg_num],
                      'length' : TIBIA_LENGTH,
                      'width' : 0.035,
-                     'height' : 0.030}))
+                     'height' : 0.030,
+                     'mesh_name' : 'file://bracket_long_tip.dae'}))
 
         print JOINT.format(
             **merge(PARAMETERS,
                     {'name' : 'tibia_hinge%d' % leg_num,
-                     'x' : -0.5 * TIBIA_LENGTH,
+                     'x' : 0.0,
                      'y' : 0.0,
                      'z' : 0.0,
                      'child' : 'tibia%d' % leg_num,
@@ -261,7 +287,7 @@ def main():
                      'z' : PARAMETERS['height'],
                      'mass' : 0.02,
                      'inertia' : sphere_inertia(0.02, 0.017),
-                     'radius' : 0.017}))
+                     'radius' : 0.012}))
 
         print TIP_JOINT.format(
             **merge(PARAMETERS,
@@ -272,6 +298,7 @@ def main():
                      'child' : 'tip%d' % leg_num,
                      'parent' : 'tibia%d' % leg_num,
                      }))
+
 
     print SUFFIX
 

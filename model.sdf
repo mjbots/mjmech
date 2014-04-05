@@ -66,7 +66,7 @@
 
 
     <link name="femur0">
-      <pose>0.180000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.160000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -79,17 +79,17 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://femur.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="femur_hinge0">
-      <pose>-0.020000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>femur0</child>
       <parent>coxa0</parent>
       <axis>
@@ -104,7 +104,7 @@
 
 
     <link name="tibia0">
-      <pose>0.230000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.220000 0.100000 0.400000 0.000000 0.000000 0.000000</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -121,13 +121,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://bracket_long_tip.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="tibia_hinge0">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>tibia0</child>
       <parent>femur0</parent>
       <axis>
@@ -142,7 +142,7 @@
 
 
     <link name="tip0">
-      <pose>0.260000 0.100000 0.400000 0 0 0</pose>
+      <pose>0.280000 0.100000 0.400000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -155,11 +155,11 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><sphere><radius>0.012000</radius></sphere></geometry>
         
       </collision>
       <visual name="visual">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><empty/></geometry>
       </visual>
     </link>
 
@@ -218,7 +218,7 @@
 
 
     <link name="femur1">
-      <pose>0.180000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.160000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -231,17 +231,17 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://femur.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="femur_hinge1">
-      <pose>-0.020000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>femur1</child>
       <parent>coxa1</parent>
       <axis>
@@ -256,7 +256,7 @@
 
 
     <link name="tibia1">
-      <pose>0.230000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
+      <pose>0.220000 -0.100000 0.400000 0.000000 0.000000 0.000000</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -273,13 +273,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://bracket_long_tip.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="tibia_hinge1">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>tibia1</child>
       <parent>femur1</parent>
       <axis>
@@ -294,7 +294,7 @@
 
 
     <link name="tip1">
-      <pose>0.260000 -0.100000 0.400000 0 0 0</pose>
+      <pose>0.280000 -0.100000 0.400000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -307,11 +307,11 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><sphere><radius>0.012000</radius></sphere></geometry>
         
       </collision>
       <visual name="visual">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><empty/></geometry>
       </visual>
     </link>
 
@@ -370,7 +370,7 @@
 
 
     <link name="femur2">
-      <pose>-0.180000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.160000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -383,17 +383,17 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://femur.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="femur_hinge2">
-      <pose>-0.020000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>femur2</child>
       <parent>coxa2</parent>
       <axis>
@@ -408,7 +408,7 @@
 
 
     <link name="tibia2">
-      <pose>-0.230000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.220000 -0.100000 0.400000 0.000000 0.000000 3.141593</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -425,13 +425,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://bracket_long_tip.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="tibia_hinge2">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>tibia2</child>
       <parent>femur2</parent>
       <axis>
@@ -446,7 +446,7 @@
 
 
     <link name="tip2">
-      <pose>-0.260000 -0.100000 0.400000 0 0 0</pose>
+      <pose>-0.280000 -0.100000 0.400000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -459,11 +459,11 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><sphere><radius>0.012000</radius></sphere></geometry>
         
       </collision>
       <visual name="visual">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><empty/></geometry>
       </visual>
     </link>
 
@@ -522,7 +522,7 @@
 
 
     <link name="femur3">
-      <pose>-0.180000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.160000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -535,17 +535,17 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.040000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://femur.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="femur_hinge3">
-      <pose>-0.020000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>femur3</child>
       <parent>coxa3</parent>
       <axis>
@@ -560,7 +560,7 @@
 
 
     <link name="tibia3">
-      <pose>-0.230000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
+      <pose>-0.220000 0.100000 0.400000 0.000000 0.000000 3.141593</pose>
       <inertial>
         <mass>0.050000</mass>
         <inertia>
@@ -577,13 +577,13 @@
       
       </collision>
       <visual name="visual">
-        <geometry><box><size>0.060000 0.035000 0.030000</size></box></geometry>
+        <geometry><mesh><uri>file://bracket_long_tip.dae</uri></mesh></geometry>
       </visual>
     </link>
 
 
     <joint type="revolute" name="tibia_hinge3">
-      <pose>-0.030000 0.000000 0.000000 0 0 0</pose>
+      <pose>0.000000 0.000000 0.000000 0 0 0</pose>
       <child>tibia3</child>
       <parent>femur3</parent>
       <axis>
@@ -598,7 +598,7 @@
 
 
     <link name="tip3">
-      <pose>-0.260000 0.100000 0.400000 0 0 0</pose>
+      <pose>-0.280000 0.100000 0.400000 0 0 0</pose>
       <inertial>
         <mass>0.020000</mass>
         <inertia>
@@ -611,11 +611,11 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><sphere><radius>0.012000</radius></sphere></geometry>
         
       </collision>
       <visual name="visual">
-        <geometry><sphere><radius>0.017000</radius></sphere></geometry>
+        <geometry><empty/></geometry>
       </visual>
     </link>
 
