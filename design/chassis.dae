@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.66.1 r55057</authoring_tool>
     </contributor>
-    <created>2014-04-05T10:36:34</created>
-    <modified>2014-04-05T10:36:34</modified>
+    <created>2014-04-05T17:40:43</created>
+    <modified>2014-04-05T17:40:43</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -385,6 +385,17 @@
       </node>
       <node id="servo_003" name="servo_003" type="NODE">
         <matrix sid="transform">-2.5882e-4 9.65926e-4 0 0.088 -9.65926e-4 -2.5882e-4 0 -0.078 0 0 0.001 -0.005 0 0 0 1</matrix>
+        <instance_geometry url="#servo-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="BlackPlastic-material" target="#BlackPlastic-material"/>
+              <instance_material symbol="WhitePlastic-material" target="#WhitePlastic-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="servo_004" name="servo_004" type="NODE">
+        <matrix sid="transform">0.001 0 0 0 0 0.001 0 -0.003 0 0 0.001 0.027 0 0 0 1</matrix>
         <instance_geometry url="#servo-mesh">
           <bind_material>
             <technique_common>

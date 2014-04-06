@@ -3,7 +3,7 @@
 import math
 
 CHASSIS_LENGTH = 0.19
-CHASSIS_MASS = 1.6
+CHASSIS_MASS = 1.05
 COXA_LENGTH = 0.06
 FEMUR_LENGTH = 0.06
 TIBIA_LENGTH = 0.06
@@ -191,6 +191,65 @@ def main():
     print PREAMBLE
 
     print CHASSIS.format(**PARAMETERS)
+
+    print MESH_LINK.format(
+        **merge(PARAMETERS,
+                {'name' : 'pan_aeg',
+                 'x' : 0.0,
+                 'y' : 0.01,
+                 'z' : PARAMETERS['height'] + PARAMETERS['chassis_height'] + 0.025,
+                 'mass' : 0.1,
+                 'inertia' : 10 * sphere_inertia(0.1, 0.02),
+                 'pitch_rad' : 0,
+                 'roll_rad' : 0,
+                 'yaw_rad' : 0,
+                 'width' : 0.04,
+                 'length' : 0.02,
+                 'height' : 0.025,
+                 'mesh_name' : 'pan_bracket.dae'
+                 }))
+
+    print JOINT.format(
+        **merge(PARAMETERS, {'name' : 'pan_aeg_hinge',
+                             'x' : 0.0,
+                             'y' : 0.0,
+                             'z' : 0.0,
+                             'child' : 'pan_aeg',
+                             'parent' : 'chassis',
+                             'axis_x' : 0.0,
+                             'axis_y' : 0.0,
+                             'axis_z' : 1.0,
+                             }))
+
+    print MESH_LINK.format(
+        **merge(PARAMETERS,
+                {'name' : 'weapon_assembly',
+                 'x' : 0.0,
+                 'y' : 0.01,
+                 'z' : PARAMETERS['height'] + PARAMETERS['chassis_height'] + 0.047,
+                 'mass' : 0.550,
+                 'inertia' : 3 * sphere_inertia(0.55, 0.2),
+                 'pitch_rad' : 0,
+                 'roll_rad' : 0,
+                 'yaw_rad' : 0,
+                 'width' : 0.035,
+                 'length' : 0.15,
+                 'height' : 0.15,
+                 'mesh_name' : 'weapon_assembly.dae'
+                 }))
+
+    print JOINT.format(
+        **merge(PARAMETERS, {'name' : 'weapon_assembly_hinge',
+                             'x' : 0.0,
+                             'y' : 0.0,
+                             'z' : 0.0,
+                             'child' : 'weapon_assembly',
+                             'parent' : 'pan_aeg',
+                             'axis_x' : 1.0,
+                             'axis_y' : 0.0,
+                             'axis_z' : 0.0,
+                             }))
+
 
     leg_x_sign = [ 1, 1, -1, -1]
     leg_y_sign = [ 1, -1, -1, 1]
