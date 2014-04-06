@@ -2,6 +2,10 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+'''A servo, inverse-kinematics, and gait configuration tool for
+walking mech robots.'''
+
+import argparse
 import eventlet
 import functools
 import os
@@ -732,10 +736,13 @@ class IkConfigTab(object):
 
 
 class Mtool(QtGui.QMainWindow):
-    CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
+    DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
 
-    def __init__(self, parent=None):
+    def __init__(self, args, parent=None):
         super(Mtool, self).__init__(parent)
+
+        self.config_file = (args.config if args.config else
+                            self.DEFAULT_CONFIG_FILE)
 
         self.ui = mtool_main_window.Ui_MtoolMainWindow()
         self.ui.setupUi(self)
@@ -751,7 +758,7 @@ class Mtool(QtGui.QMainWindow):
 
     def read_settings(self):
         config = ConfigParser.ConfigParser()
-        config.read(self.CONFIG_FILE)
+        config.read(self.config_file)
 
         self.servo_tab.read_settings(config)
         self.ikconfig_tab.read_settings(config)
@@ -762,10 +769,10 @@ class Mtool(QtGui.QMainWindow):
         self.servo_tab.write_settings(config)
         self.ikconfig_tab.write_settings(config)
 
-        config_dir = os.path.dirname(self.CONFIG_FILE)
-        if not os.path.exists(config_dir):
+        config_dir = os.path.dirname(self.config_file)
+        if config_dir != '' and not os.path.exists(config_dir):
             os.mkdir(config_dir)
-        config.write(open(self.CONFIG_FILE, 'w'))
+        config.write(open(self.config_file, 'w'))
 
 def eventlet_pyside_mainloop(app):
     timer = QtCore.QTimer()
@@ -779,7 +786,13 @@ def main():
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName('mtool')
 
-    mtool = Mtool()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-c', '--config',
+                        help='use a non-default configuration file')
+
+    args = parser.parse_args()
+
+    mtool = Mtool(args)
     mtool.show()
 
     eventlet_pyside_mainloop(app)
