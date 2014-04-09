@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="servoTab">
        <attribute name="title">
@@ -284,7 +284,7 @@
        <attribute name="title">
         <string>IK Configuration</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -703,15 +703,15 @@ p, li { white-space: pre-wrap; }
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="0" column="0">
               <widget class="QLabel" name="planeLabel">
                <property name="text">
                 <string>Plane:</string>
                </property>
               </widget>
              </item>
-             <item>
+             <item row="0" column="1" colspan="2">
               <widget class="QComboBox" name="planeCombo">
                <item>
                 <property name="text">
@@ -730,28 +730,15 @@ p, li { white-space: pre-wrap; }
                </item>
               </widget>
              </item>
-             <item>
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>18</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
+             <item row="1" column="0">
               <widget class="QLabel" name="scaleLabel">
                <property name="text">
-                <string>Scale (mm):</string>
+                <string>Length Scale (mm):</string>
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="scaleSpin">
+             <item row="1" column="1" colspan="2">
+              <widget class="QDoubleSpinBox" name="lengthScaleSpin">
                <property name="decimals">
                 <number>0</number>
                </property>
@@ -767,6 +754,53 @@ p, li { white-space: pre-wrap; }
                <property name="value">
                 <double>50.000000000000000</double>
                </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="speedScaleLabel">
+               <property name="text">
+                <string>Speed Scale (mm/s):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="speedScaleSpin">
+               <property name="minimum">
+                <number>10</number>
+               </property>
+               <property name="maximum">
+                <number>5000</number>
+               </property>
+               <property name="singleStep">
+                <number>20</number>
+               </property>
+               <property name="value">
+                <number>500</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QComboBox" name="speedAxisCombo">
+               <item>
+                <property name="text">
+                 <string>X</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Y</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Z</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Any</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>
@@ -825,7 +859,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="title">
-         <string>Command</string>
+         <string>Command (click to set)</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <item>
@@ -856,6 +890,21 @@ p, li { white-space: pre-wrap; }
              </item>
              <item>
               <property name="text">
+               <string>Body X</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Body Y</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Body Z</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Body Pitch</string>
               </property>
              </item>
@@ -881,7 +930,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QComboBox" name="comboBox_5">
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <item>
               <property name="text">
@@ -896,6 +945,21 @@ p, li { white-space: pre-wrap; }
              <item>
               <property name="text">
                <string>Rotation</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Body X</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Body Y</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Body Z</string>
               </property>
              </item>
              <item>

@@ -27,6 +27,15 @@ class Point3D(object):
             self.y * other.y,
             self.z * other.z)
 
+    def length(self):
+        value = self * self
+        return math.sqrt(value.x + value.y + value.z)
+
+    def scale(self, value):
+        return Point3D(self.x * value,
+                       self.y * value,
+                       self.z * value)
+
 class Configuration(object):
     coxa_min_deg = None
     coxa_max_deg = None
@@ -42,6 +51,8 @@ class Configuration(object):
     tibia_max_deg = None
     tibia_length_mm = None
     tibia_sign = 1
+
+    servo_speed_dps = 360.0
 
 class JointAngles(object):
     coxa_deg = None
@@ -141,3 +152,54 @@ def lizard_3dof_ik(point_mm, config):
     result.tibia_deg = tibia_deg
 
     return result
+
+class LizardIk(object):
+    def __init__(self, config):
+        self.config = config
+
+    def do_ik(self, point_mm):
+        return lizard_3dof_ik(point_mm, self.config)
+
+    def worst_case_speed_mm_s(self, point_mm, direction_mm=None):
+        '''Return the worst case linear velocity the end effector can
+        achieve in the given orientation.'''
+        step = 0.01
+        nominal = self.do_ik(point_mm)
+
+        if nominal is None:
+            return None
+
+
+        servo_step = step * self.config.servo_speed_dps
+        result = None
+
+        def update(result, advanced_servo_deg, nominal_servo_deg):
+            if advanced_servo_deg == nominal_servo_deg:
+                return
+
+            this_speed = (servo_step /
+                          abs(advanced_servo_deg - nominal_servo_deg))
+
+            if result is None or this_speed < result:
+                result = this_speed
+
+            return result
+
+        if direction_mm:
+            normalized = direction_mm.scale(1.0 / direction_mm.length())
+            consider = [normalized.scale(step)]
+        else:
+            consider = [Point3D(*val) for val in
+                        (step, 0., 0.), (0., step, 0.), (0., 0., step)]
+
+        for advance in consider:
+            advanced = self.do_ik(point_mm + advance)
+
+            if advanced is None:
+                return None
+
+            result = update(result, advanced.coxa_deg, nominal.coxa_deg)
+            result = update(result, advanced.femur_deg, nominal.femur_deg)
+            result = update(result, advanced.tibia_deg, nominal.tibia_deg)
+
+        return result

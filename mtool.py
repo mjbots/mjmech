@@ -383,7 +383,7 @@ class IkTester(object):
          self.label_y_plus,
          self.label_y_minus) = labels
 
-        self.scale = 50
+        self.length_scale = 50
         self.update_labels()
         self.ik_config = None
 
@@ -391,16 +391,16 @@ class IkTester(object):
         # Apparently it is really hard to get QGraphicsTextItems to be
         # aligned anything other than left|upper.  Thus, just hack in
         # some offsets which kind of work on my monitor for now.
-        self.label_x_plus.setPlainText('+%dmm' % int(self.scale))
+        self.label_x_plus.setPlainText('+%dmm' % int(self.length_scale))
         self.label_x_plus.setPos(0.7, 0)
 
-        self.label_x_minus.setPlainText('-%dmm' % int(self.scale))
+        self.label_x_minus.setPlainText('-%dmm' % int(self.length_scale))
         self.label_x_minus.setPos(-1, 0)
 
-        self.label_y_plus.setPlainText('+%dmm' % int(self.scale))
+        self.label_y_plus.setPlainText('+%dmm' % int(self.length_scale))
         self.label_y_plus.setPos(0, 1)
 
-        self.label_y_minus.setPlainText('-%dmm' % int(self.scale))
+        self.label_y_minus.setPlainText('-%dmm' % int(self.length_scale))
         self.label_y_minus.setPos(0, -.9)
 
     def fit_in_view(self):
@@ -413,7 +413,9 @@ class IkTester(object):
                    x_offset_mm, y_offset_mm, z_offset_mm,
                    coxa_length_mm, femur_length_mm, tibia_length_mm,
                    plane,
-                   scale):
+                   length_scale,
+                   speed_scale,
+                   speed_axis):
         self.coxa_servo = coxa_servo
         self.coxa_sign = coxa_sign
         self.femur_servo = femur_servo
@@ -431,14 +433,16 @@ class IkTester(object):
         self.femur_length_mm = femur_length_mm
         self.tibia_length_mm = tibia_length_mm
         self.plane = plane
-        self.scale = scale
+        self.length_scale = length_scale
+        self.speed_scale = speed_scale
+        self.speed_axis = speed_axis
 
         self.update_labels()
         self.update_scene()
 
     def coord_to_point(self, coord):
-        coord1 = coord[0] * self.scale
-        coord2 = coord[1] * self.scale
+        coord1 = coord[0] * self.length_scale
+        coord2 = coord[1] * self.length_scale
 
         point_mm = leg_ik.Point3D(self.x_offset_mm,
                                   self.y_offset_mm,
@@ -484,14 +488,24 @@ class IkTester(object):
         self.ik_config.tibia_length_mm = self.tibia_length_mm
         self.ik_config.tibia_sign = self.tibia_sign
 
+        ik = leg_ik.LizardIk(self.ik_config)
+
+        axis = self.speed_axis
+
         for (x, y), rect in self.usable_rects.iteritems():
             point_mm = self.coord_to_point((float(x) / self.grid_count,
                                             float(y) / self.grid_count))
-            result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
+            result = ik.do_ik(point_mm)
             if result is None:
                 rect.setBrush(QtGui.QBrush(QtCore.Qt.red))
             else:
-                rect.setBrush(QtGui.QBrush())
+                speed = ik.worst_case_speed_mm_s(point_mm, axis)
+                if speed is None:
+                    rect.setBrush(QtGui.QBrush())
+                else:
+                    val = int(min(255, 255 * speed / self.speed_scale))
+                    color = QtGui.QColor(255 - val, 255, 255 - val)
+                    rect.setBrush(QtGui.QBrush(color))
 
     def handle_mouse_press(self):
         self.servo_tab.controller.enable_power(servo_controller.POWER_ENABLE)
@@ -546,7 +560,8 @@ class IkConfigTab(object):
         for combo in [self.ui.idleCombo,
                       self.ui.minimumCombo,
                       self.ui.maximumCombo,
-                      self.ui.planeCombo]:
+                      self.ui.planeCombo,
+                      self.ui.speedAxisCombo]:
             combo.currentIndexChanged.connect(self.handle_ik_config_change)
 
         for spin in [self.ui.xOffsetSpin,
@@ -555,7 +570,8 @@ class IkConfigTab(object):
                      self.ui.coxaLengthSpin,
                      self.ui.femurLengthSpin,
                      self.ui.tibiaLengthSpin,
-                     self.ui.scaleSpin]:
+                     self.ui.lengthScaleSpin,
+                     self.ui.speedScaleSpin]:
             spin.valueChanged.connect(self.handle_ik_config_change)
 
         self.handle_ik_config_change()
@@ -667,8 +683,23 @@ class IkConfigTab(object):
             femur_length_mm=self.ui.femurLengthSpin.value(),
             tibia_length_mm=self.ui.tibiaLengthSpin.value(),
             plane=self.get_plane(),
-            scale=self.ui.scaleSpin.value(),
+            length_scale=self.ui.lengthScaleSpin.value(),
+            speed_scale=self.ui.speedScaleSpin.value(),
+            speed_axis=self._speed_axis(),
             )
+
+    def _speed_axis(self):
+        value = self.ui.speedAxisCombo.currentIndex()
+        if value == 0:
+            return leg_ik.Point3D(1., 0., 0.)
+        elif value == 1:
+            return leg_ik.Point3D(0., 1., 0.)
+        elif value == 2:
+            return leg_ik.Point3D(0., 0., 1.)
+        elif value == 3:
+            return None
+        else:
+            raise NotImplementedError()
 
     def get_float_configs(self):
         return [(self.ui.xOffsetSpin, 'x_offset'),
@@ -700,8 +731,14 @@ class IkConfigTab(object):
             self.ui.planeCombo.setCurrentIndex(
                 config.getint('ikconfig', 'plane'))
         if config.has_option('ikconfig', 'scale'):
-            self.ui.scaleSpin.setValue(
+            self.ui.lengthScaleSpin.setValue(
                 config.getfloat('ikconfig', 'scale'))
+        if config.has_option('ikconfig', 'speed_scale'):
+            self.ui.speedScaleSpin.setValue(
+                config.getfloat('ikconfig', 'speed_scale'))
+        if config.has_option('ikconfig', 'speed_axis'):
+            self.ui.speedAxisCombo.setCurrentIndex(
+                config.getint('ikconfig', 'speed_axis'))
 
         if config.has_section('ikconfig.legs'):
             for leg_name, value in config.items('ikconfig.legs'):
@@ -728,7 +765,10 @@ class IkConfigTab(object):
             config.set('ikconfig', name, spin.value())
 
         config.set('ikconfig', 'plane', self.ui.planeCombo.currentIndex())
-        config.set('ikconfig', 'scale', self.ui.scaleSpin.value())
+        config.set('ikconfig', 'scale', self.ui.lengthScaleSpin.value())
+        config.set('ikconfig', 'speed_scale', self.ui.speedScaleSpin.value())
+        config.set('ikconfig', 'speed_axis',
+                   self.ui.speedAxisCombo.currentIndex())
 
         config.add_section('ikconfig.legs')
         for leg_num, leg_config in self.legs.iteritems():
