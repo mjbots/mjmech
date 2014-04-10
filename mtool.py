@@ -508,12 +508,19 @@ class IkTester(object):
                     rect.setBrush(QtGui.QBrush(color))
 
     def handle_mouse_press(self):
+        if self.servo_tab.controller is None:
+            return
         self.servo_tab.controller.enable_power(servo_controller.POWER_ENABLE)
 
     def handle_mouse_release(self):
+        if self.servo_tab.controller is None:
+            return
         self.servo_tab.controller.enable_power(servo_controller.POWER_BRAKE)
 
     def handle_mouse_move(self, cursor):
+        if self.servo_tab.controller is None:
+            return
+
         point_mm = self.coord_to_point((cursor.x(), cursor.y()))
 
         result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
