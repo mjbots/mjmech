@@ -19,18 +19,18 @@ UNKNOWN = 2
 class LegConfig(object):
     # The mounting positions are relative to the geometric center of
     # the body.
-    mount_x_mm = None
-    mount_y_mm = None
-    mount_z_mm = None
+    mount_x_mm = 0
+    mount_y_mm = 0
+    mount_z_mm = 0
 
     # The idle positions are measured relative to the ground under
     # each mounting location, with the unique property that positive x
     # is defined always as away from the midline and y is defined as
     # away from the centerline.  (This means that it is valid for all
     # leg's idle states to be the same).
-    idle_x_mm = None
-    idle_y_mm = None
-    idle_z_mm = None
+    idle_x_mm = 100
+    idle_y_mm = 0
+    idle_z_mm = 0
 
     leg_ik = None
 

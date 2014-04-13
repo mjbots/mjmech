@@ -39,24 +39,74 @@ class GaitTab(object):
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
         self.handle_current_changed()
 
-    def read_settings(self, settings):
-        pass
+    def get_float_configs(self):
+        return [(self.ui.bodyCogXSpin, 'body_cog_x_mm'),
+                (self.ui.bodyCogYSpin, 'body_cog_y_mm'),
+                (self.ui.bodyCogZSpin, 'body_cog_z_mm'),
+                (self.ui.idlePositionXSpin, 'idle_position_x_mm'),
+                (self.ui.idlePositionYSpin, 'idle_position_y_mm'),
+                (self.ui.idlePositionZSpin, 'idle_position_z_mm'),
+                (self.ui.maxCycleTimeSpin, 'max_cycle_time_s'),
+                (self.ui.liftHeightSpin, 'lift_height_mm'),
+                (self.ui.minSwingPercentSpin, 'min_swing_percent'),
+                (self.ui.maxSwingPercentSpin, 'max_swing_percent'),
+                (self.ui.bodyZOffsetSpin, 'body_z_offset_mm')]
 
-    def write_settings(self, settings):
-        pass
+    def string_to_leg_config(self, value):
+        assert isinstance(value, str)
+        fields = [float(x) for x in value.split(',')]
+        assert len(fields) >= 3
+
+        result = ripple_gait.LegConfig()
+        result.mount_x_mm = fields[0]
+        result.mount_y_mm = fields[1]
+        result.mount_z_mm = fields[2]
+
+        return result
+
+    def leg_config_to_string(self, leg_config):
+        assert isinstance(leg_config, ripple_gait.LegConfig)
+        return '%f,%f,%f' % (
+            leg_config.mount_x_mm,
+            leg_config.mount_y_mm,
+            leg_config.mount_z_mm)
+
+    def read_settings(self, config):
+        if not config.has_section('gaitconfig'):
+            return
+
+        for spin, name in self.get_float_configs():
+            if config.has_option('gaitconfig', name):
+                spin.setValue(config.getfloat('gaitconfig', name))
+
+        if config.has_section('gaitconfig.legs'):
+            for leg_name, value in config.items('gaitconfig.legs'):
+                leg_num = int(leg_name.split('.')[1])
+                self.ripple_config.mechanical.leg_config[leg_num] = \
+                    self.string_to_leg_config(value)
+
+        self.handle_leg_change(self.ui.gaitLegList.currentItem())
+        self.handle_gait_config_change()
+
+    def write_settings(self, config):
+        config.add_section('gaitconfig')
+        for spin, name in self.get_float_configs():
+            config.set('gaitconfig', name, spin.value())
+
+        config.add_section('gaitconfig.legs')
+        for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
+            leg_num, leg_config = leg_data
+            config.set('gaitconfig.legs', 'leg.%d' % leg_num,
+                       self.leg_config_to_string(leg_config))
 
     def handle_current_changed(self, index = 2):
         if index != 2:
             return
 
-        # TODO jpieper: Ensure we copy all necessary information from
-        # the ikconfig tab... (likely just the count and numbers of
-        # the present legs).
-
+        # Update the leg list widget.
         available_legs = self.ikconfig_tab.get_all_legs()
         enabled_legs = set(self.ikconfig_tab.get_enabled_legs())
 
-        # Update the leg list widget.
         for leg_num in available_legs:
             leg_str = str(leg_num)
             if not self.ui.gaitLegList.findItems(
@@ -123,5 +173,33 @@ class GaitTab(object):
         self.handle_gait_config_change()
 
     def handle_gait_config_change(self):
-        # TODO jpieper
-        pass
+        # Put all of our GUI information into the RippleGait that
+        # needs to be.
+
+        for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
+            leg_number, leg_config = leg_data
+
+            leg_config.idle_x_mm = self.ui.idlePositionXSpin.value()
+            leg_config.idle_y_mm = self.ui.idlePositionYSpin.value()
+            leg_config.idle_z_mm = self.ui.idlePositionZSpin.value()
+
+            leg_config.leg_ik = self.ikconfig_tab.get_leg_ik(leg_number)
+
+        self.ripple_config.mechanical.body_cog_x_mm = \
+            self.ui.bodyCogXSpin.value()
+        self.ripple_config.mechanical.body_cog_y_mm = \
+            self.ui.bodyCogYSpin.value()
+        self.ripple_config.mechanical.body_cog_z_mm = \
+            self.ui.bodyCogZSpin.value()
+
+        self.ripple_config.max_cycle_time_s = self.ui.maxCycleTimeSpin.value()
+        self.ripple_config.lift_height_mm = self.ui.liftHeightSpin.value()
+        self.ripple_config.min_swing_percent = \
+            self.ui.minSwingPercentSpin.value()
+        self.ripple_config.max_swing_percent = \
+            self.ui.maxSwingPercentSpin.value()
+
+        self.ripple_config.leg_order = \
+            self.ripple_config.mechanical.leg_config.keys()
+
+        self.ripple_config.body_z_offset = self.ui.bodyZOffsetSpin.value()

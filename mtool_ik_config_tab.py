@@ -332,9 +332,10 @@ class IkConfigTab(object):
         return [x for x in self.get_all_legs()
                 if self.legs.get(x, LegConfig()).present]
 
-    def get_leg_ik(self):
+    def get_leg_ik(self, leg_number):
         '''Return an IK solver for the given leg number.'''
-        raise NotImplementedError()
+        # TODO jpieper: Implement
+        return None
 
     def update_config_enable(self):
         enable = self.ui.legPresentCombo.currentIndex() == 0

@@ -14,8 +14,8 @@
    <string>mtool</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_6">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -1025,6 +1025,9 @@ p, li { white-space: pre-wrap; }
          </item>
          <item row="2" column="1">
           <widget class="QDoubleSpinBox" name="mountingLegXSpin">
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
            <property name="maximum">
             <double>1000.000000000000000</double>
            </property>
@@ -1032,7 +1035,7 @@ p, li { white-space: pre-wrap; }
             <double>5.000000000000000</double>
            </property>
            <property name="value">
-            <double>100.000000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -1080,14 +1083,14 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>300</x>
           <y>10</y>
-          <width>301</width>
-          <height>171</height>
+          <width>291</width>
+          <height>201</height>
          </rect>
         </property>
         <property name="title">
          <string>Gait</string>
         </property>
-        <layout class="QFormLayout" name="formLayout_6">
+        <layout class="QGridLayout" name="gridLayout_7">
          <item row="0" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
@@ -1121,13 +1124,13 @@ p, li { white-space: pre-wrap; }
          <item row="2" column="1">
           <widget class="QDoubleSpinBox" name="maxCycleTimeSpin">
            <property name="maximum">
-            <double>4.000000000000000</double>
+            <double>20.000000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <double>1.000000000000000</double>
+            <double>4.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -1185,13 +1188,36 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Body Z offset:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QDoubleSpinBox" name="bodyZOffsetSpin">
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>60.000000000000000</double>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QGroupBox" name="gaitGraphGroup">
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>200</y>
+          <y>240</y>
           <width>311</width>
           <height>131</height>
          </rect>
@@ -1226,7 +1252,14 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="idlePositionXSpin"/>
+          <widget class="QDoubleSpinBox" name="idlePositionXSpin">
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_11">
@@ -1236,7 +1269,17 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="idlePositionYSpin"/>
+          <widget class="QDoubleSpinBox" name="idlePositionYSpin">
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_12">
@@ -1246,7 +1289,17 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="idlePositionZSpin"/>
+          <widget class="QDoubleSpinBox" name="idlePositionZSpin">
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -1299,7 +1352,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>350</y>
+          <y>380</y>
           <width>311</width>
           <height>241</height>
          </rect>
