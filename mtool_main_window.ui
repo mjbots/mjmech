@@ -831,7 +831,7 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Gait Configuration</string>
        </attribute>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="geometryGroup">
         <property name="geometry">
          <rect>
           <x>630</x>
@@ -849,7 +849,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_2">
+       <widget class="QGroupBox" name="commandGroup">
         <property name="geometry">
          <rect>
           <x>630</x>
@@ -986,7 +986,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_6">
+       <widget class="QGroupBox" name="mountingGroup">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -1000,14 +1000,14 @@ p, li { white-space: pre-wrap; }
         </property>
         <layout class="QFormLayout" name="formLayout_3">
          <item row="0" column="0">
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="gaitLegLabel">
            <property name="text">
             <string>Leg:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QListWidget" name="listWidget"/>
+          <widget class="QListWidget" name="gaitLegList"/>
          </item>
          <item row="1" column="0" colspan="2">
           <widget class="Line" name="line_5">
@@ -1024,7 +1024,17 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+          <widget class="QDoubleSpinBox" name="mountingLegXSpin">
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>5.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>100.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_3">
@@ -1034,7 +1044,17 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+          <widget class="QDoubleSpinBox" name="mountingLegYSpin">
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_4">
@@ -1044,11 +1064,18 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+          <widget class="QDoubleSpinBox" name="mountingLegZSpin">
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_7">
+       <widget class="QGroupBox" name="gaitGroup">
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -1092,7 +1119,17 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+          <widget class="QDoubleSpinBox" name="maxCycleTimeSpin">
+           <property name="maximum">
+            <double>4.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_7">
@@ -1102,7 +1139,17 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+          <widget class="QDoubleSpinBox" name="liftHeightSpin">
+           <property name="minimum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_8">
@@ -1112,7 +1159,14 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+          <widget class="QDoubleSpinBox" name="minSwingPercentSpin">
+           <property name="maximum">
+            <double>200.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>50.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_9">
@@ -1122,11 +1176,18 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="5" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_7"/>
+          <widget class="QDoubleSpinBox" name="maxSwingPercentSpin">
+           <property name="maximum">
+            <double>200.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>100.000000000000000</double>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_8">
+       <widget class="QGroupBox" name="gaitGraphGroup">
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -1144,7 +1205,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_9">
+       <widget class="QGroupBox" name="idlePositionGroup">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -1165,7 +1226,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_8"/>
+          <widget class="QDoubleSpinBox" name="idlePositionXSpin"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_11">
@@ -1175,7 +1236,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_9"/>
+          <widget class="QDoubleSpinBox" name="idlePositionYSpin"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_12">
@@ -1185,11 +1246,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_10"/>
+          <widget class="QDoubleSpinBox" name="idlePositionZSpin"/>
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_10">
+       <widget class="QGroupBox" name="bodyCogGroup">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -1210,7 +1271,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_11"/>
+          <widget class="QDoubleSpinBox" name="bodyCogXSpin"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_14">
@@ -1220,7 +1281,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_12"/>
+          <widget class="QDoubleSpinBox" name="bodyCogYSpin"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_15">
@@ -1230,11 +1291,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_13"/>
+          <widget class="QDoubleSpinBox" name="bodyCogZSpin"/>
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_11">
+       <widget class="QGroupBox" name="playbackGroup">
         <property name="geometry">
          <rect>
           <x>300</x>

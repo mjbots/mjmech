@@ -50,12 +50,14 @@ class Mtool(QtGui.QMainWindow):
 
         self.servo_tab.read_settings(config)
         self.ikconfig_tab.read_settings(config)
+        self.gait_tab.read_settings(config)
 
     def write_settings(self):
         config = ConfigParser.ConfigParser()
 
         self.servo_tab.write_settings(config)
         self.ikconfig_tab.write_settings(config)
+        self.gait_tab.write_settings(config)
 
         config_dir = os.path.dirname(self.config_file)
         if config_dir != '' and not os.path.exists(config_dir):

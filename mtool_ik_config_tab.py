@@ -322,6 +322,20 @@ class IkConfigTab(object):
 
         self.ik_tester.fit_in_view()
 
+    def get_all_legs(self):
+        '''Return a list of all available leg numbers.'''
+        return range(0, self.ui.legSpin.maximum() + 1)
+
+    def get_enabled_legs(self):
+        '''Return a list of all leg numbers which are currently
+        enabled.'''
+        return [x for x in self.get_all_legs()
+                if self.legs.get(x, LegConfig()).present]
+
+    def get_leg_ik(self):
+        '''Return an IK solver for the given leg number.'''
+        raise NotImplementedError()
+
     def update_config_enable(self):
         enable = self.ui.legPresentCombo.currentIndex() == 0
 
