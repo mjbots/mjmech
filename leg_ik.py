@@ -27,6 +27,14 @@ class Point3D(object):
             self.y * other.y,
             self.z * other.z)
 
+    def __eq__(self, other):
+        if isinstance(other, Point3D):
+            return self.x == other.x and self.y == other.y and self.z == other.z
+        raise NotImplementedError()
+
+    def __ne__(self, other):
+        return not (self == other)
+
     def length(self):
         value = self * self
         return math.sqrt(value.x + value.y + value.z)
