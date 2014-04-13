@@ -20,6 +20,7 @@ import servo_controller
 
 from mtool_servo_tab import ServoTab
 from mtool_ik_config_tab import IkConfigTab
+from mtool_gait_tab import GaitTab
 
 class Mtool(QtGui.QMainWindow):
     DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
@@ -35,6 +36,7 @@ class Mtool(QtGui.QMainWindow):
 
         self.servo_tab = ServoTab(self.ui)
         self.ikconfig_tab = IkConfigTab(self.ui, self.servo_tab)
+        self.gait_tab = GaitTab(self.ui, self.ikconfig_tab, self.servo_tab)
 
         self.read_settings()
 
