@@ -88,7 +88,6 @@ class GaitTab(object):
             spin.valueChanged.connect(self.handle_gait_config_change)
 
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
-        self.handle_current_changed()
 
     def get_float_configs(self):
         return [(self.ui.bodyCogXSpin, 'body_cog_x_mm'),
