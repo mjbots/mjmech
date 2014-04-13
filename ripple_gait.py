@@ -174,6 +174,9 @@ class RippleGait(object):
         and command.  This is independent of the current state, but is
         dependent upon the configuration and command.'''
 
+        if self.num_legs == 0:
+            return GaitGraph()
+
         start_phase = 0.0
         leg_cycle_time = 1.0 / self.num_legs
 

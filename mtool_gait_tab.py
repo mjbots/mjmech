@@ -7,6 +7,54 @@ import ripple_gait
 
 from mtool_common import BoolContext
 
+class GaitGraphDisplay(object):
+    def __init__(self, ui):
+        self.graphics_scene = QtGui.QGraphicsScene()
+        self.graphics_view = ui.gaitGraphView
+
+        self.graphics_view.setScene(self.graphics_scene)
+
+    def fit_in_view(self):
+        self.graphics_view.fitInView(QtCore.QRectF(-0.1, 0, 1.1, 1))
+
+    def set_gait_graph(self, graph):
+        self.graphics_scene.clear()
+
+        leg_numbers = sorted(graph.leg.keys())
+        count = len(leg_numbers)
+
+        if count == 0:
+            return
+
+        self.graphics_scene.addRect(0., 0., 1., 1.)
+
+        y_offset = 0.0
+        y_size = 1.0 / count
+        for leg_number in leg_numbers:
+            label = self.graphics_scene.addSimpleText("%d" % leg_number)
+            label.setPos(-0.08, y_offset + 0.1 * y_size)
+            label.setFlag(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+
+            self.graphics_scene.addLine(0, y_offset, 1.0, y_offset)
+
+            old_phase = 0.0
+            old_swing = False
+            for phase, mode in graph.leg[leg_number].sequence:
+                if mode == ripple_gait.STANCE and old_swing:
+                    # Render a black bar for this swing phase.
+                    self.graphics_scene.addRect(
+                        old_phase, y_offset + 0.1 * y_size,
+                        phase - old_phase, 0.8 * y_size,
+                        QtGui.QPen(),
+                        QtGui.QBrush(QtCore.Qt.black))
+
+                old_phase = phase
+                old_swing = True if mode == ripple_gait.SWING else False
+
+            y_offset += y_size
+
+        self.fit_in_view()
+
 class GaitTab(object):
     def __init__(self, ui, ikconfig_tab, servo_tab):
         self.ui = ui
@@ -16,6 +64,9 @@ class GaitTab(object):
         self.in_number_changed = BoolContext()
 
         self.ripple_config = ripple_gait.RippleConfig()
+        self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
+
+        self.gait_graph_display = GaitGraphDisplay(self.ui)
 
         self.ui.gaitLegList.currentItemChanged.connect(self.handle_leg_change)
 
@@ -66,7 +117,7 @@ class GaitTab(object):
 
     def leg_config_to_string(self, leg_config):
         assert isinstance(leg_config, ripple_gait.LegConfig)
-        return '%f,%f,%f' % (
+        return '%.2f,%.2f,%.2f' % (
             leg_config.mount_x_mm,
             leg_config.mount_y_mm,
             leg_config.mount_z_mm)
@@ -99,7 +150,7 @@ class GaitTab(object):
             config.set('gaitconfig.legs', 'leg.%d' % leg_num,
                        self.leg_config_to_string(leg_config))
 
-    def handle_current_changed(self, index = 2):
+    def handle_current_changed(self, index=2):
         if index != 2:
             return
 
@@ -176,6 +227,17 @@ class GaitTab(object):
         # Put all of our GUI information into the RippleGait that
         # needs to be.
 
+        mechanical = self.ripple_config.mechanical
+
+        for item_num in range(self.ui.gaitLegList.count()):
+            item = self.ui.gaitLegList.item(item_num)
+            leg_number = int(item.text())
+            if not (item.flags() & QtCore.Qt.ItemIsEnabled):
+                if leg_number in mechanical.leg_config:
+                    del mechanical.leg_config[leg_number]
+            elif leg_number not in mechanical.leg_config:
+                mechanical.leg_config[leg_number] = ripple_gait.LegConfig()
+
         for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
             leg_number, leg_config = leg_data
 
@@ -203,3 +265,10 @@ class GaitTab(object):
             self.ripple_config.mechanical.leg_config.keys()
 
         self.ripple_config.body_z_offset = self.ui.bodyZOffsetSpin.value()
+
+        self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
+
+        self.update_gait_graph()
+
+    def update_gait_graph(self):
+        self.gait_graph_display.set_gait_graph(self.ripple_gait.get_gait_graph())
