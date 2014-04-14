@@ -2,47 +2,7 @@
 
 import math
 
-# Nominal body coordinate convention is
-#   * x - right
-#   * y - forward
-#   * z - up
-class Point3D(object):
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def __repr__(self):
-        return '<Point3D x/y/z %r/%r/%f>' % (self.x, self.y, self.z)
-
-    def __add__(self, other):
-        return Point3D(
-            self.x + other.x,
-            self.y + other.y,
-            self.z + other.z)
-
-    def __mul__(self, other):
-        return Point3D(
-            self.x * other.x,
-            self.y * other.y,
-            self.z * other.z)
-
-    def __eq__(self, other):
-        if isinstance(other, Point3D):
-            return self.x == other.x and self.y == other.y and self.z == other.z
-        raise NotImplementedError()
-
-    def __ne__(self, other):
-        return not (self == other)
-
-    def length(self):
-        value = self * self
-        return math.sqrt(value.x + value.y + value.z)
-
-    def scale(self, value):
-        return Point3D(self.x * value,
-                       self.y * value,
-                       self.z * value)
+from tf import Point3D
 
 class Configuration(object):
     coxa_min_deg = None
@@ -194,8 +154,8 @@ class LizardIk(object):
             return result
 
         if direction_mm:
-            normalized = direction_mm.scale(1.0 / direction_mm.length())
-            consider = [normalized.scale(step)]
+            normalized = direction_mm.scaled(1.0 / direction_mm.length())
+            consider = [normalized.scaled(step)]
         else:
             consider = [Point3D(*val) for val in
                         (step, 0., 0.), (0., step, 0.), (0., 0., step)]
