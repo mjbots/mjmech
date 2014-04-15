@@ -18,9 +18,27 @@ class Point3D(object):
       +z - up
     '''
     def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.x = x
-        self.y = y
-        self.z = z
+        if isinstance(x, list) and y == 0.0 and z == 0.0:
+            self.x = x[0]
+            self.y = x[1]
+            self.z = x[2]
+        else:
+            self.x = x
+            self.y = y
+            self.z = z
+
+    def __getitem__(self, index):
+        return [self.x, self.y, self.z][index]
+
+    def __setitem__(self, key, value):
+        if key == 0:
+            self.x = value
+        elif key == 1:
+            self.y = value
+        elif key == 2:
+            self.z = value
+        else:
+            raise IndexError()
 
     def __repr__(self):
         return '<Point3D x/y/z %r/%r/%r>' % (self.x, self.y, self.z)
@@ -89,27 +107,64 @@ class Transform(object):
 
     def inversed(self):
         '''Return a transform which performs the inverse operation.'''
-        raise NotImplementedError()
+        conjugated = self.rotation.conjugated()
+        return Transform(
+            conjugated.rotate(self.translation.scaled(-1.0)),
+            conjugated)
 
 class Frame(object):
+    '''A reference frame is a transform which defines the relationship
+    between coordinates specified in this frame and a parent frame.'''
     def __init__(self, translation, rotation, parent=None):
         self.transform = Transform(translation, rotation)
         self.parent = parent
 
     def map_to_parent(self, point_or_transform):
+        '''Given a point or transform measured in this reference
+        frame, map it into one in the parent's reference frame.'''
         return self.transform.apply(point_or_transform)
 
     def map_from_parent(self, point_or_transform):
+        '''The inverse of 'map_to_parent'.'''
         return self.transform.inverse(point_or_transform)
 
     def transform_to_frame(self, other_frame):
-        # TODO jpieper: Walk up to a common ancestor, then back down
-        # again.
-        raise NotImplementedError()
+        '''Return a transform which converts coordinates specified in
+        this reference frame into coordinates specified in
+        'other_frame'.'''
+        my_parents_list = []
+        my_parents_dict = {}
+        node = self
+        while node is not None:
+            my_parents_list.append(node)
+            my_parents_dict[node] = True
+            node = node.parent
+
+        other_parents = []
+        node = other_frame
+        while node is not None:
+            if node in my_parents_dict:
+                index = my_parents_list.index(node)
+                del my_parents_list[index:]
+                break
+            other_parents.append(node)
+            node = node.parent
+
+        result = Transform(Point3D(0., 0., 0.), Quaternion())
+        for node in my_parents_list:
+            result = node.map_to_parent(result)
+
+        for node in reversed(other_parents):
+            result = node.map_from_parent(result)
+
+        return result
 
     def map_to_frame(self, other_frame, point_or_transform):
+        '''Given a point or tranform measured in this reference frame,
+        map it into an arbitrary other reference frame.'''
         return self.transform_to_frame(other_frame).apply(point_or_transform)
 
     def map_from_frame(self, other_frame, point_or_transform):
+        '''The inverse of 'map_to_frame'.'''
         return self.transform_to_frame(other_frame).inversed().apply(
             point_or_transform)

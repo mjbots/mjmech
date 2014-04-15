@@ -22,7 +22,9 @@ class Quaternion(object):
         p = Quaternion(0.0, vector3d[0], vector3d[1], vector3d[2])
         q = self * p * self.conjugated()
 
-        return numpy.array([q.x, q.y, q.z])
+        if isinstance(vector3d, numpy.ndarray):
+            return numpy.array([q.x, q.y, q.z])
+        return vector3d.__class__([q.x, q.y, q.z])
 
     def conjugated(self):
         return Quaternion(self.w, -self.x, -self.y, -self.z)
