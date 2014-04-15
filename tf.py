@@ -112,6 +112,43 @@ class Transform(object):
             conjugated.rotate(self.translation.scaled(-1.0)),
             conjugated)
 
+class FrameRelationship(object):
+    '''This maintains the relationship between two frames, and allows
+    a transform between the two frames to be re-calculated over time
+    as it may change.
+
+    If the parents of any frame are changed, it may invalidate
+    outstanding FrameRelationship instances.
+    '''
+    def __init__(self, source_frame, destination_frame):
+        self.source_parents_list = []
+        source_parents_dict = {}
+        node = source_frame
+        while node is not None:
+            self.source_parents_list.append(node)
+            source_parents_dict[node] = True
+            node = node.parent
+
+        self.destination_parents_list = []
+        node = destination_frame
+        while node is not None:
+            if node in source_parents_dict:
+                index = self.source_parents_list.index(node)
+                del self.source_parents_list[index:]
+                break
+            self.destination_parents_list.append(node)
+            node = node.parent
+
+    def transform(self):
+        result = Transform(Point3D(0., 0., 0.), Quaternion())
+        for node in self.source_parents_list:
+            result = node.map_to_parent(result)
+
+        for node in reversed(self.destination_parents_list):
+            result = node.map_from_parent(result)
+
+        return result
+
 class Frame(object):
     '''A reference frame is a transform which defines the relationship
     between coordinates specified in this frame and a parent frame.'''
@@ -132,32 +169,12 @@ class Frame(object):
         '''Return a transform which converts coordinates specified in
         this reference frame into coordinates specified in
         'other_frame'.'''
-        my_parents_list = []
-        my_parents_dict = {}
-        node = self
-        while node is not None:
-            my_parents_list.append(node)
-            my_parents_dict[node] = True
-            node = node.parent
+        return FrameRelationship(self, other_frame).transform()
 
-        other_parents = []
-        node = other_frame
-        while node is not None:
-            if node in my_parents_dict:
-                index = my_parents_list.index(node)
-                del my_parents_list[index:]
-                break
-            other_parents.append(node)
-            node = node.parent
-
-        result = Transform(Point3D(0., 0., 0.), Quaternion())
-        for node in my_parents_list:
-            result = node.map_to_parent(result)
-
-        for node in reversed(other_parents):
-            result = node.map_from_parent(result)
-
-        return result
+    def relation_to_frame(self, other_frame):
+        '''Return a relationship between frames that can be used
+        repeatedly as the transform changes.'''
+        return FrameRelationship(self, other_frame)
 
     def map_to_frame(self, other_frame, point_or_transform):
         '''Given a point or tranform measured in this reference frame,

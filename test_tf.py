@@ -57,3 +57,6 @@ def test_frame_chains():
     check_frames(subchild1, (0., 0., 0.), child1, (1., 2., 0.))
     check_frames(subchild1, (0., 0., 0.), root, (11., 4., 0.))
     check_frames(subchild1, (0., 0., 0.), child2, (14., 9., 0.))
+
+    # TODO jpieper: Finally, test a frame that is unlinked, and thus
+    # will be referenced above the current "root" node.
