@@ -152,7 +152,11 @@ class FrameRelationship(object):
 class Frame(object):
     '''A reference frame is a transform which defines the relationship
     between coordinates specified in this frame and a parent frame.'''
-    def __init__(self, translation, rotation, parent=None):
+    def __init__(self, translation=None, rotation=None, parent=None):
+        if translation is None:
+            translation = Point3D(0., 0., 0.)
+        if rotation is None:
+            rotation = Quaternion()
         self.transform = Transform(translation, rotation)
         self.parent = parent
 
@@ -165,16 +169,16 @@ class Frame(object):
         '''The inverse of 'map_to_parent'.'''
         return self.transform.inverse(point_or_transform)
 
-    def transform_to_frame(self, other_frame):
-        '''Return a transform which converts coordinates specified in
-        this reference frame into coordinates specified in
-        'other_frame'.'''
-        return FrameRelationship(self, other_frame).transform()
-
     def relation_to_frame(self, other_frame):
         '''Return a relationship between frames that can be used
         repeatedly as the transform changes.'''
         return FrameRelationship(self, other_frame)
+
+    def transform_to_frame(self, other_frame):
+        '''Return a transform which converts coordinates specified in
+        this reference frame into coordinates specified in
+        'other_frame'.'''
+        return self.relation_to_frame(other_frame).transform()
 
     def map_to_frame(self, other_frame, point_or_transform):
         '''Given a point or tranform measured in this reference frame,

@@ -1,6 +1,7 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import leg_ik
+import tf
 
 # These are possible modes for each of the legs.
 
@@ -97,9 +98,10 @@ class LegState(object):
 class RippleState(object):
     def __init__(self):
         self.legs = {}
-        self.robot_position_mm = leg_ik.Point3D(0., 0., 0.)
-        self.robot_heading_rad = 0.
         self.phase = 0.
+
+        self.robot_frame = tf.Frame()
+        self.body_frame = tf.Frame(None, None, self.robot_frame)
 
 def _sign(val):
     return -1.0 if (val < 0.0) else 1.0
@@ -143,7 +145,8 @@ class RippleGait(object):
         '''Set the current command.  This will raise a NotSupported
         exception if the platform cannot achieve the desired command,
         in this case, the desired command will not be changed.'''
-        raise NotImplementedError()
+        # TODO jpieper: Implement
+        pass
 
     def get_idle_state(self):
         '''Return a state usable for the idle stance, regardless of
@@ -166,6 +169,8 @@ class RippleGait(object):
             leg_state = LegState()
             leg_state.point = point
             result.legs[leg_number] = leg_state
+
+        result.body_frame.transform.translation.z = self.config.body_z_offset
 
         return result
 
@@ -205,7 +210,7 @@ class RippleGait(object):
         '''Advance the phase and leg state by the given amount of
         phase.  Being independent of time, this is only really useful
         for visualization or debugging.'''
-        raise NotImplementedError()
+        return self.state
 
     def _swing_phase_time(self):
         # TODO jpieper: Use the configuration to select this.

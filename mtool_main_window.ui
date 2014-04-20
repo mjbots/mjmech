@@ -1252,14 +1252,14 @@ p, li { white-space: pre-wrap; }
             </property>
             <layout class="QFormLayout" name="formLayout_7">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_16">
+              <widget class="QLabel" name="playbackBeginLabel">
                <property name="text">
                 <string>Begin:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox_2">
+              <widget class="QComboBox" name="playbackBeginCombo">
                <property name="maximumSize">
                 <size>
                  <width>100</width>
@@ -1268,25 +1268,31 @@ p, li { white-space: pre-wrap; }
                </property>
                <item>
                 <property name="text">
-                 <string>Steady State</string>
+                 <string>Idle</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Idle</string>
+                 <string>Steady State</string>
                 </property>
                </item>
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_17">
+              <widget class="QLabel" name="playbackEndLabel">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>End:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_3">
+              <widget class="QComboBox" name="playbackEndCombo">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>100</width>
@@ -1306,7 +1312,7 @@ p, li { white-space: pre-wrap; }
               </widget>
              </item>
              <item row="2" column="0" colspan="2">
-              <widget class="QSlider" name="horizontalSlider">
+              <widget class="QSlider" name="playbackPhaseSlider">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1319,6 +1325,9 @@ p, li { white-space: pre-wrap; }
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -1327,7 +1336,7 @@ p, li { white-space: pre-wrap; }
              <item row="3" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QPushButton" name="pushButton">
+                <widget class="QPushButton" name="playbackSingleButton">
                  <property name="maximumSize">
                   <size>
                    <width>100</width>
@@ -1340,7 +1349,7 @@ p, li { white-space: pre-wrap; }
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_2">
+                <widget class="QPushButton" name="playbackRepeatButton">
                  <property name="maximumSize">
                   <size>
                    <width>100</width>
@@ -1353,7 +1362,7 @@ p, li { white-space: pre-wrap; }
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_3">
+                <widget class="QPushButton" name="playbackSlowRepeatButton">
                  <property name="maximumSize">
                   <size>
                    <width>100</width>
@@ -1383,7 +1392,7 @@ p, li { white-space: pre-wrap; }
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_4">
+                <widget class="QPushButton" name="playbackCaptureButton">
                  <property name="text">
                   <string>Capture Pose</string>
                  </property>

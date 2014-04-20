@@ -7,15 +7,26 @@ import ripple_gait
 
 from mtool_common import BoolContext
 
+PHASE_STEP = 0.01
+
 class GaitGraphDisplay(object):
     def __init__(self, ui):
         self.graphics_scene = QtGui.QGraphicsScene()
         self.graphics_view = ui.gaitGraphView
 
         self.graphics_view.setScene(self.graphics_scene)
+        self.phase_line = None
+        self.phase = 0.0
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-0.1, 0, 1.1, 1))
+
+    def set_phase(self, phase):
+        self.phase = phase
+
+        if self.phase_line:
+            pos = self.phase_line.pos()
+            self.phase_line.setPos(phase, pos.y())
 
     def set_gait_graph(self, graph):
         self.graphics_scene.clear()
@@ -27,6 +38,8 @@ class GaitGraphDisplay(object):
             return
 
         self.graphics_scene.addRect(0., 0., 1., 1.)
+
+        self.phase_line = self.graphics_scene.addLine(0., 0., 0., 1.0)
 
         y_offset = 0.0
         y_size = 1.0 / count
@@ -66,6 +79,9 @@ class GaitTab(object):
         self.ripple_config = ripple_gait.RippleConfig()
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
 
+        self.command = ripple_gait.Command()
+
+        self.current_states = []
         self.gait_graph_display = GaitGraphDisplay(self.ui)
 
         self.ui.gaitLegList.currentItemChanged.connect(self.handle_leg_change)
@@ -88,6 +104,12 @@ class GaitTab(object):
             spin.valueChanged.connect(self.handle_gait_config_change)
 
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
+
+        self.ui.playbackBeginCombo.currentIndexChanged.connect(
+            self.handle_playback_config_change)
+        self.ui.playbackPhaseSlider.setMaximum(int(1.0 / PHASE_STEP))
+        self.ui.playbackPhaseSlider.valueChanged.connect(
+            self.handle_playback_phase_change)
 
     def get_float_configs(self):
         return [(self.ui.bodyCogXSpin, 'body_cog_x_mm'),
@@ -268,6 +290,38 @@ class GaitTab(object):
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
 
         self.update_gait_graph()
+        self.handle_playback_config_change()
 
     def update_gait_graph(self):
         self.gait_graph_display.set_gait_graph(self.ripple_gait.get_gait_graph())
+
+    def handle_playback_config_change(self):
+        # Re-run the playback recording the state through an entire
+        # phase.  Then make sure that the graphic state is current for
+        # the phase that is selected now.
+
+        begin_index = self.ui.playbackBeginCombo.currentIndex()
+
+        if begin_index == 0: # Idle
+            begin_state = self.ripple_gait.get_idle_state()
+        else:
+            assert False, 'Unsupported begin state'
+
+        self.ripple_gait.set_state(begin_state, self.command)
+
+        self.current_states = (
+            [begin_state] +
+            [self.ripple_gait.advance_phase(PHASE_STEP)
+             for x in range(int(1.0 / PHASE_STEP))])
+
+        self.handle_playback_phase_change()
+
+    def handle_playback_phase_change(self):
+        self.update_phase(self.ui.playbackPhaseSlider.value() * PHASE_STEP)
+
+    def update_phase(self, phase):
+        # Render the phase line in the gait graph.
+        self.gait_graph_display.set_phase(phase)
+
+        # Update the current geometry rendering.
+        state = self.current_states[int(phase / PHASE_STEP)]
