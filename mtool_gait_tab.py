@@ -3,11 +3,99 @@
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+import tf
 import ripple_gait
 
 from mtool_common import BoolContext
 
 PHASE_STEP = 0.01
+
+# TODO jpieper: It would be nice to be able to change:
+#  The projection axis.
+#  The scale.
+#  The coordinate frame used (world, robot, body)
+class GaitGeometryDisplay(object):
+    def __init__(self, ui):
+        self.graphics_scene = QtGui.QGraphicsScene()
+        self.graphics_view = ui.gaitGeometryView
+        self.graphics_view.setScene(self.graphics_scene)
+        self.graphics_view.setTransform(QtGui.QTransform().scale(1, -1))
+
+        self.config = None
+        self.state = None
+
+    def set_gait_config(self, config):
+        self.config = config
+        self.graphics_scene.clear()
+
+        # Things to render:
+        #  * Body position
+        #  * Body CoG
+        #  * Shoulder positions
+        #  * Leg positions
+        #  * Stability polygon
+        #
+        # Nice to have: Coordinate axes and scale labels.
+
+        body_poly = QtGui.QPolygonF([
+                QtCore.QPointF(-10.0, -10.0),
+                QtCore.QPointF(-10.0, 10.0),
+                QtCore.QPointF(10.0, 10.0),
+                QtCore.QPointF(10.0, -10.0)])
+        self.body = self.graphics_scene.addPolygon(
+            body_poly, QtGui.QPen(QtCore.Qt.black),
+            QtGui.QBrush(QtCore.Qt.red))
+        self.body.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+
+        self.shoulders = {}
+        self.legs = {}
+        shoulder_poly = QtGui.QPolygonF([
+                QtCore.QPointF(-10, -10),
+                QtCore.QPointF(0, 10),
+                QtCore.QPointF(10, -10)])
+        for leg_num, leg in config.mechanical.leg_config.iteritems():
+            this_shoulder = self.graphics_scene.addPolygon(
+                shoulder_poly, QtGui.QPen(QtCore.Qt.black),
+                QtGui.QBrush(QtCore.Qt.blue))
+            this_shoulder.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+            self.shoulders[leg_num] = this_shoulder
+
+            this_leg = self.graphics_scene.addEllipse(
+                -10, -10, 20, 20,
+                 QtGui.QPen(QtCore.Qt.black),
+                 QtGui.QBrush(QtCore.Qt.green))
+            this_leg.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+            self.legs[leg_num] = this_leg
+
+    def set_state(self, state):
+        assert self.config is not None
+
+        body_pos = state.body_frame.map_to_frame(
+            state.robot_frame, tf.Point3D())
+        self.body.setPos(body_pos.x, body_pos.y)
+
+        for leg_num, shoulder in self.shoulders.iteritems():
+            leg_config = self.config.mechanical.leg_config[leg_num]
+
+            pos = state.body_frame.map_to_frame(
+                state.robot_frame, tf.Point3D(
+                    leg_config.mount_x_mm,
+                    leg_config.mount_y_mm,
+                    leg_config.mount_z_mm))
+            shoulder.setPos(pos.x, pos.y)
+
+        for leg_num, leg_item in self.legs.iteritems():
+            leg = state.legs[leg_num]
+
+            leg_item.setPos(leg.point.x, leg.point.y)
+            if leg.mode == ripple_gait.STANCE:
+                color = QtCore.Qt.green
+            elif leg.mode == ripple_gait.SWING:
+                color = QtCore.Qt.lightGreen
+
+            leg_item.setBrush(QtGui.QBrush(color))
+
+        self.graphics_view.fitInView(-300, -300, 600, 600)
 
 class GaitGraphDisplay(object):
     def __init__(self, ui):
@@ -83,6 +171,7 @@ class GaitTab(object):
 
         self.current_states = []
         self.gait_graph_display = GaitGraphDisplay(self.ui)
+        self.gait_geometry_display = GaitGeometryDisplay(self.ui)
 
         self.ui.gaitLegList.currentItemChanged.connect(self.handle_leg_change)
 
@@ -289,6 +378,8 @@ class GaitTab(object):
 
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
 
+        self.gait_geometry_display.set_gait_config(self.ripple_config)
+
         self.update_gait_graph()
         self.handle_playback_config_change()
 
@@ -325,3 +416,5 @@ class GaitTab(object):
 
         # Update the current geometry rendering.
         state = self.current_states[int(phase / PHASE_STEP)]
+
+        self.gait_geometry_display.set_state(state)

@@ -1433,7 +1433,7 @@ p, li { white-space: pre-wrap; }
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <item>
-              <widget class="QGraphicsView" name="graphicsView_3">
+              <widget class="QGraphicsView" name="gaitGeometryView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -1577,7 +1577,7 @@ p, li { white-space: pre-wrap; }
               </layout>
              </item>
              <item>
-              <widget class="QGraphicsView" name="graphicsView_2">
+              <widget class="QGraphicsView" name="gaitCommandView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                  <horstretch>0</horstretch>
