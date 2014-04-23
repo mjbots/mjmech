@@ -1,5 +1,9 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import bisect
+import copy
+import math
+
 import leg_ik
 import tf
 
@@ -94,13 +98,23 @@ class LegState(object):
     def __init__(self):
         self.point = leg_ik.Point3D(0., 0., 0.)
         self.mode = STANCE
+        self.frame = None
+
+    def __repr__(self):
+        return '<LegState p=%r m=%d f=%s>' % (self.point, self.mode, self.frame)
 
 class RippleState(object):
     def __init__(self):
         self.legs = {}
         self.phase = 0.
 
-        self.robot_frame = tf.Frame()
+        # robot_frame coordinates describing the start and end
+        # position of the current swing leg.
+        self.swing_start_pos = leg_ik.Point3D()
+        self.swing_end_pos = leg_ik.Point3D()
+
+        self.world_frame = tf.Frame()
+        self.robot_frame = tf.Frame(None, None, self.world_frame)
         self.body_frame = tf.Frame(None, None, self.robot_frame)
 
 def _sign(val):
@@ -112,15 +126,16 @@ class NotSupported(RuntimeError):
     pass
 
 class RippleGait(object):
+    ACTION_START_SWING, ACTION_START_STANCE, ACTION_END = range(3)
+
     def __init__(self, config):
         self.config = config
 
         self.num_legs = len(config.mechanical.leg_config)
 
-        self.command = Command()
-
         self.state = self.get_idle_state()
-
+        self.idle_state = self.get_idle_state()
+        self.set_command(Command())
 
     def set_state(self, state, command):
         '''Force the current leg state to the given configuration.  If
@@ -133,7 +148,16 @@ class RippleGait(object):
         '''
 
         old_state = self.state
-        self.state = state
+        self.state = copy.deepcopy(state)
+        assert state.phase == 0.0
+        for leg in self.state.legs.values():
+            assert leg.mode == STANCE # Because we are at phase 0.0
+
+            # Ensure that all legs, when in STANCE mode, are in the
+            # world frame.
+            leg.point = self.state.world_frame.map_from_frame(
+                leg.frame, leg.point)
+            leg.frame = self.state.world_frame
 
         try:
             self.set_command(command)
@@ -145,8 +169,29 @@ class RippleGait(object):
         '''Set the current command.  This will raise a NotSupported
         exception if the platform cannot achieve the desired command,
         in this case, the desired command will not be changed.'''
+
+        self.command = command
+        self.actions = []
+
+        if self.num_legs == 0:
+            return
+
+        # Create the action list.
+        swing_time = self._swing_phase_time()
+
+        for i in range(self.num_legs):
+            fraction = float(i) / self.num_legs
+            leg_num = self.config.leg_order[i]
+            self.actions.append(
+                (fraction, leg_num, self.ACTION_START_SWING))
+            self.actions.append(
+                (fraction + swing_time, leg_num, self.ACTION_START_STANCE))
+
+        self.actions.sort()
+        self.actions.append((1.0, -1, self.ACTION_END))
+
         # TODO jpieper: Implement
-        pass
+
 
     def get_idle_state(self):
         '''Return a state usable for the idle stance, regardless of
@@ -168,6 +213,7 @@ class RippleGait(object):
 
             leg_state = LegState()
             leg_state.point = point
+            leg_state.frame = result.robot_frame
             result.legs[leg_number] = leg_state
 
         result.body_frame.transform.translation.z = self.config.body_z_offset
@@ -181,6 +227,8 @@ class RippleGait(object):
 
         if self.num_legs == 0:
             return GaitGraph()
+
+        # TODO jpieper: This could be generated from the actions list.
 
         start_phase = 0.0
         leg_cycle_time = 1.0 / self.num_legs
@@ -206,11 +254,100 @@ class RippleGait(object):
         time.'''
         raise NotImplementedError()
 
+    def _do_action(self, action_index):
+        phase, leg_num, action = self.actions[action_index]
+
+        if action == self.ACTION_START_STANCE:
+            leg = self.state.legs[leg_num]
+
+            leg.mode = STANCE
+            leg.point = self.state.world_frame.map_from_frame(
+                leg.frame, leg.point)
+            leg.point.z = 0.0
+            leg.frame = self.state.world_frame
+        elif action == self.ACTION_START_SWING:
+            leg = self.state.legs[leg_num]
+
+            leg.mode = SWING
+            leg.point = self.state.robot_frame.map_from_frame(
+                leg.frame, leg.point)
+            leg.frame = self.state.robot_frame
+
+            self.state.swing_start_pos = leg.point.copy()
+            self.state.swing_end_pos = self._get_swing_end_pos(leg_num)
+
+    def _noaction_advance_phase(self, delta_phase, final_phase):
+        transform = self.state.robot_frame.transform
+        dt = delta_phase * self._phase_time()
+        transform.translation.x += self.command.translate_x_mm_s * dt
+        transform.translation.y += self.command.translate_y_mm_s * dt
+        transform.rotation = (
+            tf.Quaternion.from_euler(
+                0, 0, math.radians(self.command.rotate_deg_s * dt)) *
+            transform.rotation)
+
+        # Update the legs which are in swing.
+        for leg in self.state.legs.values():
+            if leg.mode == SWING:
+                leg_phase = ((final_phase % (1.0 / self.num_legs)) /
+                             self._swing_phase_time())
+                assert leg.frame is self.state.robot_frame
+                delta = self.state.swing_end_pos - self.state.swing_start_pos
+                current = self.state.swing_start_pos + delta.scaled(leg_phase)
+                leg.point = current
+
+                if leg_phase < 0.1:
+                    leg.point.z = (leg_phase / 0.1) * self.config.lift_height_mm
+                elif leg_phase < 0.9:
+                    leg.point.z = self.config.lift_height_mm
+                else:
+                    leg.point.z = (((1.0 - leg_phase) / 0.1) *
+                                   self.config.lift_height_mm)
+
+
     def advance_phase(self, delta_phase):
         '''Advance the phase and leg state by the given amount of
         phase.  Being independent of time, this is only really useful
         for visualization or debugging.'''
+        if self.num_legs == 0:
+            self.state.phase = (self.state.phase + delta_phase) % 1.0
+            return
+
+        old_phase = self.state.phase
+        next_phase = (self.state.phase + delta_phase)
+
+        cur_phase = old_phase
+        action_index = bisect.bisect_left(self.actions, (cur_phase, 0, 0))
+        if self.actions[action_index][0] < cur_phase:
+            action_index += 1
+
+        while True:
+            # Are there any actions between old_phase and new_phase?
+            if self.actions[action_index][0] < next_phase:
+                self._do_action(action_index)
+                delta_phase = self.actions[action_index][0] - cur_phase
+                advance_phase = self.actions[action_index][0]
+                self._noaction_advance_phase(delta_phase, advance_phase)
+                cur_phase = advance_phase
+                action_index += 1
+
+                if action_index >= len(self.actions):
+                    action_index = 0
+                    next_phase -= 1.0
+                    cur_phase = 0.0
+            else:
+                break
+
+        # Finally, advance the remainder of the phase and update the phase.
+        next_phase = next_phase % 1.0
+        self._noaction_advance_phase(next_phase - cur_phase, next_phase)
+        self.state.phase = next_phase
+
         return self.state
+
+    def _phase_time(self):
+        # TODO jpieper: Implement varying cycle times.
+        return self.config.max_cycle_time_s
 
     def _swing_phase_time(self):
         # TODO jpieper: Use the configuration to select this.
@@ -220,3 +357,20 @@ class RippleGait(object):
         '''Attempt to fill in the phase member, and any UNKNOWN
         LegState fields.'''
         raise NotImplementedError()
+
+    def _get_swing_end_pos(self, leg_num):
+        # Target swing end positions such that during stance, the leg
+        # will spend half its travel time reaching the idle position,
+        # and half its travel time going beyond the idle position.
+
+        stance_phase_time = 1.0 - self._swing_phase_time()
+        dt = 0.5 * stance_phase_time * self._phase_time()
+
+        translation = tf.Point3D(self.command.translate_x_mm_s * dt,
+                                 self.command.translate_y_mm_s * dt,
+                                 0.0)
+        rotation = tf.Quaternion.from_euler(
+            0, 0, math.radians(self.command.rotate_deg_s * dt))
+        end_frame = tf.Frame(translation, rotation)
+
+        return end_frame.map_to_parent(self.idle_state.legs[leg_num].point)

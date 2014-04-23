@@ -1,5 +1,7 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import copy
+
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
@@ -87,11 +89,13 @@ class GaitGeometryDisplay(object):
         for leg_num, leg_item in self.legs.iteritems():
             leg = state.legs[leg_num]
 
-            leg_item.setPos(leg.point.x, leg.point.y)
+            point = state.robot_frame.map_from_frame(leg.frame, leg.point)
+
+            leg_item.setPos(point.x, point.y)
             if leg.mode == ripple_gait.STANCE:
                 color = QtCore.Qt.green
             elif leg.mode == ripple_gait.SWING:
-                color = QtCore.Qt.lightGreen
+                color = QtCore.Qt.yellow
 
             leg_item.setBrush(QtGui.QBrush(color))
 
@@ -402,7 +406,7 @@ class GaitTab(object):
 
         self.current_states = (
             [begin_state] +
-            [self.ripple_gait.advance_phase(PHASE_STEP)
+            [copy.deepcopy(self.ripple_gait.advance_phase(PHASE_STEP))
              for x in range(int(1.0 / PHASE_STEP))])
 
         self.handle_playback_phase_change()

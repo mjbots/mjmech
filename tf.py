@@ -27,6 +27,9 @@ class Point3D(object):
             self.y = y
             self.z = z
 
+    def copy(self):
+        return Point3D(self.x, self.y, self.z)
+
     def __getitem__(self, index):
         return [self.x, self.y, self.z][index]
 
