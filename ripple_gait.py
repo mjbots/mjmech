@@ -135,6 +135,7 @@ class RippleGait(object):
 
         self.state = self.get_idle_state()
         self.idle_state = self.get_idle_state()
+
         self.set_command(Command())
 
     def set_state(self, state, command):

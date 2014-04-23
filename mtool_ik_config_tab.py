@@ -3,6 +3,7 @@
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+import settings
 import leg_ik
 
 from mtool_common import BoolContext
@@ -458,11 +459,7 @@ class IkConfigTab(object):
 
         if config.has_section('ikconfig'):
             def set_combo(combo, name):
-                value = config.get('ikconfig', name)
-                for i in range(combo.count()):
-                    if combo.itemText(i) == value:
-                        combo.setCurrentIndex(i)
-                        break
+                settings.restore_combo(config, 'ikconfig', combo, name)
 
             set_combo(self.ui.idleCombo, 'idle_pose')
             set_combo(self.ui.minimumCombo, 'minimum_pose')

@@ -5,8 +5,9 @@ import copy
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-import tf
 import ripple_gait
+import settings
+import tf
 
 from mtool_common import BoolContext
 
@@ -17,6 +18,9 @@ PHASE_STEP = 0.01
 #  The scale.
 #  The coordinate frame used (world, robot, body)
 class GaitGeometryDisplay(object):
+    FRAME_ROBOT, FRAME_WORLD, FRAME_BODY = range(3)
+    PROJECTION_XY, PROJECTION_YZ, PROJECTION_XZ = range(3)
+
     def __init__(self, ui):
         self.graphics_scene = QtGui.QGraphicsScene()
         self.graphics_view = ui.gaitGeometryView
@@ -25,6 +29,18 @@ class GaitGeometryDisplay(object):
 
         self.config = None
         self.state = None
+
+        self.frame = self.FRAME_ROBOT
+        self.projection = self.PROJECTION_XY
+        self.scale = 300.0
+
+    def set_view(self, frame, projection, scale):
+        self.frame = frame
+        self.projection = projection
+        self.scale = scale
+
+        if self.config is not None and self.state is not None:
+            self.set_state(self.state)
 
     def set_gait_config(self, config):
         self.config = config
@@ -69,29 +85,45 @@ class GaitGeometryDisplay(object):
             this_leg.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
             self.legs[leg_num] = this_leg
 
+    def _project(self, point, frame):
+        target_frame = None
+        if self.frame == self.FRAME_ROBOT:
+            target_frame = self.state.robot_frame
+        elif self.frame == self.FRAME_WORLD:
+            target_frame = self.state.world_frame
+        elif self.frame == self.FRAME_BODY:
+            target_frame = self.state.body_frame
+
+        target_point = target_frame.map_from_frame(frame, point)
+
+        if self.projection == self.PROJECTION_XY:
+            return (target_point.x, target_point.y)
+        elif self.projection == self.PROJECTION_YZ:
+            return (target_point.y, target_point.z)
+        elif self.projection == self.PROJECTION_XZ:
+            return (target_point.x, target_point.z)
+
     def set_state(self, state):
         assert self.config is not None
+        self.state = state
 
         body_pos = state.body_frame.map_to_frame(
             state.robot_frame, tf.Point3D())
-        self.body.setPos(body_pos.x, body_pos.y)
+        self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
             leg_config = self.config.mechanical.leg_config[leg_num]
 
-            pos = state.body_frame.map_to_frame(
-                state.robot_frame, tf.Point3D(
+            body_point = tf.Point3D(
                     leg_config.mount_x_mm,
                     leg_config.mount_y_mm,
-                    leg_config.mount_z_mm))
-            shoulder.setPos(pos.x, pos.y)
+                    leg_config.mount_z_mm)
+            shoulder.setPos(*self._project(body_point, state.body_frame))
 
         for leg_num, leg_item in self.legs.iteritems():
             leg = state.legs[leg_num]
 
-            point = state.robot_frame.map_from_frame(leg.frame, leg.point)
-
-            leg_item.setPos(point.x, point.y)
+            leg_item.setPos(*self._project(leg.point, leg.frame))
             if leg.mode == ripple_gait.STANCE:
                 color = QtCore.Qt.green
             elif leg.mode == ripple_gait.SWING:
@@ -99,7 +131,8 @@ class GaitGeometryDisplay(object):
 
             leg_item.setBrush(QtGui.QBrush(color))
 
-        self.graphics_view.fitInView(-300, -300, 600, 600)
+        self.graphics_view.fitInView(-self.scale, -self.scale,
+                                      2 * self.scale, 2 * self.scale)
 
 class GaitGraphDisplay(object):
     def __init__(self, ui):
@@ -172,6 +205,8 @@ class GaitTab(object):
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
 
         self.command = ripple_gait.Command()
+        self.command.translate_y_mm_s = 50.0
+        self.command.rotate_deg_s = 5.0
 
         self.current_states = []
         self.gait_graph_display = GaitGraphDisplay(self.ui)
@@ -196,6 +231,12 @@ class GaitTab(object):
                      self.ui.maxSwingPercentSpin]:
             spin.valueChanged.connect(self.handle_gait_config_change)
 
+        for combo in [self.ui.geometryFrameCombo,
+                      self.ui.geometryProjectionCombo]:
+            combo.currentIndexChanged.connect(self.handle_geometry_change)
+        self.ui.geometryScaleSpin.valueChanged.connect(
+            self.handle_geometry_change)
+
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
 
         self.ui.playbackBeginCombo.currentIndexChanged.connect(
@@ -215,7 +256,8 @@ class GaitTab(object):
                 (self.ui.liftHeightSpin, 'lift_height_mm'),
                 (self.ui.minSwingPercentSpin, 'min_swing_percent'),
                 (self.ui.maxSwingPercentSpin, 'max_swing_percent'),
-                (self.ui.bodyZOffsetSpin, 'body_z_offset_mm')]
+                (self.ui.bodyZOffsetSpin, 'body_z_offset_mm'),
+                (self.ui.geometryScaleSpin, 'geometry_scale_mm')]
 
     def string_to_leg_config(self, value):
         assert isinstance(value, str)
@@ -244,6 +286,12 @@ class GaitTab(object):
             if config.has_option('gaitconfig', name):
                 spin.setValue(config.getfloat('gaitconfig', name))
 
+        def set_combo(combo, name):
+            settings.restore_combo(config, 'gaitconfig', combo, name)
+
+        set_combo(self.ui.geometryFrameCombo, 'geometry_frame')
+        set_combo(self.ui.geometryProjectionCombo, 'geometry_projection')
+
         if config.has_section('gaitconfig.legs'):
             for leg_name, value in config.items('gaitconfig.legs'):
                 leg_num = int(leg_name.split('.')[1])
@@ -252,11 +300,17 @@ class GaitTab(object):
 
         self.handle_leg_change(self.ui.gaitLegList.currentItem())
         self.handle_gait_config_change()
+        self.handle_geometry_change()
 
     def write_settings(self, config):
         config.add_section('gaitconfig')
         for spin, name in self.get_float_configs():
             config.set('gaitconfig', name, spin.value())
+
+        config.set('gaitconfig', 'geometry_frame',
+                   self.ui.geometryFrameCombo.currentText())
+        config.set('gaitconfig', 'geometry_projection',
+                   self.ui.geometryProjectionCombo.currentText())
 
         config.add_section('gaitconfig.legs')
         for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
@@ -422,3 +476,17 @@ class GaitTab(object):
         state = self.current_states[int(phase / PHASE_STEP)]
 
         self.gait_geometry_display.set_state(state)
+
+    def handle_geometry_change(self):
+        frame = [GaitGeometryDisplay.FRAME_ROBOT,
+                 GaitGeometryDisplay.FRAME_WORLD,
+                 GaitGeometryDisplay.FRAME_BODY][
+            self.ui.geometryFrameCombo.currentIndex()]
+
+        projection = [GaitGeometryDisplay.PROJECTION_XY,
+                      GaitGeometryDisplay.PROJECTION_YZ,
+                      GaitGeometryDisplay.PROJECTION_XZ][
+            self.ui.geometryProjectionCombo.currentIndex()]
+
+        self.gait_geometry_display.set_view(
+            frame, projection, self.ui.geometryScaleSpin.value())
