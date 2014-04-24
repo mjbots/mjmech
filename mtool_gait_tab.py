@@ -107,8 +107,6 @@ class GaitGeometryDisplay(object):
         assert self.config is not None
         self.state = state
 
-        body_pos = state.body_frame.map_to_frame(
-            state.robot_frame, tf.Point3D())
         self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
@@ -200,13 +198,12 @@ class GaitTab(object):
         self.servo_tab = servo_tab
 
         self.in_number_changed = BoolContext()
+        self.in_command_changed = BoolContext()
 
         self.ripple_config = ripple_gait.RippleConfig()
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
 
         self.command = ripple_gait.Command()
-        self.command.translate_y_mm_s = 50.0
-        self.command.rotate_deg_s = 5.0
 
         self.current_states = []
         self.gait_graph_display = GaitGraphDisplay(self.ui)
@@ -228,8 +225,24 @@ class GaitTab(object):
                      self.ui.maxCycleTimeSpin,
                      self.ui.liftHeightSpin,
                      self.ui.minSwingPercentSpin,
-                     self.ui.maxSwingPercentSpin]:
+                     self.ui.maxSwingPercentSpin,
+                     self.ui.bodyZOffsetSpin]:
             spin.valueChanged.connect(self.handle_gait_config_change)
+
+        self.command_spins = [self.ui.commandXSpin,
+                              self.ui.commandYSpin,
+                              self.ui.commandRotSpin,
+                              self.ui.commandBodyXSpin,
+                              self.ui.commandBodyYSpin,
+                              self.ui.commandBodyZSpin,
+                              self.ui.commandPitchSpin,
+                              self.ui.commandRollSpin,
+                              self.ui.commandYawSpin]
+
+        for spin in self.command_spins:
+            spin.valueChanged.connect(self.handle_command_change)
+
+        self.ui.commandResetButton.clicked.connect(self.handle_command_reset)
 
         for combo in [self.ui.geometryFrameCombo,
                       self.ui.geometryProjectionCombo]:
@@ -257,7 +270,17 @@ class GaitTab(object):
                 (self.ui.minSwingPercentSpin, 'min_swing_percent'),
                 (self.ui.maxSwingPercentSpin, 'max_swing_percent'),
                 (self.ui.bodyZOffsetSpin, 'body_z_offset_mm'),
-                (self.ui.geometryScaleSpin, 'geometry_scale_mm')]
+                (self.ui.geometryScaleSpin, 'geometry_scale_mm'),
+                (self.ui.commandXSpin, 'command_x_mm_s'),
+                (self.ui.commandYSpin, 'command_y_mm_s'),
+                (self.ui.commandRotSpin, 'command_rot_deg_s'),
+                (self.ui.commandBodyXSpin, 'command_body_x_mm'),
+                (self.ui.commandBodyYSpin, 'command_body_y_mm'),
+                (self.ui.commandBodyZSpin, 'command_body_z_mm'),
+                (self.ui.commandPitchSpin, 'command_body_pitch_deg'),
+                (self.ui.commandRollSpin, 'command_body_roll_deg'),
+                (self.ui.commandYawSpin, 'command_body_yaw_deg'),
+                ]
 
     def string_to_leg_config(self, value):
         assert isinstance(value, str)
@@ -456,10 +479,10 @@ class GaitTab(object):
         else:
             assert False, 'Unsupported begin state'
 
-        self.ripple_gait.set_state(begin_state, self.command)
+        begin_state = self.ripple_gait.set_state(begin_state, self.command)
 
         self.current_states = (
-            [begin_state] +
+            [copy.deepcopy(begin_state)] +
             [copy.deepcopy(self.ripple_gait.advance_phase(PHASE_STEP))
              for x in range(int(1.0 / PHASE_STEP))])
 
@@ -490,3 +513,27 @@ class GaitTab(object):
 
         self.gait_geometry_display.set_view(
             frame, projection, self.ui.geometryScaleSpin.value())
+
+    def handle_command_change(self):
+        if self.in_command_changed.value:
+            return
+
+        with self.in_command_changed:
+            self.command.translate_x_mm_s = self.ui.commandXSpin.value()
+            self.command.translate_y_mm_s = self.ui.commandYSpin.value()
+            self.command.rotate_deg_s = self.ui.commandRotSpin.value()
+            self.command.body_x_mm = self.ui.commandBodyXSpin.value()
+            self.command.body_y_mm = self.ui.commandBodyYSpin.value()
+            self.command.body_z_mm = self.ui.commandBodyZSpin.value()
+            self.command.body_pitch_deg = self.ui.commandPitchSpin.value()
+            self.command.body_roll_deg = self.ui.commandRollSpin.value()
+            self.command.body_yaw_deg = self.ui.commandYawSpin.value()
+
+            self.handle_playback_config_change()
+
+    def handle_command_reset(self):
+        with self.in_command_changed:
+            for spin in self.command_spins:
+                spin.setValue(0.0)
+
+        self.handle_command_change()

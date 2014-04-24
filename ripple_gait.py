@@ -166,6 +166,8 @@ class RippleGait(object):
             self.state = old_state
             raise
 
+        return self.state
+
     def set_command(self, command):
         '''Set the current command.  This will raise a NotSupported
         exception if the platform cannot achieve the desired command,
@@ -191,7 +193,14 @@ class RippleGait(object):
         self.actions.sort()
         self.actions.append((1.0, -1, self.ACTION_END))
 
-        # TODO jpieper: Implement
+        self.state.body_frame.transform.translation.x = command.body_x_mm
+        self.state.body_frame.transform.translation.y = command.body_y_mm
+        self.state.body_frame.transform.translation.z = (
+            command.body_z_mm + self.config.body_z_offset)
+        self.state.body_frame.transform.rotation = tf.Quaternion.from_euler(
+            math.radians(command.body_roll_deg),
+            math.radians(command.body_pitch_deg),
+            math.radians(command.body_yaw_deg))
 
 
     def get_idle_state(self):
@@ -280,6 +289,9 @@ class RippleGait(object):
     def _noaction_advance_phase(self, delta_phase, final_phase):
         transform = self.state.robot_frame.transform
         dt = delta_phase * self._phase_time()
+
+        # TODO jpieper: Correctly operate in the robot frame, and
+        # integrate rotation correctly.
         transform.translation.x += self.command.translate_x_mm_s * dt
         transform.translation.y += self.command.translate_y_mm_s * dt
         transform.rotation = (

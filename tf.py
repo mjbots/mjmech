@@ -163,6 +163,10 @@ class Frame(object):
         self.transform = Transform(translation, rotation)
         self.parent = parent
 
+    def __repr__(self):
+        return '<Frame t=%r r=%r>' % (self.transform.translation,
+                                      self.transform.rotation)
+
     def map_to_parent(self, point_or_transform):
         '''Given a point or transform measured in this reference
         frame, map it into one in the parent's reference frame.'''
