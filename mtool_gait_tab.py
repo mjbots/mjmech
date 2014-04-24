@@ -477,7 +477,16 @@ class GaitTab(object):
         if begin_index == 0: # Idle
             begin_state = self.ripple_gait.get_idle_state()
         else:
-            assert False, 'Unsupported begin state'
+            begin_state = self.ripple_gait.get_idle_state()
+            self.ripple_gait.set_state(begin_state, self.command)
+            for x in range(int(1.0 / PHASE_STEP)):
+                begin_state = self.ripple_gait.advance_phase(PHASE_STEP)
+
+            # When setting a state, we are required to be exactly
+            # zero.  Verify that we are close enough to zero from a
+            # numerical perspective, then force it to be exactly zero.
+            assert abs(((begin_state.phase + 0.5) % 1.0) - 0.5) < 1e-4
+            begin_state.phase = 0.0
 
         begin_state = self.ripple_gait.set_state(begin_state, self.command)
 

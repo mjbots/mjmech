@@ -151,14 +151,6 @@ class RippleGait(object):
         old_state = self.state
         self.state = copy.deepcopy(state)
         assert state.phase == 0.0
-        for leg in self.state.legs.values():
-            assert leg.mode == STANCE # Because we are at phase 0.0
-
-            # Ensure that all legs, when in STANCE mode, are in the
-            # world frame.
-            leg.point = self.state.world_frame.map_from_frame(
-                leg.frame, leg.point)
-            leg.frame = self.state.world_frame
 
         try:
             self.set_command(command)
@@ -286,18 +278,35 @@ class RippleGait(object):
             self.state.swing_start_pos = leg.point.copy()
             self.state.swing_end_pos = self._get_swing_end_pos(leg_num)
 
+    def _get_update_frame(self, dt):
+        update_frame = tf.Frame(parent=self.state.robot_frame)
+        vx = self.command.translate_x_mm_s
+        vy = self.command.translate_y_mm_s
+        if self.command.rotate_deg_s == 0:
+            dx = vx * dt
+            dy = vy * dt
+        else:
+            vyaw = math.radians(self.command.rotate_deg_s)
+            dx = (((math.cos(dt * vyaw) - 1) * vy +
+                   math.sin(dt * vyaw) * vx) / vyaw)
+            dy = (((math.cos(dt * vyaw) - 1) * vx +
+                   math.sin(dt * vyaw) * vy) / vyaw)
+            update_frame.transform.rotation = \
+                tf.Quaternion.from_euler(0, 0, dt * vyaw)
+
+        update_frame.transform.translation.x = dx
+        update_frame.transform.translation.y = dy
+        return update_frame
+
+
     def _noaction_advance_phase(self, delta_phase, final_phase):
         transform = self.state.robot_frame.transform
         dt = delta_phase * self._phase_time()
 
-        # TODO jpieper: Correctly operate in the robot frame, and
-        # integrate rotation correctly.
-        transform.translation.x += self.command.translate_x_mm_s * dt
-        transform.translation.y += self.command.translate_y_mm_s * dt
-        transform.rotation = (
-            tf.Quaternion.from_euler(
-                0, 0, math.radians(self.command.rotate_deg_s * dt)) *
-            transform.rotation)
+        update_frame = self._get_update_frame(dt)
+
+        new_transform = update_frame.transform_to_frame(self.state.world_frame)
+        self.state.robot_frame.transform = new_transform
 
         # Update the legs which are in swing.
         for leg in self.state.legs.values():
@@ -379,11 +388,6 @@ class RippleGait(object):
         stance_phase_time = 1.0 - self._swing_phase_time()
         dt = 0.5 * stance_phase_time * self._phase_time()
 
-        translation = tf.Point3D(self.command.translate_x_mm_s * dt,
-                                 self.command.translate_y_mm_s * dt,
-                                 0.0)
-        rotation = tf.Quaternion.from_euler(
-            0, 0, math.radians(self.command.rotate_deg_s * dt))
-        end_frame = tf.Frame(translation, rotation)
+        end_frame = self._get_update_frame(dt)
 
         return end_frame.map_to_parent(self.idle_state.legs[leg_num].point)
