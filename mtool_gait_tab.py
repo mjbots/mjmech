@@ -1,6 +1,7 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import copy
+import functools
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
@@ -11,10 +12,8 @@ import tf
 
 from mtool_common import BoolContext
 
-# TODO jpieper: It would be nice to be able to change:
-#  The projection axis.
-#  The scale.
-#  The coordinate frame used (world, robot, body)
+PLAYBACK_TIMEOUT_MS = 50
+
 class GaitGeometryDisplay(object):
     FRAME_ROBOT, FRAME_WORLD, FRAME_BODY = range(3)
     PROJECTION_XY, PROJECTION_YZ, PROJECTION_XZ = range(3)
@@ -190,10 +189,17 @@ class GaitGraphDisplay(object):
         self.fit_in_view()
 
 class GaitTab(object):
+    (PLAYBACK_IDLE,
+     PLAYBACK_SINGLE,
+     PLAYBACK_REPEAT,
+     PLAYBACK_SLOW_REPEAT) = range(4)
+
     def __init__(self, ui, ikconfig_tab, servo_tab):
         self.ui = ui
         self.ikconfig_tab = ikconfig_tab
         self.servo_tab = servo_tab
+
+        self.playback_mode = self.PLAYBACK_IDLE
 
         self.in_number_changed = BoolContext()
         self.in_command_changed = BoolContext()
@@ -256,6 +262,18 @@ class GaitTab(object):
             self.handle_playback_config_change)
         self.ui.playbackPhaseSlider.valueChanged.connect(
             self.handle_playback_phase_change)
+
+        for button, state in [
+            (self.ui.playbackSingleButton, self.PLAYBACK_SINGLE),
+            (self.ui.playbackRepeatButton, self.PLAYBACK_REPEAT),
+            (self.ui.playbackSlowRepeatButton, self.PLAYBACK_SLOW_REPEAT)]:
+
+            button.toggled.connect(
+                functools.partial(self.handle_playback_state_change, state))
+
+        self.playback_timer = QtCore.QTimer()
+        self.playback_timer.timeout.connect(self.handle_playback_timer)
+
 
     def get_float_configs(self):
         return [(self.ui.bodyCogXSpin, 'body_cog_x_mm'),
@@ -466,11 +484,7 @@ class GaitTab(object):
     def update_gait_graph(self):
         self.gait_graph_display.set_gait_graph(self.ripple_gait.get_gait_graph())
 
-    def handle_playback_config_change(self):
-        # Re-run the playback recording the state through an entire
-        # phase.  Then make sure that the graphic state is current for
-        # the phase that is selected now.
-
+    def get_start_state(self):
         begin_index = self.ui.playbackBeginCombo.currentIndex()
 
         if begin_index == 0: # Idle
@@ -487,6 +501,14 @@ class GaitTab(object):
             assert abs(((begin_state.phase + 0.5) % 1.0) - 0.5) < 1e-4
             begin_state.phase = 0.0
 
+        return begin_state
+
+    def handle_playback_config_change(self):
+        # Re-run the playback recording the state through an entire
+        # phase.  Then make sure that the graphic state is current for
+        # the phase that is selected now.
+        begin_state = self.get_start_state()
+
         begin_state = self.ripple_gait.set_state(begin_state, self.command)
 
         self.current_states = (
@@ -497,6 +519,8 @@ class GaitTab(object):
         self.handle_playback_phase_change()
 
     def handle_playback_phase_change(self):
+        if self.playback_mode != self.PLAYBACK_IDLE:
+            return
         self.update_phase(self.ui.playbackPhaseSlider.value() * self.phase_step)
 
     def update_phase(self, phase):
@@ -545,3 +569,50 @@ class GaitTab(object):
                 spin.setValue(0.0)
 
         self.handle_command_change()
+
+    def handle_playback_state_change(self, state, checked):
+        if not checked:
+            # If nothing is checked, then stop playback.
+            if (not self.ui.playbackSingleButton.isChecked() and
+                not self.ui.playbackRepeatButton.isChecked() and
+                not self.ui.playbackSlowRepeatButton.isChecked()):
+
+                self.playback_timer.stop()
+                self.playback_mode = self.PLAYBACK_IDLE
+
+            return
+
+        # Make sure everything else is unchecked.
+        if state != self.PLAYBACK_SINGLE:
+            self.ui.playbackSingleButton.setChecked(False)
+        if state != self.PLAYBACK_REPEAT:
+            self.ui.playbackRepeatButton.setChecked(False)
+        if state != self.PLAYBACK_SLOW_REPEAT:
+            self.ui.playbackSlowRepeatButton.setChecked(False)
+
+        print "starting playback mode: ", state
+
+        # Otherwise, start the appropriate playback mode.
+        self.ripple_gait.set_state(self.get_start_state(), self.command)
+        self.playback_mode = state
+        self.playback_timer.start(PLAYBACK_TIMEOUT_MS)
+
+    def handle_playback_timer(self):
+        if self.playback_mode == self.PLAYBACK_IDLE:
+            print "WARNING: Playback timer fired when idle."
+            return
+
+        old_phase = self.ripple_gait.state.phase
+
+        advance = PLAYBACK_TIMEOUT_MS / 1000.0
+        if self.playback_mode == self.PLAYBACK_SLOW_REPEAT:
+            advance *= 0.1
+        state = self.ripple_gait.advance_time(advance)
+
+        if (self.playback_mode == self.PLAYBACK_SINGLE and
+            state.phase < 0.5 and old_phase > 0.5):
+            self.ui.playbackSingleButton.setChecked(False)
+            return
+
+        self.gait_geometry_display.set_state(state)
+        self.gait_graph_display.set_phase(state.phase % 1.0)

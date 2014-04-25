@@ -270,7 +270,7 @@ class RippleGait(object):
     def advance_time(self, delta_s):
         '''Advance the phase and leg state by the given amount of
         time.'''
-        raise NotImplementedError()
+        return self.advance_phase(delta_s / self._phase_time())
 
     def _do_action(self, action_index):
         phase, leg_num, action = self.actions[action_index]

@@ -1313,6 +1313,12 @@ p, li { white-space: pre-wrap; }
                  <property name="text">
                   <string>Single</string>
                  </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -1326,6 +1332,9 @@ p, li { white-space: pre-wrap; }
                  <property name="text">
                   <string>Repeat</string>
                  </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -1338,6 +1347,9 @@ p, li { white-space: pre-wrap; }
                  </property>
                  <property name="text">
                   <string>0.1x Repeat</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
