@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>969</width>
-    <height>790</height>
+    <width>1016</width>
+    <height>871</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -224,8 +224,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>311</width>
-                <height>606</height>
+                <width>334</width>
+                <height>687</height>
                </rect>
               </property>
              </widget>
@@ -1250,7 +1250,7 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>Playback</string>
             </property>
-            <layout class="QFormLayout" name="formLayout_7">
+            <layout class="QGridLayout" name="gridLayout_7">
              <item row="0" column="0">
               <widget class="QLabel" name="playbackBeginLabel">
                <property name="text">
@@ -1278,40 +1278,7 @@ p, li { white-space: pre-wrap; }
                </item>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="playbackEndLabel">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>End:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QComboBox" name="playbackEndCombo">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>Steady State</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Idle</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="2">
+             <item row="1" column="0" colspan="2">
               <widget class="QSlider" name="playbackPhaseSlider">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1326,14 +1293,14 @@ p, li { white-space: pre-wrap; }
                 </size>
                </property>
                <property name="maximum">
-                <number>100</number>
+                <number>200</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="2" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QPushButton" name="playbackSingleButton">
@@ -1376,7 +1343,7 @@ p, li { white-space: pre-wrap; }
                </item>
               </layout>
              </item>
-             <item row="4" column="0" colspan="2">
+             <item row="3" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
                 <spacer name="horizontalSpacer">
@@ -1621,8 +1588,8 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>20</width>
-              <height>40</height>
+              <width>17</width>
+              <height>13</height>
              </size>
             </property>
            </spacer>
@@ -1878,7 +1845,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>969</width>
+     <width>1016</width>
      <height>20</height>
     </rect>
    </property>

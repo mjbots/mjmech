@@ -11,8 +11,6 @@ import tf
 
 from mtool_common import BoolContext
 
-PHASE_STEP = 0.01
-
 # TODO jpieper: It would be nice to be able to change:
 #  The projection axis.
 #  The scale.
@@ -252,9 +250,10 @@ class GaitTab(object):
 
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
 
+        self.phase_step = 2.0 / self.ui.playbackPhaseSlider.maximum()
+
         self.ui.playbackBeginCombo.currentIndexChanged.connect(
             self.handle_playback_config_change)
-        self.ui.playbackPhaseSlider.setMaximum(int(1.0 / PHASE_STEP))
         self.ui.playbackPhaseSlider.valueChanged.connect(
             self.handle_playback_phase_change)
 
@@ -479,8 +478,8 @@ class GaitTab(object):
         else:
             begin_state = self.ripple_gait.get_idle_state()
             self.ripple_gait.set_state(begin_state, self.command)
-            for x in range(int(1.0 / PHASE_STEP)):
-                begin_state = self.ripple_gait.advance_phase(PHASE_STEP)
+            for x in range(int(1.0 / self.phase_step)):
+                begin_state = self.ripple_gait.advance_phase(self.phase_step)
 
             # When setting a state, we are required to be exactly
             # zero.  Verify that we are close enough to zero from a
@@ -492,20 +491,20 @@ class GaitTab(object):
 
         self.current_states = (
             [copy.deepcopy(begin_state)] +
-            [copy.deepcopy(self.ripple_gait.advance_phase(PHASE_STEP))
-             for x in range(int(1.0 / PHASE_STEP))])
+            [copy.deepcopy(self.ripple_gait.advance_phase(self.phase_step))
+             for x in range(self.ui.playbackPhaseSlider.maximum())])
 
         self.handle_playback_phase_change()
 
     def handle_playback_phase_change(self):
-        self.update_phase(self.ui.playbackPhaseSlider.value() * PHASE_STEP)
+        self.update_phase(self.ui.playbackPhaseSlider.value() * self.phase_step)
 
     def update_phase(self, phase):
         # Render the phase line in the gait graph.
-        self.gait_graph_display.set_phase(phase)
+        self.gait_graph_display.set_phase(phase % 1.0)
 
         # Update the current geometry rendering.
-        state = self.current_states[int(phase / PHASE_STEP)]
+        state = self.current_states[int(phase / self.phase_step)]
 
         self.gait_geometry_display.set_state(state)
 

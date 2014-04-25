@@ -150,7 +150,23 @@ class RippleGait(object):
 
         old_state = self.state
         self.state = copy.deepcopy(state)
+
+        # Fix up the frame references after the copy.
+        self.state.robot_frame.parent = self.state.world_frame
+        self.state.body_frame.parent = self.state.robot_frame
+
+        # Make sure all the legs are in the correct frame.
         assert state.phase == 0.0
+
+        for leg in self.state.legs.values():
+            if leg.mode == STANCE:
+                leg.point = self.state.world_frame.map_from_frame(
+                    leg.frame, leg.point)
+                leg.frame = self.state.world_frame
+            elif leg.mode == SWING:
+                leg.point = self.state.robot_frame.map_from_frame(
+                    leg.frame, leg.point)
+                leg.frame = self.state.robot_frame
 
         try:
             self.set_command(command)
