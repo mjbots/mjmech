@@ -590,8 +590,6 @@ class GaitTab(object):
         if state != self.PLAYBACK_SLOW_REPEAT:
             self.ui.playbackSlowRepeatButton.setChecked(False)
 
-        print "starting playback mode: ", state
-
         # Otherwise, start the appropriate playback mode.
         self.ripple_gait.set_state(self.get_start_state(), self.command)
         self.playback_mode = state
