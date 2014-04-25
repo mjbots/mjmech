@@ -91,6 +91,9 @@ class Quaternion(object):
                           a * g - b * h + c * e + d * f,
                           a * h + b * g - c * f + d * e)
 
+    def copy(self):
+        return Quaternion(self.w, self.x, self.y, self.z)
+
     @staticmethod
     def from_euler(roll_rad, pitch_rad, yaw_rad):
         # Quaternions multiply in opposite order, and we want to get

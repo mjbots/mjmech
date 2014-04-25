@@ -115,6 +115,9 @@ class Transform(object):
             conjugated.rotate(self.translation.scaled(-1.0)),
             conjugated)
 
+    def copy(self):
+        return Transform(self.translation.copy(), self.rotation.copy())
+
 class FrameRelationship(object):
     '''This maintains the relationship between two frames, and allows
     a transform between the two frames to be re-calculated over time

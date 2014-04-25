@@ -1,6 +1,5 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-import copy
 import functools
 
 import PySide.QtCore as QtCore
@@ -123,6 +122,8 @@ class GaitGeometryDisplay(object):
                 color = QtCore.Qt.green
             elif leg.mode == ripple_gait.SWING:
                 color = QtCore.Qt.yellow
+            else:
+                assert False, 'unknown leg mode %d' % leg.mode
 
             leg_item.setBrush(QtGui.QBrush(color))
 
@@ -475,7 +476,6 @@ class GaitTab(object):
         self.ripple_config.body_z_offset = self.ui.bodyZOffsetSpin.value()
 
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
-
         self.gait_geometry_display.set_gait_config(self.ripple_config)
 
         self.update_gait_graph()
@@ -486,14 +486,15 @@ class GaitTab(object):
 
     def get_start_state(self):
         begin_index = self.ui.playbackBeginCombo.currentIndex()
+        this_ripple = ripple_gait.RippleGait(self.ripple_config)
 
         if begin_index == 0: # Idle
-            begin_state = self.ripple_gait.get_idle_state()
+            begin_state = this_ripple.get_idle_state()
         else:
-            begin_state = self.ripple_gait.get_idle_state()
-            self.ripple_gait.set_state(begin_state, self.command)
+            begin_state = this_ripple.get_idle_state()
+            this_ripple.set_state(begin_state, self.command)
             for x in range(int(1.0 / self.phase_step)):
-                begin_state = self.ripple_gait.advance_phase(self.phase_step)
+                begin_state = this_ripple.advance_phase(self.phase_step)
 
             # When setting a state, we are required to be exactly
             # zero.  Verify that we are close enough to zero from a
@@ -512,8 +513,8 @@ class GaitTab(object):
         begin_state = self.ripple_gait.set_state(begin_state, self.command)
 
         self.current_states = (
-            [copy.deepcopy(begin_state)] +
-            [copy.deepcopy(self.ripple_gait.advance_phase(self.phase_step))
+            [begin_state.copy()] +
+            [self.ripple_gait.advance_phase(self.phase_step).copy()
              for x in range(self.ui.playbackPhaseSlider.maximum())])
 
         self.handle_playback_phase_change()

@@ -1,7 +1,6 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import bisect
-import copy
 import math
 
 import leg_ik
@@ -117,6 +116,29 @@ class RippleState(object):
         self.robot_frame = tf.Frame(None, None, self.world_frame)
         self.body_frame = tf.Frame(None, None, self.robot_frame)
 
+    def copy(self):
+        result = RippleState()
+        for key, value in self.legs.iteritems():
+            leg = LegState()
+            leg.point = value.point.copy()
+            leg.mode = value.mode
+            if value.frame is self.world_frame:
+                leg.frame = result.world_frame
+            elif value.frame is self.robot_frame:
+                leg.frame = result.robot_frame
+            elif value.frame is self.body_frame:
+                leg.frame = result.body_frame
+            result.legs[key] = leg
+
+        result.swing_start_pos = self.swing_start_pos.copy()
+        result.swing_end_pos = self.swing_end_pos.copy()
+
+        result.world_frame.transform = self.world_frame.transform.copy()
+        result.robot_frame.transform = self.robot_frame.transform.copy()
+        result.body_frame.transform = self.body_frame.transform.copy()
+
+        return result
+
 def _sign(val):
     return -1.0 if (val < 0.0) else 1.0
 
@@ -149,11 +171,7 @@ class RippleGait(object):
         '''
 
         old_state = self.state
-        self.state = copy.deepcopy(state)
-
-        # Fix up the frame references after the copy.
-        self.state.robot_frame.parent = self.state.world_frame
-        self.state.body_frame.parent = self.state.robot_frame
+        self.state = state.copy()
 
         # Make sure all the legs are in the correct frame.
         assert state.phase == 0.0
@@ -349,7 +367,7 @@ class RippleGait(object):
         for visualization or debugging.'''
         if self.num_legs == 0:
             self.state.phase = (self.state.phase + delta_phase) % 1.0
-            return
+            return self.state
 
         old_phase = self.state.phase
         next_phase = (self.state.phase + delta_phase)
