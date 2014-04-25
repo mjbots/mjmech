@@ -406,4 +406,6 @@ class RippleGait(object):
 
         end_frame = self._get_update_frame(dt)
 
+        # TODO jpieper: This should map from whatever frame the idle
+        # state leg was actually in.
         return end_frame.map_to_parent(self.idle_state.legs[leg_num].point)
