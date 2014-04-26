@@ -223,7 +223,6 @@ class RippleGait(object):
         self._really_set_command(command)
 
     def _really_set_command(self, command):
-        print "new command"
         self.command = command
         self.actions = []
 
