@@ -7,6 +7,7 @@ import settings
 import leg_ik
 
 from mtool_common import BoolContext
+import mtool_graphics_scene
 
 class LegConfig(object):
     present = False
@@ -37,26 +38,6 @@ class LegConfig(object):
 
         return result
 
-class IkGraphicsScene(QtGui.QGraphicsScene):
-    sceneMouseMoveEvent = QtCore.Signal(QtCore.QPointF)
-    sceneMousePressEvent = QtCore.Signal()
-    sceneMouseReleaseEvent = QtCore.Signal()
-
-    def __init__(self, parent=None):
-        super(IkGraphicsScene, self).__init__(parent)
-
-    def mouseMoveEvent(self, event):
-        if event.buttons() & QtCore.Qt.LeftButton:
-            self.sceneMouseMoveEvent.emit(event.scenePos())
-
-    def mousePressEvent(self, event):
-        if event.button() & QtCore.Qt.LeftButton:
-            self.sceneMousePressEvent.emit()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() & QtCore.Qt.LeftButton:
-            self.sceneMouseReleaseEvent.emit()
-
 
 class IkTester(object):
     (PLANE_XY,
@@ -65,7 +46,7 @@ class IkTester(object):
 
     def __init__(self, servo_tab, graphics_view):
         self.servo_tab = servo_tab
-        self.graphics_scene = IkGraphicsScene()
+        self.graphics_scene = mtool_graphics_scene.GraphicsScene()
         self.graphics_scene.sceneMouseMoveEvent.connect(
             self.handle_mouse_move)
         self.graphics_scene.sceneMousePressEvent.connect(
@@ -230,10 +211,12 @@ class IkTester(object):
                     color = QtGui.QColor(255 - val, 255, 255 - val)
                     rect.setBrush(QtGui.QBrush(color))
 
-    def handle_mouse_press(self):
+    def handle_mouse_press(self, cursor):
         if self.servo_tab.controller is None:
             return
         self.servo_tab.controller.enable_power(servo_controller.POWER_ENABLE)
+
+        self.handle_mouse_move(cursor)
 
     def handle_mouse_release(self):
         if self.servo_tab.controller is None:

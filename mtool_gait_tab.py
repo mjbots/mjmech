@@ -10,6 +10,7 @@ import settings
 import tf
 
 from mtool_common import BoolContext
+import mtool_graphics_scene
 
 PLAYBACK_TIMEOUT_MS = 50
 
@@ -189,6 +190,114 @@ class GaitGraphDisplay(object):
 
         self.fit_in_view()
 
+class CommandWidget(object):
+    ATTR_NAMES = ['translate_x_mm_s',
+                  'translate_y_mm_s',
+                  'rotate_deg_s',
+                  'body_x_mm',
+                  'body_y_mm',
+                  'body_z_mm',
+                  'body_pitch_deg',
+                  'body_roll_deg',
+                  'body_yaw_deg',]
+
+    def __init__(self, ui, command, command_change_callback):
+        self.ui = ui
+        self.command = command
+        self.command_change_callback = command_change_callback
+        self.scales = [ 400.0, 400.0, 100.0,
+                        100.0, 100.0, 100.0,
+                        45.0, 45.0, 45.0 ]
+
+        self.graphics_scene = mtool_graphics_scene.GraphicsScene()
+        self.graphics_scene.sceneMouseMoveEvent.connect(
+            self.handle_mouse_move)
+        self.graphics_scene.sceneMousePressEvent.connect(
+            self.handle_mouse_press)
+        self.graphics_view = self.ui.gaitCommandView
+        self.graphics_view.setTransform(QtGui.QTransform().scale(1, -1))
+        self.graphics_view.setScene(self.graphics_scene)
+
+        self.in_scale_changed = BoolContext()
+
+        for combo in [self.ui.commandXCombo,
+                      self.ui.commandYCombo]:
+            combo.currentIndexChanged.connect(self.handle_axis_change)
+
+        for spin in [self.ui.commandXScaleSpin,
+                     self.ui.commandYScaleSpin]:
+            spin.valueChanged.connect(self.handle_scale_change)
+
+    def fit_in_view(self):
+        self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
+
+    def read_settings(self, config):
+        def set_combo(combo, name):
+            settings.restore_combo(config, 'gaitconfig', combo, name)
+
+        set_combo(self.ui.commandXCombo, 'command_x_axis')
+        set_combo(self.ui.commandYCombo, 'command_y_axis')
+
+        for index in range(len(self.scales)):
+            name = 'command_axis_scale_%d' % index
+            if config.has_option('gaitconfig', name):
+                self.scales[index] = config.getfloat('gaitconfig', name)
+
+        self.handle_axis_change()
+
+    def write_settings(self, config):
+        config.set('gaitconfig', 'command_x_axis',
+                   self.ui.commandXCombo.currentText())
+        config.set('gaitconfig', 'command_y_axis',
+                   self.ui.commandYCombo.currentText())
+
+        for index, value in enumerate(self.scales):
+            config.set('gaitconfig', 'command_axis_scale_%d' % index, value)
+
+    def handle_axis_change(self):
+        with self.in_scale_changed:
+            self.ui.commandXScaleSpin.setValue(self.x_scale())
+            self.ui.commandYScaleSpin.setValue(self.y_scale())
+
+    def handle_scale_change(self, value):
+        if self.in_scale_changed.value:
+            return
+
+        with self.in_scale_changed:
+            if self.x_axis() == self.y_axis():
+                self.ui.commandXScaleSpin.setValue(value)
+                self.ui.commandYScaleSpin.setValue(value)
+
+            self.scales[self.x_axis()] = self.ui.commandXScaleSpin.value()
+            self.scales[self.y_axis()] = self.ui.commandYScaleSpin.value()
+
+    def x_axis(self):
+        return self.ui.commandXCombo.currentIndex()
+
+    def y_axis(self):
+        return self.ui.commandYCombo.currentIndex()
+
+    def x_scale(self):
+        return self.scales[self.x_axis()]
+
+    def y_scale(self):
+        return self.scales[self.y_axis()]
+
+    def handle_mouse_move(self, cursor):
+        x_value = cursor.x() * self.x_scale()
+        y_value = cursor.y() * self.y_scale()
+
+        if self.x_axis() == self.y_axis():
+            x_value = y_value = 0.5 * (x_value + y_value)
+
+        setattr(self.command, self.ATTR_NAMES[self.x_axis()], x_value)
+        setattr(self.command, self.ATTR_NAMES[self.y_axis()], y_value)
+
+        self.command_change_callback()
+
+    def handle_mouse_press(self, cursor):
+        self.handle_mouse_move(cursor)
+
 class GaitTab(object):
     (PLAYBACK_IDLE,
      PLAYBACK_SINGLE,
@@ -209,6 +318,9 @@ class GaitTab(object):
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
 
         self.command = ripple_gait.Command()
+
+        self.command_widget = CommandWidget(
+            ui, self.command, self.handle_widget_set_command)
 
         self.current_states = []
         self.gait_graph_display = GaitGraphDisplay(self.ui)
@@ -234,17 +346,19 @@ class GaitTab(object):
                      self.ui.bodyZOffsetSpin]:
             spin.valueChanged.connect(self.handle_gait_config_change)
 
-        self.command_spins = [self.ui.commandXSpin,
-                              self.ui.commandYSpin,
-                              self.ui.commandRotSpin,
-                              self.ui.commandBodyXSpin,
-                              self.ui.commandBodyYSpin,
-                              self.ui.commandBodyZSpin,
-                              self.ui.commandPitchSpin,
-                              self.ui.commandRollSpin,
-                              self.ui.commandYawSpin]
+        self.command_spins = [
+            (self.ui.commandXSpin, 'translate_x_mm_s'),
+            (self.ui.commandYSpin, 'translate_y_mm_s'),
+            (self.ui.commandRotSpin, 'rotate_deg_s'),
+            (self.ui.commandBodyXSpin, 'body_x_mm'),
+            (self.ui.commandBodyYSpin, 'body_y_mm'),
+            (self.ui.commandBodyZSpin, 'body_z_mm'),
+            (self.ui.commandPitchSpin, 'body_pitch_deg'),
+            (self.ui.commandRollSpin, 'body_roll_deg'),
+            (self.ui.commandYawSpin, 'body_yaw_deg'),
+            ]
 
-        for spin in self.command_spins:
+        for spin, _ in self.command_spins:
             spin.valueChanged.connect(self.handle_command_change)
 
         self.ui.commandResetButton.clicked.connect(self.handle_command_reset)
@@ -339,6 +453,8 @@ class GaitTab(object):
                 self.ripple_config.mechanical.leg_config[leg_num] = \
                     self.string_to_leg_config(value)
 
+        self.command_widget.read_settings(config)
+
         self.handle_leg_change(self.ui.gaitLegList.currentItem())
         self.handle_gait_config_change()
         self.handle_geometry_change()
@@ -352,6 +468,8 @@ class GaitTab(object):
                    self.ui.geometryFrameCombo.currentText())
         config.set('gaitconfig', 'geometry_projection',
                    self.ui.geometryProjectionCombo.currentText())
+
+        self.command_widget.write_settings(config)
 
         config.add_section('gaitconfig.legs')
         for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
@@ -385,6 +503,8 @@ class GaitTab(object):
 
         # Make sure that our configuration is fully up to date.
         self.handle_gait_config_change()
+
+        self.command_widget.fit_in_view()
 
     def handle_leg_change(self, current_item):
         widgets = [self.ui.mountingLegXSpin,
@@ -552,21 +672,14 @@ class GaitTab(object):
             return
 
         with self.in_command_changed:
-            self.command.translate_x_mm_s = self.ui.commandXSpin.value()
-            self.command.translate_y_mm_s = self.ui.commandYSpin.value()
-            self.command.rotate_deg_s = self.ui.commandRotSpin.value()
-            self.command.body_x_mm = self.ui.commandBodyXSpin.value()
-            self.command.body_y_mm = self.ui.commandBodyYSpin.value()
-            self.command.body_z_mm = self.ui.commandBodyZSpin.value()
-            self.command.body_pitch_deg = self.ui.commandPitchSpin.value()
-            self.command.body_roll_deg = self.ui.commandRollSpin.value()
-            self.command.body_yaw_deg = self.ui.commandYawSpin.value()
+            for spin, name in self.command_spins:
+                setattr(self.command, name, spin.value())
 
-            self.handle_playback_config_change()
+            self.update_command()
 
     def handle_command_reset(self):
         with self.in_command_changed:
-            for spin in self.command_spins:
+            for spin, _ in self.command_spins:
                 spin.setValue(0.0)
 
         self.handle_command_change()
@@ -615,3 +728,16 @@ class GaitTab(object):
 
         self.gait_geometry_display.set_state(state)
         self.gait_graph_display.set_phase(state.phase % 1.0)
+
+    def handle_widget_set_command(self):
+        with self.in_command_changed:
+            for spin, name in self.command_spins:
+                spin.setValue(getattr(self.command, name))
+
+            self.update_command()
+
+    def update_command(self):
+        # TODO jpieper: only do this if we're IDLE.  If in one of
+        # the playback modes, merely call set_command on the gait
+        # object.
+        self.handle_playback_config_change()

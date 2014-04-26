@@ -831,7 +831,7 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Gait Configuration</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1,5">
+       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,6">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_11">
           <item>
@@ -1713,16 +1713,16 @@ p, li { white-space: pre-wrap; }
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_8">
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <item row="0" column="0">
                 <widget class="QLabel" name="label_18">
                  <property name="text">
                   <string>X:</string>
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QComboBox" name="comboBox_4">
+               <item row="0" column="1">
+                <widget class="QComboBox" name="commandXCombo">
                  <item>
                   <property name="text">
                    <string>Translation X</string>
@@ -1770,17 +1770,40 @@ p, li { white-space: pre-wrap; }
                  </item>
                 </widget>
                </item>
-               <item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="label_28">
+                 <property name="text">
+                  <string>Scale:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QDoubleSpinBox" name="commandXScaleSpin">
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>5000.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>10.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
                 <widget class="QLabel" name="label_19">
                  <property name="text">
                   <string>Y:</string>
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QComboBox" name="comboBox_5">
+               <item row="1" column="1">
+                <widget class="QComboBox" name="commandYCombo">
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>1</number>
                  </property>
                  <item>
                   <property name="text">
@@ -1827,6 +1850,29 @@ p, li { white-space: pre-wrap; }
                    <string>Body Yaw</string>
                   </property>
                  </item>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="label_29">
+                 <property name="text">
+                  <string>Scale:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QDoubleSpinBox" name="commandYScaleSpin">
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>5000.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>10.000000000000000</double>
+                 </property>
                 </widget>
                </item>
               </layout>
