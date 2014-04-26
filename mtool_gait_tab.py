@@ -694,6 +694,8 @@ class GaitTab(object):
                 self.playback_timer.stop()
                 self.playback_mode = self.PLAYBACK_IDLE
 
+            self.handle_playback_config_change()
+
             return
 
         # Make sure everything else is unchecked.
@@ -737,7 +739,10 @@ class GaitTab(object):
             self.update_command()
 
     def update_command(self):
-        # TODO jpieper: only do this if we're IDLE.  If in one of
-        # the playback modes, merely call set_command on the gait
-        # object.
-        self.handle_playback_config_change()
+        if self.playback_mode == self.PLAYBACK_IDLE:
+            # If we're idle, we can just update the phase list right away.
+            self.handle_playback_config_change()
+        else:
+            # Otherwise, just set the command on our gait and let
+            # playback do its thing.
+            self.ripple_gait.set_command(self.command)

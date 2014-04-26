@@ -1,6 +1,7 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import bisect
+import copy
 import math
 
 import leg_ik
@@ -77,6 +78,10 @@ class Command(object):
     body_pitch_deg = 0.0
     body_roll_deg = 0.0
     body_yaw_deg = 0.0
+
+    def copy(self):
+        return copy.copy(self)
+
 
 class GaitGraphLeg(object):
     sequence = None
@@ -158,6 +163,7 @@ class RippleGait(object):
 
         self.state = self.get_idle_state()
         self.idle_state = self.get_idle_state()
+        self.next_command = None
 
         self.set_command(Command())
 
@@ -200,6 +206,24 @@ class RippleGait(object):
         exception if the platform cannot achieve the desired command,
         in this case, the desired command will not be changed.'''
 
+        command = command.copy()
+
+        if self.state.phase != 0.0:
+            # TODO jpieper: It would be nice to be able to update the
+            # command anytime all the legs are in STANCE (or even
+            # better, all the time), rather than just at phase 0.
+            #
+            # In either case, you have to be careful that the new
+            # action list is consistent with the new command and phase
+            # or do something more complicated like interpolate
+            # between the two commands.
+            self.next_command = command
+            return
+
+        self._really_set_command(command)
+
+    def _really_set_command(self, command):
+        print "new command"
         self.command = command
         self.actions = []
 
@@ -397,6 +421,11 @@ class RippleGait(object):
                 action_index = 0
                 next_phase -= 1.0
                 cur_phase -= 1.0
+
+                if self.next_command:
+                    next_command = self.next_command
+                    self.next_command = None
+                    self._really_set_command(next_command)
 
         # Finally, advance the remainder of the phase and update the phase.
         next_phase = next_phase
