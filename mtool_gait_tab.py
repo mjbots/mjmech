@@ -201,11 +201,21 @@ class CommandWidget(object):
                   'body_roll_deg',
                   'body_yaw_deg',]
 
+    ATTR_SUFFIXES = ['mm/s',
+                     'mm/s',
+                     'deg/s',
+                     'mm',
+                     'mm',
+                     'mm',
+                     'deg',
+                     'deg',
+                     'deg',]
+
     def __init__(self, ui, command, command_change_callback):
         self.ui = ui
         self.command = command
         self.command_change_callback = command_change_callback
-        self.scales = [ 400.0, 400.0, 100.0,
+        self.scales = [ 400.0, 400.0, 50.0,
                         100.0, 100.0, 100.0,
                         45.0, 45.0, 45.0 ]
 
@@ -227,6 +237,9 @@ class CommandWidget(object):
         for spin in [self.ui.commandXScaleSpin,
                      self.ui.commandYScaleSpin]:
             spin.valueChanged.connect(self.handle_scale_change)
+
+        self.axes_item = mtool_graphics_scene.AxesItem()
+        self.graphics_scene.addItem(self.axes_item)
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
@@ -259,6 +272,13 @@ class CommandWidget(object):
             self.ui.commandXScaleSpin.setValue(self.x_scale())
             self.ui.commandYScaleSpin.setValue(self.y_scale())
 
+            self.axes_item.x_scale = self.x_scale()
+            self.axes_item.y_scale = self.y_scale()
+            self.axes_item.x_suffix = self.ATTR_SUFFIXES[self.x_axis()]
+            self.axes_item.y_suffix = self.ATTR_SUFFIXES[self.y_axis()]
+
+            self.axes_item.update()
+
     def handle_scale_change(self, value):
         if self.in_scale_changed.value:
             return
@@ -270,6 +290,10 @@ class CommandWidget(object):
 
             self.scales[self.x_axis()] = self.ui.commandXScaleSpin.value()
             self.scales[self.y_axis()] = self.ui.commandYScaleSpin.value()
+
+            self.axes_item.x_scale = self.x_scale()
+            self.axes_item.y_scale = self.y_scale()
+            self.axes_item.update()
 
     def x_axis(self):
         return self.ui.commandXCombo.currentIndex()
