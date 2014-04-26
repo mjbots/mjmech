@@ -57,7 +57,7 @@ class RippleConfig(object):
         self.min_swing_percent = None
         self.max_swing_percent = None
         self.leg_order = None
-        self.body_z_offset = None
+        self.body_z_offset_mm = None
 
 
 class LegResult(object):
@@ -130,6 +130,7 @@ class RippleState(object):
                 leg.frame = result.body_frame
             result.legs[key] = leg
 
+        result.phase = self.phase
         result.swing_start_pos = self.swing_start_pos.copy()
         result.swing_end_pos = self.swing_end_pos.copy()
 
@@ -216,13 +217,12 @@ class RippleGait(object):
             self.actions.append(
                 (fraction + swing_time, leg_num, self.ACTION_START_STANCE))
 
-        self.actions.sort()
         self.actions.append((1.0, -1, self.ACTION_END))
 
         self.state.body_frame.transform.translation.x = command.body_x_mm
         self.state.body_frame.transform.translation.y = command.body_y_mm
         self.state.body_frame.transform.translation.z = (
-            command.body_z_mm + self.config.body_z_offset)
+            command.body_z_mm + self.config.body_z_offset_mm)
         self.state.body_frame.transform.rotation = tf.Quaternion.from_euler(
             math.radians(command.body_roll_deg),
             math.radians(command.body_pitch_deg),
@@ -248,11 +248,12 @@ class RippleGait(object):
             point.z = leg_config.idle_z_mm
 
             leg_state = LegState()
-            leg_state.point = point
-            leg_state.frame = result.robot_frame
+            leg_state.point = result.world_frame.map_from_frame(
+                result.body_frame, point)
+            leg_state.frame = result.world_frame
             result.legs[leg_number] = leg_state
 
-        result.body_frame.transform.translation.z = self.config.body_z_offset
+        result.body_frame.transform.translation.z = self.config.body_z_offset_mm
 
         return result
 
@@ -379,23 +380,26 @@ class RippleGait(object):
 
         while True:
             # Are there any actions between old_phase and new_phase?
-            if self.actions[action_index][0] < next_phase:
-                self._do_action(action_index)
-                delta_phase = self.actions[action_index][0] - cur_phase
-                advance_phase = self.actions[action_index][0]
-                self._noaction_advance_phase(delta_phase, advance_phase)
-                cur_phase = advance_phase
-                action_index += 1
-
-                if action_index >= len(self.actions):
-                    action_index = 0
-                    next_phase -= 1.0
-                    cur_phase = 0.0
-            else:
+            if self.actions[action_index][0] > next_phase:
                 break
 
+            while (action_index < len(self.actions) and
+                   self.actions[action_index][0] <= next_phase):
+                advance_phase = self.actions[action_index][0]
+                self._do_action(action_index)
+                action_index += 1
+
+            delta_phase = advance_phase - cur_phase
+            self._noaction_advance_phase(delta_phase, advance_phase)
+            cur_phase = advance_phase
+
+            if action_index >= len(self.actions):
+                action_index = 0
+                next_phase -= 1.0
+                cur_phase -= 1.0
+
         # Finally, advance the remainder of the phase and update the phase.
-        next_phase = next_phase % 1.0
+        next_phase = next_phase
         self._noaction_advance_phase(next_phase - cur_phase, next_phase)
         self.state.phase = next_phase
 

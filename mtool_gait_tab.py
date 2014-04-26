@@ -473,7 +473,7 @@ class GaitTab(object):
         self.ripple_config.leg_order = \
             self.ripple_config.mechanical.leg_config.keys()
 
-        self.ripple_config.body_z_offset = self.ui.bodyZOffsetSpin.value()
+        self.ripple_config.body_z_offset_mm = self.ui.bodyZOffsetSpin.value()
 
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
         self.gait_geometry_display.set_gait_config(self.ripple_config)
