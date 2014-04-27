@@ -73,7 +73,8 @@ class GaitGeometryDisplay(object):
             this_shoulder = self.graphics_scene.addPolygon(
                 shoulder_poly, QtGui.QPen(QtCore.Qt.black),
                 QtGui.QBrush(QtCore.Qt.blue))
-            this_shoulder.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+            this_shoulder.setFlags(
+                QtGui.QGraphicsItem.ItemIgnoresTransformations)
             self.shoulders[leg_num] = this_shoulder
 
             this_leg = self.graphics_scene.addEllipse(
@@ -108,13 +109,8 @@ class GaitGeometryDisplay(object):
         self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
-            leg_config = self.config.mechanical.leg_config[leg_num]
-
-            body_point = tf.Point3D(
-                    leg_config.mount_x_mm,
-                    leg_config.mount_y_mm,
-                    leg_config.mount_z_mm)
-            shoulder.setPos(*self._project(body_point, state.body_frame))
+            shoulder.setPos(*self._project(tf.Point3D(),
+                                           state.legs[leg_num].shoulder_frame))
 
         for leg_num, leg_item in self.legs.iteritems():
             leg = state.legs[leg_num]

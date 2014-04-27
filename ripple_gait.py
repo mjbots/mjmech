@@ -103,6 +103,7 @@ class LegState(object):
         self.point = leg_ik.Point3D(0., 0., 0.)
         self.mode = STANCE
         self.frame = None
+        self.shoulder_frame = None
 
     def __repr__(self):
         return '<LegState p=%r m=%d f=%s>' % (self.point, self.mode, self.frame)
@@ -133,6 +134,10 @@ class RippleState(object):
                 leg.frame = result.robot_frame
             elif value.frame is self.body_frame:
                 leg.frame = result.body_frame
+            leg.shoulder_frame = tf.Frame(
+                value.shoulder_frame.transform.translation.copy(),
+                value.shoulder_frame.transform.rotation.copy(),
+                result.body_frame)
             result.legs[key] = leg
 
         result.phase = self.phase
@@ -208,6 +213,18 @@ class RippleGait(object):
 
         command = command.copy()
 
+        # Determine whether this command is valid or not.
+        #
+        # The things which must be configured:
+        #   cycle time
+        #   swing percent
+        #
+        # First, keeping the cycle time at the max, see if the command
+        # is feasible.  If not, then decrease the cycle time to see if
+        # the command is feasible, stopping when the first joint hits
+        # a velocity limit.  If that doesn't work, then increase the
+        # swing percent to allow decreasing the cycle time more.
+
         if self.state.phase != 0.0:
             # TODO jpieper: It would be nice to be able to update the
             # command anytime all the legs are in STANCE (or even
@@ -275,6 +292,12 @@ class RippleGait(object):
                 result.body_frame, point)
             leg_state.frame = result.world_frame
             result.legs[leg_number] = leg_state
+
+            leg_state.shoulder_frame = tf.Frame(
+                tf.Point3D(leg_config.mount_x_mm,
+                           leg_config.mount_y_mm,
+                           leg_config.mount_z_mm),
+                None, result.body_frame)
 
         result.body_frame.transform.translation.z = self.config.body_z_offset_mm
 
@@ -439,7 +462,7 @@ class RippleGait(object):
 
     def _swing_phase_time(self):
         # TODO jpieper: Use the configuration to select this.
-        return 1.0 / self.num_legs
+        return (1.0 / self.num_legs) * 0.01 * self.config.min_swing_percent
 
     def _guess_phase(self):
         '''Attempt to fill in the phase member, and any UNKNOWN
