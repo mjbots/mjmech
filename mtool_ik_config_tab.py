@@ -58,12 +58,6 @@ class IkTester(object):
         self.graphics_view.setTransform(QtGui.QTransform().scale(1, -1))
         self.graphics_view.setScene(self.graphics_scene)
 
-        self.graphics_scene.addLine(-1, 0, 1, 0)
-        self.graphics_scene.addLine(0, -1, 0, 1)
-        for x in range(-10, 11):
-            self.graphics_scene.addLine(-0.02, x / 10., 0.02, x / 10.0)
-            self.graphics_scene.addLine(x / 10., -0.02, x / 10.0, 0.02)
-
         self.usable_rects = {}
         self.grid_count = 20
         for x in range(-self.grid_count, self.grid_count + 1):
@@ -78,34 +72,16 @@ class IkTester(object):
             rect.setPen(QtGui.QPen(QtCore.Qt.NoPen))
             rect.setZValue(-20)
 
-        labels = [self.graphics_scene.addText('') for x in range(4)]
-        for label in labels:
-            label.setFlag(QtGui.QGraphicsItem.ItemIgnoresTransformations)
-
-        (self.label_x_plus,
-         self.label_x_minus,
-         self.label_y_plus,
-         self.label_y_minus) = labels
+        self.axes = mtool_graphics_scene.AxesItem()
+        self.graphics_scene.addItem(self.axes)
+        self.axes.x_suffix = 'mm'
+        self.axes.y_suffix = 'mm'
 
         self.length_scale = 50
-        self.update_labels()
+        self.axes.x_scale = self.axes.y_scale = self.length_scale
+        self.axes.update()
+
         self.ik_config = None
-
-    def update_labels(self):
-        # Apparently it is really hard to get QGraphicsTextItems to be
-        # aligned anything other than left|upper.  Thus, just hack in
-        # some offsets which kind of work on my monitor for now.
-        self.label_x_plus.setPlainText('+%dmm' % int(self.length_scale))
-        self.label_x_plus.setPos(0.7, 0)
-
-        self.label_x_minus.setPlainText('-%dmm' % int(self.length_scale))
-        self.label_x_minus.setPos(-1, 0)
-
-        self.label_y_plus.setPlainText('+%dmm' % int(self.length_scale))
-        self.label_y_plus.setPos(0, 1)
-
-        self.label_y_minus.setPlainText('-%dmm' % int(self.length_scale))
-        self.label_y_minus.setPos(0, -.9)
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
@@ -141,7 +117,8 @@ class IkTester(object):
         self.speed_scale = speed_scale
         self.speed_axis = speed_axis
 
-        self.update_labels()
+        self.axes.x_scale = self.axes.y_scale = self.length_scale
+        self.axes.update()
         self.update_scene()
 
     def coord_to_point(self, coord):
