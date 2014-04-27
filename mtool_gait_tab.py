@@ -65,9 +65,10 @@ class GaitGeometryDisplay(object):
         self.shoulders = {}
         self.legs = {}
         shoulder_poly = QtGui.QPolygonF([
-                QtCore.QPointF(-10, -10),
+                QtCore.QPointF(-10, 0),
                 QtCore.QPointF(0, 10),
-                QtCore.QPointF(10, -10)])
+                QtCore.QPointF(10, 0),
+                QtCore.QPointF(0, -10)])
         for leg_num, leg in config.mechanical.leg_config.iteritems():
             this_shoulder = self.graphics_scene.addPolygon(
                 shoulder_poly, QtGui.QPen(QtCore.Qt.black),
