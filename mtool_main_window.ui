@@ -715,17 +715,17 @@ p, li { white-space: pre-wrap; }
               <widget class="QComboBox" name="planeCombo">
                <item>
                 <property name="text">
-                 <string>X/Y (Right/Forward)</string>
+                 <string>X/Y (Clockwise/Out)</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>X/Z (Right/Up)</string>
+                 <string>X/Z (Clockwise/Up)</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Y/Z (Forward/Up)</string>
+                 <string>Y/Z (Out/Up)</string>
                 </property>
                </item>
               </widget>

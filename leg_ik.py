@@ -23,7 +23,7 @@ class Configuration(object):
     servo_speed_dps = 360.0
 
 class JointAngles(object):
-    coxa_deg = None
+    coxa_deg = None # positive is rotating clockwise viewed from top
     femur_deg = None # positive is rotating upward
     tibia_deg = None # positive is rotating upward
 
@@ -32,11 +32,15 @@ def lizard_3dof_ik(point_mm, config):
     required joint angles for a 3 degree of freedom lizard style
     leg.
 
+    +y is away from the shoulder
+    +x is clockwise from shoulder
+    +z is up
+
     If no solution is possible, return None.
     '''
     # Solve for the coxa first, as it has only a single solution.
     coxa_deg = (config.coxa_sign *
-                math.degrees(math.atan2(point_mm.y, point_mm.x)))
+                math.degrees(math.atan2(point_mm.x, point_mm.y)))
 
     if (coxa_deg < config.coxa_min_deg or
         coxa_deg > config.coxa_max_deg):
