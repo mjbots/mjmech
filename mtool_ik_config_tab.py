@@ -92,6 +92,7 @@ class IkTester(object):
                    idle_values, minimum_values, maximum_values,
                    x_offset_mm, y_offset_mm, z_offset_mm,
                    coxa_length_mm, femur_length_mm, tibia_length_mm,
+                   leg_ik,
                    plane,
                    length_scale,
                    speed_scale,
@@ -112,6 +113,7 @@ class IkTester(object):
         self.coxa_length_mm = coxa_length_mm
         self.femur_length_mm = femur_length_mm
         self.tibia_length_mm = tibia_length_mm
+        self.leg_ik = leg_ik
         self.plane = plane
         self.length_scale = length_scale
         self.speed_scale = speed_scale
@@ -140,36 +142,7 @@ class IkTester(object):
         return point_mm
 
     def update_scene(self):
-        self.ik_config = leg_ik.Configuration()
-
-        self.ik_config.coxa_min_deg = (
-            self.minimum_values[self.coxa_servo] -
-            self.idle_values[self.coxa_servo])
-        self.ik_config.coxa_max_deg = (
-            self.maximum_values[self.coxa_servo] -
-            self.idle_values[self.coxa_servo])
-        self.ik_config.coxa_length_mm = self.coxa_length_mm
-        self.ik_config.coxa_sign = self.coxa_sign
-
-        self.ik_config.femur_min_deg = (
-            self.minimum_values[self.femur_servo] -
-            self.idle_values[self.femur_servo])
-        self.ik_config.femur_max_deg = (
-            self.maximum_values[self.femur_servo] -
-            self.idle_values[self.femur_servo])
-        self.ik_config.femur_length_mm = self.femur_length_mm
-        self.ik_config.femur_sign = self.femur_sign
-
-        self.ik_config.tibia_min_deg = (
-            self.minimum_values[self.tibia_servo] -
-            self.idle_values[self.tibia_servo])
-        self.ik_config.tibia_max_deg = (
-            self.maximum_values[self.tibia_servo] -
-            self.idle_values[self.tibia_servo])
-        self.ik_config.tibia_length_mm = self.tibia_length_mm
-        self.ik_config.tibia_sign = self.tibia_sign
-
-        ik = leg_ik.LizardIk(self.ik_config)
+        ik = self.leg_ik
 
         axis = self.speed_axis
 
@@ -295,8 +268,42 @@ class IkConfigTab(object):
 
     def get_leg_ik(self, leg_number):
         '''Return an IK solver for the given leg number.'''
-        # TODO jpieper: Implement
-        return None
+        result = leg_ik.Configuration()
+
+        idle_values = self.servo_tab.pose(
+            self.ui.idleCombo.currentText())
+        minimum_values = self.servo_tab.pose(
+            self.ui.minimumCombo.currentText())
+        maximum_values = self.servo_tab.pose(
+            self.ui.maximumCombo.currentText())
+
+        leg = self.legs.get(leg_number, LegConfig())
+        coxa_servo = leg.coxa_ident
+
+        result.coxa_min_deg = (
+            minimum_values[coxa_servo] - idle_values[coxa_servo])
+        result.coxa_max_deg = (
+            maximum_values[coxa_servo] - idle_values[coxa_servo])
+        result.coxa_length_mm = self.ui.coxaLengthSpin.value()
+        result.coxa_sign = leg.coxa_sign
+
+        femur_servo = leg.femur_ident
+        result.femur_min_deg = (
+            minimum_values[femur_servo] - idle_values[femur_servo])
+        result.femur_max_deg = (
+            maximum_values[femur_servo] - idle_values[femur_servo])
+        result.femur_length_mm = self.ui.femurLengthSpin.value()
+        result.femur_sign = leg.femur_sign
+
+        tibia_servo = leg.tibia_ident
+        result.tibia_min_deg = (
+            minimum_values[tibia_servo] - idle_values[tibia_servo])
+        result.tibia_max_deg = (
+            maximum_values[tibia_servo] - idle_values[tibia_servo])
+        result.tibia_length_mm = self.ui.tibiaLengthSpin.value()
+        result.tibia_sign = leg.tibia_sign
+
+        return leg_ik.LizardIk(result)
 
     def update_config_enable(self):
         enable = self.ui.legPresentCombo.currentIndex() == 0
@@ -368,6 +375,8 @@ class IkConfigTab(object):
     def handle_ik_config_change(self):
         # Update the visualization and the IK solver with our new
         # configuration.
+        leg_ik = self.get_leg_ik(self.ui.legSpin.value())
+
         self.ik_tester.set_config(
             coxa_servo=self.ui.coxaServoSpin.value(),
             coxa_sign=self.combo_sign(self.ui.coxaSignCombo),
@@ -387,6 +396,7 @@ class IkConfigTab(object):
             coxa_length_mm=self.ui.coxaLengthSpin.value(),
             femur_length_mm=self.ui.femurLengthSpin.value(),
             tibia_length_mm=self.ui.tibiaLengthSpin.value(),
+            leg_ik=leg_ik,
             plane=self.get_plane(),
             length_scale=self.ui.lengthScaleSpin.value(),
             speed_scale=self.ui.speedScaleSpin.value(),

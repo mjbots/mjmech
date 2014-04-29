@@ -53,12 +53,12 @@ class RippleConfig(object):
     def __init__(self):
         self.mechanical = MechanicalConfig()
 
-        self.max_cycle_time_s = None
-        self.lift_height_mm = None
-        self.min_swing_percent = None
-        self.max_swing_percent = None
-        self.leg_order = None
-        self.body_z_offset_mm = None
+        self.max_cycle_time_s = 4.0
+        self.lift_height_mm = 80.0
+        self.min_swing_percent = 100.0
+        self.max_swing_percent = 100.0
+        self.leg_order = []
+        self.body_z_offset_mm = 0.0
 
 
 class LegResult(object):
@@ -158,6 +158,9 @@ class NotSupported(RuntimeError):
     configuration.'''
     pass
 
+class Options(object):
+    cycle_time_s = 0.0
+
 class RippleGait(object):
     ACTION_START_SWING, ACTION_START_STANCE, ACTION_END = range(3)
 
@@ -166,11 +169,13 @@ class RippleGait(object):
 
         self.num_legs = len(config.mechanical.leg_config)
 
+        self.cycle_time_s = None
         self.state = self.get_idle_state()
         self.idle_state = self.get_idle_state()
         self.next_command = None
+        self.next_options = None
 
-        self.set_command(Command())
+        self._really_set_command(Command(), Options())
 
     def set_state(self, state, command):
         '''Force the current leg state to the given configuration.  If
@@ -206,12 +211,63 @@ class RippleGait(object):
 
         return self.state
 
+    def _select_command_options(self, command):
+        # First, iterate, solving IK for all legs in time until we
+        # find the point at which the first leg is unsolvable.
+        dt = 0.05
+
+        time_s = 0.0
+
+        my_state = self.idle_state.copy()
+        self._apply_body_command(my_state, command)
+
+        end_time_s = None
+
+        while time_s < 1.2 * 0.5 * self.config.max_cycle_time_s:
+            if end_time_s is not None:
+                break
+            time_s += dt
+
+            forward_frame = self._get_update_frame(time_s, command=command)
+            reverse_frame = self._get_update_frame(-time_s, command=command)
+
+            for frame in [forward_frame, reverse_frame]:
+                if end_time_s is not None:
+                    break
+                for leg_num, leg in my_state.legs.iteritems():
+                    # TODO: Need to do this for the lifted leg as well.
+                    leg_robot_frame_point = frame.map_to_parent(leg.point)
+                    leg_shoulder_point = leg.shoulder_frame.map_from_frame(
+                        my_state.robot_frame, leg_robot_frame_point)
+
+                    leg_config = self.config.mechanical.leg_config[leg_num]
+                    result = leg_config.leg_ik.do_ik(leg_shoulder_point)
+                    if result is None:
+                        # Break, so that we can take action knowing
+                        # how far we can go.
+                        end_time_s = time_s
+                        break
+
+        result = Options()
+        if end_time_s is None:
+            # We can achieve this at the maximum time.
+            result.cycle_time_s = self.config.max_cycle_time_s
+        else:
+            result.cycle_time_s = 2.0 * end_time_s / 1.2
+
+        # TODO jpieper: See if this cycle time is feasible.  We will
+        # do this by checking to see if the swing leg has to move too
+        # fast.
+        return result
+
     def set_command(self, command):
         '''Set the current command.  This will raise a NotSupported
         exception if the platform cannot achieve the desired command,
         in this case, the desired command will not be changed.'''
 
         command = command.copy()
+
+        options = self._select_command_options(command)
 
         # Determine whether this command is valid or not.
         #
@@ -235,16 +291,19 @@ class RippleGait(object):
             # or do something more complicated like interpolate
             # between the two commands.
             self.next_command = command
+            self.next_options = options
             return
 
-        self._really_set_command(command)
+        self._really_set_command(command, options)
 
-    def _really_set_command(self, command):
+    def _really_set_command(self, command, options):
         self.command = command
         self.actions = []
 
         if self.num_legs == 0:
             return
+
+        self.cycle_time_s = options.cycle_time_s
 
         # Create the action list.
         swing_time = self._swing_phase_time()
@@ -259,11 +318,15 @@ class RippleGait(object):
 
         self.actions.append((1.0, -1, self.ACTION_END))
 
-        self.state.body_frame.transform.translation.x = command.body_x_mm
-        self.state.body_frame.transform.translation.y = command.body_y_mm
-        self.state.body_frame.transform.translation.z = (
+        self._apply_body_command(self.state, command)
+
+
+    def _apply_body_command(self, state, command):
+        state.body_frame.transform.translation.x = command.body_x_mm
+        state.body_frame.transform.translation.y = command.body_y_mm
+        state.body_frame.transform.translation.z = (
             command.body_z_mm + self.config.body_z_offset_mm)
-        self.state.body_frame.transform.rotation = tf.Quaternion.from_euler(
+        state.body_frame.transform.rotation = tf.Quaternion.from_euler(
             math.radians(command.body_roll_deg),
             math.radians(command.body_pitch_deg),
             math.radians(command.body_yaw_deg))
@@ -293,11 +356,17 @@ class RippleGait(object):
             leg_state.frame = result.world_frame
             result.legs[leg_number] = leg_state
 
+            # For now, we are assuming that shoulders face away from
+            # the y axis.
+            rotation = (0.5 * math.pi
+                        if leg_config.mount_x_mm > 0.0
+                        else -0.5 * math.pi)
             leg_state.shoulder_frame = tf.Frame(
                 tf.Point3D(leg_config.mount_x_mm,
                            leg_config.mount_y_mm,
                            leg_config.mount_z_mm),
-                None, result.body_frame)
+                tf.Quaternion.from_euler(0., 0., rotation),
+                result.body_frame)
 
         result.body_frame.transform.translation.z = self.config.body_z_offset_mm
 
@@ -359,15 +428,18 @@ class RippleGait(object):
             self.state.swing_start_pos = leg.point.copy()
             self.state.swing_end_pos = self._get_swing_end_pos(leg_num)
 
-    def _get_update_frame(self, dt):
+    def _get_update_frame(self, dt, command=None):
+        if command is None:
+            command = self.command
+
         update_frame = tf.Frame(parent=self.state.robot_frame)
-        vx = self.command.translate_x_mm_s
-        vy = self.command.translate_y_mm_s
-        if self.command.rotate_deg_s == 0:
+        vx = command.translate_x_mm_s
+        vy = command.translate_y_mm_s
+        if command.rotate_deg_s == 0:
             dx = vx * dt
             dy = vy * dt
         else:
-            vyaw = math.radians(self.command.rotate_deg_s)
+            vyaw = math.radians(command.rotate_deg_s)
             dx = (((math.cos(dt * vyaw) - 1) * vy +
                    math.sin(dt * vyaw) * vx) / vyaw)
             dy = (((math.cos(dt * vyaw) - 1) * vx +
@@ -447,7 +519,9 @@ class RippleGait(object):
                 if self.next_command:
                     next_command = self.next_command
                     self.next_command = None
-                    self._really_set_command(next_command)
+                    next_options = self.next_options
+                    self.next_options = None
+                    self._really_set_command(next_command, next_options)
 
         # Finally, advance the remainder of the phase and update the phase.
         next_phase = next_phase
@@ -457,11 +531,9 @@ class RippleGait(object):
         return self.state
 
     def _phase_time(self):
-        # TODO jpieper: Implement varying cycle times.
-        return self.config.max_cycle_time_s
+        return self.cycle_time_s
 
     def _swing_phase_time(self):
-        # TODO jpieper: Use the configuration to select this.
         return (1.0 / self.num_legs) * 0.01 * self.config.min_swing_percent
 
     def _guess_phase(self):
