@@ -362,8 +362,8 @@ class GaitTab(object):
                      self.ui.idlePositionZSpin,
                      self.ui.maxCycleTimeSpin,
                      self.ui.liftHeightSpin,
-                     self.ui.minSwingPercentSpin,
-                     self.ui.maxSwingPercentSpin,
+                     self.ui.swingPercentSpin,
+                     self.ui.positionMarginSpin,
                      self.ui.bodyZOffsetSpin]:
             spin.valueChanged.connect(self.handle_gait_config_change)
 
@@ -420,8 +420,8 @@ class GaitTab(object):
                 (self.ui.idlePositionZSpin, 'idle_position_z_mm'),
                 (self.ui.maxCycleTimeSpin, 'max_cycle_time_s'),
                 (self.ui.liftHeightSpin, 'lift_height_mm'),
-                (self.ui.minSwingPercentSpin, 'min_swing_percent'),
-                (self.ui.maxSwingPercentSpin, 'max_swing_percent'),
+                (self.ui.swingPercentSpin, 'swing_percent'),
+                (self.ui.positionMarginSpin, 'position_margin'),
                 (self.ui.bodyZOffsetSpin, 'body_z_offset_mm'),
                 (self.ui.geometryScaleSpin, 'geometry_scale_mm'),
                 (self.ui.commandXSpin, 'command_x_mm_s'),
@@ -606,10 +606,10 @@ class GaitTab(object):
 
         self.ripple_config.max_cycle_time_s = self.ui.maxCycleTimeSpin.value()
         self.ripple_config.lift_height_mm = self.ui.liftHeightSpin.value()
-        self.ripple_config.min_swing_percent = \
-            self.ui.minSwingPercentSpin.value()
-        self.ripple_config.max_swing_percent = \
-            self.ui.maxSwingPercentSpin.value()
+        self.ripple_config.swing_percent = \
+            self.ui.swingPercentSpin.value()
+        self.ripple_config.position_margin_percent = \
+            self.ui.positionMarginSpin.value()
 
         self.ripple_config.leg_order = \
             self.ripple_config.mechanical.leg_config.keys()

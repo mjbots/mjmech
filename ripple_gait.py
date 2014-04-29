@@ -55,8 +55,8 @@ class RippleConfig(object):
 
         self.max_cycle_time_s = 4.0
         self.lift_height_mm = 80.0
-        self.min_swing_percent = 100.0
-        self.max_swing_percent = 100.0
+        self.swing_percent = 100.0
+        self.position_margin_percent = 80.0
         self.leg_order = []
         self.body_z_offset_mm = 0.0
 
@@ -223,7 +223,8 @@ class RippleGait(object):
 
         end_time_s = None
 
-        while time_s < 1.2 * 0.5 * self.config.max_cycle_time_s:
+        while time_s < (0.5 * self.config.max_cycle_time_s /
+                        (0.01 * self.config.position_margin_percent)):
             if end_time_s is not None:
                 break
             time_s += dt
@@ -253,7 +254,8 @@ class RippleGait(object):
             # We can achieve this at the maximum time.
             result.cycle_time_s = self.config.max_cycle_time_s
         else:
-            result.cycle_time_s = 2.0 * end_time_s / 1.2
+            result.cycle_time_s = (2.0 * end_time_s *
+                                   0.01 * self.config.position_margin_percent)
 
         # TODO jpieper: See if this cycle time is feasible.  We will
         # do this by checking to see if the swing leg has to move too
@@ -534,7 +536,7 @@ class RippleGait(object):
         return self.cycle_time_s
 
     def _swing_phase_time(self):
-        return (1.0 / self.num_legs) * 0.01 * self.config.min_swing_percent
+        return (1.0 / self.num_legs) * 0.01 * self.config.swing_percent
 
     def _guess_phase(self):
         '''Attempt to fill in the phase member, and any UNKNOWN

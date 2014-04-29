@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1016</width>
-    <height>871</height>
+    <width>1002</width>
+    <height>819</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -224,8 +224,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>334</width>
-                <height>687</height>
+                <width>327</width>
+                <height>635</height>
                </rect>
               </property>
              </widget>
@@ -1128,12 +1128,12 @@ p, li { white-space: pre-wrap; }
              <item row="4" column="0">
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string>Min swing percent:</string>
+                <string>Swing percent:</string>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="minSwingPercentSpin">
+              <widget class="QDoubleSpinBox" name="swingPercentSpin">
                <property name="maximum">
                 <double>200.000000000000000</double>
                </property>
@@ -1145,17 +1145,20 @@ p, li { white-space: pre-wrap; }
              <item row="5" column="0">
               <widget class="QLabel" name="label_9">
                <property name="text">
-                <string>Max swing percent:</string>
+                <string>Position margin:</string>
                </property>
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="maxSwingPercentSpin">
+              <widget class="QDoubleSpinBox" name="positionMarginSpin">
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
                <property name="maximum">
-                <double>200.000000000000000</double>
+                <double>100.000000000000000</double>
                </property>
                <property name="value">
-                <double>100.000000000000000</double>
+                <double>80.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1182,6 +1185,16 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
+             <item row="7" column="0" colspan="2">
+              <widget class="Line" name="line_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0" colspan="2">
+              <widget class="QTextBrowser" name="gaitOptionsBrowser"/>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1193,7 +1206,7 @@ p, li { white-space: pre-wrap; }
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
+              <height>17</height>
              </size>
             </property>
            </spacer>
@@ -1388,6 +1401,9 @@ p, li { white-space: pre-wrap; }
              <string>Command</string>
             </property>
             <layout class="QFormLayout" name="formLayout_8">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
              <item row="0" column="0">
               <widget class="QLabel" name="label_16">
                <property name="text">
@@ -1431,13 +1447,6 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="singleStep">
                 <double>10.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>Rot (deg/s):</string>
                </property>
               </widget>
              </item>
@@ -1587,6 +1596,13 @@ p, li { white-space: pre-wrap; }
               <widget class="QPushButton" name="commandResetButton">
                <property name="text">
                 <string>Reset</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_20">
+               <property name="text">
+                <string>Rot (deg/s):</string>
                </property>
               </widget>
              </item>
@@ -1903,7 +1919,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1016</width>
+     <width>1002</width>
      <height>20</height>
     </rect>
    </property>
