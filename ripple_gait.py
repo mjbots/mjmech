@@ -59,6 +59,7 @@ class RippleConfig(object):
         self.position_margin_percent = 80.0
         self.leg_order = []
         self.body_z_offset_mm = 0.0
+        self.servo_speed_margin_percent = 70.0
 
 
 class LegResult(object):
@@ -160,6 +161,7 @@ class NotSupported(RuntimeError):
 
 class Options(object):
     cycle_time_s = 0.0
+    servo_speed_dps = 0.0
 
 class RippleGait(object):
     ACTION_START_SWING, ACTION_START_STANCE, ACTION_END = range(3)
@@ -212,6 +214,9 @@ class RippleGait(object):
         return self.state
 
     def _select_command_options(self, command):
+        if self.num_legs == 0:
+            return Options()
+
         # First, iterate, solving IK for all legs in time until we
         # find the point at which the first leg is unsolvable.
         dt = 0.05
@@ -222,19 +227,26 @@ class RippleGait(object):
         self._apply_body_command(my_state, command)
 
         end_time_s = None
+        min_observed_speed = None
 
-        while time_s < (0.5 * self.config.max_cycle_time_s /
-                        (0.01 * self.config.position_margin_percent)):
+        # Dictionary of (direction, leg_num) to old ik_result
+        old_ik_result = {}
+
+        fraction_in_stance = 1.0 - self._swing_phase_time()
+        margin = 0.01 * self.config.position_margin_percent * fraction_in_stance
+
+        while time_s < (0.5 * self.config.max_cycle_time_s / margin):
             if end_time_s is not None:
                 break
             time_s += dt
 
-            forward_frame = self._get_update_frame(time_s, command=command)
-            reverse_frame = self._get_update_frame(-time_s, command=command)
+            for direction in [-1, 1]:
+                frame = self._get_update_frame(
+                    direction * time_s, command=command)
 
-            for frame in [forward_frame, reverse_frame]:
                 if end_time_s is not None:
                     break
+
                 for leg_num, leg in my_state.legs.iteritems():
                     # TODO: Need to do this for the lifted leg as well.
                     leg_robot_frame_point = frame.map_to_parent(leg.point)
@@ -249,17 +261,52 @@ class RippleGait(object):
                         end_time_s = time_s
                         break
 
+                    if (direction, leg_num) in old_ik_result:
+                        this_old_result = old_ik_result[(direction, leg_num)]
+
+                        largest_change_deg = \
+                            leg_config.leg_ik.largest_change_deg(
+                            result, this_old_result)
+                        this_speed = largest_change_deg / dt
+                        if (min_observed_speed is None or
+                            this_speed < min_observed_speed):
+                            min_observed_speed = this_speed
+
+                    old_ik_result[(direction, leg_num)] = result
+
+        if min_observed_speed is None:
+            raise NotSupported()
+
         result = Options()
         if end_time_s is None:
             # We can achieve this at the maximum time.
             result.cycle_time_s = self.config.max_cycle_time_s
         else:
-            result.cycle_time_s = (2.0 * end_time_s *
-                                   0.01 * self.config.position_margin_percent)
+            result.cycle_time_s = (2.0 * end_time_s * margin)
 
         # TODO jpieper: See if this cycle time is feasible.  We will
         # do this by checking to see if the swing leg has to move too
         # fast.
+        min_swing_speed = (min_observed_speed *
+                           (1.0 - self._swing_phase_time()) /
+                           self._swing_phase_time())
+
+        result.servo_speed_dps = min_swing_speed
+
+        any_ik = self.config.mechanical.leg_config.values()[0].leg_ik
+        servo_speed_dps = any_ik.servo_speed_dps()
+
+        speed_margin = 0.01 * self.config.servo_speed_margin_percent
+        if min_swing_speed > speed_margin * servo_speed_dps:
+            # Slow the command down.
+            slow_down_factor = (min_swing_speed /
+                                (speed_margin * servo_speed_dps))
+            command.translate_x_mm_s /= slow_down_factor
+            command.translate_y_mm_s /= slow_down_factor
+            command.rotate_deg_s /= slow_down_factor
+            result.cycle_time_s *= slow_down_factor
+            result.servo_speed_dps = speed_margin * servo_speed_dps
+
         return result
 
     def set_command(self, command):
@@ -269,19 +316,11 @@ class RippleGait(object):
 
         command = command.copy()
 
+        # Determine if the command is valid or not, and select the
+        # options necessary for it.
+        #
+        # NOTE: This may modify command.
         options = self._select_command_options(command)
-
-        # Determine whether this command is valid or not.
-        #
-        # The things which must be configured:
-        #   cycle time
-        #   swing percent
-        #
-        # First, keeping the cycle time at the max, see if the command
-        # is feasible.  If not, then decrease the cycle time to see if
-        # the command is feasible, stopping when the first joint hits
-        # a velocity limit.  If that doesn't work, then increase the
-        # swing percent to allow decreasing the cycle time more.
 
         if self.state.phase != 0.0:
             # TODO jpieper: It would be nice to be able to update the
@@ -300,6 +339,8 @@ class RippleGait(object):
 
     def _really_set_command(self, command, options):
         self.command = command
+        self.options = options
+
         self.actions = []
 
         if self.num_legs == 0:

@@ -175,3 +175,11 @@ class LizardIk(object):
             result = update(result, advanced.tibia_deg, nominal.tibia_deg)
 
         return result
+
+    def servo_speed_dps(self):
+        return self.config.servo_speed_dps
+
+    def largest_change_deg(self, result1, result2):
+        return max(abs(result1.coxa_deg - result2.coxa_deg),
+                   abs(result1.femur_deg - result2.femur_deg),
+                   abs(result1.tibia_deg - result2.tibia_deg))

@@ -651,7 +651,12 @@ class GaitTab(object):
         # the phase that is selected now.
         begin_state = self.get_start_state()
 
-        begin_state = self.ripple_gait.set_state(begin_state, self.command)
+        try:
+            begin_state = self.ripple_gait.set_state(begin_state, self.command)
+        except ripple_gait.NotSupported:
+            # guess we can't change anything
+            self.ui.gaitOptionsBrowser.setText('command not possible')
+            return
 
         self.current_states = (
             [begin_state.copy()] +
@@ -659,6 +664,12 @@ class GaitTab(object):
              for x in range(self.ui.playbackPhaseSlider.maximum())])
 
         self.handle_playback_phase_change()
+
+        options = self.ripple_gait.options
+        text = 'cycle_time: %.2fs\nservo_speed: %.1fdps' % (
+            options.cycle_time_s,
+            options.servo_speed_dps)
+        self.ui.gaitOptionsBrowser.setText(text)
 
     def handle_playback_phase_change(self):
         if self.playback_mode != self.PLAYBACK_IDLE:
