@@ -39,6 +39,19 @@ class LegConfig(object):
 
     leg_ik = None
 
+    def copy(self):
+        result = LegConfig()
+        result.mount_x_mm = self.mount_x_mm
+        result.mount_y_mm = self.mount_y_mm
+        result.mount_z_mm = self.mount_z_mm
+
+        result.idle_x_mm = self.idle_x_mm
+        result.idle_y_mm = self.idle_y_mm
+        result.idle_z_mm = self.idle_z_mm
+
+        result.leg_ik = self.leg_ik
+        return result
+
 class MechanicalConfig(object):
     def __init__(self):
         # A map from leg number to LegConfig instances.
@@ -48,6 +61,17 @@ class MechanicalConfig(object):
         self.body_cog_x_mm = None
         self.body_cog_y_mm = None
         self.body_cog_z_mm = None
+
+    def copy(self):
+        result = MechanicalConfig()
+        for leg_num, leg in self.leg_config.iteritems():
+            result.leg_config[leg_num] = leg.copy()
+        result.body_cog_x_mm = self.body_cog_x_mm
+        result.body_cog_y_mm = self.body_cog_y_mm
+        result.body_cog_z_mm = self.body_cog_z_mm
+
+        return result
+
 
 class RippleConfig(object):
     def __init__(self):
@@ -60,6 +84,19 @@ class RippleConfig(object):
         self.leg_order = []
         self.body_z_offset_mm = 0.0
         self.servo_speed_margin_percent = 70.0
+
+    def copy(self):
+        result = RippleConfig()
+        result.mechanical = self.mechanical.copy()
+        result.max_cycle_time_s = self.max_cycle_time_s
+        result.lift_height_mm = self.lift_height_mm
+        result.swing_percent = self.swing_percent
+        result.position_margin_percent = self.position_margin_percent
+        result.leg_order = self.leg_order[:]
+        result.body_z_offset_mm = self.body_z_offset_mm
+        result.servo_speed_margin_percent = self.servo_speed_margin_percent
+
+        return result
 
 
 class LegResult(object):

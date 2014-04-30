@@ -1,5 +1,6 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import eventlet
 import functools
 
 import PySide.QtCore as QtCore
@@ -210,11 +211,16 @@ class CommandWidget(object):
 
     def __init__(self, ui, command, command_change_callback):
         self.ui = ui
-        self.command = command
+        self.parent_command = command
         self.command_change_callback = command_change_callback
         self.scales = [ 400.0, 400.0, 50.0,
                         100.0, 100.0, 100.0,
                         45.0, 45.0, 45.0 ]
+
+        self.update_sem = eventlet.semaphore.Semaphore()
+
+        self.config = None
+        self.command = None
 
         self.graphics_scene = mtool_graphics_scene.GraphicsScene()
         self.graphics_scene.sceneMouseMoveEvent.connect(
@@ -237,6 +243,20 @@ class CommandWidget(object):
 
         self.axes_item = mtool_graphics_scene.AxesItem()
         self.graphics_scene.addItem(self.axes_item)
+
+        self.grid_count = 10
+        self.usable_rects = {}
+        for x in range(-self.grid_count + 1, self.grid_count):
+            for y in range(-self.grid_count + 1, self.grid_count):
+                self.usable_rects[(x, y)] = \
+                    self.graphics_scene.addRect(
+                    (x - 0.5) / self.grid_count,
+                    (y - 0.5) / self.grid_count,
+                    1.0 / self.grid_count, 1.0 / self.grid_count)
+
+        for rect in self.usable_rects.itervalues():
+            rect.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+            rect.setZValue(-20)
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
@@ -276,6 +296,9 @@ class CommandWidget(object):
 
             self.axes_item.update()
 
+            if self.config is not None:
+                self.update_allowable(self.config, self.command)
+
     def handle_scale_change(self, value):
         if self.in_scale_changed.value:
             return
@@ -291,6 +314,9 @@ class CommandWidget(object):
             self.axes_item.x_scale = self.x_scale()
             self.axes_item.y_scale = self.y_scale()
             self.axes_item.update()
+
+            if self.config is not None:
+                self.update_allowable(self.config, self.command)
 
     def x_axis(self):
         return self.ui.commandXCombo.currentIndex()
@@ -311,13 +337,68 @@ class CommandWidget(object):
         if self.x_axis() == self.y_axis():
             x_value = y_value = 0.5 * (x_value + y_value)
 
-        setattr(self.command, self.ATTR_NAMES[self.x_axis()], x_value)
-        setattr(self.command, self.ATTR_NAMES[self.y_axis()], y_value)
+        setattr(self.parent_command,
+                self.ATTR_NAMES[self.x_axis()], x_value)
+        setattr(self.parent_command,
+                self.ATTR_NAMES[self.y_axis()], y_value)
 
         self.command_change_callback()
 
     def handle_mouse_press(self, cursor):
         self.handle_mouse_move(cursor)
+
+    def update_allowable(self, config, command):
+        self.next_config = config.copy()
+        self.next_command = command.copy()
+
+        if self.update_sem.locked():
+            return
+
+        self.update_sem.acquire()
+        eventlet.spawn(self._really_update_allowable)
+
+    def _really_update_allowable(self):
+        while self.next_config is not None:
+            self.do_update_allowable()
+
+        self.update_sem.release()
+
+    def do_update_allowable(self):
+        self.config = self.next_config
+        self.command = self.next_command
+
+        my_gait = ripple_gait.RippleGait(self.next_config)
+        my_command = self.next_command.copy()
+
+        self.next_config = None
+        self.next_command = None
+
+        count = 0
+        for (x, y), rect in self.usable_rects.iteritems():
+            x_value = self.x_scale() * float(x) / self.grid_count
+            y_value = self.y_scale() * float(y) / self.grid_count
+
+            setattr(my_command, self.ATTR_NAMES[self.x_axis()], x_value)
+            setattr(my_command, self.ATTR_NAMES[self.y_axis()], y_value)
+
+            color = (0, 255, 0)
+            try:
+                my_gait.set_command(my_command)
+                actual_command = my_gait.command
+                actual_x_value = getattr(
+                    actual_command, self.ATTR_NAMES[self.x_axis()])
+                actual_y_value = getattr(
+                    actual_command, self.ATTR_NAMES[self.y_axis()])
+                if actual_x_value != x_value or actual_y_value != y_value:
+                    color = (255, 255, 0)
+            except ripple_gait.NotSupported:
+                color = (255, 0, 0)
+
+            rect.setBrush(QtGui.QBrush(QtGui.QColor(*color)))
+
+            count += 1
+            if (count % 10) == 0:
+                eventlet.sleep()
 
 class GaitTab(object):
     (PLAYBACK_IDLE,
@@ -621,6 +702,7 @@ class GaitTab(object):
 
         self.update_gait_graph()
         self.handle_playback_config_change()
+        self.update_allowable_commands()
 
     def update_gait_graph(self):
         self.gait_graph_display.set_gait_graph(self.ripple_gait.get_gait_graph())
@@ -649,9 +731,9 @@ class GaitTab(object):
         # Re-run the playback recording the state through an entire
         # phase.  Then make sure that the graphic state is current for
         # the phase that is selected now.
-        begin_state = self.get_start_state()
 
         try:
+            begin_state = self.get_start_state()
             begin_state = self.ripple_gait.set_state(begin_state, self.command)
         except ripple_gait.NotSupported:
             # guess we can't change anything
@@ -708,6 +790,10 @@ class GaitTab(object):
                 setattr(self.command, name, spin.value())
 
             self.update_command()
+            self.update_allowable_commands()
+
+    def update_allowable_commands(self):
+        self.command_widget.update_allowable(self.ripple_config, self.command)
 
     def handle_command_reset(self):
         with self.in_command_changed:
