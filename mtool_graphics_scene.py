@@ -25,24 +25,47 @@ class GraphicsScene(QtGui.QGraphicsScene):
 
 
 class AxesItem(QtGui.QGraphicsItem):
-    def __init__(self, parent=None):
-        super(AxesItem, self).__init__(parent)
+    def __init__(self, parent=None, true_scale=False, grid_skip=0):
+        QtGui.QGraphicsItem.__init__(self, parent)
+
         self.x_scale = 100.0
         self.y_scale = 100.0
         self.x_suffix = ''
         self.y_suffix = ''
+        self.true_scale = true_scale
+        self.grid_skip = grid_skip
 
         self.x_format = '{0:+.0f}{suffix}'
         self.y_format = '{0:+.0f}{suffix}'
 
     def boundingRect(self):
-        return QtCore.QRectF(-1.0, -1.0, 2.0, 2.0)
+        xscale = 1.0 if not self.true_scale else self.x_scale
+        yscale = 1.0 if not self.true_scale else self.y_scale
+        return QtCore.QRectF(-xscale, -yscale, 2 * xscale, 2 * yscale)
 
     def paint(self, painter, option, widget):
+        xscale = 1.0 if not self.true_scale else self.x_scale
+        yscale = 1.0 if not self.true_scale else self.y_scale
         # Draw the major axes.
-        painter.drawLine(QtCore.QPointF(-1.0, 0.0), QtCore.QPointF(1.0, 0.0))
-        painter.drawLine(QtCore.QPointF(0.0, -1.0), QtCore.QPointF(0.0, 1.0))
+        painter.drawLine(QtCore.QPointF(-xscale, 0.0),
+                         QtCore.QPointF(xscale, 0.0))
+        painter.drawLine(QtCore.QPointF(0.0, -yscale),
+                         QtCore.QPointF(0.0, yscale))
 
+        pen = painter.pen()
+        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 200)))
+        for i in range(1, 11):
+            if self.grid_skip != 0 and (i % self.grid_skip) == 0:
+                painter.drawLine(QtCore.QPointF(-xscale, 0.1 * i * yscale),
+                                 QtCore.QPointF(xscale, 0.1 * i * yscale))
+                painter.drawLine(QtCore.QPointF(-xscale, -0.1 * i * yscale),
+                                 QtCore.QPointF(xscale, -0.1 * i * yscale))
+                painter.drawLine(QtCore.QPointF(-0.1 * i * xscale, -yscale),
+                                 QtCore.QPointF(-0.1 * i * xscale, yscale))
+                painter.drawLine(QtCore.QPointF(0.1 * i * xscale, -yscale),
+                                 QtCore.QPointF(0.1 * i * xscale, yscale))
+
+        painter.setPen(pen)
         transform = painter.transform()
         painter.resetTransform()
 
@@ -54,14 +77,15 @@ class AxesItem(QtGui.QGraphicsItem):
         # Next draw the ticks.
         d = 4
         for i in range(1, 11):
-            line(0.1 * i, 0, 0, d)
-            line(-0.1 * i, 0, 0, d)
-            line(0, 0.1 * i, d, 0)
-            line(0, -0.1 * i, d, 0)
+            line(0.1 * xscale * i, 0, 0, d)
+            line(-0.1 * xscale * i, 0, 0, d)
+
+            line(0, 0.1 * yscale * i, d, 0)
+            line(0, -0.1 * yscale * i, d, 0)
 
         width = 200
         # Finally, draw the labels.
-        point = transform.map(QtCore.QPointF(-1.0, 0.))
+        point = transform.map(QtCore.QPointF(-xscale, 0.))
         rect = QtCore.QRectF(point - QtCore.QPointF(0, 40),
                              point + QtCore.QPointF(width, -d))
         painter.drawText(
@@ -70,7 +94,7 @@ class AxesItem(QtGui.QGraphicsItem):
             self.x_format.format(-self.x_scale, suffix=self.x_suffix))
 
 
-        point = transform.map(QtCore.QPointF(1.0, 0.))
+        point = transform.map(QtCore.QPointF(xscale, 0.))
         rect = QtCore.QRectF(point - QtCore.QPointF(width, 40),
                              point - QtCore.QPointF(0, d))
 
@@ -79,7 +103,7 @@ class AxesItem(QtGui.QGraphicsItem):
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight,
             self.x_format.format(self.x_scale, suffix=self.x_suffix))
 
-        point = transform.map(QtCore.QPointF(0, 1.0))
+        point = transform.map(QtCore.QPointF(0, yscale))
         rect = QtCore.QRectF(point + QtCore.QPointF(d, 0),
                              point + QtCore.QPointF(width, 40))
         painter.drawText(
@@ -87,7 +111,7 @@ class AxesItem(QtGui.QGraphicsItem):
             QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft,
             self.y_format.format(self.y_scale, suffix=self.y_suffix))
 
-        point = transform.map(QtCore.QPointF(0, -1.0))
+        point = transform.map(QtCore.QPointF(0, -yscale))
         rect = QtCore.QRectF(point + QtCore.QPointF(d, -40),
                              point + QtCore.QPointF(width, 0))
         painter.drawText(

@@ -32,17 +32,35 @@ class GaitGeometryDisplay(object):
         self.projection = self.PROJECTION_XY
         self.scale = 300.0
 
+        self.axes_item = mtool_graphics_scene.AxesItem(
+            true_scale=True, grid_skip=2)
+        self.axes_item.x_scale = self.scale
+        self.axes_item.y_scale = self.scale
+        self.axes_item.x_suffix = 'mm'
+        self.axes_item.y_suffix = 'mm'
+        self.graphics_scene.addItem(self.axes_item)
+
+        self.items = []
+
     def set_view(self, frame, projection, scale):
         self.frame = frame
         self.projection = projection
         self.scale = scale
+        self.axes_item.x_scale = scale
+        self.axes_item.y_scale = scale
 
         if self.config is not None and self.state is not None:
             self.set_state(self.state)
 
+        self.axes_item.update()
+
     def set_gait_config(self, config):
         self.config = config
-        self.graphics_scene.clear()
+
+        for item in self.items:
+            self.graphics_scene.removeItem(item)
+
+        self.items = []
 
         # Things to render:
         #  * Body position
@@ -63,6 +81,8 @@ class GaitGeometryDisplay(object):
             QtGui.QBrush(QtCore.Qt.red))
         self.body.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
 
+        self.items.append(self.body)
+
         self.shoulders = {}
         self.legs = {}
         shoulder_poly = QtGui.QPolygonF([
@@ -77,6 +97,7 @@ class GaitGeometryDisplay(object):
             this_shoulder.setFlags(
                 QtGui.QGraphicsItem.ItemIgnoresTransformations)
             self.shoulders[leg_num] = this_shoulder
+            self.items.append(this_shoulder)
 
             this_leg = self.graphics_scene.addEllipse(
                 -10, -10, 20, 20,
@@ -84,6 +105,7 @@ class GaitGeometryDisplay(object):
                  QtGui.QBrush(QtCore.Qt.green))
             this_leg.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
             self.legs[leg_num] = this_leg
+            self.items.append(this_leg)
 
     def _project(self, point, frame):
         target_frame = None
