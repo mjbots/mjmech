@@ -351,6 +351,15 @@ class CommandWidget(object):
         self.next_config = config.copy()
         self.next_command = command.copy()
 
+        for (x, y), rect in self.usable_rects.iteritems():
+            old_brush = rect.brush()
+            old_color = old_brush.color()
+            rect.setBrush(QtGui.QBrush(QtGui.QColor(
+                        old_color.red(),
+                        old_color.green(),
+                        old_color.blue(),
+                        64)))
+
         if self.update_sem.locked():
             return
 
@@ -399,6 +408,8 @@ class CommandWidget(object):
             count += 1
             if (count % 10) == 0:
                 eventlet.sleep()
+                if self.next_config is not None:
+                    return
 
 class GaitTab(object):
     (PLAYBACK_IDLE,
