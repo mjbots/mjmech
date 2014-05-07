@@ -89,6 +89,17 @@ def test_ripple_basic():
 
     mounts = [(90., 90.), (90., -90.), (-90., -90.), (-90., 90.)]
 
+    ik_config = leg_ik.Configuration()
+    ik_config.coxa_min_deg = -120.0
+    ik_config.coxa_max_deg = 120.0
+    ik_config.coxa_length_mm = 60.0
+    ik_config.femur_min_deg = -120.0
+    ik_config.femur_max_deg = 120.0
+    ik_config.femur_length_mm = 60.0
+    ik_config.tibia_min_deg = -120.0
+    ik_config.tibia_max_deg = 120.0
+    ik_config.tibia_length_mm = 60.0
+
     for leg_num in range(4):
         leg = ripple_gait.LegConfig()
 
@@ -99,6 +110,8 @@ def test_ripple_basic():
         leg.idle_x_mm = 100.0
         leg.idle_y_mm = 0.0
         leg.idle_z_mm = 0.0
+
+        leg.leg_ik = leg_ik.LizardIk(ik_config)
 
         config.mechanical.leg_config[leg_num] = leg
 
