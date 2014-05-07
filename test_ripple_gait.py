@@ -1,5 +1,6 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import math
 import pytest
 
 import leg_ik
@@ -39,12 +40,23 @@ def sanity_check_state(state):
     #  At least 3 legs are in stance at all times.
     assert stance_legs >= 3
 
+def get_steady_state(gait, command):
+    idle = gait.get_idle_state()
+    gait.set_state(idle, command)
+    for x in range(100):
+        last = gait.advance_phase(0.01)
+    assert abs(last.phase) < 0.01
+    last.phase = 0.0
+    return last
+
 def run_cycle(gait, start_state, command, total_time_s, time_step_s):
     old_state = gait.set_state(start_state, command).copy()
 
     # Things we will want to verify.
     #
     #  * The robot moves at the expected rate/rotation
+
+    stance_bearings = {}
 
     cur_time_s = 0.0
     while cur_time_s < total_time_s:
@@ -80,9 +92,43 @@ def run_cycle(gait, start_state, command, total_time_s, time_step_s):
 
             body_speed_mm_s = (current_body_point -
                                old_body_point).length() / time_step_s
-            assert body_speed_mm_s < 500.0
+            assert body_speed_mm_s < 600.0
+
+            if this_leg.mode == STANCE:
+                shoulder_point = this_leg.shoulder_frame.map_from_frame(
+                    this_leg.frame, this_leg.point)
+                bearing_deg = math.degrees(
+                    math.atan2(shoulder_point.x, shoulder_point.y))
+                if not leg_num in stance_bearings:
+                    stance_bearings[leg_num] = {}
+                bearing_deg_rounded = int(bearing_deg + 0.5)
+                my_dict = stance_bearings[leg_num]
+                my_dict[bearing_deg_rounded] = \
+                    my_dict.get(bearing_deg_rounded, 0.0) + time_step_s
+
 
         old_state = this_state.copy()
+    return { 'stance_bearings' : stance_bearings }
+
+def verify_symmetric_result(result):
+    stance_bearings = result['stance_bearings']
+
+    def verify_symmetric_stance(stance):
+        leg_num, data = stance
+        smallest = min(data.keys())
+        biggest = max(data.keys())
+        assert abs(abs(smallest) - abs(biggest)) <= 2.0
+
+        less_than_zero = sum([val for key, val in data.iteritems()
+                              if key < 0.0])
+        greater_than_zero = sum([val for key, val in data.iteritems()
+                                 if key > 0.0])
+
+        # TODO jpieper: Why shouldn't this be much smaller?
+        assert abs(less_than_zero - greater_than_zero) < 0.45
+
+    for stance in stance_bearings.items():
+        verify_symmetric_stance(stance)
 
 def test_ripple_basic():
     config = ripple_gait.RippleConfig()
@@ -162,3 +208,15 @@ def test_ripple_basic():
     config.max_cycle_time_s = 1.7
     gait = ripple_gait.RippleGait(config)
     run_cycle(gait, idle_state, command, 5.0, 0.01)
+
+    command.translate_y_mm_s = 50.0
+    steady_state = get_steady_state(gait, command)
+
+    result = run_cycle(gait, steady_state, command, 7.0, 0.005)
+    verify_symmetric_result(result)
+
+    result = run_cycle(gait, steady_state, command, 7.0, 0.03)
+    verify_symmetric_result(result)
+
+    result = run_cycle(gait, steady_state, command, 7.0, 0.04)
+    verify_symmetric_result(result)

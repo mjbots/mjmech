@@ -150,6 +150,7 @@ class RippleState(object):
     def __init__(self):
         self.legs = {}
         self.phase = 0.
+        self.action = 0
 
         # robot_frame coordinates describing the start and end
         # position of the current swing leg.
@@ -179,6 +180,7 @@ class RippleState(object):
             result.legs[key] = leg
 
         result.phase = self.phase
+        result.action = self.action
         result.swing_start_pos = self.swing_start_pos.copy()
         result.swing_end_pos = self.swing_end_pos.copy()
 
@@ -546,6 +548,9 @@ class RippleGait(object):
             if leg.mode == SWING:
                 leg_phase = ((final_phase % (1.0 / self.num_legs)) /
                              self._swing_phase_time())
+                # Don't allow the phase to wrap-around on the final update.
+                if delta_phase > 0.0 and leg_phase == 0.0:
+                    leg_phase = 1.0
                 assert leg.frame is self.state.robot_frame
                 delta = self.state.swing_end_pos - self.state.swing_start_pos
                 current = self.state.swing_start_pos + delta.scaled(leg_phase)
@@ -572,27 +577,24 @@ class RippleGait(object):
         next_phase = (self.state.phase + delta_phase)
 
         cur_phase = old_phase
-        action_index = bisect.bisect_left(self.actions, (cur_phase, 0, 0))
-        if self.actions[action_index][0] < cur_phase:
-            action_index += 1
 
         while True:
             # Are there any actions between old_phase and new_phase?
-            if self.actions[action_index][0] > next_phase:
+            if self.actions[self.state.action][0] > next_phase:
                 break
 
-            while (action_index < len(self.actions) and
-                   self.actions[action_index][0] <= next_phase):
-                advance_phase = self.actions[action_index][0]
-                self._do_action(action_index)
-                action_index += 1
+            advance_phase = self.actions[self.state.action][0]
+            if advance_phase != cur_phase:
+                delta_phase = advance_phase - cur_phase
+                self._noaction_advance_phase(delta_phase, advance_phase)
 
-            delta_phase = advance_phase - cur_phase
-            self._noaction_advance_phase(delta_phase, advance_phase)
             cur_phase = advance_phase
+            self._do_action(self.state.action)
 
-            if action_index >= len(self.actions):
-                action_index = 0
+            self.state.action += 1
+
+            if self.state.action >= len(self.actions):
+                self.state.action = 0
                 next_phase -= 1.0
                 cur_phase -= 1.0
 
@@ -604,7 +606,6 @@ class RippleGait(object):
                     self._really_set_command(next_command, next_options)
 
         # Finally, advance the remainder of the phase and update the phase.
-        next_phase = next_phase
         self._noaction_advance_phase(next_phase - cur_phase, next_phase)
         self.state.phase = next_phase
 
