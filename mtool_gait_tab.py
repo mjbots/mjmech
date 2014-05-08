@@ -614,6 +614,10 @@ class GaitTab(object):
 
     def handle_current_changed(self, index=2):
         if index != 2:
+            # Make sure we're not still playing.
+            self.ui.playbackSingleButton.setChecked(False)
+            self.ui.playbackRepeatButton.setChecked(False)
+            self.ui.playbackSlowRepeatButton.setChecked(False)
             return
 
         # Update the leg list widget.
