@@ -2,10 +2,12 @@
 
 import eventlet
 import functools
+import numpy
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+import convexhull
 import ripple_gait
 import settings
 import tf
@@ -39,6 +41,11 @@ class GaitGeometryDisplay(object):
         self.axes_item.x_suffix = 'mm'
         self.axes_item.y_suffix = 'mm'
         self.graphics_scene.addItem(self.axes_item)
+
+        self.support_poly = QtGui.QGraphicsPolygonItem()
+        self.support_poly.setPen(QtGui.QColor(0, 0, 0, 0))
+        self.support_poly.setBrush(QtGui.QBrush(QtGui.QColor(0, 128, 0, 15)))
+        self.graphics_scene.addItem(self.support_poly)
 
         self.items = []
 
@@ -129,6 +136,8 @@ class GaitGeometryDisplay(object):
         assert self.config is not None
         self.state = state
 
+        stance_points = []
+
         self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
@@ -138,15 +147,26 @@ class GaitGeometryDisplay(object):
         for leg_num, leg_item in self.legs.iteritems():
             leg = state.legs[leg_num]
 
-            leg_item.setPos(*self._project(leg.point, leg.frame))
+            point = self._project(leg.point, leg.frame)
+            leg_item.setPos(*point)
             if leg.mode == ripple_gait.STANCE:
                 color = QtCore.Qt.green
+                stance_points.append(point)
             elif leg.mode == ripple_gait.SWING:
                 color = QtCore.Qt.yellow
             else:
                 assert False, 'unknown leg mode %d' % leg.mode
 
             leg_item.setBrush(QtGui.QBrush(color))
+
+        if len(stance_points) >= 3:
+            self.support_poly.setVisible(True)
+            hull = convexhull.convexHull(stance_points)
+
+            poly = QtGui.QPolygonF([QtCore.QPointF(x, y) for x, y in hull])
+            self.support_poly.setPolygon(poly)
+        else:
+            self.support_poly.setVisible(False)
 
         self.graphics_view.fitInView(-self.scale, -self.scale,
                                       2 * self.scale, 2 * self.scale)
