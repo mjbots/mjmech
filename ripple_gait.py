@@ -216,7 +216,29 @@ class RippleGait(object):
         self.next_command = None
         self.next_options = None
 
+        self._create_actions()
         self._really_set_command(Command(), Options())
+
+    def _create_actions(self):
+        self.actions = []
+
+        if self.num_legs == 0:
+            return
+
+        # Create the action list.
+        swing_time = self._swing_phase_time()
+
+        for i in range(self.num_legs):
+            fraction = float(i) / self.num_legs
+            leg_num = self.config.leg_order[i]
+            self.actions.append(
+                (fraction, leg_num, self.ACTION_START_SWING))
+            self.actions.append(
+                (fraction + swing_time, leg_num, self.ACTION_START_STANCE))
+
+        self.actions.append((1.0, -1, self.ACTION_END))
+
+
 
     def set_state(self, state, command):
         '''Force the current leg state to the given configuration.  If
@@ -380,26 +402,10 @@ class RippleGait(object):
         self.command = command
         self.options = options
 
-        self.actions = []
-
         if self.num_legs == 0:
             return
 
         self.cycle_time_s = options.cycle_time_s
-
-        # Create the action list.
-        swing_time = self._swing_phase_time()
-
-        for i in range(self.num_legs):
-            fraction = float(i) / self.num_legs
-            leg_num = self.config.leg_order[i]
-            self.actions.append(
-                (fraction, leg_num, self.ACTION_START_SWING))
-            self.actions.append(
-                (fraction + swing_time, leg_num, self.ACTION_START_STANCE))
-
-        self.actions.append((1.0, -1, self.ACTION_END))
-
         self._apply_body_command(self.state, command)
 
 
