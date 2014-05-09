@@ -8,6 +8,7 @@ import leg_ik
 
 from mtool_common import BoolContext
 import mtool_graphics_scene
+import servo_controller
 
 class LegConfig(object):
     present = False
@@ -86,10 +87,7 @@ class IkTester(object):
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
 
-    def set_config(self, coxa_servo, coxa_sign,
-                   femur_servo, femur_sign,
-                   tibia_servo, tibia_sign,
-                   idle_values, minimum_values, maximum_values,
+    def set_config(self,
                    x_offset_mm, y_offset_mm, z_offset_mm,
                    coxa_length_mm, femur_length_mm, tibia_length_mm,
                    leg_ik,
@@ -97,16 +95,6 @@ class IkTester(object):
                    length_scale,
                    speed_scale,
                    speed_axis):
-        self.coxa_servo = coxa_servo
-        self.coxa_sign = coxa_sign
-        self.femur_servo = femur_servo
-        self.femur_sign = femur_sign
-        self.tibia_servo = tibia_servo
-        self.tibia_sign = tibia_sign
-
-        self.idle_values = idle_values
-        self.minimum_values = minimum_values
-        self.maximum_values = maximum_values
         self.x_offset_mm = x_offset_mm
         self.y_offset_mm = y_offset_mm
         self.z_offset_mm = z_offset_mm
@@ -179,19 +167,12 @@ class IkTester(object):
 
         point_mm = self.coord_to_point((cursor.x(), cursor.y()))
 
-        result = leg_ik.lizard_3dof_ik(point_mm, self.ik_config)
+        result = self.leg_ik.do_ik(point_mm)
         if result is None:
             # This option isn't possible
             return
 
-        result.coxa_deg += self.idle_values[self.coxa_servo]
-        result.femur_deg += self.idle_values[self.femur_servo]
-        result.tibia_deg += self.idle_values[self.tibia_servo]
-
-        self.servo_tab.controller.set_pose({
-                self.coxa_servo: result.coxa_deg,
-                self.femur_servo: result.femur_deg,
-                self.tibia_servo: result.tibia_deg})
+        self.servo_tab.controller.set_pose(result.command_dict())
 
 
 class IkConfigTab(object):
@@ -280,31 +261,28 @@ class IkConfigTab(object):
         leg = self.legs.get(leg_number, LegConfig())
         coxa_servo = leg.coxa_ident
 
-        result.coxa_min_deg = (
-            minimum_values[coxa_servo] - idle_values[coxa_servo])
-        result.coxa_idle_deg = 0.0
-        result.coxa_max_deg = (
-            maximum_values[coxa_servo] - idle_values[coxa_servo])
+        result.coxa_min_deg = minimum_values[coxa_servo]
+        result.coxa_idle_deg = idle_values[coxa_servo]
+        result.coxa_max_deg = maximum_values[coxa_servo]
         result.coxa_length_mm = self.ui.coxaLengthSpin.value()
         result.coxa_sign = leg.coxa_sign
+        result.coxa_ident = coxa_servo
 
         femur_servo = leg.femur_ident
-        result.femur_min_deg = (
-            minimum_values[femur_servo] - idle_values[femur_servo])
-        result.femur_idle_deg = 0.0
-        result.femur_max_deg = (
-            maximum_values[femur_servo] - idle_values[femur_servo])
+        result.femur_min_deg = minimum_values[femur_servo]
+        result.femur_idle_deg = idle_values[femur_servo]
+        result.femur_max_deg = maximum_values[femur_servo]
         result.femur_length_mm = self.ui.femurLengthSpin.value()
         result.femur_sign = leg.femur_sign
+        result.femur_ident = femur_servo
 
         tibia_servo = leg.tibia_ident
-        result.tibia_min_deg = (
-            minimum_values[tibia_servo] - idle_values[tibia_servo])
-        result.tibia_idle_deg = 0.0
-        result.tibia_max_deg = (
-            maximum_values[tibia_servo] - idle_values[tibia_servo])
+        result.tibia_min_deg = minimum_values[tibia_servo]
+        result.tibia_idle_deg = idle_values[tibia_servo]
+        result.tibia_max_deg = maximum_values[tibia_servo]
         result.tibia_length_mm = self.ui.tibiaLengthSpin.value()
         result.tibia_sign = leg.tibia_sign
+        result.tibia_ident = tibia_servo
 
         return leg_ik.LizardIk(result)
 
@@ -340,6 +318,8 @@ class IkConfigTab(object):
         self.update_config_enable()
 
         self.legs[leg_num] = leg_config
+
+        self.handle_ik_config_change()
 
 
     def handle_leg_number_changed(self):
@@ -381,18 +361,6 @@ class IkConfigTab(object):
         leg_ik = self.get_leg_ik(self.ui.legSpin.value())
 
         self.ik_tester.set_config(
-            coxa_servo=self.ui.coxaServoSpin.value(),
-            coxa_sign=self.combo_sign(self.ui.coxaSignCombo),
-            femur_servo=self.ui.femurServoSpin.value(),
-            femur_sign=self.combo_sign(self.ui.femurSignCombo),
-            tibia_servo=self.ui.tibiaServoSpin.value(),
-            tibia_sign=self.combo_sign(self.ui.tibiaSignCombo),
-            idle_values=self.servo_tab.pose(
-                self.ui.idleCombo.currentText()),
-            minimum_values=self.servo_tab.pose(
-                self.ui.minimumCombo.currentText()),
-            maximum_values=self.servo_tab.pose(
-                self.ui.maximumCombo.currentText()),
             x_offset_mm=self.ui.xOffsetSpin.value(),
             y_offset_mm=self.ui.yOffsetSpin.value(),
             z_offset_mm=self.ui.zOffsetSpin.value(),

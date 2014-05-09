@@ -1,11 +1,13 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import eventlet
 import functools
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
 from mtool_common import BoolContext
+import servo_controller
 
 def spawn(callback):
     def task():
