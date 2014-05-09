@@ -17,6 +17,9 @@ def test_lizard_3dof():
     config.femur_max_deg = 90
     config.tibia_min_deg = -90
     config.tibia_max_deg = 90
+    config.coxa_ident = 3
+    config.femur_ident = 4
+    config.tibia_ident = 5
 
     point = leg_ik.Point3D(0, 90, -30)
     result = leg_ik.lizard_3dof_ik(point, config)
@@ -61,3 +64,9 @@ def test_lizard_3dof():
     assert abs(result.coxa_deg - 12.84) < 0.01
     assert abs(result.femur_deg - 7.18) < 0.01
     assert abs(result.tibia_deg + 6.58) < 0.01
+
+    command_dict = result.command_dict()
+    assert sorted(command_dict.keys()) == [3, 4, 5]
+    assert command_dict[3] == result.coxa_deg
+    assert command_dict[4] == result.femur_deg
+    assert command_dict[5] == result.tibia_deg

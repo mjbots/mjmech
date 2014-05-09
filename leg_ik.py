@@ -9,23 +9,35 @@ class Configuration(object):
     coxa_max_deg = None
     coxa_length_mm = None
     coxa_sign = 1
+    coxa_ident = None
 
     femur_min_deg = None
     femur_max_deg = None
     femur_length_mm = None
     femur_sign = 1
+    femur_ident = None
 
     tibia_min_deg = None
     tibia_max_deg = None
     tibia_length_mm = None
     tibia_sign = 1
+    tibia_ident = None
 
     servo_speed_dps = 360.0
 
 class JointAngles(object):
+    config = None
     coxa_deg = None # positive is rotating clockwise viewed from top
     femur_deg = None # positive is rotating upward
     tibia_deg = None # positive is rotating upward
+
+    def command_dict(self):
+        '''Return a dictionary mapping servo identifiers to commands
+        in degrees.  This is the same format as the servo_controller
+        module uses.'''
+        return { self.config.coxa_ident : self.coxa_deg,
+                 self.config.femur_ident : self.femur_deg,
+                 self.config.tibia_ident : self.tibia_deg }
 
 def lizard_3dof_ik(point_mm, config):
     '''Given a target end position in 3D coordinate space, return the
@@ -119,6 +131,7 @@ def lizard_3dof_ik(point_mm, config):
         return None
 
     result = JointAngles()
+    result.config = config
     result.coxa_deg = coxa_deg
     result.femur_deg = femur_deg
     result.tibia_deg = tibia_deg
