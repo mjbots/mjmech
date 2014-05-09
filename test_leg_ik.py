@@ -6,20 +6,28 @@ import pytest
 
 import leg_ik
 
-def test_lizard_3dof():
+def get_lizard_config():
     config = leg_ik.Configuration()
     config.coxa_length_mm = 50
     config.femur_length_mm = 40
     config.tibia_length_mm = 30
     config.coxa_min_deg = -90
+    config.coxa_idle_deg = 0
     config.coxa_max_deg = 90
     config.femur_min_deg = -90
+    config.femur_idle_deg = 0
     config.femur_max_deg = 90
     config.tibia_min_deg = -90
+    config.tibia_idle_deg = 0
     config.tibia_max_deg = 90
     config.coxa_ident = 3
     config.femur_ident = 4
     config.tibia_ident = 5
+
+    return config
+
+def test_lizard_3dof():
+    config = get_lizard_config()
 
     point = leg_ik.Point3D(0, 90, -30)
     result = leg_ik.lizard_3dof_ik(point, config)
@@ -70,3 +78,42 @@ def test_lizard_3dof():
     assert command_dict[3] == result.coxa_deg
     assert command_dict[4] == result.femur_deg
     assert command_dict[5] == result.tibia_deg
+
+    # Try adding in some idle to the coxa.
+    config.coxa_idle_deg = 3.0
+    result = leg_ik.lizard_3dof_ik(point, config)
+    assert abs(result.coxa_deg - 15.84) < 0.01
+    assert abs(result.femur_deg - 7.18) < 0.01
+    assert abs(result.tibia_deg + 6.58) < 0.01
+
+    # And some idle to femur.
+    config.femur_idle_deg = 4.0
+    result = leg_ik.lizard_3dof_ik(point, config)
+    assert abs(result.coxa_deg - 15.84) < 0.01
+    assert abs(result.femur_deg - 11.18) < 0.01
+    assert abs(result.tibia_deg + 6.58) < 0.01
+
+    # And some idle to tibia.
+    config.tibia_idle_deg = 5.0
+    result = leg_ik.lizard_3dof_ik(point, config)
+    assert abs(result.coxa_deg - 15.84) < 0.01
+    assert abs(result.femur_deg - 11.18) < 0.01
+    assert abs(result.tibia_deg + 1.58) < 0.01
+
+    # Now try setting the max coxa low enough that we should get None.
+    config.coxa_max_deg = 15.0
+
+    result = leg_ik.lizard_3dof_ik(point, config)
+    assert result is None
+
+    config.coxa_max_deg = 90.0
+    result = leg_ik.lizard_3dof_ik(point, config)
+    assert result is not None
+
+    # And set the tibia max deg low enough to get None.
+    config.femur_max_deg = 10.0
+    result = leg_ik.lizard_3dof_ik(point, config)
+    assert result is None
+
+    # We'll assume the other bounds (min, and tibia) are correct for
+    # now.

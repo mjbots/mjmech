@@ -6,18 +6,21 @@ from tf import Point3D
 
 class Configuration(object):
     coxa_min_deg = None
+    coxa_idle_deg = None
     coxa_max_deg = None
     coxa_length_mm = None
     coxa_sign = 1
     coxa_ident = None
 
     femur_min_deg = None
+    femur_idle_deg = None
     femur_max_deg = None
     femur_length_mm = None
     femur_sign = 1
     femur_ident = None
 
     tibia_min_deg = None
+    tibia_idle_deg = None
     tibia_max_deg = None
     tibia_length_mm = None
     tibia_sign = 1
@@ -52,7 +55,8 @@ def lizard_3dof_ik(point_mm, config):
     '''
     # Solve for the coxa first, as it has only a single solution.
     coxa_deg = (config.coxa_sign *
-                math.degrees(math.atan2(point_mm.x, point_mm.y)))
+                math.degrees(math.atan2(point_mm.x, point_mm.y)) +
+                config.coxa_idle_deg)
 
     if (coxa_deg < config.coxa_min_deg or
         coxa_deg > config.coxa_max_deg):
@@ -98,7 +102,8 @@ def lizard_3dof_ik(point_mm, config):
     # For our purposes, a 0 tibia angle should equate to a right angle
     # with the femur, so subtract off 90 degrees.
     tibia_deg = (config.tibia_sign *
-                 math.degrees(0.5 * math.pi - math.acos(tibia_cos)))
+                 math.degrees(0.5 * math.pi - math.acos(tibia_cos)) +
+                 config.tibia_idle_deg)
 
     if (tibia_deg < config.tibia_min_deg or
         tibia_deg > config.tibia_max_deg):
@@ -124,7 +129,8 @@ def lizard_3dof_ik(point_mm, config):
 
     femur_im_deg = math.degrees(math.acos(femur_im_cos))
 
-    femur_deg = config.femur_sign * ((femur_im_deg + true_x_deg) - 90.0)
+    femur_deg = (config.femur_sign * ((femur_im_deg + true_x_deg) - 90.0) +
+                 config.femur_idle_deg)
 
     if (femur_deg < config.femur_min_deg or
         femur_deg > config.femur_max_deg):

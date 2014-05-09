@@ -137,12 +137,15 @@ def test_ripple_basic():
 
     ik_config = leg_ik.Configuration()
     ik_config.coxa_min_deg = -120.0
+    ik_config.coxa_idle_deg = 0.0
     ik_config.coxa_max_deg = 120.0
     ik_config.coxa_length_mm = 60.0
     ik_config.femur_min_deg = -120.0
+    ik_config.femur_idle_deg = 0.0
     ik_config.femur_max_deg = 120.0
     ik_config.femur_length_mm = 60.0
     ik_config.tibia_min_deg = -120.0
+    ik_config.tibia_idle_deg = 0.0
     ik_config.tibia_max_deg = 120.0
     ik_config.tibia_length_mm = 60.0
 

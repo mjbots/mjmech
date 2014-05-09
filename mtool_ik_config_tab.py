@@ -282,6 +282,7 @@ class IkConfigTab(object):
 
         result.coxa_min_deg = (
             minimum_values[coxa_servo] - idle_values[coxa_servo])
+        result.coxa_idle_deg = 0.0
         result.coxa_max_deg = (
             maximum_values[coxa_servo] - idle_values[coxa_servo])
         result.coxa_length_mm = self.ui.coxaLengthSpin.value()
@@ -290,6 +291,7 @@ class IkConfigTab(object):
         femur_servo = leg.femur_ident
         result.femur_min_deg = (
             minimum_values[femur_servo] - idle_values[femur_servo])
+        result.femur_idle_deg = 0.0
         result.femur_max_deg = (
             maximum_values[femur_servo] - idle_values[femur_servo])
         result.femur_length_mm = self.ui.femurLengthSpin.value()
@@ -298,6 +300,7 @@ class IkConfigTab(object):
         tibia_servo = leg.tibia_ident
         result.tibia_min_deg = (
             minimum_values[tibia_servo] - idle_values[tibia_servo])
+        result.tibia_idle_deg = 0.0
         result.tibia_max_deg = (
             maximum_values[tibia_servo] - idle_values[tibia_servo])
         result.tibia_length_mm = self.ui.tibiaLengthSpin.value()
