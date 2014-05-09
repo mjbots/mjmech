@@ -1,5 +1,6 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import copy
 import math
 import pytest
 
@@ -37,8 +38,13 @@ def sanity_check_state(state):
         else:
             assert False, "unknown leg mode: %d" % leg.mode
 
-    #  At least 3 legs are in stance at all times.
+    # At least 3 legs are in stance at all times.
     assert stance_legs >= 3
+
+    # Verify that we can get the command dictionary, and that it has
+    # elements for all the servos.
+    command_dict = state.command_dict()
+    assert len(command_dict) == 12
 
 def get_steady_state(gait, command):
     idle = gait.get_idle_state()
@@ -160,7 +166,12 @@ def test_ripple_basic():
         leg.idle_y_mm = 0.0
         leg.idle_z_mm = 0.0
 
-        leg.leg_ik = leg_ik.LizardIk(ik_config)
+        this_ik_config = copy.copy(ik_config)
+        this_ik_config.coxa_ident = leg_num * 3 + 0
+        this_ik_config.femur_ident = leg_num * 3 + 1
+        this_ik_config.tibia_ident = leg_num * 3 + 2
+
+        leg.leg_ik = leg_ik.LizardIk(this_ik_config)
 
         config.mechanical.leg_config[leg_num] = leg
 

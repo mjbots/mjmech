@@ -142,6 +142,7 @@ class LegState(object):
         self.mode = STANCE
         self.frame = None
         self.shoulder_frame = None
+        self.leg_ik = None
 
     def __repr__(self):
         return '<LegState p=%r m=%d f=%s>' % (self.point, self.mode, self.frame)
@@ -177,6 +178,7 @@ class RippleState(object):
                 value.shoulder_frame.transform.translation.copy(),
                 value.shoulder_frame.transform.rotation.copy(),
                 result.body_frame)
+            leg.leg_ik = value.leg_ik
             result.legs[key] = leg
 
         result.phase = self.phase
@@ -188,6 +190,17 @@ class RippleState(object):
         result.robot_frame.transform = self.robot_frame.transform.copy()
         result.body_frame.transform = self.body_frame.transform.copy()
 
+        return result
+
+    def command_dict(self):
+        result = {}
+        for leg in self.legs.itervalues():
+            shoulder_point = leg.shoulder_frame.map_from_frame(
+                leg.frame, leg.point)
+            ik_result = leg.leg_ik.do_ik(shoulder_point)
+            if ik_result is None:
+                raise NotSupported()
+            result.update(ik_result.command_dict())
         return result
 
 def _sign(val):
@@ -455,6 +468,7 @@ class RippleGait(object):
                            leg_config.mount_z_mm),
                 tf.Quaternion.from_euler(0., 0., rotation),
                 result.body_frame)
+            leg_state.leg_ik = leg_config.leg_ik
 
         result.body_frame.transform.translation.z = self.config.body_z_offset_mm
 
