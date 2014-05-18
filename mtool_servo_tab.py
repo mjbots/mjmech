@@ -50,6 +50,9 @@ class ServoTab(object):
         self.controller = None
         self.servo_update = BoolContext()
 
+    def resizeEvent(self, event):
+        pass
+
     def poses(self):
         result = []
         for i in range(self.ui.poseList.count()):

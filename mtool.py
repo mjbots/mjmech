@@ -38,6 +38,8 @@ class Mtool(QtGui.QMainWindow):
         self.ikconfig_tab = IkConfigTab(self.ui, self.servo_tab)
         self.gait_tab = GaitTab(self.ui, self.ikconfig_tab, self.servo_tab)
 
+        self.tabs = [self.servo_tab, self.ikconfig_tab, self.gait_tab]
+
         self.read_settings()
 
     def closeEvent(self, event):
@@ -48,21 +50,23 @@ class Mtool(QtGui.QMainWindow):
         config = ConfigParser.ConfigParser()
         config.read(self.config_file)
 
-        self.servo_tab.read_settings(config)
-        self.ikconfig_tab.read_settings(config)
-        self.gait_tab.read_settings(config)
+        for tab in self.tabs:
+            tab.read_settings(config)
 
     def write_settings(self):
         config = ConfigParser.ConfigParser()
 
-        self.servo_tab.write_settings(config)
-        self.ikconfig_tab.write_settings(config)
-        self.gait_tab.write_settings(config)
+        for tab in self.tabs:
+            tab.write_settings(config)
 
         config_dir = os.path.dirname(self.config_file)
         if config_dir != '' and not os.path.exists(config_dir):
             os.mkdir(config_dir)
         config.write(open(self.config_file, 'w'))
+
+    def resizeEvent(self, event):
+        for tab in self.tabs:
+            tab.resizeEvent(event)
 
 def eventlet_pyside_mainloop(app):
     timer = QtCore.QTimer()

@@ -50,6 +50,11 @@ class GaitGeometryDisplay(object):
 
         self.items = []
 
+    def resize(self):
+        self.graphics_view.fitInView(-self.scale, -self.scale,
+                                      2 * self.scale, 2 * self.scale,
+                                      QtCore.Qt.KeepAspectRatio)
+
     def set_view(self, frame, projection, scale):
         self.frame = frame
         self.projection = projection
@@ -173,9 +178,7 @@ class GaitGeometryDisplay(object):
         else:
             self.support_poly.setVisible(False)
 
-        self.graphics_view.fitInView(-self.scale, -self.scale,
-                                      2 * self.scale, 2 * self.scale,
-                                      QtCore.Qt.KeepAspectRatio)
+        self.resize()
 
 class GaitGraphDisplay(object):
     def __init__(self, ui):
@@ -185,6 +188,9 @@ class GaitGraphDisplay(object):
         self.graphics_view.setScene(self.graphics_scene)
         self.phase_line = None
         self.phase = 0.0
+
+    def resize(self):
+        self.fit_in_view()
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-0.1, 0, 1.1, 1))
@@ -305,6 +311,9 @@ class CommandWidget(object):
         for rect in self.usable_rects.itervalues():
             rect.setPen(QtGui.QPen(QtCore.Qt.NoPen))
             rect.setZValue(-20)
+
+    def resize(self):
+        self.fit_in_view()
 
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
@@ -550,6 +559,11 @@ class GaitTab(object):
         self.playback_timer = QtCore.QTimer()
         self.playback_timer.timeout.connect(self.handle_playback_timer)
 
+    def resizeEvent(self, event):
+        if self.ui.tabWidget.currentIndex() == 2:
+            self.gait_graph_display.resize()
+            self.gait_geometry_display.resize()
+            self.command_widget.resize()
 
     def get_float_configs(self):
         return [(self.ui.bodyCogXSpin, 'body_cog_x_mm'),

@@ -84,6 +84,9 @@ class IkTester(object):
 
         self.ik_config = None
 
+    def resize(self):
+        self.fit_in_view()
+
     def fit_in_view(self):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
 
@@ -219,6 +222,9 @@ class IkConfigTab(object):
             spin.valueChanged.connect(self.handle_ik_config_change)
 
         self.handle_ik_config_change()
+
+    def resizeEvent(self, event):
+        self.ik_tester.resize()
 
     def handle_current_changed(self, index=1):
         if index != 1:
