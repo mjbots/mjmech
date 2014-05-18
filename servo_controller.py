@@ -112,7 +112,9 @@ class GazeboController(object):
             [ [ '%s::coxa_hinge%d' % (model_name, x),
                 '%s::femur_hinge%d' % (model_name, x),
                 '%s::tibia_hinge%d' % (model_name, x) ]
-              for x in range(4) ])
+              for x in range(4) ] + [ [
+                '%s::pan_aeg_hinge' % model_name,
+                '%s::weapon_assembly_hinge' % model_name ] ])
 
         self.joint_cmd = joint_cmd_pb2.JointCmd()
         self.joint_cmd.axis = 0
