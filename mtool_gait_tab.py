@@ -9,6 +9,7 @@ import PySide.QtGui as QtGui
 
 import convexhull
 import ripple_gait
+import servo_controller
 import settings
 import tf
 
@@ -141,10 +142,14 @@ class GaitGeometryDisplay(object):
         self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
+            if leg_num not in state.legs:
+                continue
             shoulder.setPos(*self._project(tf.Point3D(),
                                            state.legs[leg_num].shoulder_frame))
 
         for leg_num, leg_item in self.legs.iteritems():
+            if leg_num not in state.legs:
+                continue
             leg = state.legs[leg_num]
 
             point = self._project(leg.point, leg.frame)
@@ -638,7 +643,15 @@ class GaitTab(object):
             self.ui.playbackSingleButton.setChecked(False)
             self.ui.playbackRepeatButton.setChecked(False)
             self.ui.playbackSlowRepeatButton.setChecked(False)
+
+            if self.servo_tab.controller:
+                self.servo_tab.controller.enable_power(
+                    servo_controller.POWER_BRAKE)
             return
+
+        if self.servo_tab.controller:
+            self.servo_tab.controller.enable_power(
+                servo_controller.POWER_ENABLE)
 
         # Update the leg list widget.
         available_legs = self.ikconfig_tab.get_all_legs()
@@ -816,13 +829,17 @@ class GaitTab(object):
         self.update_phase(self.ui.playbackPhaseSlider.value() * self.phase_step)
 
     def update_phase(self, phase):
-        # Render the phase line in the gait graph.
-        self.gait_graph_display.set_phase(phase % 1.0)
-
         # Update the current geometry rendering.
         state = self.current_states[int(phase / self.phase_step)]
+        self.render_state(state)
 
+    def render_state(self, state):
+        # Render the phase line in the gait graph.
+        self.gait_graph_display.set_phase(state.phase % 1.0)
         self.gait_geometry_display.set_state(state)
+
+        if self.servo_tab.controller:
+            self.servo_tab.controller.set_pose(state.command_dict())
 
     def handle_geometry_change(self):
         frame = [GaitGeometryDisplay.FRAME_ROBOT,
@@ -903,8 +920,7 @@ class GaitTab(object):
             self.ui.playbackSingleButton.setChecked(False)
             return
 
-        self.gait_geometry_display.set_state(state)
-        self.gait_graph_display.set_phase(state.phase % 1.0)
+        self.render_state(state)
 
     def handle_widget_set_command(self):
         with self.in_command_changed:
