@@ -174,7 +174,8 @@ class GaitGeometryDisplay(object):
             self.support_poly.setVisible(False)
 
         self.graphics_view.fitInView(-self.scale, -self.scale,
-                                      2 * self.scale, 2 * self.scale)
+                                      2 * self.scale, 2 * self.scale,
+                                      QtCore.Qt.KeepAspectRatio)
 
 class GaitGraphDisplay(object):
     def __init__(self, ui):
