@@ -383,6 +383,11 @@ class RippleGait(object):
 
         return result
 
+    def _do_commands_differ_body_only(self, command1, command2):
+        return (command1.translate_x_mm_s == command2.translate_x_mm_s and
+                command1.translate_y_mm_s == command2.translate_y_mm_s and
+                command1.rotate_deg_s == command2.rotate_deg_s)
+
     def set_command(self, command):
         '''Set the current command.  This will raise a NotSupported
         exception if the platform cannot achieve the desired command,
@@ -396,7 +401,9 @@ class RippleGait(object):
         # NOTE: This may modify command.
         options = self._select_command_options(command)
 
-        if self.state.phase != 0.0:
+        body_only = self._do_commands_differ_body_only(command, self.command)
+
+        if self.state.phase != 0.0 and not body_only:
             # TODO jpieper: It would be nice to be able to update the
             # command anytime all the legs are in STANCE (or even
             # better, all the time), rather than just at phase 0.

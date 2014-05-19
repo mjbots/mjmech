@@ -854,7 +854,10 @@ class GaitTab(object):
         self.gait_geometry_display.set_state(state)
 
         if self.servo_tab.controller:
-            self.servo_tab.controller.set_pose(state.command_dict())
+            try:
+                self.servo_tab.controller.set_pose(state.command_dict())
+            except ripple_gait.NotSupported:
+                pass
 
     def handle_geometry_change(self):
         frame = [GaitGeometryDisplay.FRAME_ROBOT,
