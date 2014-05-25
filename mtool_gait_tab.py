@@ -3,6 +3,7 @@
 import eventlet
 import functools
 import numpy
+import time
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
@@ -439,7 +440,8 @@ class CommandWidget(object):
         self.next_config = None
         self.next_command = None
 
-        count = 0
+        next_wait = time.time() + 0.5 * 0.001 * PLAYBACK_TIMEOUT_MS
+
         for (x, y), rect in self.usable_rects.iteritems():
             x_value = self.x_scale() * float(x) / self.grid_count
             y_value = self.y_scale() * float(y) / self.grid_count
@@ -462,11 +464,11 @@ class CommandWidget(object):
 
             rect.setBrush(QtGui.QBrush(QtGui.QColor(*color)))
 
-            count += 1
-            if (count % 10) == 0:
+            if time.time() > next_wait:
                 eventlet.sleep()
                 if self.next_config is not None:
                     return
+                next_wait = time.time() + 0.5 * 0.001 * PLAYBACK_TIMEOUT_MS
 
 class GaitTab(object):
     (PLAYBACK_IDLE,
