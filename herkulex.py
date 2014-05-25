@@ -83,11 +83,12 @@ class HerkuleX(object):
     LED_BLUE = 0x02
     LED_RED = 0x04
 
+    EEP_ID = 6
     REG_TORQUE_CONTROL = 52
 
     def __init__(self, serial_port):
         self.baud_rate = 115200
-        if isinstance(serial_port, str):
+        if isinstance(serial_port, str) or isinstance(serial_port, unicode):
             self.serial = eventlet_serial.EventletSerial(
                 port=serial_port, baudrate=115200)
         else:
