@@ -73,8 +73,11 @@ class Point3D(object):
         return not (self == other)
 
     def length(self):
+        return math.sqrt(self.length_squared() )
+
+    def length_squared(self):
         value = self * self
-        return math.sqrt(value.x + value.y + value.z)
+        return value.x + value.y + value.z
 
     def scaled(self, value):
         return Point3D(self.x * value,
