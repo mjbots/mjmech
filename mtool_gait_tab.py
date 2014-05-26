@@ -522,8 +522,14 @@ class GaitTab(object):
                      self.ui.liftHeightSpin,
                      self.ui.swingPercentSpin,
                      self.ui.positionMarginSpin,
-                     self.ui.bodyZOffsetSpin]:
+                     self.ui.bodyZOffsetSpin,
+                     self.ui.staticCenterSpin,
+                     self.ui.staticStableSpin,
+                     self.ui.staticMarginSpin]:
             spin.valueChanged.connect(self.handle_gait_config_change)
+
+        self.ui.staticEnableCheck.toggled.connect(
+            self.handle_gait_config_change)
 
         self.command_spins = [
             (self.ui.commandXSpin, 'translate_x_mm_s'),
@@ -586,6 +592,9 @@ class GaitTab(object):
                 (self.ui.swingPercentSpin, 'swing_percent'),
                 (self.ui.positionMarginSpin, 'position_margin'),
                 (self.ui.bodyZOffsetSpin, 'body_z_offset_mm'),
+                (self.ui.staticCenterSpin, 'static_center_mm_s'),
+                (self.ui.staticStableSpin, 'static_stable_mm_s'),
+                (self.ui.staticMarginSpin, 'static_margin_mm'),
                 (self.ui.geometryScaleSpin, 'geometry_scale_mm'),
                 (self.ui.commandXSpin, 'command_x_mm_s'),
                 (self.ui.commandYSpin, 'command_y_mm_s'),
@@ -637,6 +646,10 @@ class GaitTab(object):
                 self.ripple_config.mechanical.leg_config[leg_num] = \
                     self.string_to_leg_config(value)
 
+        if config.has_option('gaitconfig', 'static_enable'):
+            self.ui.staticEnableCheck.setChecked(
+                config.getboolean('gaitconfig', 'static_enable'))
+
         self.command_widget.read_settings(config)
 
         self.handle_leg_change(self.ui.gaitLegList.currentItem())
@@ -660,6 +673,9 @@ class GaitTab(object):
             leg_num, leg_config = leg_data
             config.set('gaitconfig.legs', 'leg.%d' % leg_num,
                        self.leg_config_to_string(leg_config))
+
+        config.set('gaitconfig', 'static_enable',
+                   self.ui.staticEnableCheck.isChecked())
 
     def handle_current_changed(self, index=2):
         if index != 2:
@@ -790,6 +806,15 @@ class GaitTab(object):
             self.ripple_config.mechanical.leg_config.keys()
 
         self.ripple_config.body_z_offset_mm = self.ui.bodyZOffsetSpin.value()
+
+        self.ripple_config.statically_stable = \
+            self.ui.staticEnableCheck.isChecked()
+        self.ripple_config.static_center_velocity_mm_s = \
+            self.ui.staticCenterSpin.value()
+        self.ripple_config.static_stable_factor_mm_s = \
+            self.ui.staticStableSpin.value()
+        self.ripple_config.static_margin_mm = \
+            self.ui.staticMarginSpin.value()
 
         self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
         self.gait_geometry_display.set_gait_config(self.ripple_config)

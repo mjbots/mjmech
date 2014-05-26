@@ -4,6 +4,7 @@ import bisect
 import copy
 import math
 
+import geometry
 import leg_ik
 import tf
 
@@ -84,6 +85,10 @@ class RippleConfig(object):
         self.leg_order = []
         self.body_z_offset_mm = 0.0
         self.servo_speed_margin_percent = 70.0
+        self.statically_stable = False
+        self.static_center_velocity_mm_s = 50.0
+        self.static_stable_factor_mm_s = 150.0
+        self.static_margin_mm = 20.0
 
     def copy(self):
         result = RippleConfig()
@@ -95,6 +100,10 @@ class RippleConfig(object):
         result.leg_order = self.leg_order[:]
         result.body_z_offset_mm = self.body_z_offset_mm
         result.servo_speed_margin_percent = self.servo_speed_margin_percent
+        result.statically_stable = self.statically_stable
+        result.static_center_velocity_mm_s = self.static_center_velocity_mm_s
+        result.static_stable_factor_mm_s = self.static_stable_factor_mm_s
+        result.static_margin_mm = self.static_margin_mm
 
         return result
 
@@ -432,8 +441,9 @@ class RippleGait(object):
 
 
     def _apply_body_command(self, state, command):
-        state.body_frame.transform.translation.x = command.body_x_mm
-        state.body_frame.transform.translation.y = command.body_y_mm
+        if not self.config.statically_stable:
+            state.body_frame.transform.translation.x = command.body_x_mm
+            state.body_frame.transform.translation.y = command.body_y_mm
         state.body_frame.transform.translation.z = (
             command.body_z_mm + self.config.body_z_offset_mm)
         state.body_frame.transform.rotation = tf.Quaternion.from_euler(
@@ -599,6 +609,90 @@ class RippleGait(object):
                     leg.point.z = (((1.0 - leg_phase) / 0.1) *
                                    self.config.lift_height_mm)
 
+        # If we are running with a statically stable gait, update the
+        # body position dynamically.
+        if self.config.statically_stable:
+            desired_cog_vel = tf.Point3D()
+
+            cog_pos = self.state.cog_frame.map_to_frame(
+                self.state.robot_frame, tf.Point3D())
+            cog_pos.z = 0
+
+            # Do the part which pulls the COG back towards the center
+            # of the robot frame.
+            cog_dist = cog_pos.length()
+            scale = 1.0
+            if cog_dist < self.config.static_margin_mm:
+                scale = cog_dist / self.config.static_margin_mm
+            desired_cog_vel = tf.Point3D()
+
+            if cog_dist != 0.0:
+                desired_cog_vel = desired_cog_vel + cog_pos.scaled(
+                    -scale * self.config.static_center_velocity_mm_s /
+                     cog_dist)
+
+            if (dt * desired_cog_vel.length()) > cog_dist:
+                desired_cog_vel = desired_cog_vel.scaled(
+                    cog_dist / (dt * desired_cog_vel.length()))
+
+            # Now do the part which pulls the COG towards the support
+            # polygon.
+
+            # First, determine what support polygon we should be
+            # aiming for.
+            support_poly = self._get_current_support_poly_robot_frame()
+            support_centroid = geometry.poly_centroid(support_poly)
+            delta = cog_pos - support_centroid
+
+            if not geometry.point_in_poly(cog_pos, support_poly):
+                # We are not in the support polygon, thus move at the
+                # maximal velocity towards the centroid
+                scale = 1.0
+            else:
+                # We are in the support polygon.  See by how much to
+                # determine what our scale should be.
+                dist = geometry.distance_to_poly(cog_pos, support_poly)
+                scale = max(0.0,
+                            ((self.config.static_margin_mm - dist) /
+                             self.config.static_margin_mm))
+
+            poly_vel = delta.scaled(
+                -scale * self.config.static_stable_factor_mm_s / delta.length())
+            if (dt * poly_vel.length()) > delta.length():
+                poly_vel = poly_vel.scaled(
+                    delta.length() / (dt * poly_vel.length()))
+
+            cog_move = (desired_cog_vel + poly_vel).scaled(dt)
+            self.state.body_frame.transform.translation.x += cog_move.x
+            self.state.body_frame.transform.translation.y += cog_move.y
+
+
+    def _get_current_support_poly_robot_frame(self):
+        next_action = self.actions[self.state.action]
+
+        _, action_leg_num, action = next_action
+
+        if action == self.ACTION_END:
+            _, action_leg_num, action = self.actions[0]
+
+        legs = []
+        if action == self.ACTION_START_SWING:
+            # The next action is a lift, which means we should use all
+            # legs but this one.
+            legs = [x for x in self.state.legs.keys()
+                    if x != action_leg_num]
+        elif action == self.ACTION_START_STANCE:
+            # We must have a leg in the air now, so use the current
+            # set of stance legs.
+            legs = [x for x in self.state.legs.keys()
+                    if self.state.legs[x].mode == STANCE ]
+
+        poly = [self.state.robot_frame.map_from_frame(
+                self.state.legs[x].frame,
+                self.state.legs[x].point)
+                for x in legs]
+
+        return poly
 
     def advance_phase(self, delta_phase):
         '''Advance the phase and leg state by the given amount of

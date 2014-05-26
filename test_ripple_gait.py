@@ -234,3 +234,10 @@ def test_ripple_basic():
 
     result = run_cycle(gait, steady_state, command, 7.0, 0.04)
     verify_symmetric_result(result)
+
+    config.statically_stable = True
+    gait = ripple_gait.RippleGait(config)
+    idle_state = gait.get_idle_state()
+
+    command = ripple_gait.Command()
+    run_cycle(gait, idle_state, command, 10.0, 0.01)
