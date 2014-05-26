@@ -857,7 +857,9 @@ class GaitTab(object):
 
         if self.servo_tab.controller:
             try:
-                self.servo_tab.controller.set_pose(state.command_dict())
+                self.servo_tab.controller.set_pose(
+                    state.command_dict(),
+                    pose_time=2 * 0.001 * PLAYBACK_TIMEOUT_MS)
             except ripple_gait.NotSupported:
                 pass
 
