@@ -161,6 +161,7 @@ class RippleState(object):
         self.world_frame = tf.Frame()
         self.robot_frame = tf.Frame(None, None, self.world_frame)
         self.body_frame = tf.Frame(None, None, self.robot_frame)
+        self.cog_frame = tf.Frame(None, None, self.body_frame)
 
     def copy(self):
         result = RippleState()
@@ -189,6 +190,7 @@ class RippleState(object):
         result.world_frame.transform = self.world_frame.transform.copy()
         result.robot_frame.transform = self.robot_frame.transform.copy()
         result.body_frame.transform = self.body_frame.transform.copy()
+        result.cog_frame.transform = self.cog_frame.transform.copy()
 
         return result
 
@@ -478,6 +480,12 @@ class RippleGait(object):
             leg_state.leg_ik = leg_config.leg_ik
 
         result.body_frame.transform.translation.z = self.config.body_z_offset_mm
+        result.cog_frame.transform.translation.x = \
+            self.config.mechanical.body_cog_x_mm
+        result.cog_frame.transform.translation.y = \
+            self.config.mechanical.body_cog_y_mm
+        result.cog_frame.transform.translation.z = \
+            self.config.mechanical.body_cog_z_mm
 
         return result
 

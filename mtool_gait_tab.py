@@ -94,8 +94,14 @@ class GaitGeometryDisplay(object):
             body_poly, QtGui.QPen(QtCore.Qt.black),
             QtGui.QBrush(QtCore.Qt.red))
         self.body.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
-
         self.items.append(self.body)
+
+        self.cog = self.graphics_scene.addEllipse(
+            -5, -5, 10, 10,
+             QtGui.QPen(QtCore.Qt.black),
+             QtGui.QBrush(QtCore.Qt.yellow))
+        self.cog.setFlags(QtGui.QGraphicsItem.ItemIgnoresTransformations)
+        self.items.append(self.cog)
 
         self.shoulders = {}
         self.legs = {}
@@ -146,6 +152,7 @@ class GaitGeometryDisplay(object):
         stance_points = []
 
         self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
+        self.cog.setPos(*self._project(tf.Point3D(), state.cog_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
             if leg_num not in state.legs:
