@@ -167,7 +167,14 @@ class GaitGeometryDisplay(object):
 
             point = self._project(leg.point, leg.frame)
             leg_item.setPos(*point)
-            if leg.mode == ripple_gait.STANCE:
+
+            shoulder_point = leg.shoulder_frame.map_from_frame(
+                leg.frame, leg.point)
+            ik_result = leg.leg_ik.do_ik(shoulder_point)
+
+            if ik_result is None:
+                color = QtCore.Qt.red
+            elif leg.mode == ripple_gait.STANCE:
                 color = QtCore.Qt.green
                 stance_points.append(point)
             elif leg.mode == ripple_gait.SWING:
