@@ -599,8 +599,8 @@ class GaitTab(object):
                 (self.ui.swingPercentSpin, 'swing_percent'),
                 (self.ui.positionMarginSpin, 'position_margin'),
                 (self.ui.bodyZOffsetSpin, 'body_z_offset_mm'),
-                (self.ui.staticCenterSpin, 'static_center_mm_s'),
-                (self.ui.staticStableSpin, 'static_stable_mm_s'),
+                (self.ui.staticCenterSpin, 'static_center_factor'),
+                (self.ui.staticStableSpin, 'static_stable_factor'),
                 (self.ui.staticMarginSpin, 'static_margin_mm'),
                 (self.ui.geometryScaleSpin, 'geometry_scale_mm'),
                 (self.ui.commandXSpin, 'command_x_mm_s'),
@@ -816,9 +816,9 @@ class GaitTab(object):
 
         self.ripple_config.statically_stable = \
             self.ui.staticEnableCheck.isChecked()
-        self.ripple_config.static_center_velocity_mm_s = \
+        self.ripple_config.static_center_factor = \
             self.ui.staticCenterSpin.value()
-        self.ripple_config.static_stable_factor_mm_s = \
+        self.ripple_config.static_stable_factor = \
             self.ui.staticStableSpin.value()
         self.ripple_config.static_margin_mm = \
             self.ui.staticMarginSpin.value()

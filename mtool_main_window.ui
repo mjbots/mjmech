@@ -1272,7 +1272,7 @@ QScrollBar:vertical {
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_30">
                    <property name="text">
-                    <string>Center (mm/s):</string>
+                    <string>Center Factor:</string>
                    </property>
                   </widget>
                  </item>
@@ -1285,17 +1285,17 @@ QScrollBar:vertical {
                     <double>1000.000000000000000</double>
                    </property>
                    <property name="singleStep">
-                    <double>10.000000000000000</double>
+                    <double>1.000000000000000</double>
                    </property>
                    <property name="value">
-                    <double>30.000000000000000</double>
+                    <double>3.000000000000000</double>
                    </property>
                   </widget>
                  </item>
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_31">
                    <property name="text">
-                    <string>Stable (mm/s):</string>
+                    <string>Stable Factor:</string>
                    </property>
                   </widget>
                  </item>
@@ -1308,10 +1308,10 @@ QScrollBar:vertical {
                     <double>500.000000000000000</double>
                    </property>
                    <property name="singleStep">
-                    <double>10.000000000000000</double>
+                    <double>1.000000000000000</double>
                    </property>
                    <property name="value">
-                    <double>200.000000000000000</double>
+                    <double>10.000000000000000</double>
                    </property>
                   </widget>
                  </item>

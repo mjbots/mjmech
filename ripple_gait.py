@@ -86,8 +86,8 @@ class RippleConfig(object):
         self.body_z_offset_mm = 0.0
         self.servo_speed_margin_percent = 70.0
         self.statically_stable = False
-        self.static_center_velocity_mm_s = 50.0
-        self.static_stable_factor_mm_s = 150.0
+        self.static_center_factor = 3.0
+        self.static_stable_factor = 10.0
         self.static_margin_mm = 20.0
 
     def copy(self):
@@ -101,8 +101,8 @@ class RippleConfig(object):
         result.body_z_offset_mm = self.body_z_offset_mm
         result.servo_speed_margin_percent = self.servo_speed_margin_percent
         result.statically_stable = self.statically_stable
-        result.static_center_velocity_mm_s = self.static_center_velocity_mm_s
-        result.static_stable_factor_mm_s = self.static_stable_factor_mm_s
+        result.static_center_factor = self.static_center_factor
+        result.static_stable_factor = self.static_stable_factor
         result.static_margin_mm = self.static_margin_mm
 
         return result
@@ -627,8 +627,12 @@ class RippleGait(object):
             desired_cog_vel = tf.Point3D()
 
             if cog_dist != 0.0:
+                static_center_velocity_mm_s = (
+                    self.config.static_center_factor *
+                    self.config.static_margin_mm /
+                    self.options.cycle_time_s)
                 desired_cog_vel = desired_cog_vel + cog_pos.scaled(
-                    -scale * self.config.static_center_velocity_mm_s /
+                    -scale * static_center_velocity_mm_s /
                      cog_dist)
 
             if (dt * desired_cog_vel.length()) > cog_dist:
@@ -656,8 +660,12 @@ class RippleGait(object):
                             ((self.config.static_margin_mm - dist) /
                              self.config.static_margin_mm))
 
+            static_stable_velocity_mm_s = (
+                self.config.static_stable_factor *
+                self.config.static_margin_mm /
+                self.options.cycle_time_s)
             poly_vel = delta.scaled(
-                -scale * self.config.static_stable_factor_mm_s / delta.length())
+                -scale * static_stable_velocity_mm_s / delta.length())
             if (dt * poly_vel.length()) > delta.length():
                 poly_vel = poly_vel.scaled(
                     delta.length() / (dt * poly_vel.length()))
