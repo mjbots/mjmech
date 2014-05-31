@@ -37,18 +37,6 @@ $PLIMMAX
  20
 297.0
   9
-$PSVPSCALE
- 40
-1.0
-  9
-$PINSBASE
- 10
-105.0230729508196816
- 20
-147.1381311475409746
- 30
-0.0
-  9
 $INSUNITS
  70
 4
@@ -1291,7 +1279,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1319,7 +1307,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1347,7 +1335,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1375,7 +1363,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1403,7 +1391,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1429,7 +1417,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1459,7 +1447,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1491,7 +1479,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1519,7 +1507,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1545,7 +1533,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1575,7 +1563,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1607,7 +1595,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1635,7 +1623,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1661,7 +1649,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1691,7 +1679,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1723,7 +1711,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1751,7 +1739,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1777,7 +1765,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1807,7 +1795,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1839,7 +1827,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1867,7 +1855,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1893,7 +1881,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1923,7 +1911,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -1955,7 +1943,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -1983,7 +1971,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2009,7 +1997,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2039,7 +2027,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2071,7 +2059,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2099,7 +2087,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2125,7 +2113,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2155,7 +2143,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2187,7 +2175,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2215,7 +2203,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2241,7 +2229,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2271,7 +2259,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2303,7 +2291,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2331,7 +2319,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2359,7 +2347,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2387,7 +2375,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2415,7 +2403,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2443,7 +2431,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2471,7 +2459,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2499,7 +2487,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2527,7 +2515,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2555,7 +2543,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2581,7 +2569,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2611,7 +2599,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2643,7 +2631,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2671,7 +2659,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2697,7 +2685,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2727,7 +2715,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2759,7 +2747,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2787,7 +2775,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2813,7 +2801,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2843,7 +2831,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2875,7 +2863,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2903,7 +2891,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -2929,7 +2917,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2959,7 +2947,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -2991,7 +2979,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3019,7 +3007,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3045,7 +3033,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3075,7 +3063,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3107,7 +3095,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3135,7 +3123,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3161,7 +3149,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3191,7 +3179,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3223,7 +3211,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3251,7 +3239,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3277,7 +3265,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3307,7 +3295,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3339,7 +3327,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3367,7 +3355,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3393,7 +3381,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3423,7 +3411,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -3455,7 +3443,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3483,7 +3471,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3511,7 +3499,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3539,7 +3527,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3567,7 +3555,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3595,7 +3583,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3619,7 +3607,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3643,7 +3631,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3667,7 +3655,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3691,7 +3679,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3715,7 +3703,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3739,7 +3727,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3763,7 +3751,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3787,7 +3775,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3811,7 +3799,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3835,7 +3823,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3859,7 +3847,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3883,7 +3871,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3907,7 +3895,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3931,7 +3919,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3955,7 +3943,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -3979,7 +3967,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4003,7 +3991,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4027,7 +4015,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4051,7 +4039,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4075,7 +4063,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4099,7 +4087,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4123,7 +4111,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4147,7 +4135,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4171,7 +4159,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4195,7 +4183,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4219,7 +4207,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4243,7 +4231,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4267,7 +4255,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4291,7 +4279,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4315,7 +4303,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4339,7 +4327,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4363,7 +4351,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4387,7 +4375,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4411,7 +4399,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4435,7 +4423,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4447,129 +4435,17 @@ CONTINUOUS
  40
 1.7
   0
-LINE
+ARC
   5
 B8
 100
 AcDbEntity
-100
-AcDbLine
   8
 sheet_layer
  62
 256
 370
-18
-  6
-CONTINUOUS
- 10
--36.2999999999999972
- 20
-30.0
- 30
-0.0
- 11
--34.7199999999999989
- 21
-30.0
- 31
-0.0
-  0
-LINE
-  5
-B9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-sheet_layer
- 62
-256
-370
-18
-  6
-CONTINUOUS
- 10
--36.2999999999999972
- 20
--30.0
- 30
-0.0
- 11
--36.2999999999999972
- 21
-30.0
- 31
-0.0
-  0
-LINE
-  5
-BA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-sheet_layer
- 62
-256
-370
-18
-  6
-CONTINUOUS
- 10
--34.7199999999999989
- 20
-30.0
- 30
-0.0
- 11
--34.7199999999999989
- 21
--30.0
- 31
-0.0
-  0
-LINE
-  5
-BB
-100
-AcDbEntity
-100
-AcDbLine
-  8
-sheet_layer
- 62
-256
-370
-18
-  6
-CONTINUOUS
- 10
--34.7199999999999989
- 20
--30.0
- 30
-0.0
- 11
--36.2999999999999972
- 21
--30.0
- 31
-0.0
-  0
-ARC
-  5
-BC
-100
-AcDbEntity
-  8
-sheet_layer
- 62
-256
-370
-18
+13
   6
 CONTINUOUS
 100
@@ -4591,7 +4467,7 @@ AcDbArc
   0
 LINE
   5
-BD
+B9
 100
 AcDbEntity
 100
@@ -4601,7 +4477,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4619,7 +4495,7 @@ CONTINUOUS
   0
 LINE
   5
-BE
+BA
 100
 AcDbEntity
 100
@@ -4629,7 +4505,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4647,7 +4523,7 @@ CONTINUOUS
   0
 ARC
   5
-BF
+BB
 100
 AcDbEntity
   8
@@ -4655,7 +4531,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4677,7 +4553,7 @@ AcDbArc
   0
 ARC
   5
-C0
+BC
 100
 AcDbEntity
   8
@@ -4685,7 +4561,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4707,7 +4583,7 @@ AcDbArc
   0
 LINE
   5
-C1
+BD
 100
 AcDbEntity
 100
@@ -4717,7 +4593,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4735,7 +4611,7 @@ CONTINUOUS
   0
 LINE
   5
-C2
+BE
 100
 AcDbEntity
 100
@@ -4745,7 +4621,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4763,7 +4639,7 @@ CONTINUOUS
   0
 ARC
   5
-C3
+BF
 100
 AcDbEntity
   8
@@ -4771,7 +4647,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4793,7 +4669,7 @@ AcDbArc
   0
 ARC
   5
-C4
+C0
 100
 AcDbEntity
   8
@@ -4801,7 +4677,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4823,7 +4699,7 @@ AcDbArc
   0
 LINE
   5
-C5
+C1
 100
 AcDbEntity
 100
@@ -4833,7 +4709,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4851,7 +4727,7 @@ CONTINUOUS
   0
 ARC
   5
-C6
+C2
 100
 AcDbEntity
   8
@@ -4859,7 +4735,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4881,7 +4757,7 @@ AcDbArc
   0
 LINE
   5
-C7
+C3
 100
 AcDbEntity
 100
@@ -4891,7 +4767,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4909,7 +4785,7 @@ CONTINUOUS
   0
 ARC
   5
-C8
+C4
 100
 AcDbEntity
   8
@@ -4917,7 +4793,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4939,7 +4815,7 @@ AcDbArc
   0
 LINE
   5
-C9
+C5
 100
 AcDbEntity
 100
@@ -4949,7 +4825,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -4967,7 +4843,7 @@ CONTINUOUS
   0
 ARC
   5
-CA
+C6
 100
 AcDbEntity
   8
@@ -4975,7 +4851,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -4997,7 +4873,7 @@ AcDbArc
   0
 LINE
   5
-CB
+C7
 100
 AcDbEntity
 100
@@ -5007,7 +4883,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -5025,7 +4901,7 @@ CONTINUOUS
   0
 ARC
   5
-CC
+C8
 100
 AcDbEntity
   8
@@ -5033,7 +4909,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -5055,7 +4931,7 @@ AcDbArc
   0
 LINE
   5
-CD
+C9
 100
 AcDbEntity
 100
@@ -5065,7 +4941,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -5083,7 +4959,7 @@ CONTINUOUS
   0
 ARC
   5
-CE
+CA
 100
 AcDbEntity
   8
@@ -5091,7 +4967,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -5113,7 +4989,7 @@ AcDbArc
   0
 LINE
   5
-CF
+CB
 100
 AcDbEntity
 100
@@ -5123,7 +4999,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -5141,7 +5017,7 @@ CONTINUOUS
   0
 ARC
   5
-D0
+CC
 100
 AcDbEntity
   8
@@ -5149,7 +5025,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -5158,6 +5034,122 @@ AcDbCircle
 76.7112999999999943
  20
 -53.0666000000000011
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+-75.0
+ 51
+14.9999999999999982
+  0
+LINE
+  5
+CD
+100
+AcDbEntity
+100
+AcDbLine
+  8
+sheet_layer
+ 62
+256
+370
+13
+  6
+CONTINUOUS
+ 10
+61.7740999999999971
+ 20
+-59.1396000000000015
+ 30
+0.0
+ 11
+77.2288999999999959
+ 21
+-54.9984999999999999
+ 31
+0.0
+  0
+ARC
+  5
+CE
+100
+AcDbEntity
+  8
+sheet_layer
+ 62
+256
+370
+13
+  6
+CONTINUOUS
+100
+AcDbCircle
+ 10
+61.2563999999999993
+ 20
+-57.2077000000000027
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+-165.0
+ 51
+-75.0
+  0
+LINE
+  5
+CF
+100
+AcDbEntity
+100
+AcDbLine
+  8
+sheet_layer
+ 62
+256
+370
+13
+  6
+CONTINUOUS
+ 10
+57.7717000000000027
+ 20
+-51.9298000000000002
+ 30
+0.0
+ 11
+59.3245999999999967
+ 21
+-57.7252999999999972
+ 31
+0.0
+  0
+ARC
+  5
+D0
+100
+AcDbEntity
+  8
+sheet_layer
+ 62
+256
+370
+13
+  6
+CONTINUOUS
+100
+AcDbCircle
+ 10
+-59.7034999999999982
+ 20
+51.4121999999999986
  30
 0.0
  40
@@ -5181,19 +5173,19 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
-61.7740999999999971
+-74.6406999999999954
  20
--59.1396000000000015
+45.3391999999999982
  30
 0.0
  11
-77.2288999999999959
+-59.1858999999999966
  21
--54.9984999999999999
+49.4802999999999997
  31
 0.0
   0
@@ -5207,15 +5199,15 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
 AcDbCircle
  10
-61.2563999999999993
+-75.158299999999997
  20
--57.2077000000000027
+47.2710000000000008
  30
 0.0
  40
@@ -5239,123 +5231,7 @@ sheet_layer
  62
 256
 370
-18
-  6
-CONTINUOUS
- 10
-57.7717000000000027
- 20
--51.9298000000000002
- 30
-0.0
- 11
-59.3245999999999967
- 21
--57.7252999999999972
- 31
-0.0
-  0
-ARC
-  5
-D4
-100
-AcDbEntity
-  8
-sheet_layer
- 62
-256
-370
-18
-  6
-CONTINUOUS
-100
-AcDbCircle
- 10
--59.7034999999999982
- 20
-51.4121999999999986
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
--75.0
- 51
-14.9999999999999982
-  0
-LINE
-  5
-D5
-100
-AcDbEntity
-100
-AcDbLine
-  8
-sheet_layer
- 62
-256
-370
-18
-  6
-CONTINUOUS
- 10
--74.6406999999999954
- 20
-45.3391999999999982
- 30
-0.0
- 11
--59.1858999999999966
- 21
-49.4802999999999997
- 31
-0.0
-  0
-ARC
-  5
-D6
-100
-AcDbEntity
-  8
-sheet_layer
- 62
-256
-370
-18
-  6
-CONTINUOUS
-100
-AcDbCircle
- 10
--75.158299999999997
- 20
-47.2710000000000008
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
--165.0
- 51
--75.0
-  0
-LINE
-  5
-D7
-100
-AcDbEntity
-100
-AcDbLine
-  8
-sheet_layer
- 62
-256
-370
-18
+13
   6
 CONTINUOUS
  10
@@ -5373,7 +5249,7 @@ CONTINUOUS
   0
 ARC
   5
-D8
+D4
 100
 AcDbEntity
   8
@@ -5381,7 +5257,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -5403,7 +5279,7 @@ AcDbArc
   0
 LINE
   5
-D9
+D5
 100
 AcDbEntity
 100
@@ -5413,7 +5289,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -5431,7 +5307,7 @@ CONTINUOUS
   0
 ARC
   5
-DA
+D6
 100
 AcDbEntity
   8
@@ -5439,7 +5315,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
 100
@@ -5461,7 +5337,7 @@ AcDbArc
   0
 LINE
   5
-DB
+D7
 100
 AcDbEntity
 100
@@ -5471,7 +5347,7 @@ sheet_layer
  62
 256
 370
-18
+13
   6
 CONTINUOUS
  10
@@ -5525,7 +5401,7 @@ E
   3
 AcDbVariableDictionary
 350
-DC
+D8
   0
 DICTIONARY
   5
@@ -5989,7 +5865,7 @@ Layout2
   0
 DICTIONARY
   5
-DC
+D8
 100
 AcDbDictionary
 281
@@ -5997,15 +5873,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-DE
+DA
   3
 HIDETEXT
 350
-DD
+D9
   0
 DICTIONARYVAR
   5
-DD
+D9
 100
 DictionaryVariables
 280
@@ -6015,7 +5891,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-DE
+DA
 100
 DictionaryVariables
 280
