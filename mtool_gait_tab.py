@@ -538,6 +538,9 @@ class GaitTab(object):
         self.ui.staticEnableCheck.toggled.connect(
             self.handle_gait_config_change)
 
+        self.ui.legOrderEdit.editingFinished.connect(
+            self.handle_leg_order_editing_finished)
+
         self.command_spins = [
             (self.ui.commandXSpin, 'translate_x_mm_s'),
             (self.ui.commandYSpin, 'translate_y_mm_s'),
@@ -657,6 +660,12 @@ class GaitTab(object):
             self.ui.staticEnableCheck.setChecked(
                 config.getboolean('gaitconfig', 'static_enable'))
 
+        if config.has_option('gaitconfig', 'leg_order'):
+            self.ui.legOrderEdit.setText(self.validate_leg_order(
+                    config.get('gaitconfig', 'leg_order')))
+        else:
+            self.ui.legOrderEdit.setText(self.validate_leg_order(''))
+
         self.command_widget.read_settings(config)
 
         self.handle_leg_change(self.ui.gaitLegList.currentItem())
@@ -683,6 +692,37 @@ class GaitTab(object):
 
         config.set('gaitconfig', 'static_enable',
                    self.ui.staticEnableCheck.isChecked())
+
+        config.set('gaitconfig', 'leg_order',
+                   self.validate_leg_order(self.ui.legOrderEdit.text()))
+
+    def intify_leg_order(self, data):
+        if data == '':
+            return []
+        return [int(x) for x in data.split(',')]
+
+    def validate_leg_order(self, data):
+        """Accept data that is human entered.  Return a string
+        consisting of a list of comma separated leg numbers, where
+        each present leg appears once and exactly once."""
+        entered_values = []
+        try:
+            entered_values = self.intify_leg_order(data)
+        except:
+            pass
+
+        required_legs = self.ripple_config.mechanical.leg_config.keys()
+
+        actual_legs = []
+        for x in entered_values:
+            if x in required_legs:
+                actual_legs.append(x)
+
+        for x in required_legs:
+            if not x in actual_legs:
+                actual_legs.append(x)
+
+        return ','.join([str(x) for x in actual_legs])
 
     def handle_current_changed(self, index=2):
         if index != 2:
@@ -809,8 +849,8 @@ class GaitTab(object):
         self.ripple_config.position_margin_percent = \
             self.ui.positionMarginSpin.value()
 
-        self.ripple_config.leg_order = \
-            self.ripple_config.mechanical.leg_config.keys()
+        self.ripple_config.leg_order = self.intify_leg_order(
+            self.validate_leg_order(self.ui.legOrderEdit.text()))
 
         self.ripple_config.body_z_offset_mm = self.ui.bodyZOffsetSpin.value()
 
@@ -829,6 +869,11 @@ class GaitTab(object):
         self.update_gait_graph()
         self.handle_playback_config_change()
         self.update_allowable_commands()
+
+    def handle_leg_order_editing_finished(self):
+        self.ui.legOrderEdit.setText(self.validate_leg_order(
+                self.ui.legOrderEdit.text()))
+        self.handle_gait_config_change()
 
     def update_gait_graph(self):
         self.gait_graph_display.set_gait_graph(self.ripple_gait.get_gait_graph())

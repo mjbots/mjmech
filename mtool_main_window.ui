@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>927</width>
-    <height>952</height>
+    <width>1014</width>
+    <height>929</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -272,8 +272,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>618</width>
-                <height>768</height>
+                <width>705</width>
+                <height>745</height>
                </rect>
               </property>
              </widget>
@@ -862,7 +862,7 @@ p, li { white-space: pre-wrap; }
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>100</height>
+                 <height>80</height>
                 </size>
                </property>
               </widget>
@@ -1084,7 +1084,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QGroupBox" name="gaitGroup">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -1117,10 +1117,16 @@ p, li { white-space: pre-wrap; }
              </item>
              <item>
               <widget class="QToolBox" name="toolBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="minimumSize">
                 <size>
                  <width>220</width>
-                 <height>0</height>
+                 <height>240</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -1136,7 +1142,7 @@ QScrollBar:vertical {
 </string>
                </property>
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="page">
                 <property name="geometry">
@@ -1144,7 +1150,7 @@ QScrollBar:vertical {
                   <x>0</x>
                   <y>0</y>
                   <width>223</width>
-                  <height>147</height>
+                  <height>182</height>
                  </rect>
                 </property>
                 <attribute name="label">
@@ -1251,6 +1257,16 @@ QScrollBar:vertical {
                    </property>
                   </widget>
                  </item>
+                 <item row="5" column="0">
+                  <widget class="QLabel" name="label_5">
+                   <property name="text">
+                    <string>Leg order:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="1">
+                  <widget class="QLineEdit" name="legOrderEdit"/>
+                 </item>
                 </layout>
                </widget>
                <widget class="QWidget" name="page_2">
@@ -1259,7 +1275,7 @@ QScrollBar:vertical {
                   <x>0</x>
                   <y>0</y>
                   <width>220</width>
-                  <height>119</height>
+                  <height>182</height>
                  </rect>
                 </property>
                 <attribute name="label">
@@ -2096,7 +2112,7 @@ QScrollBar:vertical {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>927</width>
+     <width>1014</width>
      <height>20</height>
     </rect>
    </property>
