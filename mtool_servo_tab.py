@@ -47,6 +47,9 @@ class ServoTab(object):
             spawn(self.handle_move_to_pose))
         self.ui.updatePoseButton.clicked.connect(self.handle_update_pose)
 
+        self.ui.poseList.currentItemChanged.connect(
+            self.handle_poselist_current_changed)
+
         self.controller = None
         self.servo_update = BoolContext()
 
@@ -99,17 +102,34 @@ class ServoTab(object):
             doublespin.setRange(-180, 180)
             doublespin.setDecimals(1)
 
+            save = QtGui.QPushButton()
+            save.setText("Save")
+
+            move = QtGui.QPushButton()
+            move.setText("Move")
+
+            current = QtGui.QLabel()
+            current.setText('N/A')
+            current.setMinimumWidth(60)
+
             widget = QtGui.QWidget()
 
             layout = QtGui.QHBoxLayout(widget)
             layout.addWidget(label)
             layout.addWidget(slider)
             layout.addWidget(doublespin)
+            layout.addWidget(save)
+            layout.addWidget(move)
+            layout.addWidget(current)
 
             slider.valueChanged.connect(
                 functools.partial(self.handle_servo_slider, servo_id))
             doublespin.valueChanged.connect(
                 functools.partial(self.handle_servo_spin, servo_id))
+            save.clicked.connect(
+                functools.partial(self.handle_servo_save, servo_id))
+            move.clicked.connect(
+                functools.partial(self.handle_servo_move, servo_id))
 
             self.ui.scrollContents.layout().addWidget(widget)
 
@@ -117,7 +137,10 @@ class ServoTab(object):
                     'widget': widget,
                     'label': label,
                     'slider': slider,
-                    'doublespin': doublespin})
+                    'doublespin': doublespin,
+                    'save': save,
+                    'move': move,
+                    'current': current})
 
     def handle_power(self):
         text = self.ui.powerCombo.currentText().lower()
@@ -161,6 +184,26 @@ class ServoTab(object):
             value = control['doublespin'].value()
             control['slider'].setSliderPosition(int(value))
             eventlet.spawn(self.set_single_pose, servo_id, value)
+
+    def handle_servo_save(self, servo_id):
+        if self.ui.poseList.currentRow() < 0:
+            return
+
+        current_data = self.ui.poseList.currentItem().data(
+            QtCore.Qt.UserRole)
+        current_data[servo_id] = (
+            self.servo_controls[servo_id]['doublespin'].value())
+        self.ui.poseList.currentItem().setData(
+            QtCore.Qt.UserRole, current_data)
+
+        self.handle_poselist_current_changed(None, None)
+
+    def handle_servo_move(self, servo_id):
+        if self.ui.poseList.currentRow() < 0:
+            return
+
+        data = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
+        self.servo_controls[servo_id]['doublespin'].setValue(data[servo_id])
 
     def handle_capture_current(self):
         with self.servo_update:
@@ -225,6 +268,15 @@ class ServoTab(object):
 
         self.ui.poseList.currentItem().setData(
             QtCore.Qt.UserRole, self.generate_pose_data())
+        self.handle_poselist_current_changed(None, None)
+
+    def handle_poselist_current_changed(self, current, previous):
+        if self.ui.poseList.currentRow() < 0:
+            return
+
+        data = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
+        for i, control in enumerate(self.servo_controls):
+            control['current'].setText('%.1f' % data[i])
 
     def read_settings(self, config):
         if not config.has_section('servo'):

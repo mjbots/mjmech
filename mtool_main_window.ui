@@ -24,145 +24,193 @@
        <attribute name="title">
         <string>Servo Control</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,6">
         <item>
-         <widget class="QGroupBox" name="configurationGroup">
-          <property name="title">
-           <string>Configuration</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="typeLabel">
-             <property name="text">
-              <string>Type:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1" colspan="2">
-            <widget class="QComboBox" name="typeCombo">
+         <layout class="QVBoxLayout" name="verticalLayout_14" stretch="1,6">
+          <item>
+           <widget class="QGroupBox" name="configurationGroup">
+            <property name="title">
+             <string>Configuration</string>
+            </property>
+            <layout class="QFormLayout" name="formLayout_9">
+             <item row="0" column="0">
+              <widget class="QLabel" name="typeLabel">
+               <property name="text">
+                <string>Type:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="typeCombo">
+               <item>
+                <property name="text">
+                 <string>HerkuleX</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Gazebo</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="serialPortLabel">
+               <property name="text">
+                <string>Serial Port:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="serialPortCombo">
+               <property name="editable">
+                <bool>true</bool>
+               </property>
+               <item>
+                <property name="text">
+                 <string>/dev/ttyUSB0</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>/dev/ttyUSB1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>/dev/ttyS0</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>/dev/ttyS1</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="modelLabel">
+               <property name="text">
+                <string>Gazebo Model:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="modelEdit">
+               <property name="text">
+                <string>mj_mech</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QPushButton" name="connectButton">
+               <property name="text">
+                <string>Connect</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0" colspan="2">
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0">
+              <widget class="QLabel" name="statusLabel">
+               <property name="text">
+                <string>Status:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <widget class="QLabel" name="statusText">
+               <property name="text">
+                <string>stuff</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QLabel" name="servoCountLabel">
+               <property name="text">
+                <string>Servo Count:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="1">
+              <widget class="QSpinBox" name="servoCountSpin">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>253</number>
+               </property>
+               <property name="value">
+                <number>14</number>
+               </property>
+              </widget>
+             </item>
+             <item row="13" column="1">
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>276</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="posesGroup">
+            <property name="title">
+             <string>Poses</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <property name="text">
-               <string>HerkuleX</string>
-              </property>
+              <widget class="QListWidget" name="poseList"/>
              </item>
              <item>
-              <property name="text">
-               <string>Gazebo</string>
-              </property>
+              <layout class="QGridLayout" name="gridLayout_4">
+               <item row="0" column="0">
+                <widget class="QPushButton" name="addPoseButton">
+                 <property name="text">
+                  <string>Add Pose</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QPushButton" name="removePoseButton">
+                 <property name="text">
+                  <string>Remove Pose</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QPushButton" name="moveToPoseButton">
+                 <property name="text">
+                  <string>Move all Servos</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QPushButton" name="updatePoseButton">
+                 <property name="text">
+                  <string>Save all Servos</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="serialPortLabel">
-             <property name="text">
-              <string>Serial Port:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QComboBox" name="serialPortCombo">
-             <property name="editable">
-              <bool>true</bool>
-             </property>
-             <item>
-              <property name="text">
-               <string>/dev/ttyUSB0</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>/dev/ttyUSB1</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>/dev/ttyS0</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>/dev/ttyS1</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="modelLabel">
-             <property name="text">
-              <string>Gazebo Model:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1" colspan="2">
-            <widget class="QLineEdit" name="modelEdit">
-             <property name="text">
-              <string>mj_mech</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1" colspan="2">
-            <widget class="QPushButton" name="connectButton">
-             <property name="text">
-              <string>Connect</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="3">
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="statusLabel">
-             <property name="text">
-              <string>Status:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QLabel" name="statusText">
-             <property name="text">
-              <string>stuff</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="servoCountLabel">
-             <property name="text">
-              <string>Servo Count:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1" colspan="2">
-            <widget class="QSpinBox" name="servoCountSpin">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>253</number>
-             </property>
-             <property name="value">
-              <number>14</number>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="2">
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>276</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QGroupBox" name="controlGroup">
@@ -224,56 +272,12 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>290</width>
+                <width>618</width>
                 <height>768</height>
                </rect>
               </property>
              </widget>
             </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="posesGroup">
-          <property name="title">
-           <string>Poses</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QListWidget" name="poseList"/>
-           </item>
-           <item>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <item row="0" column="0">
-              <widget class="QPushButton" name="addPoseButton">
-               <property name="text">
-                <string>Add Pose</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="removePoseButton">
-               <property name="text">
-                <string>Remove Pose</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="moveToPoseButton">
-               <property name="text">
-                <string>Move to Pose</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="updatePoseButton">
-               <property name="text">
-                <string>Update Pose</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </item>
           </layout>
          </widget>
