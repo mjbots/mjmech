@@ -94,6 +94,25 @@ class HerkuleXController(object):
 
         return result
 
+    def get_temperature(self, idents=[]):
+        """Determine the temperature as measured at each servo.
+
+        :returns: a dictionary mapping identifier to temperature in C"""
+        result = {}
+        for ident in idents:
+            result[ident] = self.port.temperature_C(ident)
+        return result
+
+    def get_voltage(self, idents=[]):
+        """Determine the voltage as measured at each servo.
+
+        :returns: a dictionary mapping identifier to voltage"""
+        result = {}
+        for ident in idents:
+            result[ident] = self.port.voltage(ident)
+        return result
+
+
 class GazeboController(object):
     def __init__(self, model_name):
         self.manager = pygazebo.Manager()

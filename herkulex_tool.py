@@ -27,6 +27,12 @@ def do_reboot(servo, options):
 def do_status(servo, options):
     print servo.status(get_address(options))
 
+def do_voltage(servo, options):
+    print servo.voltage(get_address(options))
+
+def do_temperature(servo, options):
+    print servo.temperature_C(get_address(options))
+
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-a', '--address', default=None,
@@ -41,6 +47,10 @@ def main():
                       help='reboot servos')
     parser.add_option('-s', '--status', action='store_true', default=None,
                       help='query status of servo')
+    parser.add_option('-v', '--voltage', action='store_true', default=None,
+                      help='query voltage of servo')
+    parser.add_option('-t', '--temperature', action='store_true', default=None,
+                      help='query temperature of servo')
 
     (options, args) = parser.parse_args()
 
@@ -49,6 +59,8 @@ def main():
         'set_address': do_set_address,
         'reboot': do_reboot,
         'status': do_status,
+        'voltage': do_voltage,
+        'temperature': do_temperature,
         }
 
     action_func = None

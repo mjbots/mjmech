@@ -16,10 +16,12 @@ def spawn(callback):
     return task
 
 class ServoTab(object):
-    def __init__(self, ui):
+    def __init__(self, ui, status):
         self.ui = ui
+        self.status = status
 
         self.servo_controls = []
+        self.monitor_thread = None
 
         self.ui.statusText.setText('not connected')
         self.ui.connectButton.clicked.connect(
@@ -159,8 +161,52 @@ class ServoTab(object):
     def update_connected(self, value):
         self.ui.controlGroup.setEnabled(value)
         self.ui.posesGroup.setEnabled(value)
+
+        if self.monitor_thread is not None:
+            self.monitor_thread.cancel()
+            self.monitor_thread = None
+
         if value:
             self.handle_power()
+            self.monitor_thread = eventlet.spawn(self.monitor_status)
+
+    def monitor_status(self):
+        voltages = {}
+        temperatures = {}
+        ident = 0
+        while True:
+            if (self.controller is not None and
+                hasattr(self.controller, 'get_voltage')):
+
+                ident = (ident + 1) % len(self.servo_controls)
+
+                this_voltage = self.controller.get_voltage([ident])
+                voltages.update(this_voltage)
+
+                eventlet.sleep(0.0)
+
+                # Get all temperatures.
+                this_temp = self.controller.get_temperature([ident])
+                temperatures.update(this_temp)
+
+                def non_None(value):
+                    return [x for x in value if x is not None]
+
+                message = "Servo status: "
+                if len(non_None(voltages.values())):
+                    message += "%.1f/%.1fV" % (
+                        min(non_None(voltages.values())),
+                        max(non_None(voltages.values())))
+
+                if len(non_None(temperatures.values())):
+                    message += " %.1f/%.1fC" % (
+                        min(non_None(temperatures.values())),
+                        max(non_None(temperatures.values())))
+
+                self.status.showMessage(message, 10000)
+
+            eventlet.sleep(2.0)
+
 
     def set_single_pose(self, servo_id, value):
         self.controller.set_single_pose(servo_id, value, pose_time=0.2)

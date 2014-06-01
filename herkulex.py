@@ -288,6 +288,14 @@ class HerkuleX(object):
         except eventlet.timeout.Timeout:
             return None
 
+    def voltage(self, servo):
+        try:
+            value = self.ram_read(servo, 54, 1).data[0]
+
+            return 0.074 * value
+        except eventlet.timeout.Timeout:
+            return None
+
     def position(self, servo):
         try:
             # NOTE: The datasheet appears to be off here.

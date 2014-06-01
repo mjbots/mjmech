@@ -34,7 +34,7 @@ class Mtool(QtGui.QMainWindow):
         self.ui = mtool_main_window.Ui_MtoolMainWindow()
         self.ui.setupUi(self)
 
-        self.servo_tab = ServoTab(self.ui)
+        self.servo_tab = ServoTab(self.ui, self.statusBar())
         self.ikconfig_tab = IkConfigTab(self.ui, self.servo_tab)
         self.gait_tab = GaitTab(self.ui, self.ikconfig_tab, self.servo_tab)
 
