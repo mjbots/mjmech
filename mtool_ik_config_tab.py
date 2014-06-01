@@ -349,6 +349,8 @@ class IkConfigTab(object):
 
             self.update_config_enable()
 
+            self.handle_ik_config_change()
+
     def get_plane(self):
         value = self.ui.planeCombo.currentIndex()
         if value == 0:
