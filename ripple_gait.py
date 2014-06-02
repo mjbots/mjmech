@@ -50,9 +50,9 @@ class RippleState(CommonState):
         self.action = 0
 
         # robot_frame coordinates describing the start and end
-        # position of the current swing leg.
-        self.swing_start_pos = tf.Point3D()
-        self.swing_end_pos = tf.Point3D()
+        # position of the current swing leg(s).
+        self.swing_start_pos = {}
+        self.swing_end_pos = {}
 
         self.world_frame = tf.Frame()
         self.robot_frame = tf.Frame(None, None, self.world_frame)
@@ -65,8 +65,12 @@ class RippleState(CommonState):
 
         result.phase = self.phase
         result.action = self.action
-        result.swing_start_pos = self.swing_start_pos.copy()
-        result.swing_end_pos = self.swing_end_pos.copy()
+        result.swing_start_pos = dict(
+            [(key, value.copy()) for key, value in
+             self.swing_start_pos.iteritems()])
+        result.swing_end_pos = dict(
+            [(key, value.copy()) for key, value in
+             self.swing_end_pos.iteritems()])
 
         return result
 
@@ -77,13 +81,22 @@ class Options(object):
     cycle_time_s = 0.0
     servo_speed_dps = 0.0
 
+def _iterate_legs(leg_group):
+    """Given a leg group (either a scalar leg number, or a tuple of
+    legs), iterate over all of them."""
+    if isinstance(leg_group, int):
+        yield leg_group
+    else:
+        for x in leg_group:
+            yield x
+
 class RippleGait(object):
     ACTION_START_SWING, ACTION_START_STANCE, ACTION_END = range(3)
 
     def __init__(self, config):
         self.config = config
 
-        self.num_legs = len(config.mechanical.leg_config)
+        self.num_legs = len(config.leg_order)
 
         self.cycle_time_s = None
         self.state = self.get_idle_state()
@@ -105,11 +118,11 @@ class RippleGait(object):
 
         for i in range(self.num_legs):
             fraction = float(i) / self.num_legs
-            leg_num = self.config.leg_order[i]
+            leg_group = self.config.leg_order[i]
             self.actions.append(
-                (fraction, leg_num, self.ACTION_START_SWING))
+                (fraction, leg_group, self.ACTION_START_SWING))
             self.actions.append(
-                (fraction + swing_time, leg_num, self.ACTION_START_STANCE))
+                (fraction + swing_time, leg_group, self.ACTION_START_STANCE))
 
         self.actions.append((1.0, -1, self.ACTION_END))
 
@@ -364,7 +377,7 @@ class RippleGait(object):
         leg_cycle_time = 1.0 / self.num_legs
 
         result = GaitGraph()
-        for leg_number in self.config.leg_order:
+        for leg_group in self.config.leg_order:
             graph_leg = GaitGraphLeg()
 
             graph_leg.sequence = [
@@ -373,7 +386,8 @@ class RippleGait(object):
             if start_phase != 0:
                 graph_leg.sequence = [(0.0, STANCE)] + graph_leg.sequence
 
-            result.leg[leg_number] = graph_leg
+            for leg_number in _iterate_legs(leg_group):
+                result.leg[leg_number] = graph_leg
 
             start_phase += leg_cycle_time
 
@@ -385,26 +399,29 @@ class RippleGait(object):
         return self.advance_phase(delta_s / self._phase_time())
 
     def _do_action(self, action_index):
-        phase, leg_num, action = self.actions[action_index]
+        phase, leg_group, action = self.actions[action_index]
 
         if action == self.ACTION_START_STANCE:
-            leg = self.state.legs[leg_num]
+            for leg_num in _iterate_legs(leg_group):
+                leg = self.state.legs[leg_num]
 
-            leg.mode = STANCE
-            leg.point = self.state.world_frame.map_from_frame(
-                leg.frame, leg.point)
-            leg.point.z = 0.0
-            leg.frame = self.state.world_frame
+                leg.mode = STANCE
+                leg.point = self.state.world_frame.map_from_frame(
+                    leg.frame, leg.point)
+                leg.point.z = 0.0
+                leg.frame = self.state.world_frame
         elif action == self.ACTION_START_SWING:
-            leg = self.state.legs[leg_num]
+            for leg_num in _iterate_legs(leg_group):
+                leg = self.state.legs[leg_num]
 
-            leg.mode = SWING
-            leg.point = self.state.robot_frame.map_from_frame(
-                leg.frame, leg.point)
-            leg.frame = self.state.robot_frame
+                leg.mode = SWING
+                leg.point = self.state.robot_frame.map_from_frame(
+                    leg.frame, leg.point)
+                leg.frame = self.state.robot_frame
 
-            self.state.swing_start_pos = leg.point.copy()
-            self.state.swing_end_pos = self._get_swing_end_pos(leg_num)
+                self.state.swing_start_pos[leg_num] = leg.point.copy()
+                self.state.swing_end_pos[leg_num] = (
+                    self._get_swing_end_pos(leg_num))
 
     def _get_update_frame(self, dt, command=None):
         if command is None:
@@ -440,7 +457,7 @@ class RippleGait(object):
         self.state.robot_frame.transform = new_transform
 
         # Update the legs which are in swing.
-        for leg in self.state.legs.values():
+        for leg_num, leg in self.state.legs.iteritems():
             if leg.mode == SWING:
                 leg_phase = ((final_phase % (1.0 / self.num_legs)) /
                              self._swing_phase_time())
@@ -448,8 +465,10 @@ class RippleGait(object):
                 if delta_phase > 0.0 and leg_phase == 0.0:
                     leg_phase = 1.0
                 assert leg.frame is self.state.robot_frame
-                delta = self.state.swing_end_pos - self.state.swing_start_pos
-                current = self.state.swing_start_pos + delta.scaled(leg_phase)
+                delta = (self.state.swing_end_pos[leg_num] -
+                         self.state.swing_start_pos[leg_num])
+                current = (self.state.swing_start_pos[leg_num] +
+                           delta.scaled(leg_phase))
                 leg.point = current
 
                 if leg_phase < 0.1:
@@ -529,17 +548,17 @@ class RippleGait(object):
     def _get_current_support_poly_robot_frame(self):
         next_action = self.actions[self.state.action]
 
-        _, action_leg_num, action = next_action
+        _, action_leg_group, action = next_action
 
         if action == self.ACTION_END:
-            _, action_leg_num, action = self.actions[0]
+            _, action_leg_group, action = self.actions[0]
 
         legs = []
         if action == self.ACTION_START_SWING:
             # The next action is a lift, which means we should use all
             # legs but this one.
             legs = [x for x in self.state.legs.keys()
-                    if x != action_leg_num]
+                    if x not in list(_iterate_legs(action_leg_group))]
         elif action == self.ACTION_START_STANCE:
             # We must have a leg in the air now, so use the current
             # set of stance legs.
