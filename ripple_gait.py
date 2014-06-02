@@ -1,78 +1,14 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import bisect
-import copy
 import math
 
+from gait_common import (STANCE, SWING, UNKNOWN)
+from gait_common import (LegConfig, MechanicalConfig)
+from gait_common import (LegResult, Command, GaitGraphLeg, GaitGraph, LegState)
+from gait_common import (NotSupported, CommonState)
 import geometry
-import leg_ik
 import tf
-
-# These are possible modes for each of the legs.
-
-# In this phase, the leg is intended to be fixed relative to the
-# ground.
-STANCE = 0
-
-# In this phase, the leg is not intended to be in contact with the
-# ground.
-SWING = 1
-
-# This mode is used when the current mode is not known.
-UNKNOWN = 2
-
-
-class LegConfig(object):
-    # The mounting positions are relative to the geometric center of
-    # the body.
-    mount_x_mm = 0
-    mount_y_mm = 0
-    mount_z_mm = 0
-
-    # The idle positions are measured relative to the ground under
-    # each mounting location, with the unique property that positive x
-    # is defined always as away from the midline and y is defined as
-    # away from the centerline.  (This means that it is valid for all
-    # leg's idle states to be the same).
-    idle_x_mm = 100
-    idle_y_mm = 0
-    idle_z_mm = 0
-
-    leg_ik = None
-
-    def copy(self):
-        result = LegConfig()
-        result.mount_x_mm = self.mount_x_mm
-        result.mount_y_mm = self.mount_y_mm
-        result.mount_z_mm = self.mount_z_mm
-
-        result.idle_x_mm = self.idle_x_mm
-        result.idle_y_mm = self.idle_y_mm
-        result.idle_z_mm = self.idle_z_mm
-
-        result.leg_ik = self.leg_ik
-        return result
-
-class MechanicalConfig(object):
-    def __init__(self):
-        # A map from leg number to LegConfig instances.
-        self.leg_config = {}
-
-        # The center of gravity relative to the geometric center.
-        self.body_cog_x_mm = None
-        self.body_cog_y_mm = None
-        self.body_cog_z_mm = None
-
-    def copy(self):
-        result = MechanicalConfig()
-        for leg_num, leg in self.leg_config.iteritems():
-            result.leg_config[leg_num] = leg.copy()
-        result.body_cog_x_mm = self.body_cog_x_mm
-        result.body_cog_y_mm = self.body_cog_y_mm
-        result.body_cog_z_mm = self.body_cog_z_mm
-
-        return result
-
 
 class RippleConfig(object):
     def __init__(self):
@@ -107,56 +43,7 @@ class RippleConfig(object):
 
         return result
 
-
-class LegResult(object):
-    '''This gives the relative position of the leg to the shoulder
-    joint where it mounts onto the body.'''
-    def __init__(self):
-        self.point = leg_ik.Point3D(0., 0., 0.)
-        self.mode = STANCE
-
-class Command(object):
-    translate_x_mm_s = 0.0
-    translate_y_mm_s = 0.0
-    rotate_deg_s = 0.0
-    body_x_mm = 0.0
-    body_y_mm = 0.0
-    body_z_mm = 0.0
-    body_pitch_deg = 0.0
-    body_roll_deg = 0.0
-    body_yaw_deg = 0.0
-
-    def copy(self):
-        return copy.copy(self)
-
-
-class GaitGraphLeg(object):
-    sequence = None
-    '''A list of tuples (phase, mode)
-        phase - the gait phase where this mode starts
-        mode - a leg mode describing what the leg starts doing
-               at this time
-    '''
-
-class GaitGraph(object):
-    def __init__(self):
-        # This is a mapping of leg numbers to GaitGraphLeg instances.
-        self.leg = {}
-
-class LegState(object):
-    '''This keeps track of the robot position coordinates of each
-    leg.'''
-    def __init__(self):
-        self.point = leg_ik.Point3D(0., 0., 0.)
-        self.mode = STANCE
-        self.frame = None
-        self.shoulder_frame = None
-        self.leg_ik = None
-
-    def __repr__(self):
-        return '<LegState p=%r m=%d f=%s>' % (self.point, self.mode, self.frame)
-
-class RippleState(object):
+class RippleState(CommonState):
     def __init__(self):
         self.legs = {}
         self.phase = 0.
@@ -164,8 +51,8 @@ class RippleState(object):
 
         # robot_frame coordinates describing the start and end
         # position of the current swing leg.
-        self.swing_start_pos = leg_ik.Point3D()
-        self.swing_end_pos = leg_ik.Point3D()
+        self.swing_start_pos = tf.Point3D()
+        self.swing_end_pos = tf.Point3D()
 
         self.world_frame = tf.Frame()
         self.robot_frame = tf.Frame(None, None, self.world_frame)
@@ -174,53 +61,17 @@ class RippleState(object):
 
     def copy(self):
         result = RippleState()
-        for key, value in self.legs.iteritems():
-            leg = LegState()
-            leg.point = value.point.copy()
-            leg.mode = value.mode
-            if value.frame is self.world_frame:
-                leg.frame = result.world_frame
-            elif value.frame is self.robot_frame:
-                leg.frame = result.robot_frame
-            elif value.frame is self.body_frame:
-                leg.frame = result.body_frame
-            leg.shoulder_frame = tf.Frame(
-                value.shoulder_frame.transform.translation.copy(),
-                value.shoulder_frame.transform.rotation.copy(),
-                result.body_frame)
-            leg.leg_ik = value.leg_ik
-            result.legs[key] = leg
+        super(RippleState, self).copy_into(result)
 
         result.phase = self.phase
         result.action = self.action
         result.swing_start_pos = self.swing_start_pos.copy()
         result.swing_end_pos = self.swing_end_pos.copy()
 
-        result.world_frame.transform = self.world_frame.transform.copy()
-        result.robot_frame.transform = self.robot_frame.transform.copy()
-        result.body_frame.transform = self.body_frame.transform.copy()
-        result.cog_frame.transform = self.cog_frame.transform.copy()
-
-        return result
-
-    def command_dict(self):
-        result = {}
-        for leg in self.legs.itervalues():
-            shoulder_point = leg.shoulder_frame.map_from_frame(
-                leg.frame, leg.point)
-            ik_result = leg.leg_ik.do_ik(shoulder_point)
-            if ik_result is None:
-                raise NotSupported()
-            result.update(ik_result.command_dict())
         return result
 
 def _sign(val):
     return -1.0 if (val < 0.0) else 1.0
-
-class NotSupported(RuntimeError):
-    '''The given command is not realizable given the robot
-    configuration.'''
-    pass
 
 class Options(object):
     cycle_time_s = 0.0
@@ -460,7 +311,7 @@ class RippleGait(object):
         for leg_data in self.config.mechanical.leg_config.iteritems():
             leg_number, leg_config = leg_data
 
-            point = leg_ik.Point3D(0., 0., 0.)
+            point = tf.Point3D(0., 0., 0.)
 
             x_sign = _sign(leg_config.mount_x_mm)
             point.x = leg_config.mount_x_mm + leg_config.idle_x_mm * x_sign
@@ -753,11 +604,6 @@ class RippleGait(object):
 
     def _swing_phase_time(self):
         return (1.0 / self.num_legs) * 0.01 * self.config.swing_percent
-
-    def _guess_phase(self):
-        '''Attempt to fill in the phase member, and any UNKNOWN
-        LegState fields.'''
-        raise NotImplementedError()
 
     def _get_swing_end_pos(self, leg_num):
         # Target swing end positions such that during stance, the leg
