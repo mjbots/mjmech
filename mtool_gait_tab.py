@@ -17,7 +17,7 @@ import tf
 from mtool_common import BoolContext
 import mtool_graphics_scene
 
-PLAYBACK_TIMEOUT_MS = 50
+PLAYBACK_TIMEOUT_MS = 20
 
 class GaitGeometryDisplay(object):
     FRAME_ROBOT, FRAME_WORLD, FRAME_BODY = range(3)
@@ -697,14 +697,52 @@ class GaitTab(object):
                    self.validate_leg_order(self.ui.legOrderEdit.text()))
 
     def intify_leg_order(self, data):
+        result = []
         if data == '':
-            return []
-        return [int(x) for x in data.split(',')]
+            return result
+
+        in_tuple = False
+        current_tuple = ()
+        current_item = ''
+        for x in data:
+            if x == '(':
+                if in_tuple:
+                    return result
+                in_tuple = True
+
+            if x >= '0' and x <= '9':
+                current_item += x
+            else:
+                if len(current_item):
+                    value = int(current_item)
+                    current_item = ''
+                    if in_tuple:
+                        current_tuple += (value,)
+                    else:
+                        result.append(value)
+                if x == ')':
+                    if not in_tuple:
+                        return result
+                    if len(current_tuple) == 1:
+                        result.append(current_tuple[0])
+                    elif len(current_tuple) > 1:
+                        result.append(current_tuple)
+                    current_tuple = ()
+                    in_tuple = False
+
+        if len(current_item):
+            result.append(int(current_item))
+
+        return result
+
+    def stringify_leg_order(self, data):
+        assert isinstance(data, list)
+        return str(data)[1:-1].replace(' ', '')
 
     def validate_leg_order(self, data):
         """Accept data that is human entered.  Return a string
-        consisting of a list of comma separated leg numbers, where
-        each present leg appears once and exactly once."""
+        containing a valid leg ordering, which will consist of a comma
+        separate list of leg numbers, or tuples of leg numbers."""
         entered_values = []
         try:
             entered_values = self.intify_leg_order(data)
@@ -713,16 +751,30 @@ class GaitTab(object):
 
         required_legs = self.ripple_config.mechanical.leg_config.keys()
 
+        used_legs = {}
         actual_legs = []
-        for x in entered_values:
-            if x in required_legs:
-                actual_legs.append(x)
+        for group in entered_values:
+            if isinstance(group, int):
+                x = group
+                if x in required_legs and not x in used_legs:
+                    actual_legs.append(x)
+                    used_legs[x] = True
+            else:
+                next_tuple = ()
+                for x in group:
+                    if x in required_legs and not x in used_legs:
+                        next_tuple += (x,)
+                        used_legs[x] = True
+                if len(next_tuple) > 1:
+                    actual_legs.append(next_tuple)
+                elif len(next_tuple) == 1:
+                    actual_legs.append(next_tuple[0])
 
         for x in required_legs:
-            if not x in actual_legs:
+            if not x in used_legs:
                 actual_legs.append(x)
 
-        return ','.join([str(x) for x in actual_legs])
+        return self.stringify_leg_order(actual_legs)
 
     def handle_current_changed(self, index=2):
         if index != 2:
