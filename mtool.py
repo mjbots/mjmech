@@ -73,7 +73,7 @@ def eventlet_pyside_mainloop(app):
     def on_timeout():
         eventlet.sleep()
     timer.timeout.connect(on_timeout)
-    timer.start(10)
+    timer.start(5)
     app.exec_()
 
 def main():
