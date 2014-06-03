@@ -534,8 +534,11 @@ class RippleGait(object):
                 self.config.static_stable_factor *
                 self.config.static_margin_mm /
                 self.options.cycle_time_s)
-            poly_vel = delta.scaled(
-                -scale * static_stable_velocity_mm_s / delta.length())
+            if delta.length() > 0.0:
+                poly_vel = delta.scaled(
+                    -scale * static_stable_velocity_mm_s / delta.length())
+            else:
+                poly_vel = tf.Point3D()
             if (dt * poly_vel.length()) > delta.length():
                 poly_vel = poly_vel.scaled(
                     delta.length() / (dt * poly_vel.length()))
