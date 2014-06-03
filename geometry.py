@@ -24,6 +24,10 @@ def poly_centroid(poly):
     # Our polygon must be an open one.
     assert poly[0] != poly[-1]
 
+    if len(poly) == 2:
+        # This "polygon" is actually a line.  Just return the center.
+        return (poly[0] + poly[1]).scaled(0.5)
+
     area = signed_poly_area(poly)
 
     sumx = 0.0
