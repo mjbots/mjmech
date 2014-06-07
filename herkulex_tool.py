@@ -2,6 +2,8 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import trollius as asyncio
+from trollius import From, Return
 import optparse
 
 import herkulex
@@ -12,26 +14,33 @@ def get_address(options):
 
     return int(options.address)
 
+@asyncio.coroutine
 def do_enumerate(servo, options):
-    print servo.enumerate()
+    print(yield From(servo.enumerate()))
 
+@asyncio.coroutine
 def do_set_address(servo, options):
     address = int(options.set_address)
     if address == servo.BROADCAST:
         raise RuntimeError('address cannot be set using broadcast address')
-    servo.eep_write(get_address(options), servo.EEP_ID, [ address ])
+    yield From(
+        servo.eep_write(get_address(options), servo.EEP_ID, [ address ]))
 
+@asyncio.coroutine
 def do_reboot(servo, options):
-    servo.reboot(get_address(options))
+    yield From(servo.reboot(get_address(options)))
 
+@asyncio.coroutine
 def do_status(servo, options):
-    print servo.status(get_address(options))
+    print(yield From(servo.status(get_address(options))))
 
+@asyncio.coroutine
 def do_voltage(servo, options):
-    print servo.voltage(get_address(options))
+    print(yield From(servo.voltage(get_address(options))))
 
+@asyncio.coroutine
 def do_temperature(servo, options):
-    print servo.temperature_C(get_address(options))
+    print(yield From(servo.temperature_C(get_address(options))))
 
 def main():
     parser = optparse.OptionParser()
@@ -72,8 +81,9 @@ def main():
 
     servo = herkulex.HerkuleX(options.device)
 
+    loop = asyncio.get_event_loop()
     if action_func is not None:
-        action_func(servo, options)
+        loop.run_until_complete(action_func(servo, options))
         return
     else:
         raise RuntimeError('no action specified')

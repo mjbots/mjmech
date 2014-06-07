@@ -2,11 +2,12 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-import eventlet
+import trollius as asyncio
+from trollius import From, Return
 import logging
 import threading
 
-import eventlet_serial
+import asyncio_serial
 
 logger = logging.getLogger(__name__)
 
@@ -89,31 +90,34 @@ class HerkuleX(object):
     def __init__(self, serial_port):
         self.baud_rate = 115200
         if isinstance(serial_port, str) or isinstance(serial_port, unicode):
-            self.serial = eventlet_serial.EventletSerial(
+            self.serial = asyncio_serial.AsyncioSerial(
                 port=serial_port, baudrate=115200)
         else:
             # Assume it is a file like object.
             self.serial = serial_port
 
+    @asyncio.coroutine
     def enumerate(self):
         """Enumerate the list of servos on the bus.  Note, this will
-        take approximately 5s to complete.  Spawn a new eventlet
-        greenthread if you can't block that long.
+        take approximately 5s to complete.
 
         :returns: a list of integer servo IDs
         """
         result = []
         for servo in range(0xfe):
-            with eventlet.timeout.Timeout(0.02, False):
-                self.status(servo)
+            try:
+                yield From(asyncio.wait_for(self.status(servo), 0.02))
                 result.append(servo)
+            except asyncio.TimeoutError:
+                pass
 
-        return result
+        raise Return(result)
 
     def _cksum1(self, size, servo, cmd, data):
         return (size ^ servo ^ cmd ^
                 reduce(lambda a, b: a ^ b, [ord(x) for x in data], 0x00))
 
+    @asyncio.coroutine
     def _raw_send_packet(self, servo, cmd, data):
         assert servo >= 0 and servo <= 0xfe
         assert cmd >= 0 and cmd <= 0xff
@@ -124,30 +128,37 @@ class HerkuleX(object):
         to_write = ('\xff\xff' + chr(7 + len(data)) + chr(servo) + chr(cmd) +
                     chr(cksum1 & 0xfe) + chr(cksum2 & 0xfe)) + data
 
-        self.serial.write(to_write)
+        yield From(self.serial.write(to_write))
 
+    @asyncio.coroutine
     def send_packet(self, servo, cmd, data):
-        with self.serial.sem_write:
-            self._raw_send_packet(servo, cmd, data)
+        with (yield From(self.serial.write_lock)):
+            yield From(self._raw_send_packet(servo, cmd, data))
 
+    @asyncio.coroutine
     def _raw_recv_packet(self):
-        with eventlet.timeout.Timeout(max(0.1, 6*10 / self.baud_rate + 0.01)):
+        
+        @asyncio.coroutine
+        def read_frame_header():
             # Read until we get a frame header.
             maybe_header = ''
             while maybe_header != '\xff\xff':
-                maybe_header += self.serial.read(
-                    max(1, min(2, 2 - len(maybe_header))))
+                maybe_header += yield From(self.serial.read(
+                        max(1, min(2, 2 - len(maybe_header)))))
                 if len(maybe_header) > 2:
                     maybe_header = maybe_header[-2:]
 
-        with eventlet.timeout.Timeout(max(0.1, 5*10 / self.baud_rate + 0.005)):
-            # Got a header.  Now read the rest.
-            size, servo, cmd, cksum1, cksum2 = \
-                [ord(x) for x in self.serial.read(5)]
+        yield From(asyncio.wait_for(
+                read_frame_header(),
+                max(0.1, 6 * 10 / self.baud_rate + 0.01)))
 
-        with eventlet.timeout.Timeout(max(0.1, (size - 7) * 10 /
-                                          self.baud_rate + 0.005)):
-            data = self.serial.read(size - 7)
+        header = yield From(asyncio.wait_for(
+                self.serial.read(5), max(0.1, 5*10 / self.baud_rate + 0.005)))
+        size, servo, cmd, cksum1, cksum2 = [ord(x) for x in header]
+
+        data = yield From(asyncio.wait_for(
+                self.serial.read(size - 7),
+                max(0.1, (size - 7) * 10 / self.baud_rate + 0.005)))
 
         expected_cksum1 = self._cksum1(size, servo, cmd, data)
         expected_cksum2 = expected_cksum1 ^ 0xff
@@ -162,30 +173,37 @@ class HerkuleX(object):
         if not result.cksum_good:
             raise ChecksumError(result)
 
-        return result
+        raise Return(result)
 
+    @asyncio.coroutine
     def recv_packet(self):
-        with self.serial.sem_read:
-            return self._raw_recv_packet()
+        with (yield From(self.serial.read_lock)):
+            result = yield From(self._raw_recv_packet())
+            raise Return(result)
 
+    @asyncio.coroutine
     def send_recv_packet(self, servo, cmd, data):
-        with self.serial.sem_write, self.serial.sem_read:
-            self._raw_send_packet(servo, cmd, data)
-            return self._raw_recv_packet()
+        with (yield From(self.serial.write_lock)):
+            with (yield From(self.serial.read_lock)):
+                yield From(self._raw_send_packet(servo, cmd, data))
+                result = yield From(self._raw_recv_packet())
+                raise Return(result)
 
-
+    @asyncio.coroutine
     def mem_read(self, cmd, servo, reg, length):
         assert cmd >= 0 and cmd <= 0xff
         assert reg >= 0 and reg <= 0xff
         assert length >= 0 and length <= 0x7f
 
-        received = self.send_recv_packet(servo, cmd, chr(reg) + chr(length))
+        received = yield From(self.send_recv_packet(
+                servo, cmd, chr(reg) + chr(length)))
         assert received.servo == servo or servo == self.BROADCAST
         assert received.cmd == (0x40 | cmd)
         assert len(received.data) == length + 4
 
-        return MemReadResponse([ord(x) for x in received.data])
+        raise Return(MemReadResponse([ord(x) for x in received.data]))
 
+    @asyncio.coroutine
     def mem_write(self, cmd, servo, reg, data):
         assert cmd >= 0 and cmd <= 0xff
         assert reg >= 0 and reg <= 0xff
@@ -193,22 +211,31 @@ class HerkuleX(object):
         for x in data:
             assert x >= 0 and x <= 0xff
 
-        self.send_packet(servo, cmd,
-                         chr(reg) + chr(len(data)) +
-                         ''.join([chr(x) for x in data]))
+        yield From(self.send_packet(servo, cmd,
+                                    chr(reg) + chr(len(data)) +
+                                    ''.join([chr(x) for x in data])))
 
+    @asyncio.coroutine
     def eep_read(self, servo, reg, length):
-        return self.mem_read(self.CMD_EEP_READ, servo, reg, length)
+        result = yield From(
+            self.mem_read(self.CMD_EEP_READ, servo, reg, length))
+        raise Return(result)
 
+    @asyncio.coroutine
     def eep_write(self, servo, reg, data):
-        self.mem_write(self.CMD_EEP_WRITE, servo, reg, data)
+        yield From(self.mem_write(self.CMD_EEP_WRITE, servo, reg, data))
 
+    @asyncio.coroutine
     def ram_read(self, servo, reg, length):
-        return self.mem_read(self.CMD_RAM_READ, servo, reg, length)
+        result = yield From(
+            self.mem_read(self.CMD_RAM_READ, servo, reg, length))
+        raise Return(result)
 
+    @asyncio.coroutine
     def ram_write(self, servo, reg, data):
-        self.mem_write(self.CMD_RAM_WRITE, servo, reg, data)
+        yield From(self.mem_write(self.CMD_RAM_WRITE, servo, reg, data))
 
+    @asyncio.coroutine
     def i_jog(self, targets):
         """Set the position of one or more servos with unique play
         times for each servo.
@@ -231,10 +258,11 @@ class HerkuleX(object):
 
         servo = self.BROADCAST if len(targets) != 1 else targets[0][0]
 
-        self.send_packet(
-            servo, self.CMD_I_JOG,
-            ''.join([build_frame(x) for x in targets]))
+        yield From(self.send_packet(
+                servo, self.CMD_I_JOG,
+                ''.join([build_frame(x) for x in targets])))
 
+    @asyncio.coroutine
     def s_jog(self, time_ms, targets):
         """Set the position of one or more servos with a common play
         time across all servos.
@@ -257,13 +285,14 @@ class HerkuleX(object):
                     chr(target[2] << 2) +
                     chr(target[0]))
 
-        self.send_packet(
-            servo, self.CMD_S_JOG,
-            chr(int(time_ms / 11.2)) +
-            ''.join(build_frame(x) for x in targets))
+        yield From(self.send_packet(
+                servo, self.CMD_S_JOG,
+                chr(int(time_ms / 11.2)) +
+                ''.join(build_frame(x) for x in targets)))
 
+    @asyncio.coroutine
     def status(self, servo):
-        received = self.send_recv_packet(servo, self.CMD_STAT, '')
+        received = yield From(self.send_recv_packet(servo, self.CMD_STAT, ''))
         assert received.servo == servo or servo == self.BROADCAST
         assert received.cmd == (0x40 | self.CMD_STAT)
         assert len(received.data) == 2
@@ -273,65 +302,81 @@ class HerkuleX(object):
 
         result = StatusResponse(reg48, reg49)
 
-        return result
+        raise Return(result)
 
+    @asyncio.coroutine
     def reboot(self, servo):
-        self.send_packet(servo, self.CMD_REBOOT, '')
+        yield From(self.send_packet(servo, self.CMD_REBOOT, ''))
 
+    @asyncio.coroutine
     def temperature_C(self, servo):
         try:
-            value = self.ram_read(servo, 55, 1).data[0]
+            data = yield From(self.ram_read(servo, 55, 1))
+            value = data.data[0]
 
             # Note, this formula was derived from the Dongbu lookup table,
             # and becomes terribly inaccurate below -20C.
-            return (value - 40) * 0.5125 - 19.38
-        except eventlet.timeout.Timeout:
-            return None
+            raise Return((value - 40) * 0.5125 - 19.38)
+        except asyncio.TimeoutError:
+            raise Return(None)
 
+    @asyncio.coroutine
     def voltage(self, servo):
         try:
-            value = self.ram_read(servo, 54, 1).data[0]
+            data = yield From(self.ram_read(servo, 54, 1))
+            value = data.data[0]
 
-            return 0.074 * value
-        except eventlet.timeout.Timeout:
-            return None
+            raise Return(0.074 * value)
+        except asyncio.TimeoutError:
+            raise Return(None)
 
+    @asyncio.coroutine
     def position(self, servo):
         try:
             # NOTE: The datasheet appears to be off here.
-            value = self.ram_read(servo, 60, 2).data
+            data = yield From(self.ram_read(servo, 60, 2))
+            value = data.data
             if value is None:
-                return None
-            return value[1] << 8 | value[0]
-        except eventlet.timeout.Timeout:
-            return None
+                raise Return(None)
+            raise Return(value[1] << 8 | value[0])
+        except asyncio.TimeoutError:
+            raise Return(None)
 
+    @asyncio.coroutine
     def pwm(self, servo):
         try:
             # NOTE: The datasheet says this should be at RAM register 62,
             # however, nothing much ever shows up there, and something
             # which looks a lot like PWM is at the reserved RAM address
             # 64.
-            value = self.ram_read(servo, 64, 2).data
+            data = yield From(self.ram_read(servo, 64, 2))
+            value = data.data
             if value is None:
-                return None
+                raise Return(None)
             result = value[1] << 8 | value[0]
             if result > 32767:
                 result = result - 65536
-            return result
-        except eventlet.timeout.Timeout:
-            return None
+            raise Return(result)
+        except asyncio.TimeoutError:
+            raise Return(None)
 
+    @asyncio.coroutine
     def set_position_kp(self, servo, value):
-        self.ram_write(servo, 24, [ value & 0xff, (value >> 8) & 0xff ])
+        yield From(self.ram_write(
+                servo, 24, [ value & 0xff, (value >> 8) & 0xff ]))
 
+    @asyncio.coroutine
     def set_position_kd(self, servo, value):
-        self.ram_write(servo, 26, [ value & 0xff, (value >> 8) & 0xff ])
+        yield From(self.ram_write(
+                servo, 26, [ value & 0xff, (value >> 8) & 0xff ]))
 
+    @asyncio.coroutine
     def set_position_ki(self, servo, value):
-        self.ram_write(servo, 28, [ value & 0xff, (value >> 8) & 0xff ])
+        yield From(
+            self.ram_write(servo, 28, [ value & 0xff, (value >> 8) & 0xff ]))
 
 
 if __name__ == '__main__':
     port = HerkuleX('/dev/ttyUSB0')
-    port.reboot(port.BROADCAST)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(port.reboot(port.BROADCAST))
