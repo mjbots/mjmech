@@ -1,0 +1,48 @@
+I2C connector:
+Latching .100 4-pin (OSEPP pinout)
+   1   Vcc
+   2   SDA
+   3   GND
+   4   SCL
+
+Servo connector:
+ .100   servo
+ molex  conn
+   4      ?    GND
+   3      ?    TXD (from servo)
+   2      ?    RXD (to servo)
+   1      ?    Vcc
+servo pins: 1=GND/2=Vcc/3=TxD/4=RxD
+
+Serial mux:
+  Two devices share serial port: servoes and AVR.
+  Additionally, the serial interface on odroid uses bi-directional level
+  converters which are picky about connected load (for example they need zero
+  voltage to be very low)
+  We use 7402 Quad-NOR chip to condition/mask signal. The pinout is:
+
+             servo             AVR
+        +5V  RXD  /---+---\  D2  D0
+          |   |   |   |   |   |   |
+      /--14--13--12--11--10---9---8---\
+      |      4Y  4B  4A  3Y  3B  3A   |
+      |<  7402 quad NOR               |
+      |  2Y  2B  2A  1Y  1B  1A       |
+      \---1---2---3---4---5---6---7---/
+          |   |   |   |   |   |   |
+              \+--+---/  TXD  |  GND
+               |        servo | 
+             G-/     AVR      +----AVR D2
+       BS170 D-----+-D1       |
+      mosfet S-\   |          \--<R1>--+5V
+               | <R2>
+        GND----/   \-+5V   (R1,R2 = 4.7K)
+
+  When avr in bootloader, D2 is tri-stated, and thus signals from/to servo are
+  blocked. Once AVR is up, it tri-states TX and sets D2 low to connect servos
+  directly to a serial port on odroid.
+
+Laser connector
+ .100 molex
+   1   +    - to 3.3V regulator output
+   2   -    - to gnd via FET
