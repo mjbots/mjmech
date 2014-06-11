@@ -94,6 +94,7 @@ class RippleGait(object):
     ACTION_START_SWING, ACTION_START_STANCE, ACTION_END = range(3)
 
     def __init__(self, config):
+        assert config is not None
         self.config = config
 
         self.num_legs = len(config.leg_order)
