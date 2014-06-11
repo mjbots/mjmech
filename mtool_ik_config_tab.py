@@ -155,14 +155,16 @@ class IkTester(object):
     def handle_mouse_press(self, cursor):
         if self.servo_tab.controller is None:
             return
-        self.servo_tab.controller.enable_power(servo_controller.POWER_ENABLE)
+        Task(self.servo_tab.controller.enable_power(
+                servo_controller.POWER_ENABLE))
 
         self.handle_mouse_move(cursor)
 
     def handle_mouse_release(self):
         if self.servo_tab.controller is None:
             return
-        self.servo_tab.controller.enable_power(servo_controller.POWER_BRAKE)
+        Task(self.servo_tab.controller.enable_power(
+                servo_controller.POWER_BRAKE))
 
     def handle_mouse_move(self, cursor):
         if self.servo_tab.controller is None:
@@ -175,7 +177,7 @@ class IkTester(object):
             # This option isn't possible
             return
 
-        self.servo_tab.controller.set_pose(result.command_dict())
+        Task(self.servo_tab.controller.set_pose(result.command_dict()))
 
 
 class IkConfigTab(object):

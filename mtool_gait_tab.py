@@ -1,9 +1,12 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-import eventlet
 import functools
 import numpy
 import time
+import sys
+
+import trollius as asyncio
+from trollius import From, Task
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
@@ -17,7 +20,7 @@ import tf
 from mtool_common import BoolContext
 import mtool_graphics_scene
 
-PLAYBACK_TIMEOUT_MS = 20
+PLAYBACK_TIMEOUT_MS = 40
 
 class GaitGeometryDisplay(object):
     FRAME_ROBOT, FRAME_WORLD, FRAME_BODY = range(3)
@@ -286,7 +289,7 @@ class CommandWidget(object):
                         100.0, 100.0, 100.0,
                         45.0, 45.0, 45.0 ]
 
-        self.update_sem = eventlet.semaphore.Semaphore()
+        self.update_lock = asyncio.Lock()
 
         self.config = None
         self.command = None
@@ -432,18 +435,22 @@ class CommandWidget(object):
                         old_color.blue(),
                         64)))
 
-        if self.update_sem.locked():
+        Task(self._really_update_allowable())
+
+    @asyncio.coroutine
+    def _really_update_allowable(self):
+        if self.update_lock.locked():
             return
 
-        self.update_sem.acquire()
-        eventlet.spawn(self._really_update_allowable)
+        yield From(self.update_lock.acquire())
 
-    def _really_update_allowable(self):
-        while self.next_config is not None:
-            self.do_update_allowable()
+        try:
+            while self.next_config is not None:
+                yield From(self.do_update_allowable())
+        finally:
+            self.update_lock.release()
 
-        self.update_sem.release()
-
+    @asyncio.coroutine
     def do_update_allowable(self):
         self.config = self.next_config
         self.command = self.next_command
@@ -479,7 +486,7 @@ class CommandWidget(object):
             rect.setBrush(QtGui.QBrush(QtGui.QColor(*color)))
 
             if time.time() > next_wait:
-                eventlet.sleep()
+                yield From(asyncio.sleep(0.5 * 0.001 * PLAYBACK_TIMEOUT_MS))
                 if self.next_config is not None:
                     return
                 next_wait = time.time() + 0.5 * 0.001 * PLAYBACK_TIMEOUT_MS
@@ -494,6 +501,9 @@ class GaitTab(object):
         self.ui = ui
         self.ikconfig_tab = ikconfig_tab
         self.servo_tab = servo_tab
+
+        self.current_command = None
+        self.skipped_update = 0
 
         self.playback_mode = self.PLAYBACK_IDLE
 
@@ -784,13 +794,13 @@ class GaitTab(object):
             self.ui.playbackSlowRepeatButton.setChecked(False)
 
             if self.servo_tab.controller:
-                self.servo_tab.controller.enable_power(
-                    servo_controller.POWER_BRAKE)
+                Task(self.servo_tab.controller.enable_power(
+                        servo_controller.POWER_BRAKE))
             return
 
         if self.servo_tab.controller:
-            self.servo_tab.controller.enable_power(
-                servo_controller.POWER_ENABLE)
+            Task(self.servo_tab.controller.enable_power(
+                    servo_controller.POWER_ENABLE))
 
         # Update the leg list widget.
         available_legs = self.ikconfig_tab.get_all_legs()
@@ -992,12 +1002,20 @@ class GaitTab(object):
         self.gait_geometry_display.set_state(state)
 
         if self.servo_tab.controller:
+            if (self.current_command is not None and
+                not self.current_command.done()):
+                self.skipped_update += 1
+                return
+
             try:
-                self.servo_tab.controller.set_pose(
-                    state.command_dict(),
-                    pose_time=2 * 0.001 * PLAYBACK_TIMEOUT_MS)
+                command = state.command_dict()
             except ripple_gait.NotSupported:
-                pass
+                return
+
+            self.current_command = Task(
+                self.servo_tab.controller.set_pose(
+                    command,
+                    pose_time=2 * 0.001 * PLAYBACK_TIMEOUT_MS))
 
     def handle_geometry_change(self):
         frame = [GaitGeometryDisplay.FRAME_ROBOT,

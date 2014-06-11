@@ -1,7 +1,9 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-import eventlet
 import functools
+
+import trollius as asyncio
+from trollius import Task, From, Return
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
@@ -10,10 +12,9 @@ from mtool_common import BoolContext
 import servo_controller
 
 def spawn(callback):
-    def task():
-        eventlet.spawn(callback)
-
-    return task
+    def start():
+        Task(callback())
+    return start
 
 class ServoTab(object):
     def __init__(self, ui, status):
@@ -70,12 +71,14 @@ class ServoTab(object):
                 return self.ui.poseList.item(i).data(QtCore.Qt.UserRole)
         return dict([(i, 0.0) for i in range(self.ui.servoCountSpin.value())])
 
+    @asyncio.coroutine
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
-        self.controller = servo_controller.servo_controller(
-            val,
-            serial_port=self.ui.serialPortCombo.currentText(),
-            model_name=self.ui.modelEdit.text())
+        self.controller = yield From(
+            servo_controller.servo_controller(
+                val,
+                serial_port=self.ui.serialPortCombo.currentText(),
+                model_name=self.ui.modelEdit.text()))
         self.ui.statusText.setText('connected')
         self.update_connected(True)
 
@@ -144,6 +147,7 @@ class ServoTab(object):
                     'move': move,
                     'current': current})
 
+    @asyncio.coroutine
     def handle_power(self):
         text = self.ui.powerCombo.currentText().lower()
         value = None
@@ -156,7 +160,7 @@ class ServoTab(object):
         else:
             raise NotImplementedError()
 
-        self.controller.enable_power(value)
+        yield From(self.controller.enable_power(value))
 
     def update_connected(self, value):
         self.ui.controlGroup.setEnabled(value)
@@ -168,8 +172,9 @@ class ServoTab(object):
 
         if value:
             self.handle_power()
-            self.monitor_thread = eventlet.spawn(self.monitor_status)
+            self.monitor_thread = Task(self.monitor_status())
 
+    @asyncio.coroutine
     def monitor_status(self):
         voltages = {}
         temperatures = {}
@@ -177,39 +182,43 @@ class ServoTab(object):
         while True:
             if (self.controller is not None and
                 hasattr(self.controller, 'get_voltage')):
+                try:
 
-                ident = (ident + 1) % len(self.servo_controls)
+                    ident = (ident + 1) % len(self.servo_controls)
 
-                this_voltage = self.controller.get_voltage([ident])
-                voltages.update(this_voltage)
+                    this_voltage = yield From(
+                        self.controller.get_voltage([ident]))
+                    voltages.update(this_voltage)
 
-                eventlet.sleep(0.0)
+                    # Get all temperatures.
+                    this_temp = yield From(
+                        self.controller.get_temperature([ident]))
+                    temperatures.update(this_temp)
 
-                # Get all temperatures.
-                this_temp = self.controller.get_temperature([ident])
-                temperatures.update(this_temp)
+                    def non_None(value):
+                        return [x for x in value if x is not None]
 
-                def non_None(value):
-                    return [x for x in value if x is not None]
+                    message = "Servo status: "
+                    if len(non_None(voltages.values())):
+                        message += "%.1f/%.1fV" % (
+                            min(non_None(voltages.values())),
+                            max(non_None(voltages.values())))
 
-                message = "Servo status: "
-                if len(non_None(voltages.values())):
-                    message += "%.1f/%.1fV" % (
-                        min(non_None(voltages.values())),
-                        max(non_None(voltages.values())))
+                    if len(non_None(temperatures.values())):
+                        message += " %.1f/%.1fC" % (
+                            min(non_None(temperatures.values())),
+                            max(non_None(temperatures.values())))
 
-                if len(non_None(temperatures.values())):
-                    message += " %.1f/%.1fC" % (
-                        min(non_None(temperatures.values())),
-                        max(non_None(temperatures.values())))
+                    self.status.showMessage(message, 10000)
+                except Exception as e:
+                    print "Error reading servo:", e
 
-                self.status.showMessage(message, 10000)
+            yield From(asyncio.sleep(2.0))
 
-            eventlet.sleep(2.0)
-
-
+    @asyncio.coroutine
     def set_single_pose(self, servo_id, value):
-        self.controller.set_single_pose(servo_id, value, pose_time=0.2)
+        yield From(
+            self.controller.set_single_pose(servo_id, value, pose_time=0.2))
 
     def handle_servo_slider(self, servo_id, event):
         if self.servo_update.value:
@@ -219,7 +228,7 @@ class ServoTab(object):
             control = self.servo_controls[servo_id]
             value = control['slider'].value()
             control['doublespin'].setValue(value)
-            eventlet.spawn(self.set_single_pose, servo_id, value)
+            Task(self.set_single_pose(servo_id, value))
 
     def handle_servo_spin(self, servo_id, event):
         if self.servo_update.value:
@@ -229,7 +238,7 @@ class ServoTab(object):
             control = self.servo_controls[servo_id]
             value = control['doublespin'].value()
             control['slider'].setSliderPosition(int(value))
-            eventlet.spawn(self.set_single_pose, servo_id, value)
+            Task(self.set_single_pose(servo_id, value))
 
     def handle_servo_save(self, servo_id):
         if self.ui.poseList.currentRow() < 0:
@@ -251,10 +260,14 @@ class ServoTab(object):
         data = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
         self.servo_controls[servo_id]['doublespin'].setValue(data[servo_id])
 
+    @asyncio.coroutine
     def handle_capture_current(self):
         with self.servo_update:
-            results = self.controller.get_pose(range(len(self.servo_controls)))
+            results = yield From(
+                self.controller.get_pose(range(len(self.servo_controls))))
             for ident, angle in results.iteritems():
+                if angle is None:
+                    continue
                 control = self.servo_controls[ident]
                 control['slider'].setSliderPosition(int(angle))
                 control['doublespin'].setValue(angle)
@@ -296,12 +309,13 @@ class ServoTab(object):
         del self.poses[pose_name]
         self.ui.poseList.takeItem(self.ui.poseList.currentRow())
 
+    @asyncio.coroutine
     def handle_move_to_pose(self):
         if self.ui.poseList.currentRow() < 0:
             return
 
         values = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
-        self.controller.set_pose(values, pose_time=1.0)
+        yield From(self.controller.set_pose(values, pose_time=1.0))
         with self.servo_update:
             for ident, angle_deg in values.iteritems():
                 control = self.servo_controls[ident]

@@ -6,15 +6,43 @@
 walking mech robots.'''
 
 import argparse
-import eventlet
 import os
+import logging
 import sys
+import traceback
 
 import ConfigParser
+
+import trollius
+import trollius as asyncio
+
+# The following is an ugly ugly hack to get useful stack traces from
+# coroutines with trollius on python 2.
+old_future_set = trollius.Future.set_exception
+
+def Future_set_exception(self, exc):
+    tb = sys.exc_info()[2]
+    if not hasattr(exc, '__frames__'):
+        setattr(exc, '__frames__', [])
+
+    frames = getattr(exc, '__frames__')
+    if len(frames) == 0:
+        frames.append(str(exc))
+    frames[0:0] = traceback.format_tb(tb)
+
+    old_future_set(self, exc)
+
+    self._tb_logger.tb = frames
+
+    self = None
+
+trollius.Future.set_exception = Future_set_exception
+
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+import asyncio_qt
 import mtool_main_window
 import servo_controller
 
@@ -68,15 +96,11 @@ class Mtool(QtGui.QMainWindow):
         for tab in self.tabs:
             tab.resizeEvent(event)
 
-def eventlet_pyside_mainloop(app):
-    timer = QtCore.QTimer()
-    def on_timeout():
-        eventlet.sleep()
-    timer.timeout.connect(on_timeout)
-    timer.start(5)
-    app.exec_()
-
 def main():
+    logging.basicConfig(level=logging.WARN, stream=sys.stdout)
+
+    asyncio.set_event_loop_policy(asyncio_qt.QtEventLoopPolicy())
+
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName('mtool')
 
@@ -89,8 +113,8 @@ def main():
     mtool = Mtool(args)
     mtool.show()
 
-    eventlet_pyside_mainloop(app)
-    sys.exit()
+    loop = asyncio.get_event_loop()
+    loop.run_forever()
 
 if __name__ == '__main__':
     main()

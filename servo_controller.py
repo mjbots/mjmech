@@ -2,7 +2,8 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-import eventlet
+import trollius as asyncio
+from trollius import From, Return
 import math
 import pygazebo
 from pygazebo.msg import joint_cmd_pb2
@@ -26,24 +27,31 @@ class HerkuleXController(object):
         self.port = herkulex.HerkuleX(serial_port=serial_port)
         self.default_pose_time = 0.03
 
+    def start(self):
+        raise Return(self)
+
     def _angle_to_counts(self, angle_deg):
         return min(1023, max(0, int(512 + angle_deg / 0.325)))
 
     def _counts_to_angle(self, counts):
         return (counts - 512) * 0.325
 
+    @asyncio.coroutine
     def set_pose(self, id_to_deg_map, pose_time=None):
         if pose_time is None:
             pose_time = self.default_pose_time
 
-        self.port.s_jog(
-            time_ms=pose_time * 1000,
-            targets=[(ident, self._angle_to_counts(angle), 0)
-                     for ident, angle in id_to_deg_map.iteritems()])
+        yield From(
+            self.port.s_jog(
+                time_ms=pose_time * 1000,
+                targets=[(ident, self._angle_to_counts(angle), 0)
+                         for ident, angle in id_to_deg_map.iteritems()]))
 
+    @asyncio.coroutine
     def set_single_pose(self, ident, angle_deg, pose_time=None):
-        self.set_pose({ident: angle_deg}, pose_time)
+        yield From(self.set_pose({ident: angle_deg}, pose_time))
 
+    @asyncio.coroutine
     def enable_power(self, state, idents=None):
         """Enable the power state of one or more servos.
 
@@ -63,9 +71,11 @@ class HerkuleXController(object):
             idents = [self.port.BROADCAST]
 
         for ident in idents:
-            self.port.ram_write(
-                ident, self.port.REG_TORQUE_CONTROL, [value])
+            yield From(
+                self.port.ram_write(
+                    ident, self.port.REG_TORQUE_CONTROL, [value]))
 
+    @asyncio.coroutine
     def get_pose(self, idents=[]):
         """Determine the current pose of the requested servos.
 
@@ -74,13 +84,14 @@ class HerkuleXController(object):
         result = {}
 
         for ident in idents:
-            counts = self.port.position(ident)
+            counts = yield From(self.port.position(ident))
             if counts is None:
                 continue
             result[ident] = self._counts_to_angle(counts)
 
-        return result
+        raise Return(result)
 
+    @asyncio.coroutine
     def get_torque(self, idents=[]):
         """Determine the current torque applied by each servo.
 
@@ -89,37 +100,45 @@ class HerkuleXController(object):
         result = {}
 
         for ident in idents:
-            pwm = self.port.pwm(ident)
+            pwm = yield From(self.port.pwm(ident))
             result[ident] = self._pwm_to_torque(pwm)
 
-        return result
+        raise Return(result)
 
+    @asyncio.coroutine
     def get_temperature(self, idents=[]):
         """Determine the temperature as measured at each servo.
 
         :returns: a dictionary mapping identifier to temperature in C"""
         result = {}
         for ident in idents:
-            result[ident] = self.port.temperature_C(ident)
-        return result
+            result[ident] = yield From(self.port.temperature_C(ident))
+        raise Return(result)
 
+    @asyncio.coroutine
     def get_voltage(self, idents=[]):
         """Determine the voltage as measured at each servo.
 
         :returns: a dictionary mapping identifier to voltage"""
         result = {}
         for ident in idents:
-            result[ident] = self.port.voltage(ident)
-        return result
+            result[ident] = yield From(self.port.voltage(ident))
+        raise Return(result)
 
 
 class GazeboController(object):
     def __init__(self, model_name):
-        self.manager = pygazebo.Manager()
+        self.model_name = model_name
 
-        self.publisher = self.manager.advertise(
+    @asyncio.coroutine
+    def start(self):
+        model_name = self.model_name
+
+        self.manager = yield From(pygazebo.connect())
+
+        self.publisher = yield From(self.manager.advertise(
             '/gazebo/default/%s/joint_cmd' % model_name,
-            'gazebo.msgs.JointCmd')
+            'gazebo.msgs.JointCmd'))
 
         self.subscriber = self.manager.subscribe(
             '/gazebo/default/%s/joint_cmd' % model_name,
@@ -156,13 +175,15 @@ class GazeboController(object):
 
         self._servo_angles[index] = joint_cmd.position.target
 
+    @asyncio.coroutine
     def set_pose(self, id_to_deg_map, pose_time=None):
         for ident, angle in id_to_deg_map.iteritems():
             self.joint_cmd.name = self._servo_names[ident]
             self.joint_cmd.position.target = math.radians(angle)
-            self.publisher.publish(self.joint_cmd)
+            yield From(self.publisher.publish(self.joint_cmd))
             self._servo_angles[ident] = angle
 
+    @asyncio.coroutine
     def get_pose(self, idents=[]):
         """Determine the current pose of the requested servos.
 
@@ -173,8 +194,9 @@ class GazeboController(object):
         for ident in idents:
             result[ident] = self._servo_angles.get(ident)
 
-        return result
+        raise Return(result)
 
+    @asyncio.coroutine
     def get_torque(self, idents=[]):
         """Determine the current torque applied by each servo.
 
@@ -185,11 +207,13 @@ class GazeboController(object):
         for ident in idents:
             result[ident] = None
 
-        return result
+        raise Return(result)
 
+    @asyncio.coroutine
     def set_single_pose(self, ident, angle_deg, pose_time=None):
-        self.set_pose({ident: angle_deg}, pose_time)
+        yield From(self.set_pose({ident: angle_deg}, pose_time))
 
+    @asyncio.coroutine
     def enable_power(self, state, idents=None):
         """Enable the power state of one or more servos.
 
@@ -197,16 +221,19 @@ class GazeboController(object):
         :param idents: optional list of identifiers to configure, if
             None, all servos are configured
         """
-        pass
+        raise Return(None)
 
+@asyncio.coroutine
 def servo_controller(servo_type, **kwargs):
     if servo_type == 'herkulex':
         if 'model_name' in kwargs:
             kwargs.pop('model_name')
-        return HerkuleXController(**kwargs)
+        result = HerkuleXController(**kwargs)
     elif servo_type == 'gazebo':
         if 'serial_port' in kwargs:
             kwargs.pop('serial_port')
-        return GazeboController(**kwargs)
+        result = GazeboController(**kwargs)
     else:
         raise RuntimeError('unknown servo type: ' + servo_type)
+    yield From(result.start())
+    raise Return(result)
