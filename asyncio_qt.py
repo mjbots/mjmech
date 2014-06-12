@@ -32,17 +32,28 @@ class QtEventLoopPolicy(asyncio.AbstractEventLoopPolicy):
         return QtEventLoop()
 
 class _Invoker(QtCore.QObject):
-    signal = QtCore.Signal(types.FunctionType)
+    signal = QtCore.Signal()
 
     def __init__(self):
         super(_Invoker, self).__init__()
+        self._callbacks = []
         self.signal.connect(self._run, QtCore.Qt.QueuedConnection)
 
-    def schedule(self, callback):
-        self.signal.emit(callback)
+        # In order to not have GUI events starve us, we use a QTimer
+        # to flush the run queue as well.
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self._run)
+        self.timer.start(25)
 
-    def _run(self, callback):
-        callback()
+    def schedule(self, callback):
+        self._callbacks.append(callback)
+        self.signal.emit()
+
+    def _run(self):
+        while len(self._callbacks):
+            this, self._callbacks = self._callbacks, []
+            for callback in this:
+                callback()
     
 
 class QtEventLoop(asyncio.AbstractEventLoop):
@@ -208,7 +219,6 @@ class QtEventLoop(asyncio.AbstractEventLoop):
 
     @asyncio.coroutine
     def sock_accept(self, sock):
-        print 'sock_accept:', sock, sock.fileno()
         assert sock.gettimeout() == 0.0
 
         while True:
@@ -219,11 +229,9 @@ class QtEventLoop(asyncio.AbstractEventLoop):
             finally:
                 self.remove_reader(sock.fileno())
 
-            print 'sock_accept reader ready!'
             try:
                 result = sock.accept()
                 result[0].setblocking(False)
-                print "got accept!:", result
                 raise Return(result)
             except socket.error as e:
                 if (e.args[0] != errno.EINPROGRESS and
