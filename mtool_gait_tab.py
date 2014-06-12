@@ -503,7 +503,7 @@ class GaitTab(object):
         self.servo_tab = servo_tab
 
         self.current_command = None
-        self.skipped_update = 0
+        self.next_state = None
 
         self.playback_mode = self.PLAYBACK_IDLE
 
@@ -1002,18 +1002,27 @@ class GaitTab(object):
         self.gait_geometry_display.set_state(state)
 
         if self.servo_tab.controller:
-            if (self.current_command is not None and
-                not self.current_command.done()):
-                self.skipped_update += 1
-                return
-
             try:
                 command = state.command_dict()
             except ripple_gait.NotSupported:
                 return
 
-            self.current_command = Task(
-                self.servo_tab.controller.set_pose(
+            self.next_command = command
+
+            if (self.current_command is not None and
+                not self.current_command.done()):
+                return
+
+            self.current_command = Task(self.set_next_pose())
+
+    @asyncio.coroutine
+    def set_next_pose(self):
+        count = 0
+        while self.next_command is not None:
+            count += 1
+            command, self.next_command = self.next_command, None
+
+            yield From(self.servo_tab.controller.set_pose(
                     command,
                     pose_time=2 * 0.001 * PLAYBACK_TIMEOUT_MS))
 
