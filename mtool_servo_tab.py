@@ -211,7 +211,8 @@ class ServoTab(object):
 
                     self.status.showMessage(message, 10000)
                 except Exception as e:
-                    print "Error reading servo:", e
+                    traceback.print_exc()
+                    print "Error reading servo:", type(e), e
 
             yield From(asyncio.sleep(2.0))
 
