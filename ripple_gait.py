@@ -16,6 +16,7 @@ class RippleConfig(object):
 
         self.max_cycle_time_s = 4.0
         self.lift_height_mm = 80.0
+        self.lift_percent = 25.0
         self.swing_percent = 100.0
         self.position_margin_percent = 80.0
         self.leg_order = []
@@ -31,6 +32,7 @@ class RippleConfig(object):
         result.mechanical = self.mechanical.copy()
         result.max_cycle_time_s = self.max_cycle_time_s
         result.lift_height_mm = self.lift_height_mm
+        result.lift_percent = self.lift_percent
         result.swing_percent = self.swing_percent
         result.position_margin_percent = self.position_margin_percent
         result.leg_order = self.leg_order[:]
@@ -472,12 +474,14 @@ class RippleGait(object):
                            delta.scaled(leg_phase))
                 leg.point = current
 
-                if leg_phase < 0.1:
-                    leg.point.z = (leg_phase / 0.1) * self.config.lift_height_mm
-                elif leg_phase < 0.9:
+                lift_fraction = 0.01 * self.config.lift_percent
+                if leg_phase < lift_fraction:
+                    leg.point.z = ((leg_phase / lift_fraction) *
+                                   self.config.lift_height_mm)
+                elif leg_phase < (1.0 - lift_fraction):
                     leg.point.z = self.config.lift_height_mm
                 else:
-                    leg.point.z = (((1.0 - leg_phase) / 0.1) *
+                    leg.point.z = (((1.0 - leg_phase) / lift_fraction) *
                                    self.config.lift_height_mm)
 
         # If we are running with a statically stable gait, update the
