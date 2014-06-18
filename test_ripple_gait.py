@@ -3,6 +3,8 @@
 import copy
 import math
 import pytest
+import ConfigParser
+import StringIO
 
 import leg_ik
 import ripple_gait
@@ -241,3 +243,34 @@ def test_ripple_basic():
 
     command = ripple_gait.Command()
     run_cycle(gait, idle_state, command, 10.0, 0.01)
+
+def test_leg_order_parse():
+    parse = ripple_gait.RippleConfig.parse_leg_order
+    assert parse('0,3,1,2') == [0, 3, 1, 2]
+    assert parse('5,4,3,2,1') == [5, 4, 3, 2, 1]
+    assert parse('(1,2),0,1') == [(1, 2), 0, 1]
+    assert parse('0,(4,1),3,(2,5)') == [0, (4, 1), 3, (2, 5)]
+    assert parse('( 1,  2), 0, 1  ') == [(1, 2), 0, 1]
+
+    # Strings that should result in fractional results.
+    assert parse('7,') == [7]
+    assert parse('(7,') == []
+    assert parse('3,),8,6') == [3]
+    assert parse('2,3,(7,(8,6),1),0') == [2, 3]
+
+def test_config_settings():
+    dut = ripple_gait.RippleConfig()
+    config = ConfigParser.ConfigParser()
+
+    dut.write_settings(config, 'test_group')
+
+    out = StringIO.StringIO()
+    config.write(out)
+    config_data = out.getvalue()
+
+    config_copy = ConfigParser.ConfigParser()
+    inp = StringIO.StringIO(config_data)
+    config_copy.readfp(inp)
+
+    copy = ripple_gait.RippleConfig.read_settings(
+        config_copy, 'test_group', {})

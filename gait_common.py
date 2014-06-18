@@ -49,15 +49,42 @@ class LegConfig(object):
         result.leg_ik = self.leg_ik
         return result
 
+    @staticmethod
+    def create_from_string(value):
+        fields = [float(x) for x in value.split(',')]
+        assert len(fields) >= 6
+
+        result = LegConfig()
+
+        result.mount_x_mm = fields[0]
+        result.mount_y_mm = fields[1]
+        result.mount_z_mm = fields[2]
+
+        result.idle_x_mm = fields[3]
+        result.idle_y_mm = fields[4]
+        result.idle_z_mm = fields[5]
+
+        return result
+
+    def __str__(self):
+        return ','.join('%.2f' % x for x in
+                        [self.mount_x_mm,
+                         self.mount_y_mm,
+                         self.mount_z_mm,
+                         self.idle_x_mm,
+                         self.idle_y_mm,
+                         self.idle_z_mm,])
+
+
 class MechanicalConfig(object):
     def __init__(self):
         # A map from leg number to LegConfig instances.
         self.leg_config = {}
 
         # The center of gravity relative to the geometric center.
-        self.body_cog_x_mm = None
-        self.body_cog_y_mm = None
-        self.body_cog_z_mm = None
+        self.body_cog_x_mm = 0.0
+        self.body_cog_y_mm = 0.0
+        self.body_cog_z_mm = 0.0
 
     def copy(self):
         result = MechanicalConfig()
@@ -68,6 +95,40 @@ class MechanicalConfig(object):
         result.body_cog_z_mm = self.body_cog_z_mm
 
         return result
+
+    _FLOAT_ATTRIBUTES = [
+        'body_cog_x_mm',
+        'body_cog_y_mm',
+        'body_cog_z_mm',
+        ]
+
+    @staticmethod
+    def read_settings(config, group_name, leg_ik_map):
+        result = MechanicalConfig()
+
+        if config.has_section(group_name + '.legs'):
+            for leg_name, value in config.items(group_name + '.legs'):
+                if not leg_name.startswith('leg.'):
+                    continue
+                leg_num = int(leg_name.split('.')[1])
+                leg_config = LegConfig.create_from_string(value)
+                leg_config.leg_ik = leg_ik_map[leg_num]
+                result.leg_config[leg_num] = leg_config
+
+        for x in MechanicalConfig._FLOAT_ATTRIBUTES:
+            if config.has_option(group_name, x):
+                setattr(result, x, config.getfloat(group_name, x))
+
+        return result
+
+    def write_settings(self, config, group_name):
+        config.add_section(group_name)
+        for leg_name, leg_config in self.leg_config.iteritems():
+            config.set(group_name, 'leg.%d' % leg_num, str(leg_config))
+
+        for x in self._FLOAT_ATTRIBUTES:
+            config.set(group_name, x, getattr(self, x))
+
 
 class LegResult(object):
     '''This gives the relative position of the leg to the shoulder

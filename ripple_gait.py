@@ -17,7 +17,7 @@ class RippleConfig(object):
         self.max_cycle_time_s = 4.0
         self.lift_height_mm = 80.0
         self.lift_percent = 25.0
-        self.swing_percent = 100.0
+        self.swing_percent = 80.0
         self.position_margin_percent = 80.0
         self.leg_order = []
         self.body_z_offset_mm = 0.0
@@ -44,6 +44,116 @@ class RippleConfig(object):
         result.static_margin_mm = self.static_margin_mm
 
         return result
+
+    @staticmethod
+    def parse_leg_order(data):
+        '''A leg ordering is a comma separated list of leg numbers, or
+        of leg groups, where a leg group is a parenthesis grouped list
+        of leg numbers.
+
+        Return the programmatic representation of that ordering when
+        given a string version.  On malformed input, make all attempts
+        to return something, even if only a subset of the input.
+        '''
+        assert isinstance(data, str)
+
+        result = []
+        if data == '':
+            return result
+
+        in_tuple = False
+        current_tuple = ()
+        current_item = ''
+        for x in data:
+            if x == '(':
+                if in_tuple:
+                    return result
+                in_tuple = True
+
+            if x >= '0' and x <= '9':
+                current_item += x
+            else:
+                if len(current_item):
+                    value = int(current_item)
+                    current_item = ''
+                    if in_tuple:
+                        current_tuple += (value,)
+                    else:
+                        result.append(value)
+                if x == ')':
+                    if not in_tuple:
+                        return result
+                    if len(current_tuple) == 1:
+                        result.append(current_tuple[0])
+                    elif len(current_tuple) > 1:
+                        result.append(current_tuple)
+                    current_tuple = ()
+                    in_tuple = False
+
+        if len(current_item):
+            result.append(int(current_item))
+
+        return result
+
+    @staticmethod
+    def str_leg_order(data):
+        '''Given a leg ordering, return the canonical string
+        representation.'''
+        assert isinstance(data, list)
+        return str(data)[1:-1].replace(' ', '')
+
+    _FLOAT_ATTRIBUTES = [
+        'max_cycle_time_s',
+        'lift_height_mm',
+        'lift_percent',
+        'swing_percent',
+        'position_margin_percent',
+        'body_z_offset_mm',
+        'servo_speed_margin_percent',
+        'static_center_factor',
+        'static_stable_factor',
+        'static_margin_mm',
+        ]
+
+    @staticmethod
+    def read_settings(config, group_name, leg_ik_map):
+        '''Populate a RippleConfig instance from the given
+        ConfigParser instance and group name.
+
+        :param config: Configuration to read
+        :param group_name: String containing the appropriate group
+        :param leg_ik_map: Mapping from leg number to IK instance'''
+        result = RippleConfig()
+
+        result.mechanical = MechanicalConfig.read_settings(
+            config, group_name + '.legs', leg_ik_map)
+
+        for x in RippleConfig._FLOAT_ATTRIBUTES:
+            if config.has_option(group_name, x):
+                setattr(result, x, config.getfloat(group_name, x))
+
+        if config.has_option(group_name, 'statically_stable'):
+            result.statically_stable = config.getboolean(
+                group_name, 'statically_stable')
+
+        if config.has_option(group_name, 'leg_order'):
+            result.leg_order = RippleConfig.parse_leg_order(
+                config.get(group_name, 'leg_order'))
+
+        return result
+
+    def write_settings(self, config, group_name):
+        '''Store this RippleConfig instance into the given
+        ConfigParser instance at the given group name.'''
+
+        config.add_section(group_name)
+        self.mechanical.write_settings(config, group_name + '.legs')
+
+        for x in self._FLOAT_ATTRIBUTES:
+            config.set(group_name, x, getattr(self, x))
+
+        config.set(group_name, 'statically_stable', self.statically_stable)
+        config.set(group_name, 'leg_order', self.str_leg_order(self.leg_order))
 
 class RippleState(CommonState):
     def __init__(self):
@@ -295,6 +405,9 @@ class RippleGait(object):
             return
 
         self._really_set_command(command, options)
+
+    def is_command_pending(self):
+        return self.next_command is not None
 
     def _really_set_command(self, command, options):
         self.command = command
