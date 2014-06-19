@@ -72,6 +72,7 @@ class GaitGeometryDisplay(object):
         self.axes_item.update()
 
     def set_gait_config(self, config):
+        assert config is not None
         self.config = config
 
         for item in self.items:
@@ -507,6 +508,7 @@ class GaitTab(object):
 
         self.playback_mode = self.PLAYBACK_IDLE
 
+        self.in_gait_changed = BoolContext()
         self.in_number_changed = BoolContext()
         self.in_command_changed = BoolContext()
 
@@ -601,21 +603,7 @@ class GaitTab(object):
             self.command_widget.resize()
 
     def get_float_configs(self):
-        return [(self.ui.bodyCogXSpin, 'body_cog_x_mm'),
-                (self.ui.bodyCogYSpin, 'body_cog_y_mm'),
-                (self.ui.bodyCogZSpin, 'body_cog_z_mm'),
-                (self.ui.idlePositionXSpin, 'idle_position_x_mm'),
-                (self.ui.idlePositionYSpin, 'idle_position_y_mm'),
-                (self.ui.idlePositionZSpin, 'idle_position_z_mm'),
-                (self.ui.maxCycleTimeSpin, 'max_cycle_time_s'),
-                (self.ui.liftHeightSpin, 'lift_height_mm'),
-                (self.ui.swingPercentSpin, 'swing_percent'),
-                (self.ui.positionMarginSpin, 'position_margin'),
-                (self.ui.bodyZOffsetSpin, 'body_z_offset_mm'),
-                (self.ui.staticCenterSpin, 'static_center_factor'),
-                (self.ui.staticStableSpin, 'static_stable_factor'),
-                (self.ui.staticMarginSpin, 'static_margin_mm'),
-                (self.ui.geometryScaleSpin, 'geometry_scale_mm'),
+        return [(self.ui.geometryScaleSpin, 'geometry_scale_mm'),
                 (self.ui.commandXSpin, 'command_x_mm_s'),
                 (self.ui.commandYSpin, 'command_y_mm_s'),
                 (self.ui.commandRotSpin, 'command_rot_deg_s'),
@@ -650,9 +638,21 @@ class GaitTab(object):
         if not config.has_section('gaitconfig'):
             return
 
-        for spin, name in self.get_float_configs():
-            if config.has_option('gaitconfig', name):
-                spin.setValue(config.getfloat('gaitconfig', name))
+        class IkGetter(object):
+            def __init__(self, parent):
+                self.parent = parent
+
+            def __getitem__(self, index):
+                return self.parent.ikconfig_tab.get_leg_ik(index)
+
+        self.ripple_config = \
+            ripple_gait.RippleConfig.read_settings(config, 'gaitconfig',
+                                                   IkGetter(self))
+
+        with self.in_command_changed:
+            for spin, name in self.get_float_configs():
+                if config.has_option('gaitconfig', name):
+                    spin.setValue(config.getfloat('gaitconfig', name))
 
         def set_combo(combo, name):
             settings.restore_combo(config, 'gaitconfig', combo, name)
@@ -660,30 +660,49 @@ class GaitTab(object):
         set_combo(self.ui.geometryFrameCombo, 'geometry_frame')
         set_combo(self.ui.geometryProjectionCombo, 'geometry_projection')
 
-        if config.has_section('gaitconfig.legs'):
-            for leg_name, value in config.items('gaitconfig.legs'):
-                leg_num = int(leg_name.split('.')[1])
-                self.ripple_config.mechanical.leg_config[leg_num] = \
-                    self.string_to_leg_config(value)
-
-        if config.has_option('gaitconfig', 'static_enable'):
-            self.ui.staticEnableCheck.setChecked(
-                config.getboolean('gaitconfig', 'static_enable'))
-
-        if config.has_option('gaitconfig', 'leg_order'):
-            self.ui.legOrderEdit.setText(self.validate_leg_order(
-                    config.get('gaitconfig', 'leg_order')))
-        else:
-            self.ui.legOrderEdit.setText(self.validate_leg_order(''))
-
         self.command_widget.read_settings(config)
 
+        self.update_ui_from_config()
         self.handle_leg_change(self.ui.gaitLegList.currentItem())
         self.handle_gait_config_change()
         self.handle_geometry_change()
+        self.handle_command_change()
+
+    def update_ui_from_config(self):
+        with self.in_gait_changed:
+            c = self.ripple_config
+            m = c.mechanical
+            legs = m.leg_config.values()
+            l = legs[0] if len(legs) > 0 else ripple_gait.LegConfig()
+
+            spins = [
+                (self.ui.bodyCogXSpin, m.body_cog_x_mm),
+                (self.ui.bodyCogYSpin, m.body_cog_y_mm),
+                (self.ui.bodyCogZSpin, m.body_cog_z_mm),
+                (self.ui.idlePositionXSpin, l.idle_x_mm),
+                (self.ui.idlePositionYSpin, l.idle_y_mm),
+                (self.ui.idlePositionZSpin, l.idle_z_mm),
+                (self.ui.maxCycleTimeSpin, c.max_cycle_time_s),
+                (self.ui.liftHeightSpin, c.lift_height_mm),
+                (self.ui.swingPercentSpin, c.swing_percent),
+                (self.ui.positionMarginSpin, c.position_margin_percent),
+                (self.ui.bodyZOffsetSpin, c.body_z_offset_mm),
+                (self.ui.staticCenterSpin, c.static_center_factor),
+                (self.ui.staticStableSpin, c.static_stable_factor),
+                (self.ui.staticMarginSpin, c.static_margin_mm),
+                ]
+
+            for spin, value in spins:
+                spin.setValue(value)
+
+            self.ui.staticEnableCheck.setChecked(c.statically_stable)
+            self.ui.legOrderEdit.setText(c.str_leg_order(c.leg_order))
+
+            self.handle_leg_change(self.ui.gaitLegList.currentItem())
 
     def write_settings(self, config):
-        config.add_section('gaitconfig')
+        self.ripple_config.write_settings(config, 'gaitconfig')
+
         for spin, name in self.get_float_configs():
             config.set('gaitconfig', name, spin.value())
 
@@ -694,60 +713,8 @@ class GaitTab(object):
 
         self.command_widget.write_settings(config)
 
-        config.add_section('gaitconfig.legs')
-        for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
-            leg_num, leg_config = leg_data
-            config.set('gaitconfig.legs', 'leg.%d' % leg_num,
-                       self.leg_config_to_string(leg_config))
-
-        config.set('gaitconfig', 'static_enable',
-                   self.ui.staticEnableCheck.isChecked())
-
-        config.set('gaitconfig', 'leg_order',
-                   self.validate_leg_order(self.ui.legOrderEdit.text()))
-
-    def intify_leg_order(self, data):
-        result = []
-        if data == '':
-            return result
-
-        in_tuple = False
-        current_tuple = ()
-        current_item = ''
-        for x in data:
-            if x == '(':
-                if in_tuple:
-                    return result
-                in_tuple = True
-
-            if x >= '0' and x <= '9':
-                current_item += x
-            else:
-                if len(current_item):
-                    value = int(current_item)
-                    current_item = ''
-                    if in_tuple:
-                        current_tuple += (value,)
-                    else:
-                        result.append(value)
-                if x == ')':
-                    if not in_tuple:
-                        return result
-                    if len(current_tuple) == 1:
-                        result.append(current_tuple[0])
-                    elif len(current_tuple) > 1:
-                        result.append(current_tuple)
-                    current_tuple = ()
-                    in_tuple = False
-
-        if len(current_item):
-            result.append(int(current_item))
-
-        return result
-
     def stringify_leg_order(self, data):
-        assert isinstance(data, list)
-        return str(data)[1:-1].replace(' ', '')
+        return ripple_gait.RippleConfig.str_leg_order(data)
 
     def validate_leg_order(self, data):
         """Accept data that is human entered.  Return a string
@@ -755,7 +722,7 @@ class GaitTab(object):
         separate list of leg numbers, or tuples of leg numbers."""
         entered_values = []
         try:
-            entered_values = self.intify_leg_order(data)
+            entered_values = ripple_gait.RippleConfig.parse_leg_order(data)
         except:
             pass
 
@@ -874,6 +841,9 @@ class GaitTab(object):
         self.handle_gait_config_change()
 
     def handle_gait_config_change(self):
+        if self.in_gait_changed.value:
+            return
+
         # Put all of our GUI information into the RippleGait that
         # needs to be.
 
@@ -911,8 +881,9 @@ class GaitTab(object):
         self.ripple_config.position_margin_percent = \
             self.ui.positionMarginSpin.value()
 
-        self.ripple_config.leg_order = self.intify_leg_order(
-            self.validate_leg_order(self.ui.legOrderEdit.text()))
+        self.ripple_config.leg_order = \
+            ripple_gait.RippleConfig.parse_leg_order(
+                self.validate_leg_order(self.ui.legOrderEdit.text()))
 
         self.ripple_config.body_z_offset_mm = self.ui.bodyZOffsetSpin.value()
 

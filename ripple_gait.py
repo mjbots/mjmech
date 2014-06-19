@@ -55,8 +55,6 @@ class RippleConfig(object):
         given a string version.  On malformed input, make all attempts
         to return something, even if only a subset of the input.
         '''
-        assert isinstance(data, str)
-
         result = []
         if data == '':
             return result

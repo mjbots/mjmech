@@ -1,6 +1,8 @@
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
 import copy
+import sys
+import traceback
 
 import tf
 
@@ -106,12 +108,18 @@ class MechanicalConfig(object):
     def read_settings(config, group_name, leg_ik_map):
         result = MechanicalConfig()
 
-        if config.has_section(group_name + '.legs'):
-            for leg_name, value in config.items(group_name + '.legs'):
+        if config.has_section(group_name):
+            for leg_name, value in config.items(group_name):
                 if not leg_name.startswith('leg.'):
                     continue
                 leg_num = int(leg_name.split('.')[1])
-                leg_config = LegConfig.create_from_string(value)
+                try:
+                    leg_config = LegConfig.create_from_string(value)
+                except Exception as e:
+                    print >> sys.stderr, 'Error reading leg, ignoring:', value
+                    traceback.print_exc()
+                    continue
+
                 leg_config.leg_ik = leg_ik_map[leg_num]
                 result.leg_config[leg_num] = leg_config
 
@@ -123,7 +131,7 @@ class MechanicalConfig(object):
 
     def write_settings(self, config, group_name):
         config.add_section(group_name)
-        for leg_name, leg_config in self.leg_config.iteritems():
+        for leg_num, leg_config in self.leg_config.iteritems():
             config.set(group_name, 'leg.%d' % leg_num, str(leg_config))
 
         for x in self._FLOAT_ATTRIBUTES:
