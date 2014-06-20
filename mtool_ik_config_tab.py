@@ -465,3 +465,8 @@ class IkConfigTab(object):
         config.add_section('ikconfig.legs')
         for leg_num, leg_config in self.legs.iteritems():
             config.set('ikconfig.legs', 'leg.%d' % leg_num, str(leg_config))
+
+            if leg_config.present:
+                self.get_leg_ik(leg_num).config.write_settings(
+                    config, 'ikconfig.leg.%d' % leg_num)
+

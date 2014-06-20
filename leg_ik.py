@@ -28,6 +28,31 @@ class Configuration(object):
 
     servo_speed_dps = 360.0
 
+    @staticmethod
+    def get_attributes():
+        return [key for key, value in Configuration.__dict__.iteritems()
+                if (not key.startswith('__') and
+                    not callable(value) and
+                    not isinstance(value, staticmethod))]
+
+    def write_settings(self, config, group_name):
+        config.add_section(group_name)
+
+        for x in Configuration.get_attributes():
+            config.set(group_name, x, getattr(self, x))
+
+    @staticmethod
+    def read_settings(config, group_name):
+        result = Configuration()
+        for x in Configuration.get_attributes():
+            if config.has_option(group_name, x):
+                if x.endswith('sign') or x.endswith('ident'):
+                    value = config.getint(group_name, x)
+                else:
+                    value = config.getfloat(group_name, x)
+                setattr(result, x, value)
+        return result
+
 class JointAngles(object):
     config = None
     coxa_deg = None # positive is rotating clockwise viewed from top
