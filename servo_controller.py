@@ -140,6 +140,8 @@ class GazeboController(object):
             '/gazebo/default/%s/joint_cmd' % model_name,
             'gazebo.msgs.JointCmd'))
 
+        yield From(self.publisher.wait_for_listener())
+
         self.subscriber = self.manager.subscribe(
             '/gazebo/default/%s/joint_cmd' % model_name,
             'gazebo.msgs.JointCmd',
