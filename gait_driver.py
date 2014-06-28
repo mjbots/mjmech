@@ -2,15 +2,15 @@
 
 # Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-import argparse
 import ConfigParser
 import logging
+import optparse
 import pygame
 import sys
 import time
 
 import trollius as asyncio
-from trollius import From, Task
+from trollius import From, Task, Return
 
 import trollius_trace
 
@@ -58,14 +58,20 @@ class GaitDriver(object):
         # at once.  However, just forcing us to the gait's idle state
         # is easier for now.
 
+        self.state = self.gait.get_idle_state()
+        self.gait.set_state(self.state, ripple_gait.Command())
+
+        do_idle = True
+
         while True:
-            yield From(self._idle_state())
+            if do_idle:
+                yield From(self._idle_state())
 
             # Run the current command as long as one is present.
             yield From(self._run_command())
 
             # Transition back to the idle state.
-            yield From(self._transition_to_idle())
+            do_idle = yield From(self._transition_to_idle())
 
     def set_command(self, command):
         '''Command the mech to begin motion.
@@ -96,15 +102,16 @@ class GaitDriver(object):
         servo_pose = self.state.command_dict()
 
         yield From(self.servo.set_pose(
-                servo_pose, pose_time=3 * UPDATE_TIME))
+                servo_pose, pose_time=0.5))
 
+        # TODO jpieper: It would be nice to periodically set the idle
+        # command while waiting for something new.
         while self.next_command is None:
             yield From(self.command_event.wait())
 
     @asyncio.coroutine
     def _run_command(self):
         self.mode = self.COMMAND
-        self.gait.set_state(self.state, ripple_gait.Command())
         
         yield From(self._run_while(
                 lambda: self.mode == self.COMMAND,
@@ -141,8 +148,12 @@ class GaitDriver(object):
         self.gait.set_command(ripple_gait.Command())
 
         yield From(self._run_while(
-                lambda: self.gait.is_command_pending(),
+                lambda: (self.gait.is_command_pending() and
+                         not self.next_command),
                 allow_new=False))
+
+        if self.next_command:
+            raise Return(False)
 
         class PhaseChecker(object):
             def __init__(self, parent):
@@ -154,19 +165,105 @@ class GaitDriver(object):
                 self.phase_delta += _wrap_phase(
                     self.parent.state.phase - self.old_phase)
                 self.old_phase = self.parent.state.phase
-                return self.phase_delta < 0.95
+                return (self.phase_delta < 0.95 and
+                        not self.parent.next_command)
 
         checker = PhaseChecker(self)
 
         yield From(self._run_while(checker.check, allow_new=False))
 
+        if self.next_command:
+            raise Return(False)
+
         def any_non_stance():
+            if self.next_command:
+                return False
+
             for leg in self.state.legs.values():
                 if leg.mode != ripple_gait.STANCE:
                     return True
             return False
 
         yield From(self._run_while(any_non_stance, allow_new=False))
+
+        if self.next_command:
+            raise Return(False)
+
+        raise Return(True)
+
+
+class MechDriver(object):
+    def __init__(self, options):
+        self.options = options
+        self.command_time = time.time()
+
+        self.driver = None
+        self.servo = None
+
+        config = ConfigParser.ConfigParser()
+        config.read(options.config)
+
+        self.leg_ik_map = _load_ik(config)
+
+        self.ripple_config = ripple_gait.RippleConfig.read_settings(
+            config, 'gaitconfig', self.leg_ik_map)
+
+        self.gait = ripple_gait.RippleGait(self.ripple_config)
+
+    @asyncio.coroutine
+    def run(self):
+        kwargs = {}
+        if self.options.serial_port:
+            kwargs['serial_port'] = self.options.serial_port
+        if self.options.model_name:
+            kwargs['model_name'] = self.options.model_name
+        self.servo = yield From(servo_controller.servo_controller(
+                self.options.servo,
+                **kwargs))
+
+        self.driver = GaitDriver(self.gait, self.servo)
+
+        idle_task = Task(self._make_idle())
+        driver_task = Task(self.driver.run())
+
+        done, pending = yield From(
+            asyncio.wait([idle_task, driver_task],
+                         return_when=asyncio.FIRST_EXCEPTION))
+
+        for x in done:
+            x.result()
+
+    def set_command(self, command):
+        self.command_time = time.time()
+        self.driver.set_command(command)
+
+    def set_idle(self):
+        self.command_time = time.time()
+        self.driver.set_idle()
+
+    def set_turret(self, pan_deg, tilt_deg):
+        if not self.servo:
+            return
+
+        Task(self.servo.set_pose({12: pan_deg, 13: tilt_deg}))
+
+    @asyncio.coroutine
+    def _make_idle(self):
+        while True:
+            now = time.time()
+            if now - self.command_time > 2.0:
+                self.driver.set_idle()
+            yield From(asyncio.sleep(0.5))
+
+    @staticmethod
+    def add_options(parser):
+        parser.add_option('-c', '--config', help='configuration to use')
+        parser.add_option('-s', '--servo', help='type of servo',
+                          default='gazebo')
+        parser.add_option('-m', '--model-name', help='gazebo model name',
+                          default='mj_mech')
+        parser.add_option('-p', '--serial-port', help='serial port to use',
+                          default='/dev/ttyUSB0')
         
         
 def _wrap_phase(delta):
@@ -174,7 +271,7 @@ def _wrap_phase(delta):
         return delta + 1.0
     return delta
 
-def load_ik(config):
+def _load_ik(config):
     leg_ik_map = {}
     for section in config.sections():
         if section.startswith('ikconfig.leg.'):
@@ -232,26 +329,10 @@ def handle_input(driver):
         clock.tick(10)
 
 @asyncio.coroutine
-def start(args):
-    config = ConfigParser.ConfigParser()
-    config.read(args.config)
-
-    leg_ik_map = load_ik(config)
-
-    ripple_config = ripple_gait.RippleConfig.read_settings(
-        config, 'gaitconfig', leg_ik_map)
-
-    gait = ripple_gait.RippleGait(ripple_config)
-
-    servo = yield From(servo_controller.servo_controller(
-              args.servo,
-              serial_port='/dev/ttyUSB0',
-              model_name=args.model))
-
-    driver = GaitDriver(gait, servo)
-
-    driver_task = Task(driver.run())
-    input_task = Task(handle_input(driver))
+def start(options):
+    gait_driver = MechDriver(options)
+    driver_task = Task(gait_driver.run())
+    input_task = Task(handle_input(gait_driver))
 
     done, pending = yield From(
         asyncio.wait([driver_task, input_task],
@@ -262,17 +343,13 @@ def start(args):
 def main():
     logging.basicConfig(level=logging.WARN, stream=sys.stdout)
 
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = optparse.OptionParser(description=__doc__)
 
-    parser.add_argument('-c', '--config', help='configuration to use')
-    parser.add_argument('-s', '--servo', help='type of servo',
-                        default='gazebo')
-    parser.add_argument('-m', '--model', help='gazebo model name',
-                        default='mj_mech')
+    MechDriver.add_options(parser)
 
-    args = parser.parse_args()
+    options, args = parser.parse_args()
 
-    task = Task(start(args))
+    task = Task(start(options))
     asyncio.get_event_loop().run_until_complete(task)
 
 if __name__ == '__main__':
