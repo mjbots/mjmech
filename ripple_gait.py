@@ -387,21 +387,6 @@ class RippleGait(object):
         # NOTE: This may modify command.
         options = self._select_command_options(command)
 
-        body_only = self._do_commands_differ_body_only(command, self.command)
-
-        if self.state.phase != 0.0 and not body_only:
-            # TODO jpieper: It would be nice to be able to update the
-            # command anytime all the legs are in STANCE (or even
-            # better, all the time), rather than just at phase 0.
-            #
-            # In either case, you have to be careful that the new
-            # action list is consistent with the new command and phase
-            # or do something more complicated like interpolate
-            # between the two commands.
-            self.next_command = command
-            self.next_options = options
-            return
-
         self._really_set_command(command, options)
 
     def is_command_pending(self):

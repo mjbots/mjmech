@@ -95,7 +95,8 @@ class GaitDriver(object):
         self.state = self.gait.get_idle_state()
         servo_pose = self.state.command_dict()
 
-        yield From(self.servo.set_pose(servo_pose, 2 * UPDATE_TIME))
+        yield From(self.servo.set_pose(
+                servo_pose, pose_time=3 * UPDATE_TIME))
 
         while self.next_command is None:
             yield From(self.command_event.wait())
@@ -122,7 +123,8 @@ class GaitDriver(object):
             self.state = self.gait.advance_time(UPDATE_TIME)
             try:
                 servo_pose = self.state.command_dict()
-                yield From(self.servo.set_pose(servo_pose, 2 * UPDATE_TIME))
+                yield From(self.servo.set_pose(
+                        servo_pose, pose_time=3 * UPDATE_TIME))
             except ripple_gait.NotSupported:
                 pass
 
@@ -214,8 +216,8 @@ def handle_input(driver):
 
         print x_speed, y_speed, rot_speed
 
-        command.translate_x_mm_s = x_speed * 50
-        command.translate_y_mm_s = y_speed * 50
+        command.translate_x_mm_s = x_speed * 100
+        command.translate_y_mm_s = y_speed * 250
         command.rotate_deg_s = rot_speed * 30
 
         if x_speed != 0.0 or y_speed != 0.0 or rot_speed != 0.0:
