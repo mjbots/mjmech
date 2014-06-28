@@ -15,13 +15,25 @@ except ImportError:  # pragma: no cover
     ssl = None
 
 from . import base_events
-from asyncio import constants
-from asyncio import events
-from asyncio import futures
-from asyncio import selectors
-from asyncio import transports
-from asyncio.log import logger
+from trollius import constants
+from trollius import events
+from trollius import futures
+from trollius import selectors
+from trollius import transports
+from trollius.log import logger
+from trollius import (SSLEOFError, SSLWantReadError, SSLWantWriteError,
+                      BlockingIOError, BrokenPipeError, ChildProcessError,
+                      ConnectionAbortedError, ConnectionRefusedError,
+                      ConnectionResetError, FileNotFoundError,
+                      InterruptedError, PermissionError)
+from trollius import py33_exceptions
 
+def wrap_error(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except (socket.error, IOError, OSError) as err:
+        new_err_cls = py33_exceptions.get_error_class(err.errno, OSError)
+        raise new_err_cls(err.errno, str(err))
 
 class BaseSelectorEventLoop(base_events.BaseEventLoop):
     """Selector event loop.
@@ -30,7 +42,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
     """
 
     def __init__(self, selector=None):
-        super().__init__()
+        super(BaseSelectorEventLoop, self).__init__()
 
 #        if selector is None:
 #            selector = selectors.DefaultSelector()
@@ -38,14 +50,14 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
 #        self._selector = selector
         self._make_self_pipe()
 
-    def _make_socket_transport(self, sock, protocol, waiter=None, *,
-                               extra=None, server=None):
+    def _make_socket_transport(self, sock, protocol, waiter=None,
+                               extra=None, server=None, *args):
         return _SelectorSocketTransport(self, sock, protocol, waiter,
                                         extra, server)
 
-    def _make_ssl_transport(self, rawsock, protocol, sslcontext, waiter, *,
+    def _make_ssl_transport(self, rawsock, protocol, sslcontext, waiter,
                             server_side=False, server_hostname=None,
-                            extra=None, server=None):
+                            extra=None, server=None, *args):
         return _SelectorSslTransport(
             self, rawsock, protocol, sslcontext, waiter,
             server_side, server_hostname, extra, server)
@@ -60,7 +72,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             self._close_self_pipe()
 #            self._selector.close()
 #            self._selector = None
-            super().close()
+            super(BaseSelectorEventLoop, self).close()
 
     def _socketpair(self):
         raise NotImplementedError
@@ -83,13 +95,13 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
 
     def _read_from_self(self):
         try:
-            self._ssock.recv(1)
+            wrap_error(self._ssock.recv, 1)
         except (BlockingIOError, InterruptedError):
             pass
 
     def _write_to_self(self):
         try:
-            self._csock.send(b'x')
+            wrap_error(self._csock.send, b'x')
         except (BlockingIOError, InterruptedError):
             pass
 
@@ -101,7 +113,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
     def _accept_connection(self, protocol_factory, sock,
                            sslcontext=None, server=None):
         try:
-            conn, addr = sock.accept()
+            conn, addr = wrap_error(sock.accept())
             conn.setblocking(False)
         except (BlockingIOError, InterruptedError, ConnectionAbortedError):
             pass  # False alarm.
@@ -219,7 +231,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         if fut.cancelled():
             return
         try:
-            data = sock.recv(n)
+            data = wrap_error(sock.recv, n)
         except (BlockingIOError, InterruptedError):
             self.add_reader(fd, self._sock_recv, fut, True, sock, n)
         except Exception as exc:
@@ -245,7 +257,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             return
 
         try:
-            n = sock.send(data)
+            n = wrap_error(sock.send, data)
         except (BlockingIOError, InterruptedError):
             n = 0
         except Exception as exc:
@@ -285,15 +297,19 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         try:
             if not registered:
                 # First time around.
-                sock.connect(address)
+                print "trying connect!"
+                wrap_error(sock.connect, address)
             else:
                 err = sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
                 if err != 0:
-                    # Jump to the except clause below.
-                    raise OSError(err, 'Connect call failed %s' % (address,))
+                    def doit():
+                        # Jump to the except clause below.
+                        raise OSError(err, 'Connect call failed %s' % (address,))
+                    wrap_error(doit)
         except (BlockingIOError, InterruptedError):
             self.add_writer(fd, self._sock_connect, fut, True, sock, address)
         except Exception as exc:
+            print "got exception:", type(exc), exc
             fut.set_exception(exc)
         else:
             fut.set_result(None)
@@ -311,7 +327,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         if fut.cancelled():
             return
         try:
-            conn, address = sock.accept()
+            conn, address = wrap_error(sock.accept)
             conn.setblocking(False)
         except (BlockingIOError, InterruptedError):
             self.add_reader(fd, self._sock_accept, fut, True, sock)
@@ -357,7 +373,7 @@ class _FlowControlMixin(transports.Transport):
     """
 
     def __init__(self, extra=None):
-        super().__init__(extra)
+        super(_FlowControlMixin, self).__init__(extra)
         self._protocol_paused = False
         self.set_write_buffer_limits()
 
@@ -406,7 +422,7 @@ class _SelectorTransport(_FlowControlMixin, transports.Transport):
     _buffer_factory = bytearray  # Constructs initial value for self._buffer.
 
     def __init__(self, loop, sock, protocol, extra, server=None):
-        super().__init__(extra)
+        super(_SelectorTransport, self).__init__(extra)
         self._extra['socket'] = sock
         self._extra['sockname'] = sock.getsockname()
         if 'peername' not in self._extra:
@@ -476,7 +492,8 @@ class _SelectorSocketTransport(_SelectorTransport):
 
     def __init__(self, loop, sock, protocol, waiter=None,
                  extra=None, server=None):
-        super().__init__(loop, sock, protocol, extra, server)
+        super(_SelectorTransport, self).__init__(
+            loop, sock, protocol, extra, server)
         self._eof = False
         self._paused = False
 
@@ -503,7 +520,7 @@ class _SelectorSocketTransport(_SelectorTransport):
 
     def _read_ready(self):
         try:
-            data = self._sock.recv(self.max_size)
+            data = wrap_error(self._sock.recv, self.max_size)
         except (BlockingIOError, InterruptedError):
             pass
         except Exception as exc:
@@ -539,7 +556,7 @@ class _SelectorSocketTransport(_SelectorTransport):
         if not self._buffer:
             # Optimization: try to send now.
             try:
-                n = self._sock.send(data)
+                n = wrap_error(self._sock.send, data)
             except (BlockingIOError, InterruptedError):
                 pass
             except Exception as exc:
@@ -560,7 +577,7 @@ class _SelectorSocketTransport(_SelectorTransport):
         assert self._buffer, 'Data should not be empty'
 
         try:
-            n = self._sock.send(self._buffer)
+            n = wrap_error(self._sock.send, self._buffer)
         except (BlockingIOError, InterruptedError):
             pass
         except Exception as exc:
@@ -627,7 +644,8 @@ class _SelectorSslTransport(_SelectorTransport):
             wrap_kwargs['server_hostname'] = server_hostname
         sslsock = sslcontext.wrap_socket(rawsock, **wrap_kwargs)
 
-        super().__init__(loop, sslsock, protocol, extra, server)
+        super(_SelectorSslTransport, self).__init__(
+            loop, sslsock, protocol, extra, server)
 
         self._server_hostname = server_hostname
         self._waiter = waiter
@@ -725,7 +743,7 @@ class _SelectorSslTransport(_SelectorTransport):
                 self._loop.add_writer(self._sock_fd, self._write_ready)
 
         try:
-            data = self._sock.recv(self.max_size)
+            data = wrap_error(self._sock.recv, self.max_size)
         except (BlockingIOError, InterruptedError, ssl.SSLWantReadError):
             pass
         except ssl.SSLWantWriteError:
@@ -756,7 +774,7 @@ class _SelectorSslTransport(_SelectorTransport):
 
         if self._buffer:
             try:
-                n = self._sock.send(self._buffer)
+                n = wrap_error(self._sock.send, self._buffer)
             except (BlockingIOError, InterruptedError,
                     ssl.SSLWantWriteError):
                 n = 0
@@ -809,7 +827,8 @@ class _SelectorDatagramTransport(_SelectorTransport):
     _buffer_factory = collections.deque
 
     def __init__(self, loop, sock, protocol, address=None, extra=None):
-        super().__init__(loop, sock, protocol, extra)
+        super(_SelectorDatagramTransport, self).__init__(
+            loop, sock, protocol, extra)
         self._address = address
         self._loop.add_reader(self._sock_fd, self._read_ready)
         self._loop.call_soon(self._protocol.connection_made, self)
@@ -819,7 +838,7 @@ class _SelectorDatagramTransport(_SelectorTransport):
 
     def _read_ready(self):
         try:
-            data, addr = self._sock.recvfrom(self.max_size)
+            data, addr = wrap_error(self._sock.recvfrom, self.max_size)
         except (BlockingIOError, InterruptedError):
             pass
         except OSError as exc:
@@ -850,9 +869,9 @@ class _SelectorDatagramTransport(_SelectorTransport):
             # Attempt to send it right away first.
             try:
                 if self._address:
-                    self._sock.send(data)
+                    wrap_error(self._sock.send, data)
                 else:
-                    self._sock.sendto(data, addr)
+                    wrap_error(self._sock.sendto, data, addr)
                 return
             except (BlockingIOError, InterruptedError):
                 self._loop.add_writer(self._sock_fd, self._sendto_ready)
@@ -872,9 +891,9 @@ class _SelectorDatagramTransport(_SelectorTransport):
             data, addr = self._buffer.popleft()
             try:
                 if self._address:
-                    self._sock.send(data)
+                    wrap_error(self._sock.send, data)
                 else:
-                    self._sock.sendto(data, addr)
+                    wrap_error(self._sock.sendto, data, addr)
             except (BlockingIOError, InterruptedError):
                 self._buffer.appendleft((data, addr))  # Try again later.
                 break

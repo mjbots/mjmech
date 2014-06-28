@@ -11,16 +11,18 @@ import sys
 import threading
 
 
-from asyncio import base_subprocess
-from asyncio import constants
-from asyncio import events
-from asyncio import protocols
+from trollius import base_subprocess
+from trollius import constants
+from trollius import events
+from trollius import protocols
 from .     import selector_events
-from asyncio import tasks
-from asyncio import transports
-from asyncio.log import logger
+from trollius import tasks
+from trollius import transports
+from trollius.log import logger
 
-from asyncio.unix_events import AbstractChildWatcher, DefaultEventLoopPolicy
+from trollius.unix_events import AbstractChildWatcher, DefaultEventLoopPolicy
+
+from trollius import From, Return
 
 __all__ = ['SelectorEventLoop',
            'AbstractChildWatcher', 'SafeChildWatcher',
@@ -161,11 +163,11 @@ class _UnixSelectorEventLoop(selector_events.BaseSelectorEventLoop):
             transp = _UnixSubprocessTransport(self, protocol, args, shell,
                                               stdin, stdout, stderr, bufsize,
                                               extra=extra, **kwargs)
-            yield from transp._post_init()
+            yield From(transp._post_init())
             watcher.add_child_handler(transp.get_pid(),
                                       self._child_watcher_callback, transp)
 
-        return transp
+        raise Return(transp)
 
     def _child_watcher_callback(self, pid, returncode, transp):
         self.call_soon_threadsafe(transp._process_exited, returncode)

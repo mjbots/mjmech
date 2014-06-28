@@ -24,11 +24,13 @@ import time
 import os
 import sys
 
-from asyncio import events
-from asyncio import futures
-from asyncio import tasks
-from asyncio.log import logger
-from asyncio.base_events import Server
+from trollius import events
+from trollius import futures
+from trollius import tasks
+from trollius.log import logger
+from trollius.base_events import Server
+
+from trollius import From, Return
 
 
 __all__ = ['BaseEventLoop']
@@ -96,16 +98,18 @@ class BaseEventLoop(events.AbstractEventLoop):
 #        self._scheduled = []
         self._default_executor = None
         self._internal_fds = 0
+        self._exception_handler = None
+        self._debug = False
 #        self._running = False
 
-    def _make_socket_transport(self, sock, protocol, waiter=None, *,
-                               extra=None, server=None):
+    def _make_socket_transport(self, sock, protocol, waiter=None,
+                               extra=None, server=None, *args):
         """Create socket transport."""
         raise NotImplementedError
 
-    def _make_ssl_transport(self, rawsock, protocol, sslcontext, waiter, *,
+    def _make_ssl_transport(self, rawsock, protocol, sslcontext, waiter,
                             server_side=False, server_hostname=None,
-                            extra=None, server=None):
+                            extra=None, server=None, *args):
         """Create SSL transport."""
         raise NotImplementedError
 
@@ -270,8 +274,74 @@ class BaseEventLoop(events.AbstractEventLoop):
     def set_default_executor(self, executor):
         self._default_executor = executor
 
-    def getaddrinfo(self, host, port, *,
-                    family=0, type=0, proto=0, flags=0):
+    def set_exception_handler(self, handler):
+        self._exception_handler = handler
+
+    def get_debug(self):
+        return self._debug
+
+    def set_debug(self, value):
+        self._debug = value
+
+    def default_exception_handler(self, context):
+        message = context.get('message')
+        if not message:
+            message = 'Unhandled exception in event loop'
+
+        exception = context.get('exception')
+        if exception is not None:
+            if hasattr(exception, '__traceback__'):
+                # Python 3
+                tb = exception.__traceback__
+            else:
+                # call_exception_handler() is usually called indirectly
+                # from an except block. If it's not the case, the traceback
+                # is undefined...
+                tb = sys.exc_info()[2]
+            exc_info = (type(exception), exception, tb)
+        else:
+            exc_info = False
+
+        log_lines = [message]
+        for key in sorted(context):
+            if key in ('message', 'exception'):
+                continue
+            log_lines.append('{0}: {1!r}'.format(key, context[key]))
+
+        logger.error('\n'.join(log_lines), exc_info=exc_info)
+
+    def call_exception_handler(self, context):
+        if self._exception_handler is None:
+            try:
+                self.default_exception_handler(context)
+            except Exception:
+                # Second protection layer for unexpected errors
+                # in the default implementation, as well as for subclassed
+                # event loops with overloaded "default_exception_handler".
+                logger.error('Exception in default exception handler',
+                             exc_info=True)
+        else:
+            try:
+                self._exception_handler(self, context)
+            except Exception as exc:
+                # Exception in the user set custom exception handler.
+                try:
+                    # Let's try default handler.
+                    self.default_exception_handler({
+                        'message': 'Unhandled error in exception handler',
+                        'exception': exc,
+                        'context': context,
+                    })
+                except Exception:
+                    # Guard 'default_exception_handler' in case it's
+                    # overloaded.
+                    logger.error('Exception in default exception handler '
+                                 'while handling an unexpected error '
+                                 'in custom exception handler',
+                                 exc_info=True)
+
+    def getaddrinfo(self, host, port,
+                    family=0, type=0, proto=0, flags=0, *args):
         return self.run_in_executor(None, socket.getaddrinfo,
                                     host, port, family, type, proto, flags)
 
@@ -279,9 +349,9 @@ class BaseEventLoop(events.AbstractEventLoop):
         return self.run_in_executor(None, socket.getnameinfo, sockaddr, flags)
 
     @tasks.coroutine
-    def create_connection(self, protocol_factory, host=None, port=None, *,
+    def create_connection(self, protocol_factory, host=None, port=None,
                           ssl=None, family=0, proto=0, flags=0, sock=None,
-                          local_addr=None, server_hostname=None):
+                          local_addr=None, server_hostname=None, *args):
         """XXX"""
         if server_hostname is not None and not ssl:
             raise ValueError('server_hostname is only meaningful with ssl')
@@ -319,7 +389,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             else:
                 f2 = None
 
-            yield from tasks.wait(fs, loop=self)
+            yield From(tasks.wait(fs, loop=self))
 
             infos = f1.result()
             if not infos:
@@ -350,7 +420,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                             sock.close()
                             sock = None
                             continue
-                    yield from self.sock_connect(sock, address)
+                    yield From(self.sock_connect(sock, address))
                 except OSError as exc:
                     if sock is not None:
                         sock.close()
@@ -386,13 +456,13 @@ class BaseEventLoop(events.AbstractEventLoop):
         else:
             transport = self._make_socket_transport(sock, protocol, waiter)
 
-        yield from waiter
-        return transport, protocol
+        yield From(waiter)
+        raise Return((transport, protocol))
 
     @tasks.coroutine
     def create_datagram_endpoint(self, protocol_factory,
-                                 local_addr=None, remote_addr=None, *,
-                                 family=0, proto=0, flags=0):
+                                 local_addr=None, remote_addr=None,
+                                 family=0, proto=0, flags=0, *args):
         """Create datagram connection."""
         if not (local_addr or remote_addr):
             if family == 0:
@@ -406,9 +476,9 @@ class BaseEventLoop(events.AbstractEventLoop):
                     assert isinstance(addr, tuple) and len(addr) == 2, (
                         '2-tuple is expected')
 
-                    infos = yield from self.getaddrinfo(
+                    infos = yield From(self.getaddrinfo(
                         *addr, family=family, type=socket.SOCK_DGRAM,
-                        proto=proto, flags=flags)
+                        proto=proto, flags=flags))
                     if not infos:
                         raise OSError('getaddrinfo() returned empty list')
 
@@ -442,7 +512,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                 if local_addr:
                     sock.bind(local_address)
                 if remote_addr:
-                    yield from self.sock_connect(sock, remote_address)
+                    yield From(self.sock_connect(sock, remote_address))
                     r_addr = remote_address
             except OSError as exc:
                 if sock is not None:
@@ -455,17 +525,17 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         protocol = protocol_factory()
         transport = self._make_datagram_transport(sock, protocol, r_addr)
-        return transport, protocol
+        raise Return((transport, protocol))
 
     @tasks.coroutine
     def create_server(self, protocol_factory, host=None, port=None,
-                      *,
                       family=socket.AF_UNSPEC,
                       flags=socket.AI_PASSIVE,
                       sock=None,
                       backlog=100,
                       ssl=None,
-                      reuse_address=None):
+                      reuse_address=None,
+                      *args):
         """XXX"""
         if isinstance(ssl, bool):
             raise TypeError('ssl argument must be an SSLContext or None')
@@ -481,9 +551,9 @@ class BaseEventLoop(events.AbstractEventLoop):
             if host == '':
                 host = None
 
-            infos = yield from self.getaddrinfo(
+            infos = yield From(self.getaddrinfo(
                 host, port, family=family,
-                type=socket.SOCK_STREAM, proto=0, flags=flags)
+                type=socket.SOCK_STREAM, proto=0, flags=flags))
             if not infos:
                 raise OSError('getaddrinfo() returned empty list')
 
@@ -529,29 +599,29 @@ class BaseEventLoop(events.AbstractEventLoop):
             sock.listen(backlog)
             sock.setblocking(False)
             self._start_serving(protocol_factory, sock, ssl, server)
-        return server
+        raise Return(server)
 
     @tasks.coroutine
     def connect_read_pipe(self, protocol_factory, pipe):
         protocol = protocol_factory()
         waiter = futures.Future(loop=self)
         transport = self._make_read_pipe_transport(pipe, protocol, waiter)
-        yield from waiter
-        return transport, protocol
+        yield From(waiter)
+        raise Return((transport, protocol))
 
     @tasks.coroutine
     def connect_write_pipe(self, protocol_factory, pipe):
         protocol = protocol_factory()
         waiter = futures.Future(loop=self)
         transport = self._make_write_pipe_transport(pipe, protocol, waiter)
-        yield from waiter
-        return transport, protocol
+        yield From(waiter)
+        raise Return((transport, protocol))
 
     @tasks.coroutine
-    def subprocess_shell(self, protocol_factory, cmd, *, stdin=subprocess.PIPE,
+    def subprocess_shell(self, protocol_factory, cmd, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                          universal_newlines=False, shell=True, bufsize=0,
-                         **kwargs):
+                         *args, **kwargs):
         if not isinstance(cmd, str):
             raise ValueError("cmd must be a string")
         if universal_newlines:
@@ -561,15 +631,15 @@ class BaseEventLoop(events.AbstractEventLoop):
         if bufsize != 0:
             raise ValueError("bufsize must be 0")
         protocol = protocol_factory()
-        transport = yield from self._make_subprocess_transport(
-            protocol, cmd, True, stdin, stdout, stderr, bufsize, **kwargs)
-        return transport, protocol
+        transport = yield From(self._make_subprocess_transport(
+            protocol, cmd, True, stdin, stdout, stderr, bufsize, **kwargs))
+        raise Return((transport, protocol))
 
     @tasks.coroutine
-    def subprocess_exec(self, protocol_factory, *args, stdin=subprocess.PIPE,
+    def subprocess_exec(self, protocol_factory, stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                         universal_newlines=False, shell=False, bufsize=0,
-                        **kwargs):
+                        *args, **kwargs):
         if universal_newlines:
             raise ValueError("universal_newlines must be False")
         if shell:
@@ -577,9 +647,9 @@ class BaseEventLoop(events.AbstractEventLoop):
         if bufsize != 0:
             raise ValueError("bufsize must be 0")
         protocol = protocol_factory()
-        transport = yield from self._make_subprocess_transport(
-            protocol, args, False, stdin, stdout, stderr, bufsize, **kwargs)
-        return transport, protocol
+        transport = yield From(self._make_subprocess_transport(
+            protocol, args, False, stdin, stdout, stderr, bufsize, **kwargs))
+        raise Return((transport, protocol))
 
 #    def _add_callback(self, handle):
 #        """Add a Handle to ready or scheduled."""

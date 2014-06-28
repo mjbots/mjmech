@@ -7,10 +7,10 @@ try:
 except ImportError:
     Gtk = None
 
-from asyncio import events
-from asyncio import futures
-from asyncio import tasks
-from asyncio.log import logger
+from trollius import events
+from trollius import futures
+from trollius import tasks
+from trollius.log import logger
 
 from . import unix_events
 
@@ -79,7 +79,7 @@ class GLibChildWatcher(unix_events.AbstractChildWatcher):
 
 class GLibHandle(events.Handle):
     def __init__(self, loop, source, repeat, callback, args):
-        super().__init__(callback, args, loop)
+        super(GLibHandle, self).__init__(callback, args, loop)
 
         self._loop   = loop
         self._source = source
@@ -90,13 +90,13 @@ class GLibHandle(events.Handle):
         loop._handlers.add(self)
 
     def cancel(self):
-        super().cancel()
+        super(GLibHandle, self).cancel()
         self._source.destroy()
         self._loop._handlers.discard(self)
 
     def _run(self):
         self._ready = False
-        super()._run()
+        super(GLibHandle, self)._run()
 
     def _callback(self):
         if not self._ready:
@@ -165,7 +165,7 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
     Glib.MainLoop operations are implemented in the derived classes.
     """
 
-    class DefaultSigINTHandler:
+    class DefaultSigINTHandler(object):
         def __init__(self):
             s = GLib.unix_signal_source_new(signal.SIGINT)
             s.set_callback(self.__class__._callback, self)
@@ -230,7 +230,7 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
         self._loop_implem = None
         self._interrupted = False
 
-        super().__init__()
+        super(BaseGLibEventLoop, self).__init__()
 
         # install a default handler for SIGINT
         # in the default context
@@ -369,7 +369,7 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
 
         self._default_sigint_handler.detach(self)
 
-        super().close()
+        super(BaseGLibEventLoop, self).close()
 
     # Methods scheduling callbacks.  All these return Handles.
     def call_soon(self, callback, *args):
@@ -591,7 +591,7 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
 GLibEventLoop = BaseGLibEventLoop
 
 
-class _LoopImplem:
+class _LoopImplem(object):
     def __init__(self, loop):
         self._loop = loop
 
@@ -604,7 +604,7 @@ class _LoopImplem:
 class _GLibLoopImplem(_LoopImplem):
 
     def __init__(self, loop):
-        super().__init__(loop)
+        super(_GLibLoopImplem, self).__init__(loop)
 
         # We use the introspected MainLoop object directly, because the
         # override in pygobject tampers with SIGINT
@@ -627,7 +627,7 @@ if Gtk:
 class _GApplicationLoopImplem(_LoopImplem):
 
     def __init__(self, loop, application):
-        super().__init__(loop)
+        super(_GApplicationLoopImplem, self).__init__(loop)
 
         if not isinstance (application, Gio.Application):
             raise TypeError("application must be a Gio.Application object")
@@ -650,7 +650,7 @@ class GLibEventLoopPolicy(events.AbstractEventLoopPolicy):
 
     #TODO add a parameter to synchronise with GLib's thead default contextes
     #	(g_main_context_push_thread_default())
-    def __init__(self, *, full=False, default=True, threads=True):
+    def __init__(self, full=False, default=True, threads=True, *args):
         """Constructor
 
         threads     Multithread support (default: True)
@@ -725,19 +725,21 @@ class GLibEventLoopPolicy(events.AbstractEventLoopPolicy):
 
 if Gtk:
     class GtkEventLoopPolicy(GLibEventLoopPolicy):
-        def __init__(self, *, full=False, threads=True):
-            super().__init__ (default=True, full=full, threads=threads)
+        def __init__(self, full=False, threads=True, *args):
+            super(GtkEventLoopPolicy, self).__init__(
+                default=True, full=full, threads=threads)
 
         def _new_default_loop(self):
             return GLibEventLoop(gtk=True)
 
 class GApplicationEventLoopPolicy(GLibEventLoopPolicy):
-    def __init__(self, *, full=False, threads=True):
-        super().__init__ (default=True, full=full, threads=threads)
+    def __init__(self, full=False, threads=True, *args):
+        super(GApplicationEventLoopPolicy, self).__init__(
+            default=True, full=full, threads=threads)
 
 class wait_signal (futures.Future):
-    def __init__(self, obj, name, *, loop=None):
-        super().__init__(loop=loop)
+    def __init__(self, obj, name, loop=None, *args):
+        super(wait_signal, self).__init__(loop=loop)
         self._obj = obj
         #FIXME: use  a weakref ?
         self._hnd = obj.connect(name, self._signal_callback)
@@ -747,7 +749,7 @@ class wait_signal (futures.Future):
         self.set_result(k)
 
     def cancel(self):
-        super().cancel()
+        super(wait_signal, self).cancel()
         if self._obj:
             self._obj.disconnect(self._hnd)
             self._obj = None
