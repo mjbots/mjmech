@@ -297,7 +297,6 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         try:
             if not registered:
                 # First time around.
-                print "trying connect!"
                 wrap_error(sock.connect, address)
             else:
                 err = sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
