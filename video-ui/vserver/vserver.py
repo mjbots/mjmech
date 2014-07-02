@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import sys
 import os
-import gobject
 import traceback
 import logging
 import socket
@@ -12,6 +11,18 @@ import time
 import signal
 import serial
 import fcntl
+
+import trollius as asyncio
+from trollius import Task
+
+from gi.repository import GObject
+gobject = GObject
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../legtool'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
+
+import gait_driver
+import gbulb
 
 g_main_loop = gobject.MainLoop()
 
@@ -59,69 +70,6 @@ class UdpAnnouncer(object):
         self.sock.sendto(msg + '\n', self.dest)
         return True
 
-class SerialControl(object):
-    """Serial control object.
-    Assumes Firmata control interface with servoes on pins 3 and 5
-    """
-
-    SERPORT = '/dev/ttyACM99'
-    BAUDRATE = 57600
-
-    def __init__(self):
-        self.pos = None
-        self.send_count = 0
-
-        # We are not using dev's read/write methods, as they
-        # are not safe to use inside the loop.
-        # instead, we just use underlying fd directly.
-        self.serial_dev = serial.Serial(self.SERPORT, baudrate=self.BAUDRATE)
-        self.serial_fd = self.serial_dev.fileno()
-
-        # Assert that the fd is nonblocking
-        mode = fcntl.fcntl(self.serial_fd, fcntl.F_GETFL)
-        assert mode & os.O_NONBLOCK, mode
-
-    def on_timer(self):
-        self._send_packet()
-
-    def set_pos(self, pos):
-        if pos is None:
-            if self.pos is not None:
-                self.send_count = 0
-            new_pos = None
-        else:
-            if self.pos is None:
-                self.send_count = 0
-            new_pos = (min(1, max(0, pos[0])),
-                       min(1, max(0, pos[1])))
-        if new_pos == self.pos:
-            return
-        self.pos = new_pos
-        self._send_packet()
-
-    def _send_packet(self):
-        self.send_count += 1
-        data = []
-        if self.pos is not None:
-            if (self.send_count % 20) == 1:
-                # Set pins 3 and 5 to servo mode
-                data += [0xF4, 3, 4, 0xF4, 5, 4]
-            # map 0..1 positions to degrees for firmata
-            dvals = (int(60 + 60 * self.pos[0]),
-                     int(60 + 60 * self.pos[1]))
-            for pin, d_val in zip([3, 5], dvals):
-                data += [0xE0 | pin, d_val & 0x7F, (d_val >> 7) & 0x7F]
-        else:
-            if (self.send_count % 20) == 1:
-                # Set pins 3 and 5 to output (DC) mode
-                data += [0xF4, 3, 1, 0xF4, 5, 1]
-            # No values
-
-        if not data:
-            return
-        data_bin = ''.join(chr(x) for x in data)
-        written = os.write(self.serial_fd, data_bin)
-        assert written == len(data_bin), (written, len(data_bin))
 
 class ControlInterface(object):
     PORT = 13356
@@ -142,10 +90,12 @@ class ControlInterface(object):
         self.recent_packets = 0
         self.last_seq = None
         
-        if self.opts.no_serial:
-            self.serial_control = None
+        if self.opts.no_mech:
+            self.mech_driver = None
         else:
-            self.serial_control = SerialControl()
+            self.mech_driver = gait_driver.MechDriver(opts)
+
+        Task(self.mech_driver.run())
 
         self.video_addr = None
         self.video_proc = None
@@ -165,8 +115,6 @@ class ControlInterface(object):
             self._set_src_addr(None)
         else:
             self._set_video_dest(None)
-        if self.serial_control:
-            self.serial_control.on_timer()
         return True
 
     def _on_readable(self, source, cond):
@@ -186,8 +134,6 @@ class ControlInterface(object):
         self.logger.info('Remote peer address is now %r' % (addr, ))
         self.src_addr = addr
         self._set_video_dest(None)
-        if self.serial_control:
-            self.serial_control.set_pos(None)
 
     def _handle_packet(self, pkt_bin):
         self.recent_packets += 1
@@ -203,8 +149,8 @@ class ControlInterface(object):
             self.logger.info('Seq number jump: %r->%r' % (self.last_seq, pkt['seq']))
         self.last_seq = pkt['seq']
 
-        if 'servo_x' in pkt and 'servo_y' in pkt and self.serial_control:
-            self.serial_control.set_pos((pkt['servo_x'], pkt['servo_y']))
+        if 'servo_x' in pkt and 'servo_y' in pkt and self.mech_driver:
+            self.mech_driver.set_turret((pkt['servo_x'], pkt['servo_y']))
 
         #self.logger.debug('Remote packet: %r' % (pkt, ))
 
@@ -242,8 +188,10 @@ class ControlInterface(object):
         #gobject.g_spawn_close_pid(pid)
 
 def main(opts):
+    asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
+
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.WARN,
         format="%(asctime)s.%(msecs).3d [%(levelname).1s] %(name)s: %(message)s",
         datefmt="%T")
 
@@ -256,14 +204,18 @@ def main(opts):
     ann = UdpAnnouncer()
     cif = ControlInterface(opts)
     logging.info('Running')
-    g_main_loop.run()
+
+    asyncio.get_event_loop().run_forever()
 
 if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option('--check', action='store_true',
                       help='Exit immediately')
-    parser.add_option('--no-serial', action='store_true',
-                      help='Do not open serial control port')
+    parser.add_option('--no-mech', action='store_true',
+                      help='Do not try and control mech')
+
+    gait_driver.MechDriver.add_options(parser)
+
     opts, args = parser.parse_args()
     if args:
         parser.error('No args accepted')
