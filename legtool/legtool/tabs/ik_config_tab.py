@@ -1,14 +1,27 @@
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-import settings
-import leg_ik
+from ..servo import selector
+from ..gait import leg_ik
 
-from mtool_common import BoolContext
-import mtool_graphics_scene
-import servo_controller
+from .common import BoolContext
+from . import settings
+from . import graphics_scene
 
 class LegConfig(object):
     present = False
@@ -156,7 +169,7 @@ class IkTester(object):
         if self.servo_tab.controller is None:
             return
         Task(self.servo_tab.controller.enable_power(
-                servo_controller.POWER_ENABLE))
+                selector.POWER_ENABLE))
 
         self.handle_mouse_move(cursor)
 
@@ -164,7 +177,7 @@ class IkTester(object):
         if self.servo_tab.controller is None:
             return
         Task(self.servo_tab.controller.enable_power(
-                servo_controller.POWER_BRAKE))
+                selector.POWER_BRAKE))
 
     def handle_mouse_move(self, cursor):
         if self.servo_tab.controller is None:

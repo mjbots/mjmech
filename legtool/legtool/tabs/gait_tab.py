@@ -1,4 +1,17 @@
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import functools
 import numpy
@@ -11,14 +24,15 @@ from trollius import From, Task
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-import convexhull
-import ripple_gait
-import servo_controller
-import settings
-import tf
+from ..tf import tf
+from ..servo import selector
+from ..gait import ripple
 
-from mtool_common import BoolContext
-import mtool_graphics_scene
+from . import convexhull
+from . import settings
+
+from .common import BoolContext
+from . import graphics_scene
 
 PLAYBACK_TIMEOUT_MS = 40
 
@@ -39,8 +53,7 @@ class GaitGeometryDisplay(object):
         self.projection = self.PROJECTION_XY
         self.scale = 300.0
 
-        self.axes_item = mtool_graphics_scene.AxesItem(
-            true_scale=True, grid_skip=2)
+        self.axes_item = graphics_scene.AxesItem(true_scale=True, grid_skip=2)
         self.axes_item.x_scale = self.scale
         self.axes_item.y_scale = self.scale
         self.axes_item.x_suffix = 'mm'
@@ -178,10 +191,10 @@ class GaitGeometryDisplay(object):
 
             if ik_result is None:
                 color = QtCore.Qt.red
-            elif leg.mode == ripple_gait.STANCE:
+            elif leg.mode == ripple.STANCE:
                 color = QtCore.Qt.green
                 stance_points.append(point)
-            elif leg.mode == ripple_gait.SWING:
+            elif leg.mode == ripple.SWING:
                 color = QtCore.Qt.yellow
             else:
                 assert False, 'unknown leg mode %d' % leg.mode
@@ -246,7 +259,7 @@ class GaitGraphDisplay(object):
             old_phase = 0.0
             old_swing = False
             for phase, mode in graph.leg[leg_number].sequence:
-                if mode == ripple_gait.STANCE and old_swing:
+                if mode == ripple.STANCE and old_swing:
                     # Render a black bar for this swing phase.
                     self.graphics_scene.addRect(
                         old_phase, y_offset + 0.1 * y_size,
@@ -255,7 +268,7 @@ class GaitGraphDisplay(object):
                         QtGui.QBrush(QtCore.Qt.black))
 
                 old_phase = phase
-                old_swing = True if mode == ripple_gait.SWING else False
+                old_swing = True if mode == ripple.SWING else False
 
             y_offset += y_size
 
@@ -295,7 +308,7 @@ class CommandWidget(object):
         self.config = None
         self.command = None
 
-        self.graphics_scene = mtool_graphics_scene.GraphicsScene()
+        self.graphics_scene = graphics_scene.GraphicsScene()
         self.graphics_scene.sceneMouseMoveEvent.connect(
             self.handle_mouse_move)
         self.graphics_scene.sceneMousePressEvent.connect(
@@ -314,7 +327,7 @@ class CommandWidget(object):
                      self.ui.commandYScaleSpin]:
             spin.valueChanged.connect(self.handle_scale_change)
 
-        self.axes_item = mtool_graphics_scene.AxesItem()
+        self.axes_item = graphics_scene.AxesItem()
         self.graphics_scene.addItem(self.axes_item)
 
         self.grid_count = 10
@@ -456,7 +469,7 @@ class CommandWidget(object):
         self.config = self.next_config
         self.command = self.next_command
 
-        my_gait = ripple_gait.RippleGait(self.next_config)
+        my_gait = ripple.RippleGait(self.next_config)
         my_command = self.next_command.copy()
 
         self.next_config = None
@@ -481,7 +494,7 @@ class CommandWidget(object):
                     actual_command, self.ATTR_NAMES[self.y_axis()])
                 if actual_x_value != x_value or actual_y_value != y_value:
                     color = (255, 255, 0)
-            except ripple_gait.NotSupported:
+            except ripple.NotSupported:
                 color = (255, 0, 0)
 
             rect.setBrush(QtGui.QBrush(QtGui.QColor(*color)))
@@ -512,10 +525,10 @@ class GaitTab(object):
         self.in_number_changed = BoolContext()
         self.in_command_changed = BoolContext()
 
-        self.ripple_config = ripple_gait.RippleConfig()
-        self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
+        self.ripple_config = ripple.RippleConfig()
+        self.ripple_gait = ripple.RippleGait(self.ripple_config)
 
-        self.command = ripple_gait.Command()
+        self.command = ripple.Command()
 
         self.command_widget = CommandWidget(
             ui, self.command, self.handle_widget_set_command)
@@ -620,7 +633,7 @@ class GaitTab(object):
         fields = [float(x) for x in value.split(',')]
         assert len(fields) >= 3
 
-        result = ripple_gait.LegConfig()
+        result = ripple.LegConfig()
         result.mount_x_mm = fields[0]
         result.mount_y_mm = fields[1]
         result.mount_z_mm = fields[2]
@@ -628,7 +641,7 @@ class GaitTab(object):
         return result
 
     def leg_config_to_string(self, leg_config):
-        assert isinstance(leg_config, ripple_gait.LegConfig)
+        assert isinstance(leg_config, ripple.LegConfig)
         return '%.2f,%.2f,%.2f' % (
             leg_config.mount_x_mm,
             leg_config.mount_y_mm,
@@ -646,8 +659,8 @@ class GaitTab(object):
                 return self.parent.ikconfig_tab.get_leg_ik(index)
 
         self.ripple_config = \
-            ripple_gait.RippleConfig.read_settings(config, 'gaitconfig',
-                                                   IkGetter(self))
+            ripple.RippleConfig.read_settings(config, 'gaitconfig',
+                                              IkGetter(self))
 
         with self.in_command_changed:
             for spin, name in self.get_float_configs():
@@ -673,7 +686,7 @@ class GaitTab(object):
             c = self.ripple_config
             m = c.mechanical
             legs = m.leg_config.values()
-            l = legs[0] if len(legs) > 0 else ripple_gait.LegConfig()
+            l = legs[0] if len(legs) > 0 else ripple.LegConfig()
 
             spins = [
                 (self.ui.bodyCogXSpin, m.body_cog_x_mm),
@@ -714,7 +727,7 @@ class GaitTab(object):
         self.command_widget.write_settings(config)
 
     def stringify_leg_order(self, data):
-        return ripple_gait.RippleConfig.str_leg_order(data)
+        return ripple.RippleConfig.str_leg_order(data)
 
     def validate_leg_order(self, data):
         """Accept data that is human entered.  Return a string
@@ -722,7 +735,7 @@ class GaitTab(object):
         separate list of leg numbers, or tuples of leg numbers."""
         entered_values = []
         try:
-            entered_values = ripple_gait.RippleConfig.parse_leg_order(data)
+            entered_values = ripple.RippleConfig.parse_leg_order(data)
         except:
             pass
 
@@ -762,12 +775,12 @@ class GaitTab(object):
 
             if self.servo_tab.controller:
                 Task(self.servo_tab.controller.enable_power(
-                        servo_controller.POWER_BRAKE))
+                        selector.POWER_BRAKE))
             return
 
         if self.servo_tab.controller:
             Task(self.servo_tab.controller.enable_power(
-                    servo_controller.POWER_ENABLE))
+                    selector.POWER_ENABLE))
 
         # Update the leg list widget.
         available_legs = self.ikconfig_tab.get_all_legs()
@@ -809,7 +822,7 @@ class GaitTab(object):
             number = int(current_item.text())
 
             leg_config = self.ripple_config.mechanical.leg_config.get(
-                number, ripple_gait.LegConfig())
+                number, ripple.LegConfig())
             if leg_config.mount_x_mm is not None:
                 self.ui.mountingLegXSpin.setValue(leg_config.mount_x_mm)
             if leg_config.mount_y_mm is not None:
@@ -830,7 +843,7 @@ class GaitTab(object):
         number = int(number_item.text())
 
         leg_config = self.ripple_config.mechanical.leg_config.get(
-            number, ripple_gait.LegConfig())
+            number, ripple.LegConfig())
 
         leg_config.mount_x_mm = self.ui.mountingLegXSpin.value()
         leg_config.mount_y_mm = self.ui.mountingLegYSpin.value()
@@ -856,7 +869,7 @@ class GaitTab(object):
                 if leg_number in mechanical.leg_config:
                     del mechanical.leg_config[leg_number]
             elif leg_number not in mechanical.leg_config:
-                mechanical.leg_config[leg_number] = ripple_gait.LegConfig()
+                mechanical.leg_config[leg_number] = ripple.LegConfig()
 
         for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
             leg_number, leg_config = leg_data
@@ -882,7 +895,7 @@ class GaitTab(object):
             self.ui.positionMarginSpin.value()
 
         self.ripple_config.leg_order = \
-            ripple_gait.RippleConfig.parse_leg_order(
+            ripple.RippleConfig.parse_leg_order(
                 self.validate_leg_order(self.ui.legOrderEdit.text()))
 
         self.ripple_config.body_z_offset_mm = self.ui.bodyZOffsetSpin.value()
@@ -896,7 +909,7 @@ class GaitTab(object):
         self.ripple_config.static_margin_mm = \
             self.ui.staticMarginSpin.value()
 
-        self.ripple_gait = ripple_gait.RippleGait(self.ripple_config)
+        self.ripple_gait = ripple.RippleGait(self.ripple_config)
         self.gait_geometry_display.set_gait_config(self.ripple_config)
 
         self.update_gait_graph()
@@ -909,11 +922,11 @@ class GaitTab(object):
         self.handle_gait_config_change()
 
     def update_gait_graph(self):
-        self.gait_graph_display.set_gait_graph(self.ripple_gait.get_gait_graph())
+        self.gait_graph_display.set_gait_graph(self.ripple.get_gait_graph())
 
     def get_start_state(self):
         begin_index = self.ui.playbackBeginCombo.currentIndex()
-        this_ripple = ripple_gait.RippleGait(self.ripple_config)
+        this_ripple = ripple.RippleGait(self.ripple_config)
 
         if begin_index == 0: # Idle
             begin_state = this_ripple.get_idle_state()
@@ -938,20 +951,20 @@ class GaitTab(object):
 
         try:
             begin_state = self.get_start_state()
-            begin_state = self.ripple_gait.set_state(begin_state, self.command)
-        except ripple_gait.NotSupported:
+            begin_state = self.ripple.set_state(begin_state, self.command)
+        except ripple.NotSupported:
             # guess we can't change anything
             self.ui.gaitOptionsBrowser.setText('command not possible')
             return
 
         self.current_states = (
             [begin_state.copy()] +
-            [self.ripple_gait.advance_phase(self.phase_step).copy()
+            [self.ripple.advance_phase(self.phase_step).copy()
              for x in range(self.ui.playbackPhaseSlider.maximum())])
 
         self.handle_playback_phase_change()
 
-        options = self.ripple_gait.options
+        options = self.ripple.options
         text = 'cycle_time: %.2fs\nservo_speed: %.1fdps' % (
             options.cycle_time_s,
             options.servo_speed_dps)
@@ -975,7 +988,7 @@ class GaitTab(object):
         if self.servo_tab.controller:
             try:
                 command = state.command_dict()
-            except ripple_gait.NotSupported:
+            except ripple.NotSupported:
                 return
 
             self.next_command = command
@@ -1055,7 +1068,7 @@ class GaitTab(object):
             self.ui.playbackSlowRepeatButton.setChecked(False)
 
         # Otherwise, start the appropriate playback mode.
-        self.ripple_gait.set_state(self.get_start_state(), self.command)
+        self.ripple.set_state(self.get_start_state(), self.command)
         self.playback_mode = state
         self.playback_timer.start(PLAYBACK_TIMEOUT_MS)
 
@@ -1064,12 +1077,12 @@ class GaitTab(object):
             print "WARNING: Playback timer fired when idle."
             return
 
-        old_phase = self.ripple_gait.state.phase
+        old_phase = self.ripple.state.phase
 
         advance = PLAYBACK_TIMEOUT_MS / 1000.0
         if self.playback_mode == self.PLAYBACK_SLOW_REPEAT:
             advance *= 0.1
-        state = self.ripple_gait.advance_time(advance)
+        state = self.ripple.advance_time(advance)
 
         if (self.playback_mode == self.PLAYBACK_SINGLE and
             state.phase < 0.5 and old_phase > 0.5):
@@ -1092,4 +1105,4 @@ class GaitTab(object):
         else:
             # Otherwise, just set the command on our gait and let
             # playback do its thing.
-            self.ripple_gait.set_command(self.command)
+            self.ripple.set_command(self.command)

@@ -1,4 +1,16 @@
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import functools
 
@@ -8,8 +20,9 @@ from trollius import Task, From, Return
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-from mtool_common import BoolContext
-import servo_controller
+from ..servo import selector
+
+from .common import BoolContext
 
 def spawn(callback):
     def start():
@@ -75,7 +88,7 @@ class ServoTab(object):
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
         self.controller = yield From(
-            servo_controller.servo_controller(
+            selector.selector(
                 val,
                 serial_port=self.ui.serialPortCombo.currentText(),
                 model_name=self.ui.modelEdit.text()))
@@ -152,11 +165,11 @@ class ServoTab(object):
         text = self.ui.powerCombo.currentText().lower()
         value = None
         if text == 'free':
-            value = servo_controller.POWER_FREE
+            value = selector.POWER_FREE
         elif text == 'brake':
-            value = servo_controller.POWER_BRAKE
+            value = selector.POWER_BRAKE
         elif text == 'drive':
-            value = servo_controller.POWER_ENABLE
+            value = selector.POWER_ENABLE
         else:
             raise NotImplementedError()
 
