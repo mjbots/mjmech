@@ -8,7 +8,7 @@ import math
 import pygazebo
 from pygazebo.msg import joint_cmd_pb2
 
-import herkulex
+from . import herkulex
 
 # Constants used in the 'enable_power' method.
 (# No power is applied, servos can be manipulated
@@ -226,7 +226,7 @@ class GazeboController(object):
         raise Return(None)
 
 @asyncio.coroutine
-def servo_controller(servo_type, **kwargs):
+def select_servo(servo_type, **kwargs):
     if servo_type == 'herkulex':
         if 'model_name' in kwargs:
             kwargs.pop('model_name')
