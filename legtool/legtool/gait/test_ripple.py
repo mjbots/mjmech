@@ -1,4 +1,17 @@
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import copy
 import math
@@ -6,9 +19,9 @@ import pytest
 import ConfigParser
 import StringIO
 
-import leg_ik
-import ripple_gait
-from ripple_gait import (STANCE, SWING)
+from . import leg_ik
+from . import ripple
+from .ripple import (STANCE, SWING)
 
 def contains(sequence, value):
     return len([x for x in sequence if x is value]) == 1
@@ -139,7 +152,7 @@ def verify_symmetric_result(result):
         verify_symmetric_stance(stance)
 
 def test_ripple_basic():
-    config = ripple_gait.RippleConfig()
+    config = ripple.RippleConfig()
 
     mounts = [(90., 90.), (90., -90.), (-90., -90.), (-90., 90.)]
 
@@ -158,7 +171,7 @@ def test_ripple_basic():
     ik_config.tibia_length_mm = 60.0
 
     for leg_num in range(4):
-        leg = ripple_gait.LegConfig()
+        leg = ripple.LegConfig()
 
         leg.mount_x_mm = mounts[leg_num][0]
         leg.mount_y_mm = mounts[leg_num][1]
@@ -188,7 +201,7 @@ def test_ripple_basic():
     config.leg_order = [0, 2, 1, 3]
     config.body_z_offset_mm = 60.0
 
-    gait = ripple_gait.RippleGait(config)
+    gait = ripple.RippleGait(config)
 
     # We want to:
     #  1. get the idle state
@@ -217,12 +230,12 @@ def test_ripple_basic():
 
     sanity_check_state(idle_state)
 
-    command = ripple_gait.Command()
+    command = ripple.Command()
     run_cycle(gait, idle_state, command, 10.0, 0.01)
     run_cycle(gait, idle_state, command, 10.0, 0.0073)
 
     config.max_cycle_time_s = 1.7
-    gait = ripple_gait.RippleGait(config)
+    gait = ripple.RippleGait(config)
     run_cycle(gait, idle_state, command, 5.0, 0.01)
 
     command.translate_y_mm_s = 50.0
@@ -238,14 +251,14 @@ def test_ripple_basic():
     verify_symmetric_result(result)
 
     config.statically_stable = True
-    gait = ripple_gait.RippleGait(config)
+    gait = ripple.RippleGait(config)
     idle_state = gait.get_idle_state()
 
-    command = ripple_gait.Command()
+    command = ripple.Command()
     run_cycle(gait, idle_state, command, 10.0, 0.01)
 
 def test_leg_order_parse():
-    parse = ripple_gait.RippleConfig.parse_leg_order
+    parse = ripple.RippleConfig.parse_leg_order
     assert parse('0,3,1,2') == [0, 3, 1, 2]
     assert parse('5,4,3,2,1') == [5, 4, 3, 2, 1]
     assert parse('(1,2),0,1') == [(1, 2), 0, 1]
@@ -259,7 +272,7 @@ def test_leg_order_parse():
     assert parse('2,3,(7,(8,6),1),0') == [2, 3]
 
 def test_config_settings():
-    dut = ripple_gait.RippleConfig()
+    dut = ripple.RippleConfig()
     config = ConfigParser.ConfigParser()
 
     dut.write_settings(config, 'test_group')
@@ -272,5 +285,5 @@ def test_config_settings():
     inp = StringIO.StringIO(config_data)
     config_copy.readfp(inp)
 
-    copy = ripple_gait.RippleConfig.read_settings(
+    copy = ripple.RippleConfig.read_settings(
         config_copy, 'test_group', {})
