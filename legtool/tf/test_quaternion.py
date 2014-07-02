@@ -1,6 +1,16 @@
-#!/usr/bin/python
-
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from math import degrees
 from math import radians
@@ -8,7 +18,7 @@ from numpy import array
 import sys
 import unittest
 
-from quaternion import Quaternion
+from .quaternion import Quaternion
 
 class QuaternionTest(unittest.TestCase):
     def check_vector_close(self, vector, x, y, z):
@@ -107,6 +117,3 @@ class QuaternionTest(unittest.TestCase):
                          radians(-3.24974326),
                          radians(2.727438544),
                          radians(-4.99563857))
-
-if __name__ == '__main__':
-    unittest.main()
