@@ -1,6 +1,18 @@
 #!/usr/bin/python
 
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 '''A servo, inverse-kinematics, and gait configuration tool for
 walking mech robots.'''
@@ -15,29 +27,29 @@ import ConfigParser
 import trollius
 import trollius as asyncio
 
-import trollius_trace
+from legtool.async import trollius_trace
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-import asyncio_qt
-import mtool_main_window
-import servo_controller
+from legtool.async import asyncio_qt
 
-from mtool_servo_tab import ServoTab
-from mtool_ik_config_tab import IkConfigTab
-from mtool_gait_tab import GaitTab
+import legtool_main_window
 
-class Mtool(QtGui.QMainWindow):
-    DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/mtool/mtool.ini')
+from legtool.tabs.servo_tab import ServoTab
+from legtool.tabs.ik_config_tab import IkConfigTab
+from legtool.tabs.gait_tab import GaitTab
+
+class LegTool(QtGui.QMainWindow):
+    DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/legtool/legtool.ini')
 
     def __init__(self, args, parent=None):
-        super(Mtool, self).__init__(parent)
+        super(LegTool, self).__init__(parent)
 
         self.config_file = (args.config if args.config else
                             self.DEFAULT_CONFIG_FILE)
 
-        self.ui = mtool_main_window.Ui_MtoolMainWindow()
+        self.ui = legtool_main_window.Ui_LegToolMainWindow()
         self.ui.setupUi(self)
 
         self.servo_tab = ServoTab(self.ui, self.statusBar())
@@ -80,7 +92,7 @@ def main():
     asyncio.set_event_loop_policy(asyncio_qt.QtEventLoopPolicy())
 
     app = QtGui.QApplication(sys.argv)
-    app.setApplicationName('mtool')
+    app.setApplicationName('legtool')
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-c', '--config',
@@ -88,8 +100,8 @@ def main():
 
     args = parser.parse_args()
 
-    mtool = Mtool(args)
-    mtool.show()
+    legtool = LegTool(args)
+    legtool.show()
 
     loop = asyncio.get_event_loop()
     loop.run_forever()

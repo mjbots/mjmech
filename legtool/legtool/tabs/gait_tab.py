@@ -526,7 +526,7 @@ class GaitTab(object):
         self.in_command_changed = BoolContext()
 
         self.ripple_config = ripple.RippleConfig()
-        self.ripple_gait = ripple.RippleGait(self.ripple_config)
+        self.ripple = ripple.RippleGait(self.ripple_config)
 
         self.command = ripple.Command()
 
@@ -909,7 +909,7 @@ class GaitTab(object):
         self.ripple_config.static_margin_mm = \
             self.ui.staticMarginSpin.value()
 
-        self.ripple_gait = ripple.RippleGait(self.ripple_config)
+        self.ripple = ripple.RippleGait(self.ripple_config)
         self.gait_geometry_display.set_gait_config(self.ripple_config)
 
         self.update_gait_graph()

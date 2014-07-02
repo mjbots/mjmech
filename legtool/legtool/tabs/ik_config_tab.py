@@ -60,7 +60,7 @@ class IkTester(object):
 
     def __init__(self, servo_tab, graphics_view):
         self.servo_tab = servo_tab
-        self.graphics_scene = mtool_graphics_scene.GraphicsScene()
+        self.graphics_scene = graphics_scene.GraphicsScene()
         self.graphics_scene.sceneMouseMoveEvent.connect(
             self.handle_mouse_move)
         self.graphics_scene.sceneMousePressEvent.connect(
@@ -86,7 +86,7 @@ class IkTester(object):
             rect.setPen(QtGui.QPen(QtCore.Qt.NoPen))
             rect.setZValue(-20)
 
-        self.axes = mtool_graphics_scene.AxesItem()
+        self.axes = graphics_scene.AxesItem()
         self.graphics_scene.addItem(self.axes)
         self.axes.x_suffix = 'mm'
         self.axes.y_suffix = 'mm'
