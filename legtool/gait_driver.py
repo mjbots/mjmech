@@ -1,6 +1,19 @@
 #!/usr/bin/python
 
-# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2014 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import ConfigParser
 import logging
@@ -12,11 +25,10 @@ import time
 import trollius as asyncio
 from trollius import From, Task, Return
 
-import trollius_trace
-
-import leg_ik
-import ripple_gait
-import servo_controller
+from legtool.async import trollius_trace
+from legtool.servo import selector
+from legtool.gait import leg_ik
+from legtool.gait import ripple
 
 UPDATE_TIME = 0.04
 
@@ -59,7 +71,7 @@ class GaitDriver(object):
         # is easier for now.
 
         self.state = self.gait.get_idle_state()
-        self.gait.set_state(self.state, ripple_gait.Command())
+        self.gait.set_state(self.state, ripple.Command())
 
         do_idle = True
 
@@ -132,7 +144,7 @@ class GaitDriver(object):
                 servo_pose = self.state.command_dict()
                 yield From(self.servo.set_pose(
                         servo_pose, pose_time=3 * UPDATE_TIME))
-            except ripple_gait.NotSupported:
+            except ripple.NotSupported:
                 pass
 
             delay = (current_time + UPDATE_TIME) - time.time()
@@ -145,7 +157,7 @@ class GaitDriver(object):
         # Command 0 speed, wait for the command to be active, then
         # wait for at least 1 phase, then wait for all legs to be in
         # stance.
-        self.gait.set_command(ripple_gait.Command())
+        self.gait.set_command(ripple.Command())
 
         yield From(self._run_while(
                 lambda: (self.gait.is_command_pending() and
@@ -180,7 +192,7 @@ class GaitDriver(object):
                 return False
 
             for leg in self.state.legs.values():
-                if leg.mode != ripple_gait.STANCE:
+                if leg.mode != ripple.STANCE:
                     return True
             return False
 
@@ -205,10 +217,10 @@ class MechDriver(object):
 
         self.leg_ik_map = _load_ik(config)
 
-        self.ripple_config = ripple_gait.RippleConfig.read_settings(
+        self.ripple_config = ripple.RippleConfig.read_settings(
             config, 'gaitconfig', self.leg_ik_map)
 
-        self.gait = ripple_gait.RippleGait(self.ripple_config)
+        self.gait = ripple.RippleGait(self.ripple_config)
 
     @asyncio.coroutine
     def run(self):
@@ -217,7 +229,7 @@ class MechDriver(object):
             kwargs['serial_port'] = self.options.serial_port
         if self.options.model_name:
             kwargs['model_name'] = self.options.model_name
-        self.servo = yield From(servo_controller.servo_controller(
+        self.servo = yield From(selector.select_servo(
                 self.options.servo,
                 **kwargs))
 
@@ -295,7 +307,7 @@ def handle_input(driver):
     print "numaxes=", joystick.get_numaxes()
     print "numbuttons=", joystick.get_numbuttons()
 
-    command = ripple_gait.Command()
+    command = ripple.Command()
     idle = True
         
     while True:

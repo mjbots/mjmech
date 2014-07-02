@@ -88,7 +88,7 @@ class ServoTab(object):
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
         self.controller = yield From(
-            selector.selector(
+            selector.select_servo(
                 val,
                 serial_port=self.ui.serialPortCombo.currentText(),
                 model_name=self.ui.modelEdit.text()))
