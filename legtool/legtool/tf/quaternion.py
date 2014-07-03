@@ -126,7 +126,7 @@ class Quaternion(object):
     @staticmethod
     def integrate_rotation_rate(roll_rate_rps, pitch_rate_rps, yaw_rate_rps,
                                 dt_s):
-        # This simple technique will yield terrible results in the
+        # This simple technique will yield terrible results if the
         # total delta is too large.
         MAX_INTEGRATION_ANGLE = math.radians(30)
 
