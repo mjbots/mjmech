@@ -15,6 +15,9 @@
 Import('canonenv')
 env = canonenv.Clone()
 
-env.Command('legtool_main_window.py', 'legtool_main_window.ui',
+env.Command('ui_legtool_main_window.py', 'legtool_main_window.ui',
             'pyside-uic $SOURCE -o $TARGET')
 
+env.Command('legtool/tabs/ui_gazebo_config_dialog.py',
+            'legtool/tabs/gazebo_config_dialog.ui',
+            'pyside-uic $SOURCE -o $TARGET')

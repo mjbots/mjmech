@@ -24,6 +24,8 @@ from ..servo import selector
 
 from .common import BoolContext
 
+from . import gazebo_config_dialog
+
 def spawn(callback):
     def start():
         Task(callback())
@@ -37,9 +39,17 @@ class ServoTab(object):
         self.servo_controls = []
         self.monitor_thread = None
 
+        self.servo_model = ''
+        self.servo_name_map = {}
+
         self.ui.statusText.setText('not connected')
         self.ui.connectButton.clicked.connect(
             spawn(self.handle_connect_clicked))
+
+        self.ui.typeCombo.currentIndexChanged.connect(self.handle_type_change)
+        self.handle_type_change()
+        self.ui.configureGazeboButton.clicked.connect(
+            self.handle_configure_gazebo)
 
         servo_layout = QtGui.QVBoxLayout()
         servo_layout.setSpacing(0)
@@ -87,13 +97,38 @@ class ServoTab(object):
     @asyncio.coroutine
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
-        self.controller = yield From(
-            selector.select_servo(
-                val,
-                serial_port=self.ui.serialPortCombo.currentText(),
-                model_name=self.ui.modelEdit.text()))
-        self.ui.statusText.setText('connected')
-        self.update_connected(True)
+        try:
+            self.controller = yield From(
+                selector.select_servo(
+                    val,
+                    serial_port=self.ui.serialPortCombo.currentText(),
+                    model_name=self.servo_model,
+                    servo_name_map=self.servo_name_map))
+            self.ui.statusText.setText('connected')
+            self.update_connected(True)
+        except Exception as e:
+            self.ui.statusText.setText('error: %s' % str(e))
+            self.update_connected(False)
+
+    def handle_type_change(self):
+        val = self.ui.typeCombo.currentText().lower()
+        self.ui.serialPortCombo.setEnabled(val == 'herkulex')
+        self.ui.configureGazeboButton.setEnabled(val == 'gazebo')
+
+    def handle_configure_gazebo(self):
+        servo_name_map = self.servo_name_map.copy()
+        for x in range(self.ui.servoCountSpin.value()):
+            if not x in servo_name_map:
+                servo_name_map[x] = ''
+        dialog = gazebo_config_dialog.GazeboConfigDialog(
+            self.servo_model, servo_name_map)
+        dialog.setModal(True)
+        result = dialog.exec_()
+        if result == QtGui.QDialog.Rejected:
+            return
+
+        self.servo_model = dialog.model_name()
+        self.servo_name_map = dialog.servo_name_map()
 
     def handle_servo_count(self):
         count = self.ui.servoCountSpin.value()
@@ -358,29 +393,38 @@ class ServoTab(object):
 
         self.ui.typeCombo.setCurrentIndex(config.getint('servo', 'type'))
         self.ui.serialPortCombo.setEditText(config.get('servo', 'port'))
-        self.ui.modelEdit.setText(config.get('servo', 'model'))
         self.ui.servoCountSpin.setValue(config.getint('servo', 'count'))
 
-        if not config.has_section('servo.poses'):
-            return
+        self.servo_model = config.get('servo', 'model')
 
-        for name, value in config.items('servo.poses'):
-            this_data = {}
-            for element in value.split(','):
-                ident, angle_deg = element.split('=')
-                this_data[int(ident)] = float(angle_deg)
-            item = self.add_list_pose(name)
-            item.setData(QtCore.Qt.UserRole, this_data)
+        if config.has_section('servo.names'):
+            self.servo_name_map = {}
+            for name, value in config.items('servo.names'):
+                self.servo_name_map[int(name)] = value
+
+        if config.has_section('servo.poses'):
+            for name, value in config.items('servo.poses'):
+                this_data = {}
+                for element in value.split(','):
+                    ident, angle_deg = element.split('=')
+                    this_data[int(ident)] = float(angle_deg)
+                item = self.add_list_pose(name)
+                item.setData(QtCore.Qt.UserRole, this_data)
 
 
     def write_settings(self, config):
         config.add_section('servo')
         config.add_section('servo.poses')
+        config.add_section('servo.names')
 
         config.set('servo', 'type', self.ui.typeCombo.currentIndex())
         config.set('servo', 'port', self.ui.serialPortCombo.currentText())
-        config.set('servo', 'model', self.ui.modelEdit.text())
         config.set('servo', 'count', self.ui.servoCountSpin.value())
+
+        config.set('servo', 'model', self.servo_model)
+
+        for key, value in self.servo_name_map.iteritems():
+            config.set('servo.names', str(key), value)
 
         for row in range(self.ui.poseList.count()):
             item = self.ui.poseList.item(row)

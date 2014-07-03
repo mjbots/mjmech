@@ -34,7 +34,7 @@ import PySide.QtGui as QtGui
 
 from legtool.async import asyncio_qt
 
-import legtool_main_window
+import ui_legtool_main_window
 
 from legtool.tabs.servo_tab import ServoTab
 from legtool.tabs.ik_config_tab import IkConfigTab
@@ -49,7 +49,7 @@ class LegTool(QtGui.QMainWindow):
         self.config_file = (args.config if args.config else
                             self.DEFAULT_CONFIG_FILE)
 
-        self.ui = legtool_main_window.Ui_LegToolMainWindow()
+        self.ui = ui_legtool_main_window.Ui_LegToolMainWindow()
         self.ui.setupUi(self)
 
         self.servo_tab = ServoTab(self.ui, self.statusBar())

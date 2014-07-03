@@ -139,8 +139,12 @@ class HerkuleXController(object):
 
 
 class GazeboController(object):
-    def __init__(self, model_name):
+    def __init__(self, model_name, servo_name_map=None):
         self.model_name = model_name
+
+        self.servo_name_map = dict(
+            (key, model_name + '::' + value)
+            for key, value in servo_name_map.iteritems())
 
     @asyncio.coroutine
     def start(self):
@@ -159,14 +163,6 @@ class GazeboController(object):
             'gazebo.msgs.JointCmd',
             self._receive_joint_cmd)
 
-        self._servo_names = reduce(
-            lambda a, b: a + b,
-            [ [ '%s::coxa_hinge%d' % (model_name, x),
-                '%s::femur_hinge%d' % (model_name, x),
-                '%s::tibia_hinge%d' % (model_name, x) ]
-              for x in range(4) ] + [ [
-                '%s::pan_aeg_hinge' % model_name,
-                '%s::weapon_assembly_hinge' % model_name ] ])
 
         self.joint_cmd = joint_cmd_pb2.JointCmd()
         self.joint_cmd.axis = 0
@@ -179,7 +175,7 @@ class GazeboController(object):
 
     def _receive_joint_cmd(self, data):
         joint_cmd = joint_cmd_pb2.JointCmd.FromString(data)
-        index = self._servo_names.index(self.joint_cmd.name)
+        index = self.servo_name_map.index(self.joint_cmd.name)
         if index < 0:
             return
 
@@ -192,7 +188,7 @@ class GazeboController(object):
     @asyncio.coroutine
     def set_pose(self, id_to_deg_map, pose_time=None):
         for ident, angle in id_to_deg_map.iteritems():
-            self.joint_cmd.name = self._servo_names[ident]
+            self.joint_cmd.name = self.servo_name_map[ident]
             self.joint_cmd.position.target = math.radians(angle)
             yield From(self.publisher.publish(self.joint_cmd))
             self._servo_angles[ident] = angle
@@ -242,6 +238,8 @@ def select_servo(servo_type, **kwargs):
     if servo_type == 'herkulex':
         if 'model_name' in kwargs:
             kwargs.pop('model_name')
+        if 'servo_name_map' in kwargs:
+            kwargs.pop('servo_name_map')
         result = HerkuleXController(**kwargs)
     elif servo_type == 'gazebo':
         if 'serial_port' in kwargs:
