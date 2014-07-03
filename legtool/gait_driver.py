@@ -253,12 +253,6 @@ class MechDriver(object):
         self.command_time = time.time()
         self.driver.set_idle()
 
-    def set_turret(self, pan_deg, tilt_deg):
-        if not self.servo:
-            return
-
-        Task(self.servo.set_pose({12: pan_deg, 13: tilt_deg}))
-
     @asyncio.coroutine
     def _make_idle(self):
         while True:

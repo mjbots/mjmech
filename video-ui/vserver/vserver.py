@@ -150,7 +150,9 @@ class ControlInterface(object):
         self.last_seq = pkt['seq']
 
         if 'servo_x' in pkt and 'servo_y' in pkt and self.mech_driver:
-            self.mech_driver.set_turret((pkt['servo_x'], pkt['servo_y']))
+            Task(self.mech_driver.servo.set_pose(
+                    {12: pkt['servo_x'],
+                     13: pkt['servo_y']}))
 
         #self.logger.debug('Remote packet: %r' % (pkt, ))
 
