@@ -70,6 +70,8 @@ class GaitDriver(object):
         # at once.  However, just forcing us to the gait's idle state
         # is easier for now.
 
+        yield From(self.servo.enable_power(selector.POWER_ENABLE))
+
         self.state = self.gait.get_idle_state()
         self.gait.set_state(self.state, ripple.Command())
 
