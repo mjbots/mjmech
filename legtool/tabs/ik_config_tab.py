@@ -16,6 +16,8 @@
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+from trollius import Task
+
 from ..servo import selector
 from ..gait import leg_ik
 
