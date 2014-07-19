@@ -23,6 +23,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 
 import gait_driver
 import gbulb
+import legtool
 
 g_main_loop = gobject.MainLoop()
 
@@ -94,8 +95,7 @@ class ControlInterface(object):
             self.mech_driver = None
         else:
             self.mech_driver = gait_driver.MechDriver(opts)
-
-        Task(self.mech_driver.run())
+            Task(self.mech_driver.run())
 
         self.video_addr = None
         self.video_proc = None
@@ -153,6 +153,17 @@ class ControlInterface(object):
             Task(self.mech_driver.servo.set_pose(
                     {12: pkt['servo_x'],
                      13: pkt['servo_y']}))
+
+        if 'gait' in pkt and self.mech_driver:
+            gait = pkt['gait']
+            if gait is None:
+                self.mech_driver.set_idle()
+            else:
+                command = legtool.gait.ripple.Command()
+                for key, value in gait.iteritems():
+                    setattr(command, key, value)
+
+                self.mech_driver.set_command(command)
 
         #self.logger.debug('Remote packet: %r' % (pkt, ))
 

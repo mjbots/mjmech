@@ -32,6 +32,12 @@ def wrap_event(callback):
             raise
     return wrapped
 
+NULL_COMMAND = {
+    'translate_x_mm_s': 0,
+    'translate_y_mm_s': 0,
+    'rotate_deg_s': 0,
+    }
+
 class UdpAnnounceReceiver(object):
     PORT = 13355
 
@@ -118,6 +124,8 @@ class ControlInterface(object):
         else:
             self.video = VideoWindow(host, self.VIDEO_PORT)
             self.video.on_video_click_1 = self._handle_video_click_1
+            self.video.on_key_press = self._handle_key_press
+            self.video.on_key_release = self._handle_key_release
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
                          self._on_send_timer)
@@ -162,7 +170,33 @@ class ControlInterface(object):
         self.control_dict['servo_x'] = pos[0]
         self.control_dict['servo_y'] = pos[1]
         self._send_control()
-    
+
+    def _handle_key_press(self, evt):
+        dx = 0
+        dy = 0
+        dr = 0
+        name = Gdk.keyval_name(evt.keyval)
+        if name == 'w':
+            dy = 1
+        elif name == 's':
+            dy = -1
+        elif name == 'a':
+            dx = -1
+        elif name == 'd':
+            dx = 1
+        elif name == 'q':
+            dr = -1
+        elif name == 'e':
+            dr = 1
+
+        gait = NULL_COMMAND.copy()
+        gait['translate_x_mm_s'] = dx * 50
+        gait['translate_y_mm_s'] = dy * 100
+        gait['rotate_deg_s'] = dr * 30
+        self.control_dict['gait'] = gait
+
+    def _handle_key_release(self, evt):
+        self.control_dict['gait'] = None
 
 class VideoWindow(object):
     def __init__(self, host, port, rotate=False):
@@ -184,6 +218,8 @@ class VideoWindow(object):
                                     )
         self.drawingarea.connect("button-press-event", self._on_da_click)        
         self.drawingarea.connect("motion-notify-event", self._on_da_move)
+        self.window.connect("key-press-event", self._on_da_key)
+        self.window.connect("key-release-event", self._on_da_release)
         vbox.add(self.drawingarea)
         self.window.show_all()
         # You need to get the XID after window.show_all().  You shouldn't get it
@@ -241,6 +277,8 @@ class VideoWindow(object):
 
         # Callback functions
         self.on_video_click_1 = None
+        self.on_key_press = None
+        self.on_key_release = None
 
     def make_element(self, etype, **kwargs):
         elt = Gst.ElementFactory.make(etype)        
@@ -341,6 +379,20 @@ class VideoWindow(object):
                          (evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state))
         if evt.button == 1 and self.on_video_click_1:
             self.on_video_click_1(rel_pos)
+        return True
+
+    @wrap_event
+    def _on_da_key(self, src, evt):
+        assert src == self.window, src
+        if self.on_key_press:
+            self.on_key_press(evt)
+        return True
+
+    @wrap_event
+    def _on_da_release(self, src, evt):
+        assert src == self.window, src
+        if self.on_key_release:
+            self.on_key_release(evt)
         return True
 
 def main(opts):
