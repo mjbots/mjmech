@@ -222,6 +222,11 @@ class MechDriver(object):
         self.ripple_config = ripple.RippleConfig.read_settings(
             config, 'gaitconfig', self.leg_ik_map)
 
+        self.servo_name_map = {}
+        if config.has_section('servo.names'):
+            for name, value in config.items('servo.names'):
+                self.servo_name_map[int(name)] = value
+
         self.gait = ripple.RippleGait(self.ripple_config)
 
     @asyncio.coroutine
@@ -231,6 +236,7 @@ class MechDriver(object):
             kwargs['serial_port'] = self.options.serial_port
         if self.options.model_name:
             kwargs['model_name'] = self.options.model_name
+        kwargs['servo_name_map'] = self.servo_name_map
         self.servo = yield From(selector.select_servo(
                 self.options.servo,
                 **kwargs))
