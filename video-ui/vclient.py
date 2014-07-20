@@ -9,11 +9,22 @@ import json
 import errno
 import time
 
+import trollius as asyncio
+from trollius import Task, From
+
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import GObject, GLib
 from gi.repository import GdkX11, GstVideo, Gtk, Gdk
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../legtool/'))
+
+import gbulb
+import joystick
+import legtool.async.trollius_trace
+import linux_input
 
 # based on example at:
 # http://bazaar.launchpad.net/~jderose/+junk/gst-examples/view/head:/video-player-1.0
@@ -127,6 +138,26 @@ class ControlInterface(object):
             self.video.on_key_press = self._handle_key_press
             self.video.on_key_release = self._handle_key_release
 
+        def metric(device):
+            abs_axis = device.get_features(linux_input.EV.ABS)
+            for x in [linux_input.ABS.X,
+                      linux_input.ABS.Y,
+                      linux_input.ABS.RX]:
+                if not x in abs_axis:
+                    return -1
+            return 1
+            
+        enumerator = joystick.JoystickEnumerator(metric)
+        joysticks = enumerator.joysticks()
+        if len(joysticks):
+            self.joystick = joysticks[0]
+            self.joystick_task = Task(self.read_joystick())
+        else:
+            self.joystick = None
+            self.joystick_task = None
+            print "No joysticks found!"
+            
+
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
                          self._on_send_timer)
         GLib.io_add_watch(self.sock.fileno(), 
@@ -134,8 +165,38 @@ class ControlInterface(object):
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
 
+    @asyncio.coroutine
+    def read_joystick(self):
+        try:
+            while True:
+                ev = yield From(self.joystick.read())
+
+                if ev.ev_type != linux_input.EV.ABS:
+                    continue
+
+                dx = self.joystick.absinfo(linux_input.ABS.X).scaled()
+                dy = self.joystick.absinfo(linux_input.ABS.Y).scaled()
+                dr = self.joystick.absinfo(linux_input.ABS.RX).scaled()
+
+                if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
+                    self.control_dict['gait'] = None
+                else:
+                    gait = NULL_COMMAND.copy()
+                    gait['translate_x_mm_s'] = dx * 50
+                    gait['translate_y_mm_s'] = -dy * 200
+                    gait['rotate_deg_s'] = dr * 50
+                    self.control_dict['gait'] = gait
+        except Exception as e:
+            print "ERROR!:", str(e)
+            raise
+
     @wrap_event
     def _on_send_timer(self):
+        if self.joystick_task:
+            if self.joystick_task.done():
+                self.joystick_task.result()
+                self.joystick_task = None
+
         self._send_control()
         return True
 
@@ -396,6 +457,8 @@ class VideoWindow(object):
         return True
 
 def main(opts):
+    asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
+    
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s.%(msecs).3d [%(levelname).1s] %(name)s: %(message)s",
@@ -430,4 +493,5 @@ if __name__ == '__main__':
         opts.addr = args.pop(0)
     if args:
         parser.error('Invalid number of args')
+
     main(opts)
