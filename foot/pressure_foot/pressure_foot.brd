@@ -113,6 +113,7 @@
 <hole x="8.89" y="8.89" drill="4.7625"/>
 <text x="11.557" y="8.89" size="0.6096" layer="21" font="vector">jjp@pobox.com</text>
 <text x="11.557" y="7.747" size="0.6096" layer="21" font="vector">(c) 2014</text>
+<text x="16.637" y="7.747" size="0.6096" layer="21" font="vector">v1</text>
 </plain>
 <libraries>
 <library name="Atmel_By_element14_Batch_1-00">
@@ -1557,9 +1558,11 @@ design rules under a new name.</description>
 <attribute name="MPN" value="ATTINY45V-10SU" x="44.45" y="-2.921" size="1.778" layer="27" display="off"/>
 <attribute name="SUPPLIER" value="Atmel" x="44.45" y="-2.921" size="1.778" layer="27" display="off"/>
 <attribute name="OC_FARNELL" value="1288355" x="44.45" y="-2.921" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="7.3152" y="2.2352" size="1.016" layer="25" ratio="10" rot="SR0"/>
+<attribute name="NAME" x="8.0772" y="-0.3048" size="1.016" layer="25" ratio="10" rot="SR0"/>
 </element>
-<element name="U2" library="SparkFun-Sensors" package="LGA8" value="MPL115A" x="9.144" y="13.462" rot="R90"/>
+<element name="U2" library="SparkFun-Sensors" package="LGA8" value="MPL115A" x="9.144" y="13.462" smashed="yes" rot="R90">
+<attribute name="NAME" x="6.35" y="15.494" size="1.016" layer="25" font="vector" rot="R180"/>
+</element>
 <element name="C1" library="rcl" package="C0603" value="1uF" x="9.144" y="16.764" smashed="yes">
 <attribute name="NAME" x="5.715" y="16.129" size="1.016" layer="25"/>
 </element>
