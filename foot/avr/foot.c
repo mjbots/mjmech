@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "i2c.h"
 #include "util.h"
 #include "vcs_version.h"
 
@@ -193,6 +194,12 @@ static uint8_t cmd_prf(char* extra_args, char* output, uint8_t output_len,
   return 0;
 }
 
+static uint8_t cmd_i2c(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  uint8_t err = i2c_command(extra_args, output, output_len);
+  return err;
+}
+
 static uint8_t cmd_gpq(char* extra_args, char* output, uint8_t output_len,
                        uint8_t stream) {
   *output++ = ' ';
@@ -294,6 +301,7 @@ static const struct fw_command_struct PROGMEM fw_command_table[] = {
   { "TMQ", cmd_tmq, (1 << CMD_FLAGS_STREAMABLE) },
   { "QGR", cmd_qgr, (1 << CMD_FLAGS_STREAMABLE) },
   { "PRF", cmd_prf, (1 << CMD_FLAGS_STREAMABLE) },
+  { "I2C", cmd_i2c, (1 << CMD_FLAGS_STREAMABLE) },
   { "GPQ", cmd_gpq, (1 << CMD_FLAGS_STREAMABLE) },
   { "GPC", cmd_gpc, 0 },
   { "WDT", cmd_wdt, 0 },

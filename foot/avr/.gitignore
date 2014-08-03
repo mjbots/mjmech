@@ -2,3 +2,4 @@
 *.out
 *.srec
 *.hex
+vcs_version.h

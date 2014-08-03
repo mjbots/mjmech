@@ -1,6 +1,6 @@
 PROG=foot
 
-OBJS=util.o
+OBJS=util.o i2c.o
 
 FOOT_DBG_FLAG = #-dbg
 UPDATE_VCS := $(shell ./revision_update.py vcs_version.h)
@@ -27,7 +27,7 @@ load : $(PROG).srec
 	avrdude -p attiny861 -c avrispmkII -U flash:w:$(PROG).srec
 
 depend:
-	makedepend -I../avr_include $(PROG).c
+	makedepend -I../avr_include $(PROG).c $(OBJS:%.o=%.c)
 # DO NOT DELETE
 
 foot.o: /usr/include/inttypes.h /usr/include/features.h
@@ -46,5 +46,10 @@ foot.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
 foot.o: /usr/include/alloca.h /usr/include/bits/stdlib-float.h
 foot.o: /usr/include/ctype.h /usr/include/stdio.h /usr/include/libio.h
 foot.o: /usr/include/_G_config.h /usr/include/wchar.h
-foot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h util.h
-foot.o: vcs_version.h compact_software_uart.h usart_rate_calc.h
+foot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h i2c.h
+foot.o: util.h vcs_version.h compact_software_uart.h usart_rate_calc.h
+util.o: util.h
+i2c.o: /usr/include/string.h /usr/include/features.h
+i2c.o: /usr/include/stdc-predef.h /usr/include/sys/cdefs.h
+i2c.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+i2c.o: /usr/include/xlocale.h i2c.h util.h
