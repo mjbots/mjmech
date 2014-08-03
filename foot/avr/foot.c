@@ -49,18 +49,18 @@
 #define EOL "\r\n"
 
 #define STR_OK " OK"
-#define STR_PARSE_ERROR " could not parse"
+#define STR_PARSE_ERROR " no parse"
 #define STR_CODE_MISMATCH " code mismatch"
-#define STR_INVALID_PORT " invalid port"
-#define STR_INVALID_BIT " invalid bit"
-#define STR_INVALID_VALUE " invalid value"
-#define STR_UNKNOWN_CMD " unknown cmd"
-#define STR_NOT_STREAMABLE " not streamable"
-#define STR_ID_ZERO " stream id zero"
-#define STR_ID_INVALID " stream id invalid"
-#define STR_STREAM_ID_IN_USE " stream id in use"
-#define STR_STREAM_TABLE_FULL " stream table full"
-#define STR_STREAM_NOT_FOUND " stream not found"
+#define STR_INVALID_PORT " inv port"
+#define STR_INVALID_BIT " inv bit"
+#define STR_INVALID_VALUE " inv value"
+#define STR_UNKNOWN_CMD " unk cmd"
+#define STR_NOT_STREAMABLE " not stmable"
+#define STR_ID_ZERO " stm id zero"
+#define STR_ID_INVALID " stm id invalid"
+#define STR_STREAM_ID_IN_USE " stm id in use"
+#define STR_STREAM_TABLE_FULL " stm table full"
+#define STR_STREAM_NOT_FOUND " stm not found"
 #define STR_OVERFLOW " overflow"
 
 static int16_t g_next_char = -1;
@@ -660,9 +660,11 @@ int main() {
   PCMSK1 = 0x01; // Set PB0 interrupt enable.
   GIMSK |= (1 << PCIE0); // Enable
 
+  i2c_init();
+
   sei();
   
-  strcpy_P(line_buf, PSTR("!GNR WELCOME " DEV_VERSION EOL));
+  strcpy_P(line_buf, PSTR("!GNR HI " DEV_VERSION EOL));
   software_uart_write_string(line_buf);
   
   for (;;) {

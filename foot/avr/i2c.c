@@ -26,7 +26,7 @@
 static uint8_t g_i2c_state;
 
 static void i2c_delay() {
-  _delay_us(10);
+  _delay_us(0);
 }
 
 static uint8_t i2c_sda_high() {
@@ -55,18 +55,26 @@ void i2c_init(void) {
   /* Start with both pins as inputs with pullups enabled. */
   i2c_sda_high();
   i2c_scl_high();
+  g_i2c_state = I2C_STATE_IDLE;
 }
 
 uint8_t i2c_start() {
-  /* For now, do something that will always work, even for repeated
-   * starts. */
   if (g_i2c_state == I2C_STATE_ACTIVE) {
+    /* Handle the repeated start case. */
     i2c_sda_high();
     i2c_delay();
     i2c_scl_high();
     i2c_delay();
+  } else {
+    /* If this is our first go, then both lines should be high,
+     * otherwise another master is using the bus. */
+    if (!i2c_sda_high() || !i2c_scl_high()) {
+      return I2C_ERR_BUSY;
+    }
   }
   i2c_sda_low();
+  i2c_delay();
+  i2c_scl_low();
   i2c_delay();
 
   g_i2c_state = I2C_STATE_ACTIVE;
@@ -74,9 +82,6 @@ uint8_t i2c_start() {
 }
 
 static uint8_t i2c_stop() {
-  if (g_i2c_state != I2C_STATE_ACTIVE) {
-    return I2C_ERR_BADCMD;
-  }
   i2c_sda_low();
   i2c_delay();
   i2c_scl_high();
@@ -84,10 +89,16 @@ static uint8_t i2c_stop() {
   i2c_sda_high();
   i2c_delay();
 
+  if (g_i2c_state != I2C_STATE_ACTIVE) {
+    return I2C_ERR_BADCMD;
+  }
+  
   if (!(I2C_SCL_PIN & (1 << I2C_SCL_BIT)) ||
       !(I2C_SDA_PIN & (1 << I2C_SDA_BIT))) {
     return I2C_ERR_BUSY;
   }
+
+  g_i2c_state = I2C_STATE_IDLE;
   
   return 0;
 }
@@ -109,7 +120,7 @@ static uint8_t i2c_write_bit(uint8_t bit) {
     if (timeout++ > I2C_TIMEOUT) { return I2C_ERR_TIMEOUT; }
   }
 
-  if (!bit && i2c_sda_high()) {
+  if (bit && !i2c_sda_high()) {
     return I2C_ERR_WRITE_COLL;
   }
 
@@ -148,6 +159,9 @@ static uint8_t i2c_write_byte(uint8_t data) {
   }
 
   err = i2c_read_bit();
+  if (err) {
+    return 0xff;
+  }
   return err;
 }
 
