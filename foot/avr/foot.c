@@ -63,7 +63,6 @@
 #define STR_STREAM_NOT_FOUND " stm not found"
 #define STR_OVERFLOW " overflow"
 
-static int16_t g_next_char = -1;
 static uint16_t g_timer;
 static uint16_t g_main_loop_count;
 
@@ -633,10 +632,15 @@ static void handle_line(char* line_buf) {
   software_uart_write_string(output);
 }
 
+static uint8_t g_serial_rbuf[16];
+static uint8_t g_serial_rbuf_head;
+static uint8_t g_serial_rbuf_tail;
+
 ISR(PCINT_vect) {
   if ((PINB & 0x01) == 0) {
     uint8_t c = software_uart_read_char();
-    g_next_char = c;
+    g_serial_rbuf[g_serial_rbuf_head] = c;
+    g_serial_rbuf_head = (g_serial_rbuf_head + 1) % sizeof(g_serial_rbuf);
   }
 }
 
@@ -673,13 +677,11 @@ int main() {
     
     PORTA ^= 0x01;
     cli();
-    int16_t this_char = g_next_char;
+    uint8_t rbuf_head = g_serial_rbuf_head;
     sei();
-    if (this_char >= 0) {
-      uint8_t c = this_char;
-      cli();
-      g_next_char = -1;
-      sei();
+    if (g_serial_rbuf_tail != rbuf_head) {
+      uint8_t c = g_serial_rbuf[g_serial_rbuf_tail];
+      g_serial_rbuf_tail = (g_serial_rbuf_tail + 1) % sizeof(g_serial_rbuf);
       
       if (c == '\r' || c == '\n') {
         line_buf[line_len] = 0;
