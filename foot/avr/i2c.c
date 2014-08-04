@@ -18,8 +18,6 @@
 #define I2C_SDA_DDR DDRB
 #define I2C_SDA_BIT 3
 
-#define I2C_TIMEOUT 1000
-
 #define I2C_STATE_IDLE 0
 #define I2C_STATE_ACTIVE 1
 
@@ -104,21 +102,14 @@ static uint8_t i2c_stop() {
 }
 
 static uint8_t i2c_write_bit(uint8_t bit) {
-  if (g_i2c_state != I2C_STATE_ACTIVE) {
-    return I2C_ERR_BADCMD;
-  }
-  
   if (bit) {
     i2c_sda_high();
   } else {
     i2c_sda_low();
   }
   i2c_delay();
-  
-  uint16_t timeout = 0;
-  while (i2c_scl_high() == 0) {
-    if (timeout++ > I2C_TIMEOUT) { return I2C_ERR_TIMEOUT; }
-  }
+
+  i2c_scl_high();
 
   if (bit && !i2c_sda_high()) {
     return I2C_ERR_WRITE_COLL;
@@ -129,20 +120,13 @@ static uint8_t i2c_write_bit(uint8_t bit) {
   return 0;
 }
 
-/** Return 0 on low read, 0xff on high read, error on other. */
+/** Returns 0 or 1 */
 static uint8_t i2c_read_bit() {
-  if (g_i2c_state != I2C_STATE_ACTIVE) {
-    return I2C_ERR_BADCMD;
-  }
-  
   uint8_t bit;
 
   i2c_sda_high();
   i2c_delay();
-  uint8_t timeout = 0;
-  while (i2c_scl_high() == 0) {
-    if (timeout++ > I2C_TIMEOUT) { return I2C_ERR_TIMEOUT; }
-  }
+  i2c_scl_high();
   bit = i2c_sda_high();
   i2c_delay();
   i2c_scl_low();
@@ -151,9 +135,13 @@ static uint8_t i2c_read_bit() {
 
 /** Return 0 if success, 0xff if success and NACK. */
 static uint8_t i2c_write_byte(uint8_t data) {
+  if (g_i2c_state != I2C_STATE_ACTIVE) {
+    return I2C_ERR_BADCMD;
+  }
+  
   uint8_t err = 0;
   for (uint8_t bit = 0; bit < 8; bit++) {
-    err = i2c_write_bit((data & 0x80) != 0);
+    err = i2c_write_bit(data & 0x80);
     if (err != 0) { return err; }
     data <<= 1;
   }
@@ -167,16 +155,17 @@ static uint8_t i2c_write_byte(uint8_t data) {
 
 /** Return 0 if success. */
 static uint8_t i2c_read_byte(uint8_t nack, uint8_t* data) {
+  if (g_i2c_state != I2C_STATE_ACTIVE) {
+    return I2C_ERR_BADCMD;
+  }
+  
   uint8_t result = 0;
   uint8_t err;
   for (uint8_t bit = 0; bit < 8; bit++) {
     err = i2c_read_bit();
     result <<= 1;
-    if (err == 0) {
-    } else if (err == 1) {
+    if (err) {
       result |= 0x01;
-    } else {
-      return err;
     }
   }
   if ((err = i2c_write_bit(nack))) {
