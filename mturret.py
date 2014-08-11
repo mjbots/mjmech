@@ -13,12 +13,13 @@ import time
 
 import ConfigParser
 
-sys.path.append('/home/josh/prog/mech')
+sys.path.append('legtool')
 import eventlet_serial
-from quaternion import Euler
-from quaternion import Quaternion
-import servo_controller
-import ukf_filter
+from legtool.tf.quaternion import Euler
+from legtool.tf.quaternion import Quaternion
+from legtool.servo.selector import select_servo
+
+import imu.ukf_filter
 
 def parsehex(hexdata):
     result = ''
@@ -417,7 +418,7 @@ class MechTurret(object):
         self.fake_servo_port = Pipe(self._write_serial)
         self.fake_imu_port = Pipe(self._write_imu)
 
-        self.controller = servo_controller.servo_controller(
+        self.controller = select_servo(
             self.servo_config.servo_type,
             serial_port=self.fake_servo_port)
 
