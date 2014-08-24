@@ -33,11 +33,11 @@
 //                 --------------
 //        RXD    --|PB0      PA0|-- 
 //        TXD    --|PB1      PA1|-- 
-//               --|PB2      PA2|-- 
-//               --|PB3      PA3|-- 
+//   BAR SHDN    --|PB2      PA2|-- 
+//    BAR SDA    --|PB3      PA3|-- 
 //               --|VCC      GND|--
 //               --|GND     AVCC|--
-//               --|PB4      PA4|-- 
+//    BAR SCK    --|PB4      PA4|-- 
 //               --|PB5      PA5|-- 
 //               --|PB6      PA6|-- 
 //       Reset   --|PB7      PA7|-- 
@@ -93,7 +93,7 @@ static uint8_t cmd_ver(char* extra_args, char* output, uint8_t output_len,
 static uint8_t cmd_rst(char* extra_args, char* output, uint8_t output_len,
                        uint8_t stream) {
   for (;;) {
-    PORTA ^= 0x01;
+    PORTB ^= 0x01;
   }
   return 0;
 }
@@ -163,7 +163,9 @@ static uint8_t cmd_qgr(char* extra_args, char* output, uint8_t output_len,
 
         uint8_t value = 0;
         switch (port_char) {
+#ifdef PINA
           case 'A': { value = PINA; break; }
+#endif
           case 'B': { value = PINB; break; }
         }
 
@@ -201,8 +203,10 @@ static uint8_t cmd_i2c(char* extra_args, char* output, uint8_t output_len,
 
 static uint8_t cmd_gpq(char* extra_args, char* output, uint8_t output_len,
                        uint8_t stream) {
+#ifdef PINA
   *output++ = ' ';
   uint8_to_hex(&output, PINA);
+#endif
   *output++ = ' ';
   uint8_to_hex(&output, PINB);
   *output = 0;
@@ -222,7 +226,7 @@ static uint8_t cmd_gpc(char* extra_args, char* output, uint8_t output_len,
     strcpy_P(output, PSTR(STR_PARSE_ERROR));
     return 1;
   }
-  if (port != 'A' && port != 'a') {
+  if (port != 'B' && port != 'b') {
     strcpy_P(output, PSTR(STR_INVALID_PORT));
     return 1;
   }
@@ -235,9 +239,9 @@ static uint8_t cmd_gpc(char* extra_args, char* output, uint8_t output_len,
     return 1;
   }
   if (value) {
-    PORTA |= (1 << bit);
+    PORTB |= (1 << bit);
   } else {
-    PORTA &= ~(1 << bit);
+    PORTB &= ~(1 << bit);
   }
 
   strcpy_P(output, PSTR(STR_OK));
@@ -636,7 +640,11 @@ static uint8_t g_serial_rbuf[16];
 static uint8_t g_serial_rbuf_head;
 static uint8_t g_serial_rbuf_tail;
 
+#ifdef PCINT_vect
 ISR(PCINT_vect) {
+#else
+ISR(PCINT0_vect) {
+#endif
   if ((PINB & 0x01) == 0) {
     uint8_t c = software_uart_read_char();
     g_serial_rbuf[g_serial_rbuf_head] = c;
@@ -649,20 +657,33 @@ int main() {
   CLKPR = 0x80;
   CLKPR = 0x00;
 
+#ifdef PORTA
   PORTA = 0x00;
   DDRA = 0xff;
+#endif
+
+  PORTB = 0x00 | (1 << 2); // Start with barometer enabled.
   DDRB = 0xfe;
 
   // Set up Timer 1 to match compare every 1ms.
+#if defined(__AVR_ATtiny85__)
+  OCR1C = 125;
+  TCCR1 = 0x80 | 0x06; // CTC on OCR1C, CK / 32
+  PCMSK = 0x01; // PB0 interrupt enable
+  GIMSK |= (1 << PCIE); // Enable
+#elif defined(__AVR_ATTiny861__)
   OCR1A = 125;
   TCCR1A = 0x02; // CTC on OCR1A
   TCCR1B = 0x06; // CK / 32 (32 * 125 == 4000)
+  PCMSK1 = 0x01; // Set PB0 interrupt enable.
+  GIMSK |= (1 << PCIE0); // Enable
+#else
+#error Unknown processor
+#endif
 
   char line_buf[32];
   uint8_t line_len = 0;
 
-  PCMSK1 = 0x01; // Set PB0 interrupt enable.
-  GIMSK |= (1 << PCIE0); // Enable
 
   i2c_init();
 
@@ -675,7 +696,6 @@ int main() {
     wdt_reset();
     g_main_loop_count++;
     
-    PORTA ^= 0x01;
     cli();
     uint8_t rbuf_head = g_serial_rbuf_head;
     sei();

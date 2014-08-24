@@ -24,7 +24,7 @@
 static uint8_t g_i2c_state;
 
 static void i2c_delay() {
-  _delay_us(0);
+  _delay_us(5);
 }
 
 static uint8_t i2c_sda_high() {
@@ -39,7 +39,14 @@ static void i2c_sda_low() {
 }
 
 static uint8_t i2c_scl_high() {
+#if defined(__AVR_ATtiny85)
+  /* The ATtiny85 board doesn't have enough pullup on the SCK line,
+   * and thus we drive the clock line high rather than wait for the
+   * built in pullup to work. */
+  I2C_SCL_DDR |= (1 << I2C_SCL_BIT);
+#else
   I2C_SCL_DDR &= ~(1 << I2C_SCL_BIT);
+#endif
   I2C_SCL_PORT |= (1 << I2C_SCL_BIT);
   return ((I2C_SCL_PIN & (1 << I2C_SCL_BIT)) != 0x00);
 }

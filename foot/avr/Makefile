@@ -5,7 +5,13 @@ OBJS=util.o i2c.o
 FOOT_DBG_FLAG = #-dbg
 UPDATE_VCS := $(shell ./revision_update.py vcs_version.h)
 
-CFLAGS= -mmcu=avr2 -D__AVR_ATtiny861__ -g -I../avr_include -Os -mcall-prologues -Winline -Wall -DF_CPU=8000000 -DFOOT_DBG_FLAG=\"$(FOOT_DBG_FLAG)\" -std=gnu99
+GCC_PART = __AVR_ATtiny861__
+AVR_PART = attiny861
+
+GCC_PART = __AVR_ATtiny85__
+AVR_PART = attiny85
+
+CFLAGS= -mmcu=avr2 -D$(GCC_PART) -g -I../avr_include -Os -mcall-prologues -Winline -Wall -DF_CPU=8000000 -DFOOT_DBG_FLAG=\"$(FOOT_DBG_FLAG)\" -std=gnu99
 
 all : $(PROG).srec
 
@@ -24,7 +30,7 @@ $(PROG).out : $(PROG).o $(OBJS)
 	avr-gcc -c $(CFLAGS) $< -o $@
 
 load : $(PROG).srec
-	avrdude -p attiny861 -c avrispmkII -U flash:w:$(PROG).srec
+	avrdude -p $(AVR_PART) -c avrispmkII -U flash:w:$(PROG).srec
 
 depend:
 	makedepend -I../avr_include $(PROG).c $(OBJS:%.o=%.c)

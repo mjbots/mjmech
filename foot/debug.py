@@ -19,10 +19,11 @@ def main():
     while True:
         fd.write('I2C s60w12ff\n')
         result = fd.readline()
-        assert result.startswith('<I2C OK')
+        assert result.startswith('<I2C OK'), result
         time.sleep(0.005)
         fd.write('I2C s60w00r04\n')
         result = fd.readline()
+        assert result.startswith('<I2C OK'), result
         data = result.split(' ')[2]
         pressure = int(data[0:4], 16) >> 6
         temp = int(data[4:8], 16) >> 6
