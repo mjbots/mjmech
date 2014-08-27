@@ -8,11 +8,14 @@ filter gains.'''
 import math
 import numpy
 import random
+import scipy
+import scipy.integrate
 
 import ahrs
 import imu_error_model
 
 SAMPLE_FREQUENCY_HZ = 100.0
+G = 9.81
 
 class TestCase(object):
     def advance(self, dt):
@@ -40,11 +43,17 @@ class StationaryTest(TestCase):
     def expected_pitch(self):
         return 0.
 
+# TODO jpieper: I seem to have mixed up my mps2 and my g in the units
+# for calculating accelerations in possibly many places!
+
 class PendulumCase(TestCase):
     def __init__(self):
         self.length_m = 1.0
         self.pitch_rad = 0.0
         self.velocity_rad_s = 1.0
+        self.time_s = 0.
+        self.accely = 0.
+        self.accelz = 0.
 
     def gyro(self):
         return self.velocity_rad_s
@@ -55,11 +64,35 @@ class PendulumCase(TestCase):
         z = 1.0 * math.cos(self.pitch_rad)
 
         # The change in velocity component.
+        y += self.accely
+        z += self.accelz
 
+        return y, z
+
+    def dydt(self, y, t):
+        theta, theta_dot = y
+        theta_dot_dot = (-G / self.length_m) * scipy.sin(theta)
+        return [theta_dot, theta_dot_dot]
 
     def advance(self, dt):
-        # TODO jpieper
-        raise NotImplementedError
+        y = [self.pitch_rad, self.velocity_rad_s]
+        y_traj = scipy.integrate.odeint(
+            self.dydt, y,
+            scipy.array(
+                [self.time_s,
+                 self.time_s + dt]))
+        new_pitch_rad, new_velocity_rad_s = y_traj[-1]
+
+        oldvy = self.velocity_rad_s * math.cos(self.pitch_rad)
+        newvy = new_velocity_rad_s * math.cos(new_pitch_rad)
+        self.accely = (newvy - oldvy) / dt
+
+        oldvz = self.velocity_rad_s * math.sin(self.pitch_rad)
+        newvz = new_velocity_rad_s * math.sin(new_pitch_rad)
+        self.accelz = (newvz - oldvz) / dt
+
+        self.pitch_rad, self.velocity_rad_s = new_pitch_rad, new_velocity_rad_s
+        self.time_s += dt
 
     def expected_pitch(self):
         return self.pitch_rad
@@ -104,7 +137,6 @@ def main():
         estimator.process_accel(accel_y, accel_z)
 
         error += estimator.pitch() ** 2
-#        print accel_y, accel_z, gyro, estimator.pitch()
 
     print "rms error:", math.degrees(math.sqrt((error / NUM_COUNT)))
     diag = numpy.diag(estimator.covariance())
