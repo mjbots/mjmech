@@ -6,7 +6,10 @@
 filter gains.'''
 
 import math
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import numpy
+import pylab
 import random
 import scipy
 import scipy.integrate
@@ -43,29 +46,32 @@ class StationaryTest(TestCase):
     def expected_pitch(self):
         return 0.
 
-# TODO jpieper: I seem to have mixed up my mps2 and my g in the units
-# for calculating accelerations in possibly many places!
-
 class PendulumCase(TestCase):
     def __init__(self):
         self.length_m = 1.0
         self.pitch_rad = 0.0
-        self.velocity_rad_s = 1.0
+        self.velocity_rad_s = 6.2
         self.time_s = 0.
-        self.accely = 0.
-        self.accelz = 0.
+        self.accelx_mps2 = 0.
+        self.accely_mps2 = 0.
+        self.velx_mps = 0.
+        self.vely_mps = 0.
 
     def gyro(self):
         return self.velocity_rad_s
 
     def accel_yz(self):
         # The gravity component.
-        y = 1.0 * math.sin(self.pitch_rad)
-        z = 1.0 * math.cos(self.pitch_rad)
+        x = 0.0
+        y = 1.0
 
         # The change in velocity component.
-        y += self.accely
-        z += self.accelz
+        x += self.accelx_mps2 / G
+        y += self.accely_mps2 / G
+
+        # TODO jpieper: Need to rotate everything into the IMU
+        # reference frame.
+        y, z = x, y
 
         return y, z
 
@@ -83,19 +89,68 @@ class PendulumCase(TestCase):
                  self.time_s + dt]))
         new_pitch_rad, new_velocity_rad_s = y_traj[-1]
 
-        oldvy = self.velocity_rad_s * math.cos(self.pitch_rad)
-        newvy = new_velocity_rad_s * math.cos(new_pitch_rad)
-        self.accely = (newvy - oldvy) / dt
+        oldvx = self.velocity_rad_s * math.cos(self.pitch_rad)
+        newvx = new_velocity_rad_s * math.cos(new_pitch_rad)
+        self.velx_mps = newvx
+        self.accelx_mps2 = (newvx - oldvx) / dt
 
-        oldvz = self.velocity_rad_s * math.sin(self.pitch_rad)
-        newvz = new_velocity_rad_s * math.sin(new_pitch_rad)
-        self.accelz = (newvz - oldvz) / dt
+        oldvy = self.velocity_rad_s * math.sin(self.pitch_rad)
+        newvy = new_velocity_rad_s * math.sin(new_pitch_rad)
+        self.vely_mps = newvy
+        self.accely_mps2 = (newvy - oldvy) / dt
 
         self.pitch_rad, self.velocity_rad_s = new_pitch_rad, new_velocity_rad_s
         self.time_s += dt
 
     def expected_pitch(self):
         return self.pitch_rad
+
+def plot_pendulum():
+    pc = PendulumCase()
+    results = []
+    for i in range(800):
+        results.append((pc.expected_pitch(),
+                        pc.gyro(),
+                        pc.accelx_mps2 / G,
+                        pc.accely_mps2 / G,
+                        pc.accel_yz()))
+        pc.advance(0.01)
+
+    pylab.plot([x[0] for x in results], label='pitch_rad')
+    pylab.plot([x[1] for x in results], label='gyro_rps')
+    pylab.plot([x[2] for x in results], label='accelx_g')
+    pylab.plot([x[3] for x in results], label='accely_g')
+    pylab.plot([x[4][0] for x in results], label='accel_y')
+    pylab.plot([x[4][1] for x in results], label='accel_z')
+    pylab.legend()
+    pylab.show()
+
+def animate_pendulum():
+    pc = PendulumCase()
+    fig = plt.figure()
+    fig.subplots_adjust(left=0., right=1., bottom=0., top=1.)
+    ax = fig.add_subplot(111, aspect='equal', autoscale_on=False,
+                         xlim=(-3., 3.), ylim=(-3., 3.))
+
+    pend_line, = ax.plot([], [], '-', lw=3)
+    vel_line, = ax.plot([], [], 'b-', lw=5)
+    acc_line, = ax.plot([], [], 'r-', lw=5)
+
+    def animate(i):
+        pc.advance(0.01)
+
+        px = math.sin(pc.pitch_rad)
+        py = -math.cos(pc.pitch_rad)
+
+        pend_line.set_data([0., px],
+                           [0., py])
+        vel_line.set_data([px, px + 0.2 * pc.velx_mps],
+                          [py, py + 0.2 * pc.vely_mps])
+        acc_line.set_data([px, px + 0.05 * pc.accelx_mps2],
+                          [py, py + 0.05 * pc.accely_mps2])
+
+    ani = animation.FuncAnimation(fig, animate, frames=600, interval=10)
+    plt.show()
 
 
 def main():
@@ -144,5 +199,6 @@ def main():
     print "bias uncert:", math.degrees(math.sqrt(diag[1]))
 
 if __name__ == '__main__':
-    main()
+    #main()
+    animate_pendulum()
 
