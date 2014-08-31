@@ -35,6 +35,9 @@ class Packet(object):
     data = None
     cksum_good = None
 
+    def __str__(self):
+        return repr((self.__class__.__name__, self.servo, self.cmd, self.data,
+                     self.cksum_good))
 
 class Response(object):
     indent = 0
@@ -107,7 +110,7 @@ class HerkuleX(object):
         self.baud_rate = 115200
         if isinstance(serial_port, str) or isinstance(serial_port, unicode):
             self.serial = asyncio_serial.AsyncioSerial(
-                port=serial_port, baudrate=115200)
+                serial_port, baudrate=115200)
         else:
             # Assume it is a file like object.
             self.serial = serial_port
@@ -153,7 +156,7 @@ class HerkuleX(object):
 
     @asyncio.coroutine
     def _raw_recv_packet(self):
-        
+
         @asyncio.coroutine
         def read_frame_header():
             # Read until we get a frame header.
@@ -323,6 +326,11 @@ class HerkuleX(object):
     @asyncio.coroutine
     def reboot(self, servo):
         yield From(self.send_packet(servo, self.CMD_REBOOT, ''))
+
+    @asyncio.coroutine
+    def set_leds(self, servo, leds):
+        """@p leds is bitflag of LED_RED, LED_GREEN, LED_BLUE"""
+        yield From(self.ram_write(servo, 53, [leds]))
 
     @asyncio.coroutine
     def temperature_C(self, servo):

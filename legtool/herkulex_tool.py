@@ -20,6 +20,7 @@ HerkuleX servos.'''
 import trollius as asyncio
 from trollius import From, Return
 import optparse
+import sys
 
 from legtool.servo import herkulex
 
@@ -57,6 +58,20 @@ def do_voltage(servo, options):
 def do_temperature(servo, options):
     print(yield From(servo.temperature_C(get_address(options))))
 
+@asyncio.coroutine
+def do_blink_led(servo, options):
+    addr = get_address(options)
+    try:
+        for _ in xrange(10):
+            for leds in [servo.LED_RED, servo.LED_GREEN, servo.LED_BLUE, 0]:
+                yield From(servo.set_leds(addr, leds))
+                yield From(asyncio.sleep(0.2))
+                sys.stderr.write(str(leds))
+                sys.stderr.flush()
+    finally:
+        yield From(servo.set_leds(addr, 0))
+        print >>sys.stderr, '0'
+
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-a', '--address', default=None,
@@ -75,8 +90,13 @@ def main():
                       help='query voltage of servo')
     parser.add_option('-t', '--temperature', action='store_true', default=None,
                       help='query temperature of servo')
+    parser.add_option('-b', '--blink_led', action='store_true', default=None,
+                      help='Blink servo\'s LEDs')
 
     (options, args) = parser.parse_args()
+
+    if args:
+        parser.error('No arguments accepted')
 
     actions = {
         'enumerate': do_enumerate,
@@ -85,6 +105,7 @@ def main():
         'status': do_status,
         'voltage': do_voltage,
         'temperature': do_temperature,
+        'blink_led': do_blink_led,
         }
 
     action_func = None
