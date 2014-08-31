@@ -662,7 +662,7 @@ int main() {
   DDRA = 0xff;
 #endif
 
-  PORTB = 0x00 | (1 << 2); // Start with barometer enabled.
+  PORTB = 0x04; // Start with barometer enabled.
   DDRB = 0xfe;
 
   // Set up Timer 1 to match compare every 1ms.
