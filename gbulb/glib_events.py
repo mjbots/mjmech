@@ -1,8 +1,11 @@
 # vim:sw=4:sts=4:nosta:et:
 """PEP 3156 event loop based on GLib"""
+import os
 
 from gi.repository import GLib, GObject, Gio
 try:
+    if not os.getenv('DISPLAY'):
+        raise ImportError('gtk import is going to fail, no X')
     from gi.repository import Gtk
 except ImportError:
     Gtk = None
@@ -365,7 +368,7 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
         for s in list(self._handlers):
             s.cancel()
 
-        self._ready.clear() 
+        self._ready.clear()
 
         self._default_sigint_handler.detach(self)
 
@@ -416,13 +419,13 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
 #		raise NotImplementedError
 #
 #	def create_connection(self, protocol_factory, host=None, port=None, *,
-#						  ssl=None, family=0, proto=0, flags=0, sock=None,
-#						  local_addr=None):
+#                                                 ssl=None, family=0, proto=0, flags=0, sock=None,
+#                                                 local_addr=None):
 #		raise NotImplementedError
 #
 #	def start_serving(self, protocol_factory, host=None, port=None, *,
-#					  family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE,
-#					  sock=None, backlog=100, ssl=None, reuse_address=None):
+#                                         family=socket.AF_UNSPEC, flags=socket.AI_PASSIVE,
+#                                         sock=None, backlog=100, ssl=None, reuse_address=None):
 #		"""A coroutine which creates a TCP server bound to host and
 #		port and whose result will be a list of socket objects which
 #		will later be handled by protocol_factory.
@@ -458,8 +461,8 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
 #		raise NotImplementedError
 #
 #	def create_datagram_endpoint(self, protocol_factory,
-#								 local_addr=None, remote_addr=None, *,
-#								 family=0, proto=0, flags=0):
+#                                                                local_addr=None, remote_addr=None, *,
+#                                                                family=0, proto=0, flags=0):
 #		raise NotImplementedError
 #
 #	def connect_read_pipe(self, protocol_factory, pipe):
@@ -489,8 +492,8 @@ class BaseGLibEventLoop(unix_events.SelectorEventLoop):
 #		raise NotImplementedError
 #
 #	def subprocess_shell(self, protocol_factory, cmd, *, stdin=subprocess.PIPE,
-#						 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-#						 **kwargs):
+#                                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+#                                                **kwargs):
 #		raise NotImplementedError
 #
 #	def subprocess_exec(self, protocol_factory, *args, stdin=subprocess.PIPE,
@@ -743,7 +746,7 @@ class wait_signal (futures.Future):
         self._obj = obj
         #FIXME: use  a weakref ?
         self._hnd = obj.connect(name, self._signal_callback)
-    
+
     def _signal_callback(self, *k):
         self._obj.disconnect(self._hnd)
         self.set_result(k)
@@ -756,4 +759,3 @@ class wait_signal (futures.Future):
 
 def get_default_loop(self):
     return asyncio.get_event_loop_policy().get_default_loop()
-

@@ -46,4 +46,5 @@ fi
 
 echo No loop found, starting here
 cd $(dirname $(readlink -f "$0")) || exit 1
+ls -l
 ./vserver.py

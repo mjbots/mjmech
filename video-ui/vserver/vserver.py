@@ -20,6 +20,7 @@ gobject = GObject
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../legtool'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'legtool'))
 
 import gait_driver
 import gbulb
@@ -52,7 +53,7 @@ class UdpAnnouncer(object):
         self.sock.setblocking(0)
         #self.logger.info('Binding to port %d' % self.PORT)
         #self.sock.bind(('', self.PORT))
-        self.logger.info('Will broadcast on port %d every %.2f seconds' % 
+        self.logger.info('Will broadcast on port %d every %.2f seconds' %
                          (self.PORT, self.INTERVAL))
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.dest = ('255.255.255.255', self.PORT)
@@ -63,7 +64,7 @@ class UdpAnnouncer(object):
     def _broadcast(self):
         #self.logger.debug('Broadcasting anouncement')
         self.seq += 1
-        msg = json.dumps({'type': 'announce', 
+        msg = json.dumps({'type': 'announce',
                           'seq': self.seq,
                           'cport': ControlInterface.PORT,
                           'start_time': self.start_time,
@@ -90,7 +91,7 @@ class ControlInterface(object):
         self.src_addr = None
         self.recent_packets = 0
         self.last_seq = None
-        
+
         if self.opts.no_mech:
             self.mech_driver = None
         else:
@@ -101,7 +102,7 @@ class ControlInterface(object):
         self.video_proc = None
         gobject.timeout_add(int(self.TIMEOUT * 1000),
                             wrap_event(self._on_timeout))
-        gobject.io_add_watch(self.sock.fileno(), 
+        gobject.io_add_watch(self.sock.fileno(),
                              gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
                              wrap_event(self._on_readable))
 
@@ -176,7 +177,7 @@ class ControlInterface(object):
         if self.video_proc:
             self.logger.info('Killing old video process')
             os.kill(self.video_proc, signal.SIGTERM)
-            # return for now. We did not update video_addr, so we will 
+            # return for now. We did not update video_addr, so we will
             # keep re-entering unless process dies.
             return
         self.video_addr = addr
@@ -184,7 +185,7 @@ class ControlInterface(object):
             return
         self.logger.info('Sending video to %r' % (addr, ))
         pid, _1, _2, _3 = gobject.spawn_async(
-            ['./send-video.sh', str(addr[0]), str(addr[1])], 
+            ['./send-video.sh', str(addr[0]), str(addr[1])],
             flags=gobject.SPAWN_DO_NOT_REAP_CHILD)
         self.video_proc = pid
         self.logger.info('Started video process, PID %r' % pid)

@@ -47,14 +47,14 @@ class GaitDriver(object):
     '''
 
     IDLE, COMMAND, IDLING = range(3)
-    
+
     def __init__(self, gait, servo):
         self.gait = gait
         self.servo = servo
         self.state = None
-        
+
         self.mode = self.IDLE
-        
+
         # This event should be set anytime a next_command is present.
         self.command_event = asyncio.Event()
         self.next_command = None
@@ -103,7 +103,7 @@ class GaitDriver(object):
 
         self.next_command = None
         self.command_event.clear()
-        
+
         if self.mode == self.IDLE:
             pass
         elif self.mode == self.COMMAND:
@@ -126,7 +126,7 @@ class GaitDriver(object):
     @asyncio.coroutine
     def _run_command(self):
         self.mode = self.COMMAND
-        
+
         yield From(self._run_while(
                 lambda: self.mode == self.COMMAND,
                 allow_new=True))
@@ -134,7 +134,7 @@ class GaitDriver(object):
     @asyncio.coroutine
     def _run_while(self, condition, allow_new):
         current_time = time.time()
-        
+
         while condition():
             if allow_new and self.next_command:
                 self.gait.set_command(self.next_command)
@@ -271,15 +271,16 @@ class MechDriver(object):
 
     @staticmethod
     def add_options(parser):
-        parser.add_option('-c', '--config', help='configuration to use')
+        parser.add_option('-c', '--config', help='configuration to use',
+                          default=[])
         parser.add_option('-s', '--servo', help='type of servo',
                           default='gazebo')
         parser.add_option('-m', '--model-name', help='gazebo model name',
                           default='mj_mech')
         parser.add_option('-p', '--serial-port', help='serial port to use',
                           default='/dev/ttyUSB0')
-        
-        
+
+
 def _wrap_phase(delta):
     if delta < 0.0:
         return delta + 1.0
@@ -311,10 +312,10 @@ def handle_input(driver):
 
     command = ripple.Command()
     idle = True
-        
+
     while True:
         pygame.event.pump()
-        
+
         x_speed = joystick.get_axis(0)
         if abs(x_speed) < 0.1:
             x_speed = 0.0
@@ -338,7 +339,7 @@ def handle_input(driver):
             if not idle:
                 driver.set_idle()
                 idle = True
-        
+
         yield From(asyncio.sleep(0.05))
         clock.tick(10)
 

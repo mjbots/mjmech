@@ -22,7 +22,7 @@ import serial
 class AsyncioSerial(object):
     def __init__(self, *args, **kwargs):
         kwargs['timeout'] = 0
-        self.raw_serial = serial.Serial(*args, **kwargs)
+        self.raw_serial = serial.serial_for_url(*args, **kwargs)
         self.write_lock = asyncio.Lock()
         self.read_lock = asyncio.Lock()
 
@@ -38,7 +38,7 @@ class AsyncioSerial(object):
             while len(data):
                 yield From(event.wait())
                 event.clear()
-                
+
                 written = self.raw_serial.write(data)
                 data = data[written:]
         finally:
