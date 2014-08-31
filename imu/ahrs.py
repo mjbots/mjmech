@@ -186,6 +186,9 @@ class PitchEstimator(object):
       1: gyro bias (rad/s)
     '''
 
+    def state_names(self):
+        return ['pitch', 'gyro_bias']
+
     def state_function(self, state, dt):
         result = state
 
