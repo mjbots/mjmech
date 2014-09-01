@@ -9,6 +9,7 @@ sys.path.append(os.path.join(sys.path[0], '../legtool'))
 
 from legtool.tf.quaternion import Quaternion
 
+import imu_error_model
 import ukf_filter
 
 # TODO jpieper: Make this initialized in the class.
@@ -177,6 +178,30 @@ class AttitudeEstimator(object):
         self.current_gyro = []
         #self.emit_log()
 
+class Dummy(object):
+    def __init__(self):
+        self.value = None
+
+    def sample(self):
+        result = self.value
+        self.value = None
+        return result
+
+class LowpassFilter(object):
+    def __init__(self, frequency):
+        self.dummy = Dummy()
+        self.filter = imu_error_model.ChebyshevFilter(
+            self.dummy,
+            1.0 / IMU_UPDATE_PERIOD,
+            frequency,
+            imu_error_model.ChebyshevFilter.LOW_PASS,
+            5,
+            4)
+
+    def __call__(self, value):
+        self.dummy.value = value
+        return self.filter.sample()
+
 class PitchEstimator(object):
     '''A 1 dimensional pitch estimator.  It accepts a gyro input, and
     two accelerometers.
@@ -214,7 +239,8 @@ class PitchEstimator(object):
     def __init__(self, log_filename=None,
                  process_noise_gyro=1e-8,
                  process_noise_bias=math.radians(1e-6),
-                 measurement_noise_accel=10):
+                 measurement_noise_accel=10.,
+                 accel_filter=None):
         self.current_gyro = []
         self.init = False
         if log_filename:
@@ -227,6 +253,13 @@ class PitchEstimator(object):
         self.process_noise_gyro = process_noise_gyro
         self.process_noise_bias = process_noise_bias
         self.measurement_noise_accel = measurement_noise_accel
+        if accel_filter is None:
+            self.accel_y_filter = lambda x: x
+            self.accel_z_filter = lambda x: x
+        else:
+            self.accel_y_filter = LowpassFilter(accel_filter)
+            self.accel_z_filter = LowpassFilter(accel_filter)
+
 
     def emit_header(self):
         if self.log is None:
@@ -267,16 +300,20 @@ class PitchEstimator(object):
         for x in range(2):
             if P[x, x] < 1e-9:
                 P[x, x] = 1e-9
-        for x in range(0, 1):
-            if P[x, x] > .15:
-                P[x, x] = .15
-        for x in range(1, 2):
-            if P[x, x] > math.radians(50):
-                P[x, x] = math.radians(50)
+#        for x in range(0, 1):
+#            if P[x, x] > .15:
+#                P[x, x] = .15
+#        for x in range(1, 2):
+#            if P[x, x] > math.radians(50):
+#                P[x, x] = math.radians(50)
         return P
 
     def process_accel(self, y, z):
-        # First, normalize.
+        # Filter
+        y = self.accel_y_filter(y)
+        z = self.accel_z_filter(z)
+
+        # Normalize
         norm = math.sqrt(y * y + z * z)
 
         y /= norm

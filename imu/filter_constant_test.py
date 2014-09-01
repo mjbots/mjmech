@@ -253,7 +253,7 @@ def plot_pendulum():
     pylab.show()
 
 def animate_pendulum():
-    pc = BouncingTest(accel_noise=5.0)
+    pc = BouncingTest(accel_noise=20.0)
     fig = plt.figure()
     fig.subplots_adjust(left=0., right=1., bottom=0., top=1.)
     ax = fig.add_subplot(111, aspect='equal', autoscale_on=False,
@@ -316,7 +316,7 @@ def run_case(test_case, estimator):
 
     estimator.process_accel(0, 1.0)
 
-    NUM_COUNT = 20000
+    NUM_COUNT = 60000
     error = 0.0
 
     for count in range(NUM_COUNT):
@@ -342,7 +342,10 @@ def main():
     cases = []
     cases += [BouncingTest(damp_vel=0.1)]
     cases += [BouncingTest()]
+    cases += [BouncingTest(accel_noise=20.)]
     cases += [RotatingTest()]
+    cases += [RotatingTest(noise_level=5)]
+    cases += [RotatingTest(noise_level=10)]
     cases += [StationaryTest()]
     cases += [PendulumTest(v=0.5)]
     cases += [PendulumTest(v=1.0)]
@@ -354,7 +357,7 @@ def main():
         estimator = ahrs.PitchEstimator(
             process_noise_gyro=math.radians(0.05)**2,
             process_noise_bias=math.radians(0.0512)**2,
-            measurement_noise_accel=1.**2)
+            measurement_noise_accel=40.**2)
 
         result = run_case(case, estimator)
 

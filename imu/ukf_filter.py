@@ -2,10 +2,18 @@
 
 import numpy
 
+def is_positive_definite(P):
+    return numpy.all(numpy.linalg.eigvals(P) > 0)
+
 def make_positive_definite(P):
     '''Return a matrix which is "near" to P, but is positive definite.
     i.e. all of its eigenvalues will be positive.'''
+
+    if not is_positive_definite(P):
+        print numpy.linalg.eigvals(P)
+        raise RuntimeError('not positive definite!')
     # TODO jpieper: Implement me when we first find a problem.
+
     return P
 
 class UkfFilter(object):
