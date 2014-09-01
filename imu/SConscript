@@ -1,0 +1,18 @@
+# -*- mode: python; compile-command: "scons -u -k" -*-
+Import('canonenv')
+
+env = canonenv.Clone()
+env.Append(CPPPATH=['.'])
+env.ParseConfig('pkg-config --cflags --libs eigen3')
+
+test_env = env.Clone()
+test_env.Append(LIBS=['boost_unit_test_framework'])
+
+TEST_SOURCES = ['test/' + x for x in [
+        'test_quaternion.cc',
+        'test_main.cc',
+        ]]
+
+all_tests = test_env.Program('all_tests', TEST_SOURCES)
+passed = test_env.Command('all_tests.passed', all_tests,
+                          '$SOURCE && touch $TARGET')
