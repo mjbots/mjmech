@@ -9,8 +9,10 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy
+import optparse
 import pylab
 import random
+import re
 import scipy
 import scipy.integrate
 
@@ -252,8 +254,7 @@ def plot_pendulum():
     pylab.legend()
     pylab.show()
 
-def animate_pendulum():
-    pc = BouncingTest(accel_noise=20.0)
+def animate_case(pc):
     fig = plt.figure()
     fig.subplots_adjust(left=0., right=1., bottom=0., top=1.)
     ax = fig.add_subplot(111, aspect='equal', autoscale_on=False,
@@ -337,7 +338,7 @@ def run_case(test_case, estimator):
     return { 'rms_error': math.degrees(math.sqrt((error / NUM_COUNT))),
              'uncert': numpy.sqrt(diag) }
 
-def main():
+def run(options):
 
     cases = []
     cases += [BouncingTest(damp_vel=0.1)]
@@ -350,6 +351,20 @@ def main():
     cases += [PendulumTest(v=0.5)]
     cases += [PendulumTest(v=1.0)]
     cases += [PendulumTest(v=2.0)]
+
+    if len(options.limit):
+        def match(case):
+            for exp in options.limit:
+                if re.search(exp, x.name()):
+                    return True
+            return False
+        
+        cases = [x for x in cases if match(x)]
+
+    if options.animate:
+        print 'Animating:', cases[0].name()
+        animate_case(cases[0])
+        return
 
     print '%20s %10s   %s' % ('test case', 'err', 'covar')
 
@@ -367,9 +382,16 @@ def main():
                      for x, y in zip(estimator.state_names(),
                                      result['uncert'])))
 
-if __name__ == '__main__':
-    if 1:
-        main()
-    else:
-        animate_pendulum()
+def main():
+    parser = optparse.OptionParser()
+    parser.add_option('-l', '--limit', action='append', default=[],
+                      help='Only consider tests matching these regular exps')
+    parser.add_option('-a', '--animate', action='store_true', default=False,
+                      help='Animate the first selected test')
 
+    options, args = parser.parse_args()
+    assert len(args) == 0
+    run(options)
+
+if __name__ == '__main__':
+    main()
