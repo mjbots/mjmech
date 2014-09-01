@@ -311,13 +311,13 @@ def run_case(test_case, estimator):
     gyro_error = imu_error_model.InertialErrorModel(
         rng,
         SAMPLE_FREQUENCY_HZ,
-        math.radians(0.001),  # 5.3e-4 rad/sqrt(s), 0.0303 deg/sqrt(s)
-        math.radians(0.001),  # 1.4e-4 rad/s, 0.0080 deg/s
-        1.38e-5)               # 3.6e-6 rad/sqrt(s)
+        3e-4,  # 5.3e-4 rad/sqrt(s), 0.0303 deg/sqrt(s)
+        1e-4,  # 1.4e-4 rad/s, 0.0080 deg/s
+        3.6e-6)               # 3.6e-6 rad/sqrt(s)
 
     estimator.process_accel(0, 1.0)
 
-    NUM_COUNT = 60000
+    NUM_COUNT = 90000
     error = 0.0
 
     for count in range(NUM_COUNT):
@@ -351,6 +351,7 @@ def run(options):
     cases += [PendulumTest(v=0.5)]
     cases += [PendulumTest(v=1.0)]
     cases += [PendulumTest(v=2.0)]
+    cases += [PendulumTest(v=4.0)]
 
     if len(options.limit):
         def match(case):
@@ -370,14 +371,14 @@ def run(options):
 
     for case in cases:
         estimator = ahrs.PitchEstimator(
-            process_noise_gyro=math.radians(0.05)**2,
+            process_noise_gyro=math.radians(0.0008)**2,
             process_noise_bias=math.radians(0.0512)**2,
-            measurement_noise_accel=40.**2)
+            measurement_noise_accel=20.0**2)
 
         result = run_case(case, estimator)
 
         print '%20s %10s %s' % (
-            case.name(), '%.3f' % result['rms_error'],
+            case.name(), '%.4f' % result['rms_error'],
             ' '.join('%s=%f' % (x, math.degrees(y))
                      for x, y in zip(estimator.state_names(),
                                      result['uncert'])))
