@@ -76,9 +76,8 @@ class UkfFilter {
   void UpdateMeasurement(MeasurementFunction measurement_function,
                          Measurement measurement,
                          MeasurementNoise measurement_noise) {
-    static_assert(MeasurementNoise::RowsAtCompileTime == 1,
+    static_assert(Measurement::ColsAtCompileTime == 1,
                   "measurement must be column vector");
-    typedef decltype(measurement_noise) Measurement;
 
     // Equation 14.62
     const int N = _NumStates * 2;
@@ -95,7 +94,10 @@ class UkfFilter {
     Measurement yhat = (1.0 / N) * ArraySum(yhatin);
 
     // Equation 14.65
-    Measurement Py = Measurement::Zero();
+    typedef Eigen::Matrix<_Scalar,
+                          Measurement::RowsAtCompileTime,
+                          Measurement::RowsAtCompileTime> PyMatrix;
+    PyMatrix Py = PyMatrix::Zero();
     for (int i = 0; i < N; i++) {
       Py += (yhatin[i] - yhat) * (yhatin[i] - yhat).transpose();
     }
@@ -113,9 +115,12 @@ class UkfFilter {
     Pxy *= (1.0 / N);
 
     // Equation 14.67
-    auto K = Pxy * Py.inverse();
+    typedef Eigen::Matrix<_Scalar,
+                          State::RowsAtCompileTime,
+                          Measurement::RowsAtCompileTime> KMatrix;
+    KMatrix K = Pxy * Py.inverse();
     State xplus = state_ + K * (measurement - yhat);
-    Covariance Pplus = covariance_ - (K * Py * K.transpose());
+    Covariance Pplus = covariance_ - ((K * Py) * K.transpose());
 
     state_ = xplus;
     covariance_ = ConditionCovariance(Pplus);
