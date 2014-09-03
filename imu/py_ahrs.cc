@@ -12,6 +12,9 @@ BOOST_PYTHON_MODULE(_ahrs) {
   bp::class_<std::vector<double> >("doublevec")
       .def(bp::vector_indexing_suite<std::vector<double> >())
       ;
+  bp::class_<std::vector<float> >("doublefloat")
+      .def(bp::vector_indexing_suite<std::vector<float> >())
+      ;
   bp::class_<std::vector<std::string> >("stringvec")
       .def(bp::vector_indexing_suite<std::vector<std::string> >())
       ;
