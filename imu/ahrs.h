@@ -21,10 +21,10 @@ class PitchEstimator {
         pitch_filter_(
             PitchFilter::State::Zero(),
             (PitchFilter::Covariance() <<
-             std::pow(5. / 180 * M_PI, 2.0), 0.0, 
+             std::pow(5. / 180 * M_PI, 2.0), 0.0,
              0.0, std::pow(1.0 / 180 * M_PI, 2.0)).finished(),
             (PitchFilter::Covariance() <<
-             process_noise_gyro, 0.0, 
+             process_noise_gyro, 0.0,
              0.0, process_noise_bias).finished()) {
   }
 
@@ -34,6 +34,14 @@ class PitchEstimator {
 
   PitchFilter::Covariance covariance() const {
     return pitch_filter_.covariance();
+  }
+
+  std::vector<double> covariance_diag() const {
+    std::vector<double> result;
+    for (int i = 0; i < 2; i++) {
+      result.push_back(pitch_filter_.covariance()(i, i));
+    }
+    return result;
   }
 
   double pitch_rad() const { return pitch_filter_.state()(0); }

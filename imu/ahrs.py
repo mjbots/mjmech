@@ -227,6 +227,9 @@ class PitchEstimator(object):
     def covariance(self):
         return self.ukf.covariance
 
+    def covariance_diag(self):
+        return list(numpy.diag(self.ukf.covariance))
+
     def pitch(self):
         return self.ukf.state[0,0]
 
@@ -236,11 +239,12 @@ class PitchEstimator(object):
     def gyro_bias_uncertainty(self):
         return [math.sqrt(x) for x in list(numpy.diag(self.ukf.covariance)[1])][0]
 
-    def __init__(self, log_filename=None,
+    def __init__(self,
                  process_noise_gyro=1e-8,
                  process_noise_bias=math.radians(1e-6),
                  measurement_noise_accel=10.,
-                 accel_filter=None):
+                 accel_filter=None,
+                 log_filename=None):
         self.current_gyro = []
         self.init = False
         if log_filename:
@@ -347,4 +351,3 @@ class PitchEstimator(object):
 
         self.current_gyro = []
         self.emit_log()
-

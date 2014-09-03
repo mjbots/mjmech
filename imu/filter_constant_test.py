@@ -15,9 +15,13 @@ import random
 import re
 import scipy
 import scipy.integrate
+import sys
 
 import ahrs
 import imu_error_model
+
+sys.path.append('build')
+import _ahrs
 
 SAMPLE_FREQUENCY_HZ = 100.0
 G = 9.81
@@ -69,7 +73,7 @@ class RotatingTest(TestCase):
         self.noise_level = noise_level
         self.return_coeff = 0.05
 
-        self.rng = random.Random()
+        self.rng = random.Random(0)
         self.white_noise = imu_error_model.WhiteNoise(
             self.rng, self.noise_level)
         self.noise = imu_error_model.ChebyshevFilter(
@@ -294,7 +298,7 @@ def animate_case(pc):
     plt.show()
 
 def run_case(test_case, estimator):
-    rng = random.Random()
+    rng = random.Random(0)
 
     # These constants are from the Pololu MiniIMU v2 @8g.
     accel_y_error, accel_z_error = [
@@ -333,7 +337,7 @@ def run_case(test_case, estimator):
 
         error += (estimator.pitch() - test_case.expected_pitch()) ** 2
 
-    diag = numpy.diag(estimator.covariance())
+    diag = estimator.covariance_diag()
 
     return { 'rms_error': math.degrees(math.sqrt((error / NUM_COUNT))),
              'uncert': numpy.sqrt(diag) }
@@ -359,7 +363,7 @@ def run(options):
                 if re.search(exp, x.name()):
                     return True
             return False
-        
+
         cases = [x for x in cases if match(x)]
 
     if options.animate:
@@ -370,7 +374,11 @@ def run(options):
     print '%20s %10s   %s' % ('test case', 'err', 'covar')
 
     for case in cases:
-        estimator = ahrs.PitchEstimator(
+        estimator_class = _ahrs.PitchEstimator
+        if options.python:
+            estimator_class = ahrs.PitchEstimator
+
+        estimator = estimator_class(
             process_noise_gyro=math.radians(0.0008)**2,
             process_noise_bias=math.radians(0.0512)**2,
             measurement_noise_accel=20.0**2)
@@ -389,6 +397,8 @@ def main():
                       help='Only consider tests matching these regular exps')
     parser.add_option('-a', '--animate', action='store_true', default=False,
                       help='Animate the first selected test')
+    parser.add_option('-p', '--python', action='store_true', default=False,
+                      help='Use python filter')
 
     options, args = parser.parse_args()
     assert len(args) == 0

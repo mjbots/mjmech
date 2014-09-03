@@ -5,6 +5,11 @@ env = canonenv.Clone()
 env.Append(CPPPATH=['.'])
 env.ParseConfig('pkg-config --cflags --libs eigen3')
 
+pyenv = env.Clone()
+pyenv.Append(CPPPATH=['/usr/include/python2.7/'])
+pyenv.Append(LIBS=['boost_python-py27'])
+pyahrs = pyenv.SharedLibrary('_ahrs', 'py_ahrs.cc', SHLIBPREFIX='')
+
 test_env = env.Clone()
 test_env.Append(LIBS=['boost_unit_test_framework'])
 
