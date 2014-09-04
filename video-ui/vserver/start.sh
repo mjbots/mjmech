@@ -1,50 +1,46 @@
 #!/bin/bash
+# This file starts and runs a single instance vserver
+# It is run either from loop.sh on startup, or from ssh session during 
+# development.
+PFILE=/tmp/vserver-process
 
-LPID=/tmp/vserver-loop.pid
-if test -f $LPID  && kill -0 $(cat $LPID); then
-    echo Loop is running, will use it instead
-    vs_pid=$(pgrep vserver.py)
-    if [[ -f /tmp/vserver.log ]]; then
-        mv -f /tmp/vserver.log /tmp/vserver.log.1
-    fi
-    if [[ "$vs_pid" != "" ]]; then
-        echo old process: $(ps --no-headers -l -p $vs_pid)
-        kill $vs_pid
-        for x in `seq 30 -1 0`; do
-            if ! kill -0 $vs_pid 2>/dev/null; then break; fi
-            echo Waiting for process to die
-            sleep 0.2
-        done
-        if [[ "$x" == 0 ]]; then
-            echo Process failed to exit
+if [[ "$1" != "loop" ]]; then
+    # Kill a loop, if any.
+    # Once you start process manually, you have to do it until reboot.
+    exec 11>$PFILE.loop-lock
+    if ! flock -n 11; then
+        echo Killing startup loop
+        kill $(cat $PFILE.loop-pid)
+        if ! flock -w 10 11; then
+            echo Loop does not want to quit
             exit 1
         fi
-    else
-        echo No process to kill
     fi
-    for x in `seq 50 -1 0`; do
-        vs_pid=$(pgrep vserver.py)
-        if [[ "$vs_pid" != "" ]]; then break; fi
-        if [[ -f /tmp/vserver.log ]]; then
-            # We got the log, but no process -- this means process failed to start.
-            break
-        fi
-        echo Waiting for process to start
-        sleep 1
-    done
-    if [[ "$vs_pid" == "" ]]; then
-        echo new process failed to start
-        EC=1
-    else
-        echo new process: $(ps --no-headers -l -p $vs_pid)
-        EC=0
-    fi
-    sleep 1 # give server time to start
-    cat -n /tmp/vserver.log
-    exit $EC
 fi
 
-echo No loop found, starting here
+# Kill old process, if any
+vs_pid="$(cat $PFILE.pid 2>/dev/null)"
+if [[ "$vs_pid" != "" ]]; then
+    echo Another instance is running, killing it
+    echo old process: $(ps --no-headers -l -p $vs_pid)
+    kill $vs_pid
+    # We will know when process dies when the lock is released
+fi
+
+# Get a lock to run the process
+exec 9>$PFILE.lock
+if ! flock -w 1 9; then
+    echo Waiting for other process to exit
+    if ! flock -w 30 9; then
+        echo Other process failed to exit
+        exit 1
+    fi
+fi
+
+# Start the process
 cd $(dirname $(readlink -f "$0")) || exit 1
-ls -l
-./vserver.py
+echo Starting from `pwd` on `date`
+./vserver.py -s herkulex -c real.cfg -p /dev/ttyACM99
+EC=$?
+echo "*** Exited with code $EC ***"
+exit $EC

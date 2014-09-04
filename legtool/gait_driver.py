@@ -215,7 +215,9 @@ class MechDriver(object):
         self.servo = None
 
         config = ConfigParser.ConfigParser()
-        config.read(options.config)
+        successful = config.read(options.config)
+        assert successful, ('No config files found, searched: ' + 
+                            str(options.config))
 
         self.leg_ik_map = _load_ik(config)
 

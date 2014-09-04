@@ -150,7 +150,7 @@ class ControlInterface(object):
             self.logger.info('Seq number jump: %r->%r' % (self.last_seq, pkt['seq']))
         self.last_seq = pkt['seq']
 
-        if 'servo_x' in pkt and 'servo_y' in pkt and self.mech_driver:
+        if 'servo_x' in pkt and 'servo_y' in pkt and self.mech_driver and self.mech_driver.servo:
             Task(self.mech_driver.servo.set_pose(
                     {12: pkt['servo_x'],
                      13: pkt['servo_y']}))
