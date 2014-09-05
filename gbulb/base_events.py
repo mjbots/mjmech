@@ -30,7 +30,7 @@ from trollius import tasks
 from trollius.log import logger
 from trollius.base_events import Server
 
-from trollius import From, Return
+from trollius import From, Return, Task
 
 
 __all__ = ['BaseEventLoop']
@@ -650,6 +650,9 @@ class BaseEventLoop(events.AbstractEventLoop):
         transport = yield From(self._make_subprocess_transport(
             protocol, args, False, stdin, stdout, stderr, bufsize, **kwargs))
         raise Return((transport, protocol))
+
+    def create_task(self, coro):
+        return Task(coro)
 
 #    def _add_callback(self, handle):
 #        """Add a Handle to ready or scheduled."""
