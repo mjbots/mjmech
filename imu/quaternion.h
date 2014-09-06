@@ -19,21 +19,21 @@ class Quaternion {
       : w_(1.0), x_(0.), y_(0.), z_(0.) {}
 
   typedef Eigen::Matrix<_Scalar, 3, 1> Vector3D;
-  
+
   Vector3D Rotate(const Vector3D& vector3d) const {
     Quaternion p(0.0,
                  vector3d[0],
                  vector3d[1],
                  vector3d[2]);
-    Quaternion q = *this * p * Conjugated();
+    Quaternion q = *this * p * conjugated();
     return Vector3D(q.x(), q.y(), q.z());
   }
 
-  Quaternion Conjugated() const {
+  Quaternion conjugated() const {
     return Quaternion(w_, -x_, -y_, -z_);
   }
 
-  Quaternion Normalized() const {
+  Quaternion normalized() const {
     _Scalar norm = std::sqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
     return Quaternion(w_ / norm,
                       x_ / norm,
@@ -43,7 +43,7 @@ class Quaternion {
 
   Eigen::Matrix<_Scalar, 3, 3> matrix() const {
     Eigen::Matrix<_Scalar, 3, 3> r;
-    
+
     r(0, 0) = w_ * w_ + x_ * x_ - y_ * y_ - z_ * z_;
     r(0, 1) = 2 * (x_ * y_ - w_ * z_);
     r(0, 2) = 2 * (w_ * y_ + x_ * z_);
@@ -124,7 +124,7 @@ class Quaternion {
     return Quaternion(1.0,
                       0.5 * pitch_rate_rps * dt_s,
                       0.5 * roll_rate_rps * dt_s,
-                      -0.5 * yaw_rate_rps * dt_s).Normalized();
+                      -0.5 * yaw_rate_rps * dt_s).normalized();
   }
 
   _Scalar w() const { return w_; }

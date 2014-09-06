@@ -18,6 +18,7 @@ import scipy.integrate
 import sys
 
 import ahrs
+from ahrs import Quaternion
 import imu_error_model
 
 sys.path.append('build')
@@ -297,45 +298,74 @@ def animate_case(pc):
     ani = animation.FuncAnimation(fig, animate, frames=600, interval=10)
     plt.show()
 
-def run_case(test_case, estimator):
+def run_case(options, test_case, estimator):
     rng = random.Random(0)
 
     # These constants are from the Pololu MiniIMU v2 @8g.
-    accel_y_error, accel_z_error = [
+    accel_x_error, accel_y_error, accel_z_error = [
         imu_error_model.InertialErrorModel(
             rng,
             SAMPLE_FREQUENCY_HZ,
             1.9e-2,
             1.2e-3,
             1.3e-5)
-        for x in range(2)]
+        for x in range(3)]
 
     # These constants are from the Pololu MiniIMU v2 at 2000dps
     # maximum rate.
-    gyro_error = imu_error_model.InertialErrorModel(
-        rng,
-        SAMPLE_FREQUENCY_HZ,
-        3e-4,  # 5.3e-4 rad/sqrt(s), 0.0303 deg/sqrt(s)
-        1e-4,  # 1.4e-4 rad/s, 0.0080 deg/s
-        3.6e-6)               # 3.6e-6 rad/sqrt(s)
+    gyro_x_error, gyro_y_error, gyro_z_error = [
+        imu_error_model.InertialErrorModel(
+            rng,
+            SAMPLE_FREQUENCY_HZ,
+            3e-4,  # 5.3e-4 rad/sqrt(s), 0.0303 deg/sqrt(s)
+            1e-4,  # 1.4e-4 rad/s, 0.0080 deg/s
+            3.6e-6)               # 3.6e-6 rad/sqrt(s)
+        for x in range(3)]
 
-    estimator.process_accel(0, 1.0)
+    if options.attitude:
+        estimator.process_accel(0., 0., 1.0)
+    else:
+        estimator.process_accel(0, 1.0)
 
     NUM_COUNT = 90000
     error = 0.0
+    diff = 0.0
 
     for count in range(NUM_COUNT):
         test_case.advance(1.0 / SAMPLE_FREQUENCY_HZ)
         true_accel_y, true_accel_z = test_case.accel_yz()
 
+        accel_x = accel_x_error.sample() / 9.81
         accel_y = true_accel_y + (accel_y_error.sample() / 9.81)
         accel_z = true_accel_z + (accel_z_error.sample() / 9.81)
-        gyro = test_case.gyro() + gyro_error.sample()
+        gyro_x = test_case.gyro() + gyro_x_error.sample()
+        gyro_y = gyro_y_error.sample()
+        gyro_z = gyro_z_error.sample()
 
-        estimator.process_gyro(gyro)
-        estimator.process_accel(accel_y, accel_z)
+        gyro_x_bias = gyro_x_error.bias()
+        gyro_y_bias = gyro_y_error.bias()
+        gyro_z_bias = gyro_z_error.bias()
 
-        error += (estimator.pitch() - test_case.expected_pitch()) ** 2
+        if options.attitude:
+            estimator.process_gyro(
+                yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y)
+            extra_log = [('true_pitch', test_case.expected_pitch()),
+                         ('pitch_err', diff),
+                         ('true_gyro_x_bias', gyro_x_bias),
+                         ('true_gyro_y_bias', gyro_y_bias),
+                         ('true_gyro_z_bias', gyro_z_bias)]
+            kwargs = {}
+            if options.python:
+                kwargs['extra_log'] = extra_log
+            estimator.process_accel(
+                accel_x, accel_y, accel_z,
+                **kwargs)
+        else:
+            estimator.process_gyro(gyro_x)
+            estimator.process_accel(accel_y, accel_z)
+
+        diff = estimator.pitch_error(test_case.expected_pitch())
+        error += diff ** 2
 
     diag = estimator.covariance_diag()
 
@@ -347,7 +377,7 @@ def run(options):
     cases = []
     cases += [BouncingTest(damp_vel=0.1)]
     cases += [BouncingTest()]
-    cases += [BouncingTest(accel_noise=20.)]
+    cases += [BouncingTest(noise_level=5.0, accel_noise=20.)]
     cases += [RotatingTest()]
     cases += [RotatingTest(noise_level=5)]
     cases += [RotatingTest(noise_level=10)]
@@ -374,31 +404,50 @@ def run(options):
     print '%20s %10s   %s' % ('test case', 'err', 'covar')
 
     for case in cases:
-        estimator_class = _ahrs.PitchEstimator
+        kwargs = {}
+        extra_log = [('true_pitch', 0),
+                     ('pitch_err', 0),
+                     ('true_gyro_x_bias', 0),
+                     ('true_gyro_y_bias', 0),
+                     ('true_gyro_z_bias', 0)]
+
         if options.python:
-            estimator_class = ahrs.PitchEstimator
+            module = ahrs
+            kwargs['extra_log'] = extra_log
+        else:
+            module = _ahrs
+
+        if not options.attitude:
+            estimator_class = module.PitchEstimator
+        else:
+            estimator_class = module.AttitudeEstimator
 
         estimator = estimator_class(
-            process_noise_gyro=math.radians(0.0008)**2,
-            process_noise_bias=math.radians(0.0512)**2,
-            measurement_noise_accel=20.0**2)
+            process_noise_gyro=math.radians(0.0002)**2,
+            process_noise_bias=math.radians(0.0032)**2,
+            measurement_noise_accel=3.0**2,
+            **kwargs)
 
-        result = run_case(case, estimator)
+        result = run_case(options, case, estimator)
 
+        covar = ' '.join('%s=%f' % (x, math.degrees(y))
+                         for x, y in zip(estimator.state_names(),
+                                         result['uncert']))
+        if len(covar) > 40:
+            covar = covar[0:40]
         print '%20s %10s %s' % (
-            case.name(), '%.4f' % result['rms_error'],
-            ' '.join('%s=%f' % (x, math.degrees(y))
-                     for x, y in zip(estimator.state_names(),
-                                     result['uncert'])))
+            case.name(), '%.4f' % result['rms_error'], covar)
 
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-l', '--limit', action='append', default=[],
                       help='Only consider tests matching these regular exps')
-    parser.add_option('-a', '--animate', action='store_true', default=False,
+    parser.add_option('--animate', action='store_true', default=False,
                       help='Animate the first selected test')
     parser.add_option('-p', '--python', action='store_true', default=False,
                       help='Use python filter')
+    parser.add_option('-a', '--attitude', action='store_true', default=False,
+                      help='Use full 2d attitude filter')
 
     options, args = parser.parse_args()
     assert len(args) == 0

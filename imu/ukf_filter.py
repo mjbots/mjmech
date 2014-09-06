@@ -77,7 +77,8 @@ class UkfFilter(object):
         self.covariance = self._condition_covariance(Pminus)
 
     def update_measurement(self, measurement,
-                           measurement_function=None, measurement_noise=None):
+                           measurement_function=None, measurement_noise=None,
+                           mahal_limit=None):
         assert measurement.shape[1] == 1
 
         if measurement_function is None:
@@ -114,8 +115,16 @@ class UkfFilter(object):
                 for xi, yi in zip(sigma_points, yhatin)])
 
         # Equation 14.67
-        K = numpy.dot(Pxy, numpy.linalg.inv(Py))
-        xplus = self.state + numpy.dot(K, (measurement - yhat))
+        Py_inv = numpy.linalg.inv(Py)
+        innovation = measurement - yhat
+        if mahal_limit is not None:
+            distance = numpy.dot(numpy.dot(innovation.transpose(), Py_inv),
+                                 innovation)
+            if distance[0, 0] > mahal_limit:
+                return
+
+        K = numpy.dot(Pxy, Py_inv)
+        xplus = self.state + numpy.dot(K, innovation)
         Pplus = self.covariance - numpy.dot(numpy.dot(K, Py), K.transpose())
 
         self.state = xplus

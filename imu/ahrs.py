@@ -15,6 +15,12 @@ import ukf_filter
 # TODO jpieper: Make this initialized in the class.
 IMU_UPDATE_PERIOD = 0.01
 
+class Euler(object):
+    def __init__(self, yaw=None, pitch=None, roll=None):
+        self.roll = roll
+        self.pitch = pitch
+        self.yaw = yaw
+
 class AttitudeEstimator(object):
     # States are:
     # 0: attitude W
@@ -33,13 +39,17 @@ class AttitudeEstimator(object):
         delta = Quaternion()
         for x in self.current_gyro:
             advance = Quaternion.integrate_rotation_rate(
-                x.roll + result[4],
+                x.roll + result[6],
                 x.pitch + result[5],
-                x.yaw + result[6],
+                x.yaw + result[4],
                 dt)
             delta = delta * advance
 
         next_attitude = (this_attitude * delta).normalized()
+        # yaw = advanced_attitude.euler().yaw
+        # next_attitude = (Quaternion.from_euler(0., 0., -yaw) *
+        #                  advanced_attitude)
+        # next_attitude = next_attitude.normalized()
         result[0] = next_attitude.w
         result[1] = next_attitude.x
         result[2] = next_attitude.y
@@ -47,7 +57,15 @@ class AttitudeEstimator(object):
         return result
 
     def attitude(self):
-        return Quaternion(*self.ukf.state[0:4,0])
+        return Quaternion(*self.ukf.state[0:4,0]).normalized()
+
+    def pitch_error(self, pitch):
+        return (self.attitude() *
+                Quaternion.from_euler(
+                0., pitch, 0.).conjugated()).euler().pitch
+
+    def pitch(self):
+        return self.attitude().euler().pitch
 
     def gyro_bias(self):
         return list(self.ukf.state[4:7,0])
@@ -55,27 +73,60 @@ class AttitudeEstimator(object):
     def gyro_bias_uncertainty(self):
         return [math.sqrt(x) for x in list(numpy.diag(self.ukf.covariance)[4:7])]
 
-    def __init__(self):
+    def covariance_diag(self):
+        return numpy.diag(self.ukf.covariance)
+
+    def state_names(self):
+        return ['w', 'x', 'y', 'z', 'gx', 'gy', 'gz']
+
+    def __init__(self,
+                 process_noise_gyro,
+                 process_noise_bias,
+                 measurement_noise_accel,
+                 log_filename="/tmp/rotate.log",
+                 extra_log=None):
+        self.process_noise_gyro = process_noise_gyro
+        self.process_noise_bias = process_noise_bias
+        self.measurement_noise_accel = measurement_noise_accel
         self.current_gyro = []
         self.init = False
-        self.log = open('/tmp/attitude.csv', 'w')
-        self.emit_header()
+        if log_filename:
+            self.log = open(log_filename, 'w')
+        else:
+            self.log = None
+        self.emit_header(extra_log)
         self.ukf = None
 
-    def emit_header(self):
+    def emit_header(self, extra_log):
+        if self.log is None:
+            return
+        if extra_log is None:
+            extra_log = []
         self.log.write(','.join(
+                [x[0] for x in extra_log] +
+                ['gyro_x', 'gyro_y', 'gyro_z', 'accel_x', 'accel_y', 'accel_z'] +
+                ['roll', 'pitch', 'yaw'] +
                 ['state_%d' % x for x in range(7)] +
                 ['covar_%d_%d' % (x / 7, x % 7) for x in range(7 * 7)]) + '\n')
 
-    def emit_log(self):
+    def emit_log(self, gyro, accel, extra_log):
+        if self.log is None:
+            return
+        e = self.attitude().euler()
+        if extra_log is None:
+            extra_log = []
         self.log.write(','.join(
                 ['%g' % x for x in
-                 list(self.state.flatten()) +
-                 list(self.covariance.flatten())]) + '\n')
+                 [x[1] for x in extra_log] +
+                 [gyro.pitch, gyro.roll, gyro.yaw] +
+                 [accel[0], accel[1], accel[2]] +
+                 [e.roll, e.pitch, e.yaw] +
+                 list(self.ukf.state.flatten()) +
+                 list(self.ukf.covariance.flatten())]) + '\n')
 
     def process_gyro(self, yaw_rps, pitch_rps, roll_rps):
-        self.current_gyro += [
-            Euler(yaw=yaw_rps, pitch=pitch_rps, roll=roll_rps)]
+        e = Euler(yaw=yaw_rps, pitch=pitch_rps, roll=roll_rps)
+        self.current_gyro += [ e ]
 
     @staticmethod
     def orientation_to_accel(quaternion):
@@ -108,15 +159,6 @@ class AttitudeEstimator(object):
 
     @staticmethod
     def covariance_limit(P):
-        for x in range(7):
-            if P[x, x] < 1e-9:
-                P[x, x] = 1e-9
-        for x in range(0, 4):
-            if P[x, x] > .15:
-                P[x, x] = .15
-        for x in range(4, 7):
-            if P[x, x] > math.radians(50):
-                P[x, x] = math.radians(50)
         return P
 
     def process_yaw(self, mounting, yaw):
@@ -134,7 +176,7 @@ class AttitudeEstimator(object):
             measurement_function=yaw_meas,
             measurement_noise=numpy.array([[math.radians(5)]]))
 
-    def process_accel(self, x, y, z):
+    def process_accel(self, x, y, z, extra_log=None):
         # First, normalize.
         norm = math.sqrt(x * x + y * y + z * z)
 
@@ -156,27 +198,29 @@ class AttitudeEstimator(object):
                                  [0.],
                                  [0.]])
             covariance = numpy.diag([1e-3, 1e-3, 1e-3, 1e-3,
-                                     math.radians(1),
-                                     math.radians(1),
-                                     math.radians(1)])
+                                     math.radians(0.01)**2,
+                                     math.radians(0.01)**2,
+                                     math.radians(0.01)**2])
 
             self.ukf = ukf_filter.UkfFilter(
                 initial_state=state,
                 initial_covariance=covariance,
                 process_function=self.state_function,
-                process_noise=numpy.diag([1e-8, 1e-8, 1e-8, 1e-8,
-                                          math.radians(1e-6),
-                                          math.radians(1e-6),
-                                          math.radians(1e-6)]),
+                process_noise=numpy.diag([self.process_noise_gyro] * 4 +
+                                         [self.process_noise_bias] * 3),
                 measurement_function=self.accel_measurement,
-                measurement_noise=numpy.diag([10.0, 10.0, 10.0]),
+                measurement_noise=numpy.diag([self.measurement_noise_accel] * 3),
                 covariance_limit=self.covariance_limit)
 
         self.ukf.update_state(IMU_UPDATE_PERIOD)
-        self.ukf.update_measurement(numpy.array([[x],[y],[z]]))
+        self.ukf.update_measurement(numpy.array([[x],[y],[z]]),
+                                    mahal_limit=None)
 
+        gyro = Euler(0., 0., 0.)
+        if len(self.current_gyro):
+            gyro = self.current_gyro[0]
+        self.emit_log(gyro, (x, y, z), extra_log)
         self.current_gyro = []
-        #self.emit_log()
 
 class Dummy(object):
     def __init__(self):
@@ -236,6 +280,14 @@ class PitchEstimator(object):
     def gyro_bias(self):
         return self.ukf.state[1,0]
 
+    def attitude(self):
+        return Quaternion.from_euler(0., self.pitch(), 0.)
+
+    def pitch_error(self, pitch):
+        return (self.attitude() *
+                Quaternion.from_euler(
+                0., pitch, 0.).conjugated()).euler().pitch
+
     def gyro_bias_uncertainty(self):
         return [math.sqrt(x) for x in list(numpy.diag(self.ukf.covariance)[1])][0]
 
@@ -244,7 +296,8 @@ class PitchEstimator(object):
                  process_noise_bias=math.radians(1e-6),
                  measurement_noise_accel=10.,
                  accel_filter=None,
-                 log_filename=None):
+                 log_filename=None,
+                 extra_log=None):
         self.current_gyro = []
         self.init = False
         if log_filename:

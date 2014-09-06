@@ -68,9 +68,15 @@ class InertialErrorModel(object):
         self._rate_walk = BrownianMotion(
             rng, rate_random_walk_rad_sqrt_s / bw_sqrt_hz)
 
+        self._last_bias = 0.0
+
+    def bias(self):
+        return self._last_bias
+
     def sample(self):
+        self._last_bias = self._bias.sample()
         return (self._white_noise.sample() +
-                self._bias.sample() +
+                self._last_bias +
                 self._rate_walk.sample())
 
 class WhiteNoise(object):
