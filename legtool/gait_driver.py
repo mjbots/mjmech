@@ -156,51 +156,81 @@ class GaitDriver(object):
 
     @asyncio.coroutine
     def _transition_to_idle(self):
+        result = yield From(self.gait.transition_to_idle(
+                lambda: self.next_command is not None,
+                self._run_while))
+        raise Return(result)
+
+
+class ConfigRippleGait(object):
+    def __init__(self, config, name, leg_ik_map):
+        self.ripple_config = ripple.RippleConfig.read_settings(
+            config, 'gaitconfig', leg_ik_map)
+
+        self.gait = ripple.RippleGait(self.ripple_config)
+
+    def get_idle_state(self):
+        return self.gait.get_idle_state()
+
+    def set_state(self, state, command):
+        return self.gait.set_state(state, command)
+
+    def set_command(self, command):
+        return self.gait.set_command(command)
+
+    def advance_time(self, delta_time):
+        return self.gait.advance_time(delta_time)
+
+    def is_command_pending(self):
+        return self.gait.is_command_pending()
+
+    @asyncio.coroutine
+    def transition_to_idle(self, early_exit, run):
         # Command 0 speed, wait for the command to be active, then
         # wait for at least 1 phase, then wait for all legs to be in
         # stance.
         self.gait.set_command(ripple.Command())
 
-        yield From(self._run_while(
+        yield From(run(
                 lambda: (self.gait.is_command_pending() and
-                         not self.next_command),
+                         not early_exit()),
                 allow_new=False))
 
-        if self.next_command:
+        if early_exit():
             raise Return(False)
 
         class PhaseChecker(object):
             def __init__(self, parent):
                 self.phase_delta = 0.0
                 self.parent = parent
-                self.old_phase = self.parent.state.phase
+                self.old_phase = self.parent.gait.state.phase
 
             def check(self):
                 self.phase_delta += _wrap_phase(
-                    self.parent.state.phase - self.old_phase)
-                self.old_phase = self.parent.state.phase
-                return (self.phase_delta < 0.95 and
-                        not self.parent.next_command)
+                    self.parent.gait.state.phase - self.old_phase)
+                self.old_phase = self.parent.gait.state.phase
+                return (self.phase_delta < 0.95)
 
         checker = PhaseChecker(self)
 
-        yield From(self._run_while(checker.check, allow_new=False))
+        yield From(run(lambda: checker.check() and not early_exit(),
+                       allow_new=False))
 
-        if self.next_command:
+        if early_exit():
             raise Return(False)
 
         def any_non_stance():
-            if self.next_command:
+            if early_exit():
                 return False
 
-            for leg in self.state.legs.values():
+            for legnum, leg in self.gait.state.legs.iteritems():
                 if leg.mode != ripple.STANCE:
                     return True
             return False
 
-        yield From(self._run_while(any_non_stance, allow_new=False))
+        yield From(run(any_non_stance, allow_new=False))
 
-        if self.next_command:
+        if early_exit():
             raise Return(False)
 
         raise Return(True)
@@ -220,16 +250,12 @@ class MechDriver(object):
                             str(options.config))
 
         self.leg_ik_map = _load_ik(config)
-
-        self.ripple_config = ripple.RippleConfig.read_settings(
-            config, 'gaitconfig', self.leg_ik_map)
+        self.gait = ConfigRippleGait(config, 'gaitconfig', self.leg_ik_map)
 
         self.servo_name_map = {}
         if config.has_section('servo.names'):
             for name, value in config.items('servo.names'):
                 self.servo_name_map[int(name)] = value
-
-        self.gait = ripple.RippleGait(self.ripple_config)
 
     @asyncio.coroutine
     def run(self):
