@@ -1,3 +1,4 @@
  * Need pullups on SDA and SCL... the AVR built-ins aren't sufficient
  * Would be nice to have test points for SDA/SCL if room
- 
+ * Leave a little more room around the inner post, to allow for a
+   custom machined post with a lip
