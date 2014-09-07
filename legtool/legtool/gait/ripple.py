@@ -268,8 +268,6 @@ class RippleGait(object):
         self.state = state.copy()
 
         # Make sure all the legs are in the correct frame.
-        assert state.phase == 0.0
-
         for leg in self.state.legs.values():
             if leg.mode == STANCE:
                 leg.point = self.state.world_frame.map_from_frame(
