@@ -48,15 +48,17 @@ class GaitDriver(object):
 
     IDLE, COMMAND, IDLING = range(3)
 
-    def __init__(self, gait, servo):
-        self.gait = gait
+    def __init__(self, idle_state, servo):
+        self.gait = None
         self.servo = servo
-        self.state = None
+        self.idle_state = idle_state
+        self.state = self.idle_state.copy()
 
         self.mode = self.IDLE
 
         # This event should be set anytime a next_command is present.
         self.command_event = asyncio.Event()
+        self.next_gait = None
         self.next_command = None
 
     @asyncio.coroutine
@@ -72,8 +74,7 @@ class GaitDriver(object):
 
         yield From(self.servo.enable_power(selector.POWER_ENABLE))
 
-        self.state = self.gait.get_idle_state()
-        self.gait.set_state(self.state, ripple.Command())
+        self.state = self.idle_state.copy()
 
         do_idle = True
 
@@ -87,13 +88,15 @@ class GaitDriver(object):
             # Transition back to the idle state.
             do_idle = yield From(self._transition_to_idle())
 
-    def set_command(self, command):
+    def set_command(self, gait, command):
         '''Command the mech to begin motion.
 
+        :param gait: The gait object to use
         :param command: The current command to begin executing
         :type command: An instance of gait_command.Command
         '''
 
+        self.next_gait = gait
         self.next_command = command
         self.command_event.set()
 
@@ -102,6 +105,7 @@ class GaitDriver(object):
         motionless.'''
 
         self.next_command = None
+        self.next_gait = None
         self.command_event.clear()
 
         if self.mode == self.IDLE:
@@ -111,8 +115,9 @@ class GaitDriver(object):
 
     @asyncio.coroutine
     def _idle_state(self):
+        print '_idle_state'
         self.mode = self.IDLE
-        self.state = self.gait.get_idle_state()
+        self.state = self.idle_state.copy()
         servo_pose = self.state.command_dict()
 
         yield From(self.servo.set_pose(
@@ -125,7 +130,14 @@ class GaitDriver(object):
 
     @asyncio.coroutine
     def _run_command(self):
+        print '_run_command'
         self.mode = self.COMMAND
+        assert self.next_gait is not None
+        assert self.next_command is not None
+
+        self.gait = self.next_gait
+        self.gait.set_state(self.state, self.next_command)
+        self.next_command = None
 
         yield From(self._run_while(
                 lambda: self.mode == self.COMMAND,
@@ -137,7 +149,13 @@ class GaitDriver(object):
 
         while condition():
             if allow_new and self.next_command:
+                if self.next_gait != self.gait:
+                    self.command_event.clear()
+                    self.mode = self.IDLING
+                    raise Return()
+
                 self.gait.set_command(self.next_command)
+                self.next_gait = None
                 self.next_command = None
                 self.command_event.clear()
 
@@ -156,8 +174,10 @@ class GaitDriver(object):
 
     @asyncio.coroutine
     def _transition_to_idle(self):
+        print '_transition_to_idle'
         result = yield From(self.gait.transition_to_idle(
-                lambda: self.next_command is not None,
+                lambda: (self.next_command is not None or
+                         self.next_gait == self.gait),
                 self._run_while))
         raise Return(result)
 
@@ -186,6 +206,7 @@ class ConfigRippleGait(object):
 
     @asyncio.coroutine
     def transition_to_idle(self, early_exit, run):
+        print 'transition_to_idle'
         # Command 0 speed, wait for the command to be active, then
         # wait for at least 1 phase, then wait for all legs to be in
         # stance.
@@ -197,6 +218,7 @@ class ConfigRippleGait(object):
                 allow_new=False))
 
         if early_exit():
+            print 'early exit 1'
             raise Return(False)
 
         class PhaseChecker(object):
@@ -217,6 +239,7 @@ class ConfigRippleGait(object):
                        allow_new=False))
 
         if early_exit():
+            print 'early exit 2'
             raise Return(False)
 
         def any_non_stance():
@@ -231,8 +254,10 @@ class ConfigRippleGait(object):
         yield From(run(any_non_stance, allow_new=False))
 
         if early_exit():
+            print 'early exit 3'
             raise Return(False)
 
+        print 'normal exit'
         raise Return(True)
 
 
@@ -269,7 +294,7 @@ class MechDriver(object):
                 self.options.servo,
                 **kwargs))
 
-        self.driver = GaitDriver(self.gait, self.servo)
+        self.driver = GaitDriver(self.gait.get_idle_state(), self.servo)
 
         idle_task = Task(self._make_idle())
         driver_task = Task(self.driver.run())
@@ -283,7 +308,7 @@ class MechDriver(object):
 
     def set_command(self, command):
         self.command_time = time.time()
-        self.driver.set_command(command)
+        self.driver.set_command(self.gait, command)
 
     def set_idle(self):
         self.command_time = time.time()
