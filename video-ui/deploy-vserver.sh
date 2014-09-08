@@ -9,7 +9,10 @@ Commands:
   start     -- upload server to odroid's RAM and start
   install   -- install server to odroid's flash
   assemble  -- do not upload, just put all files to $TMPDIR
-  exec CMD  -- upload, then exec CMD in vserver's dir
+  exec CMD  -- upload, then exec CMD in vserver's dir, with X11 forwarding. Example:
+   exec sudo ./install-packages.sh
+   exec legtool/legtool.py
+   exec legtool/herkulex_tool.py -d /dev/ttyACM99 -b -a 2
 EOF
     exit 1
 fi
@@ -46,5 +49,5 @@ elif [[ "$1" == "install" ]]; then
 elif [[ "$1" = "exec" ]]; then
     shift
     set -x
-    ssh odroid -t cd /tmp/vserver \&\& "$@"
+    ssh odroid -Yt cd /tmp/vserver \&\& "$@"
 fi

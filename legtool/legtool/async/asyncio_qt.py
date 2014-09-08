@@ -18,7 +18,7 @@ with QT/PySide.'''
 import errno
 import thread
 import trollius as asyncio
-from trollius import From, Return
+from trollius import From, Return, Task
 import logging
 import socket
 import sys
@@ -327,3 +327,5 @@ class QtEventLoop(asyncio.AbstractEventLoop):
                                  'in custom exception handler',
                                  exc_info=True)
         
+    def create_task(self, coro):
+        return Task(coro)
