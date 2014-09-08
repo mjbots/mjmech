@@ -15,7 +15,7 @@ import fcntl
 import trollius as asyncio
 from trollius import Task
 
-from gi.repository import GObject
+from gi.repository import GObject, Gtk
 gobject = GObject
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../legtool'))
@@ -25,8 +25,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'legtool'))
 import gait_driver
 import gbulb
 import legtool
-
-g_main_loop = gobject.MainLoop()
 
 def wrap_event(callback, *args1, **kwargs1):
     """Wrap event callback so the app exit if it crashes"""
@@ -38,7 +36,7 @@ def wrap_event(callback, *args1, **kwargs1):
         except BaseException as e:
             logging.error("Callback %r crashed:", callback)
             logging.error(" %s %s" % (e.__class__.__name__, e))
-            g_main_loop.quit()
+            Gtk.main_quit()
             raise
     return wrapped
 
@@ -91,6 +89,7 @@ class ControlInterface(object):
         self.src_addr = None
         self.recent_packets = 0
         self.last_seq = None
+        self.last_fire_cmd_count = None
 
         if self.opts.no_mech:
             self.mech_driver = None
@@ -150,12 +149,46 @@ class ControlInterface(object):
             self.logger.info('Seq number jump: %r->%r' % (self.last_seq, pkt['seq']))
         self.last_seq = pkt['seq']
 
-        if 'servo_x' in pkt and 'servo_y' in pkt and self.mech_driver and self.mech_driver.servo:
-            Task(self.mech_driver.servo.set_pose(
-                    {12: pkt['servo_x'],
-                     13: pkt['servo_y']}))
+        f_c_c = pkt.get('fire_cmd_count')
+        if self.last_fire_cmd_count is None or f_c_c is None:
+            fire_diff = 0
+        else:
+            fire_diff = f_c_c - self.last_fire_cmd_count
+            if (fire_diff < 0) or (fire_diff > 3):
+                self.logging.info('fire_cmd_count jump: %r->%r' % (
+                    self.last_fire_cmd_count, f_c_c))
+                fire_diff = 0
+        self.last_fire_cmd_count = f_c_c
+        if fire_diff > 0:
+            self.logger.info('bang bang (%dx)' % fire_diff)            
 
-        if 'gait' in pkt and self.mech_driver:
+        #self.logger.debug('Remote packet: %r' % (pkt, ))
+
+        if not self.mech_driver:
+            return
+        
+        if fire_diff > 0:
+            # TODO mafanasyev: give fire command
+            pass
+
+        # re-sent magic servo command. Unlike real servo,
+        # it will timeout and turn off all LEDs if there were no
+        # commands for a while (TODO implement this on avr side)
+        Task(self.mech_driver.servo.set_leds(
+            99, 
+            red=pkt.get('laser_on'),
+            green=pkt.get('mixer_on'),
+            # LED_BLUE is an actual blue LED on the board. Flash it
+            # as we receive the packets.
+            blue=(self.recent_packets % 2)))
+
+        if pkt.get('turret'):
+            servo_x, servo_y = pkt['turret']
+            Task(self.mech_driver.servo.set_pose(
+                    {12: servo_x,
+                     13: servo_y}))
+
+        if 'gait' in pkt:
             gait = pkt['gait']
             if gait is None:
                 self.mech_driver.set_idle()
@@ -165,8 +198,6 @@ class ControlInterface(object):
                     setattr(command, key, value)
 
                 self.mech_driver.set_command(command)
-
-        #self.logger.debug('Remote packet: %r' % (pkt, ))
 
     def _set_video_dest(self, addr):
         """This function should be called periodically -- it might not
@@ -205,7 +236,7 @@ def main(opts):
     asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
 
     logging.basicConfig(
-        level=logging.WARN,
+        level=logging.INFO,
         format="%(asctime)s.%(msecs).3d [%(levelname).1s] %(name)s: %(message)s",
         datefmt="%T")
 

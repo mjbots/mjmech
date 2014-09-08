@@ -124,10 +124,18 @@ class ControlInterface(object):
         self.logger.info('Connecting to %s:%d' % self.addr)
         self.sock.connect(self.addr)
 
+        # Wallclock and pipeline time
+        self.last_video_wall_time = None
+        self.last_video_pp_time = None
+
         self.seq = 0
         self.control_dict = dict(
             video_port=self.VIDEO_PORT,
-            servo_x = 0.5, servo_y = 0.5,
+            # Not set: turret - pair of (x, y) degrees
+            # Not set: gait - a dict based off NULL_COMMAND
+            laser_on = 0,  # 0 = laser off; 1 = laser on
+            fire_cmd_count = 0,  # fire a shot every time this changes; should only ever increase
+            mixer_on = 0,
             )
        
         if opts.external_video:
@@ -155,7 +163,7 @@ class ControlInterface(object):
         else:
             self.joystick = None
             self.joystick_task = None
-            print "No joysticks found!"
+            self.logger.info("No joysticks found!")
             
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
@@ -187,7 +195,7 @@ class ControlInterface(object):
                     gait['rotate_deg_s'] = dr * 50
                     self.control_dict['gait'] = gait
         except Exception as e:
-            print "ERROR!:", str(e)
+            print >>sys.stderr, "ERROR!:", str(e)
             raise
 
     @wrap_event
@@ -198,6 +206,20 @@ class ControlInterface(object):
                 self.joystick_task = None
 
         self._send_control()
+
+        if self.video:
+            tm_pp = self.video.get_time()
+            tm_wc = time.time()
+            if self.last_video_pp_time is not None:
+                dt_pp = tm_pp - self.last_video_pp_time
+                dt_wc = tm_wc - self.last_video_wall_time
+                lost = (dt_wc - dt_pp)
+                if abs(lost) > 0.01:
+                    self.logger.info('Video time lost: %.3f msec (%.1f%%)' % (
+                        lost * 1000.0, lost * 100.0 / (dt_wc or 1)))
+
+            self.last_video_wall_time = tm_wc
+            self.last_video_pp_time = tm_pp
         return True
 
     @wrap_event
@@ -225,11 +247,29 @@ class ControlInterface(object):
     def _handle_packet(self, pkt):
         self.logger.info('Remote packet: %r' % (pkt, ))
 
-    def _handle_video_click_1(self, pos):
+    _CAMERA_VIEW_ANGLE_DIAG = 78.0   # from camera datasheet
+    _CAMERA_VIEW_ANGLE_HOR = _CAMERA_VIEW_ANGLE_DIAG / (16*16 + 9*9)**(0.5) * 16
+    _CAMERA_VIEW_ANGLE_VERT = _CAMERA_VIEW_ANGLE_DIAG / (16*16 + 9*9)**(0.5) * 9
+
+    def _handle_video_click_1(self, pos, moved=False):
         """User clicked button 1 on video window.
         pos is (x, y) tuple in 0..1 range"""
-        self.control_dict['servo_x'] = pos[0]
-        self.control_dict['servo_y'] = pos[1]
+        assert len(pos) == 2
+        if moved:
+            # Only care about initial click.
+            return
+        old_turret = self.control_dict.get('turret')
+        if old_turret is None:
+            self.logger.warn('Cannot move turret -- center it first')
+            return
+        ang_x, ang_y = old_turret
+
+        ang_x -= (pos[0] - 0.5) * self._CAMERA_VIEW_ANGLE_HOR
+        ang_y += (pos[1] - 0.5) * self._CAMERA_VIEW_ANGLE_VERT
+
+        self.logger.info('Setting turret to (%+.1f, %+.1f) deg in response to click at %r',
+                         ang_x, ang_y, pos)
+        self.control_dict['turret'] = (ang_x, ang_y)
         self._send_control()
 
     def _handle_key_press(self, evt):
@@ -249,15 +289,48 @@ class ControlInterface(object):
             dr = -1
         elif name == 'e':
             dr = 1
+        elif name == 'h':
+            self._print_help()
+        elif name == 'l':
+            self.control_dict['laser_on'] ^= 1
+            self.logger.info('Laser set to %d', 
+                             self.control_dict['laser_on'])
+        elif name == 'm':
+            self.control_dict['mixer_on'] ^= 1
+            self.logger.info('Mixer set to %d', 
+                             self.control_dict['mixer_on'])
+        elif name in ['Return']:
+            self.control_dict['fire_cmd_count'] += 1
+            self.logger.info('Sent fire command')
+        elif name == 'c':
+            self.control_dict['turret'] = (0.0, 0.0)
+            self.logger.info('Centered turret')
+        else:
+            print 'Unknown key %r' % name
 
-        gait = NULL_COMMAND.copy()
-        gait['translate_x_mm_s'] = dx * 50
-        gait['translate_y_mm_s'] = dy * 100
-        gait['rotate_deg_s'] = dr * 30
-        self.control_dict['gait'] = gait
+        if dx or dy or dr:
+            gait = NULL_COMMAND.copy()
+            gait['translate_x_mm_s'] = dx * 50
+            gait['translate_y_mm_s'] = dy * 100
+            gait['rotate_deg_s'] = dr * 30
+            self.control_dict['gait'] = gait
+        self._send_control()
 
     def _handle_key_release(self, evt):
-        self.control_dict['gait'] = None
+        if self.control_dict.get('gait') is not None:
+            self.control_dict['gait'] = None
+            self._send_control()
+
+    def _print_help(self):
+        print 'Keys:'
+        print '  w/s, a/d - move'
+        print '  q/e      - rotate'
+        print '  l        - laser on/off'
+        print '  m        - mixer on/off'
+        print '  c        - enable && center turret'
+        print '  click    - point turret to this location (must center first)'
+        print '  ENTER    - fire'
+                
 
 class VideoWindow(object):
     def __init__(self, host, port, rotate=False):
@@ -365,6 +438,13 @@ class VideoWindow(object):
         self.pipeline.set_state(Gst.State.NULL)
         Gtk.main_quit()
 
+    def get_time(self):
+        """Return timestamp in video. This freezes when video does not work.
+        """
+        clock = self.pipeline.get_clock()
+        tm = clock.get_internal_time()
+        return tm / 1.e9
+
     @wrap_event
     def _on_new_rtpbin_pad(self, source, pad):
         name = pad.get_name()
@@ -425,7 +505,7 @@ class VideoWindow(object):
             # Button is being held.
             rel_pos = self._evt_get_video_coord(evt)
             if rel_pos and self.on_video_click_1:
-                self.on_video_click_1(rel_pos)
+                self.on_video_click_1(rel_pos, moved=True)
 
     @wrap_event
     def _on_da_click(self, src, evt):
@@ -439,7 +519,7 @@ class VideoWindow(object):
         self.logger.info('Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d' % 
                          (evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state))
         if evt.button == 1 and self.on_video_click_1:
-            self.on_video_click_1(rel_pos)
+            self.on_video_click_1(rel_pos, moved=False)
         return True
 
     @wrap_event

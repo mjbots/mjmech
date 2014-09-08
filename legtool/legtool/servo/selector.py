@@ -137,6 +137,17 @@ class HerkuleXController(object):
             result[ident] = yield From(self.port.voltage(ident))
         raise Return(result)
 
+    @asyncio.coroutine
+    def set_leds(self, ident, red=False, green=False, blue=False):
+        flags = 0
+        if red:
+            flags |= self.port.LED_RED
+        if green:
+            flags |= self.port.LED_GREEN
+        if blue:
+            flags |= self.port.LED_BLUE
+
+        yield From(self.port.set_leds(ident, flags))
 
 class GazeboController(object):
     def __init__(self, model_name, servo_name_map=None):
