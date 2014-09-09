@@ -36,6 +36,8 @@ def wrap_event(callback, *args1, **kwargs1):
         except BaseException as e:
             logging.error("Callback %r crashed:", callback)
             logging.error(" %s %s" % (e.__class__.__name__, e))
+            # TODO mafanasyev: this does not work. Should probably use
+            # asyncio-specific method (if implemented).
             Gtk.main_quit()
             raise
     return wrapped
@@ -155,18 +157,18 @@ class ControlInterface(object):
         else:
             fire_diff = f_c_c - self.last_fire_cmd_count
             if (fire_diff < 0) or (fire_diff > 3):
-                self.logging.info('fire_cmd_count jump: %r->%r' % (
+                self.logger.info('fire_cmd_count jump: %r->%r' % (
                     self.last_fire_cmd_count, f_c_c))
                 fire_diff = 0
         self.last_fire_cmd_count = f_c_c
         if fire_diff > 0:
-            self.logger.info('bang bang (%dx)' % fire_diff)            
+            self.logger.info('bang bang (%dx)' % fire_diff)
 
         #self.logger.debug('Remote packet: %r' % (pkt, ))
 
         if not self.mech_driver:
             return
-        
+
         if fire_diff > 0:
             # TODO mafanasyev: give fire command
             pass
@@ -175,7 +177,7 @@ class ControlInterface(object):
         # it will timeout and turn off all LEDs if there were no
         # commands for a while (TODO implement this on avr side)
         Task(self.mech_driver.servo.set_leds(
-            99, 
+            99,
             red=pkt.get('laser_on'),
             green=pkt.get('mixer_on'),
             # LED_BLUE is an actual blue LED on the board. Flash it

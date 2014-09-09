@@ -62,7 +62,7 @@ class UdpAnnounceReceiver(object):
         self.sock.bind(('', self.PORT))
 
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        GLib.io_add_watch(self.sock.fileno(), 
+        GLib.io_add_watch(self.sock.fileno(),
                           GLib.PRIORITY_DEFAULT,
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
@@ -71,7 +71,7 @@ class UdpAnnounceReceiver(object):
         self.server = None
         self.recent_sources = list()
         self.control = None
-        
+
     @wrap_event
     def _on_readable(self, source, cond):
         while True:
@@ -82,7 +82,7 @@ class UdpAnnounceReceiver(object):
                     raise
                 break
             data = json.loads(pkt)
-            if (self.server is None or 
+            if (self.server is None or
                 self.server['host'] != data['host'] or
                 self.server['start_time'] != data['start_time'] or
                 addr not in self.recent_sources):
@@ -90,7 +90,7 @@ class UdpAnnounceReceiver(object):
                 server = dict(host=data['host'],
                               start_time=data['start_time'],
                               cport=data['cport'], # control port
-                              addr=addr[0], 
+                              addr=addr[0],
                               aport=addr[1] # announce port
                               )
                 self._on_new_server(server)
@@ -101,13 +101,13 @@ class UdpAnnounceReceiver(object):
 
     def _on_new_server(self, info):
         self.logger.info('Found a server at %s:%d (a-port %s, host %r, started %s)' % (
-                info['addr'], info['cport'], info['aport'], info['host'], 
+                info['addr'], info['cport'], info['aport'], info['host'],
                 time.strftime('%F_%T', time.localtime(info['start_time']))))
         assert self.server is None or self.server['addr'] == info['addr'], \
             'IP change not supported'
         self.server = info
         if self.control is None:
-            self.control = ControlInterface(self.opts, self.server['addr'], 
+            self.control = ControlInterface(self.opts, self.server['addr'],
                                             self.server['cport'])
 
 class ControlInterface(object):
@@ -137,11 +137,14 @@ class ControlInterface(object):
             fire_cmd_count = 0,  # fire a shot every time this changes; should only ever increase
             mixer_on = 0,
             )
-       
+
         if opts.external_video:
             self.video = None
         else:
-            self.video = VideoWindow(host, self.VIDEO_PORT)
+            video_log = None
+            if opts.log_prefix:
+                video_log = opts.log_prefix + '.mkv'
+            self.video = VideoWindow(host, self.VIDEO_PORT, video_log=video_log)
             self.video.on_video_click_1 = self._handle_video_click_1
             self.video.on_key_press = self._handle_key_press
             self.video.on_key_release = self._handle_key_release
@@ -154,7 +157,7 @@ class ControlInterface(object):
                 if not x in abs_axis:
                     return -1
             return 1
-            
+
         enumerator = joystick.JoystickEnumerator(metric)
         joysticks = enumerator.joysticks()
         if len(joysticks):
@@ -164,11 +167,11 @@ class ControlInterface(object):
             self.joystick = None
             self.joystick_task = None
             self.logger.info("No joysticks found!")
-            
+
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
                          self._on_send_timer)
-        GLib.io_add_watch(self.sock.fileno(), 
+        GLib.io_add_watch(self.sock.fileno(),
                           GLib.PRIORITY_DEFAULT,
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
@@ -267,7 +270,8 @@ class ControlInterface(object):
         ang_x -= (pos[0] - 0.5) * self._CAMERA_VIEW_ANGLE_HOR
         ang_y += (pos[1] - 0.5) * self._CAMERA_VIEW_ANGLE_VERT
 
-        self.logger.info('Setting turret to (%+.1f, %+.1f) deg in response to click at %r',
+        self.logger.info('Setting turret to (%+.1f, %+.1f) deg in response '
+                         'to click at %r',
                          ang_x, ang_y, pos)
         self.control_dict['turret'] = (ang_x, ang_y)
         self._send_control()
@@ -293,11 +297,11 @@ class ControlInterface(object):
             self._print_help()
         elif name == 'l':
             self.control_dict['laser_on'] ^= 1
-            self.logger.info('Laser set to %d', 
+            self.logger.info('Laser set to %d',
                              self.control_dict['laser_on'])
         elif name == 'm':
             self.control_dict['mixer_on'] ^= 1
-            self.logger.info('Mixer set to %d', 
+            self.logger.info('Mixer set to %d',
                              self.control_dict['mixer_on'])
         elif name in ['Return']:
             self.control_dict['fire_cmd_count'] += 1
@@ -306,7 +310,7 @@ class ControlInterface(object):
             self.control_dict['turret'] = (0.0, 0.0)
             self.logger.info('Centered turret')
         else:
-            print 'Unknown key %r' % name
+            self.logger.info('Unknown key %r' % name)
 
         if dx or dy or dr:
             gait = NULL_COMMAND.copy()
@@ -330,10 +334,10 @@ class ControlInterface(object):
         print '  c        - enable && center turret'
         print '  click    - point turret to this location (must center first)'
         print '  ENTER    - fire'
-                
+
 
 class VideoWindow(object):
-    def __init__(self, host, port, rotate=False):
+    def __init__(self, host, port, rotate=False, video_log=None):
         self.host = host
         self.port = port
         self.logger = logging.getLogger('video')
@@ -350,7 +354,7 @@ class VideoWindow(object):
                                     Gdk.EventMask.BUTTON_RELEASE_MASK |
                                     Gdk.EventMask.POINTER_MOTION_MASK
                                     )
-        self.drawingarea.connect("button-press-event", self._on_da_click)        
+        self.drawingarea.connect("button-press-event", self._on_da_click)
         self.drawingarea.connect("motion-notify-event", self._on_da_move)
         self.window.connect("key-press-event", self._on_da_key)
         self.window.connect("key-release-event", self._on_da_release)
@@ -363,7 +367,7 @@ class VideoWindow(object):
 
         self.pipeline = Gst.Pipeline()
         self.rtpbin = self.make_element("rtpbin", do_retransmission=True)
-        
+
         #caps = Gst.Caps("application/x-rtp",
         #                media="video", clock_rate=90000, encoding_name="H264")
         caps = Gst.Caps.from_string("application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264")
@@ -372,7 +376,7 @@ class VideoWindow(object):
 
         rtcp_src = self.make_element("udpsrc", port=self.port + 1)
         self.link_pads(rtcp_src, None, self.rtpbin, "recv_rtcp_sink_0")
-        
+
         rtcp_sink = self.make_element("udpsink", host=self.host, port=self.port + 2,
                                       sync=False, async=False)
         self.link_pads(self.rtpbin, "send_rtcp_src_0", rtcp_sink, None)
@@ -383,9 +387,13 @@ class VideoWindow(object):
             valignment="bottom", halignment="left", line_alignment="left",
             text="Video info\nNo data yet")
 
-        play_elements = [
+        decode_elements = [
             self.make_element("rtph264depay"),
             self.make_element("h264parse"),
+            self.make_element("tee"),
+        ]
+        play_elements = decode_elements + [
+            self.make_element('queue'),
             self.make_element("avdec_h264"),
             self.make_element("videoconvert"),
             self.make_element("timeoverlay", shaded_background=True,
@@ -397,17 +405,27 @@ class VideoWindow(object):
             play_elements.append(self.make_element(
                     "videoflip", method="clockwise"))
         play_elements.append(self.make_element("xvimagesink"))
-        for i in range(1, len(play_elements)):
-            self.link_pads(play_elements[i-1], None, play_elements[i], None)
+        self.link_list_of_pads(play_elements)
         self.play_elements = play_elements
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
+
+
+        if video_log is not None:
+            self.logger.info('Recording video to %r' % video_log)
+            save_elements = [
+                decode_elements[-1],
+                self.make_element('queue'),
+                self.make_element('matroskamux'),
+                self.make_element('filesink', location=video_log)
+            ]
+            self.link_list_of_pads(save_elements)
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message::error", self._on_error)
         bus.connect("message::eos", self._on_end_of_stream)
         bus.enable_sync_message_emission()
-        bus.connect('sync-message::element', self._on_sync_message)       
+        bus.connect('sync-message::element', self._on_sync_message)
 
         # Callback functions
         self.on_video_click_1 = None
@@ -415,7 +433,7 @@ class VideoWindow(object):
         self.on_key_release = None
 
     def make_element(self, etype, **kwargs):
-        elt = Gst.ElementFactory.make(etype)        
+        elt = Gst.ElementFactory.make(etype)
         assert elt
         self.pipeline.add(elt)
         for n, v in sorted(kwargs.items()):
@@ -427,7 +445,12 @@ class VideoWindow(object):
             res = elt1.link(elt2)
         else:
             res = elt1.link_pads(pad1, elt2, pad2)
-        assert res, (elt1, pad1, elt2, pad2)    
+        assert res, 'Failed to link (%r,%r) to (%r,%r)' % (
+            elt1, pad1, elt2, pad2)
+
+    def link_list_of_pads(self, elements):
+        for i in range(1, len(elements)):
+            self.link_pads(elements[i-1], None, elements[i], None)
 
     def start(self):
         self.logger.info('Starting video')
@@ -512,11 +535,11 @@ class VideoWindow(object):
         assert src == self.drawingarea, src
         rel_pos = self._evt_get_video_coord(evt)
         if rel_pos is None:
-            self.logger.info('Video click outside of image at wpt=(%d,%d) button=%d state=%d' % 
+            self.logger.info('Video click outside of image at wpt=(%d,%d) button=%d state=%d' %
                              (evt.x, evt.y, evt.button, evt.state))
             return True
 
-        self.logger.info('Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d' % 
+        self.logger.info('Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d' %
                          (evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state))
         if evt.button == 1 and self.on_video_click_1:
             self.on_video_click_1(rel_pos, moved=False)
@@ -538,15 +561,40 @@ class VideoWindow(object):
 
 def main(opts):
     asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
-    
+
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s.%(msecs).3d [%(levelname).1s] %(name)s: %(message)s",
         datefmt="%T")
 
+    root = logging.getLogger()
+    # Do not apply limits on loggers; instead apply them on handlers.
+    root.setLevel(logging.DEBUG)
+
     if opts.check:
         logging.info('Check passed')
         return
+
+    if opts.log_dir is not None and opts.log_prefix is None:
+        opts.log_prefix = os.path.abspath(os.path.join(
+            opts.log_dir,
+            time.strftime('mjlog-%Y%m%d-%H%M%S', time.localtime())))
+
+    if opts.log_prefix:
+        print 'Saving logs to %s.*' % opts.log_prefix
+        txtname = opts.log_prefix + '.log'
+        try:
+            os.makedirs(os.path.dirname(txtname))
+        except OSError:
+            pass
+
+        txtlog = logging.FileHandler(txtname, encoding='utf-8')
+        txtlog.setFormatter(logging.Formatter(
+            "%(asctime)s.%(msecs).3d [%(levelname).1s] %(name)s: %(message)s",
+            datefmt="%F %T"))
+        txtlog.setLevel(logging.DEBUG)
+        root.addHandler(txtlog)
+
 
     #GObject.threads_init()
     Gst.init(None)
@@ -562,11 +610,18 @@ def main(opts):
 if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option('--check', action='store_true',
-                      help='Exit immediately')
+                      help='Exit immediately after loading program')
     parser.add_option('--addr', metavar='IP',
-                      help='Client address')
+                      help='Client address (default autodiscover)')
     parser.add_option('--external-video', action='store_true',
-                      help='')
+                      help='Use external process for video playing')
+    parser.add_option('--log-prefix', default=None,
+                      help='Write logfiles with specified prefix '
+                      '(must include path, default base on log-dir and '
+                      'current timestamp)')
+    parser.add_option('-L', '--log-dir', default='./mjmech-data',
+                      help='Write logfiles using autogenerated names in '
+                      'this directory. Empty to disable. Default "%default".')
 
     opts, args = parser.parse_args()
     if len(args) and opts.addr is None:
