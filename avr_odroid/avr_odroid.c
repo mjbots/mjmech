@@ -93,6 +93,8 @@ HWUART_RX_VECT() {
 uint8_t servo_status_err = 0;
 uint8_t servo_status_det = 0;
 uint8_t servo_leds = 0;
+uint8_t servo_leds_timeout = 0;
+uint8_t servo_fire_time = 0;
 
 enum {
   // servo_status_err
@@ -138,25 +140,6 @@ static void handle_STAT_command() {
   rx.val.data[0] = servo_status_err;
   rx.val.data[1] = servo_status_det;
   send_rx_buffer();
-
-  /*
-  enable_tx();
-  // send STAT_ACK -- code 9
-  uint8_t cs1 = (9 ^ SERVO_ADDR ^ 0x47 ^
-                 servo_status_err ^
-                 servo_status_det) & 0xfe;
-  hwuart_tx(0xff); // sync
-  hwuart_tx(0xff);
-  hwuart_tx(9); // packet len
-  hwuart_tx(SERVO_ADDR);
-  hwuart_tx(0x47); // cmd
-  hwuart_tx(cs1);
-  hwuart_tx((cs1 ^ 0xFF) & 0xFE);
-  hwuart_tx(servo_status_err);
-  hwuart_tx(servo_status_det);
-  hwuart_tx(0); // junk
-  disable_tx();
-  */
 }
 
 
@@ -166,13 +149,21 @@ static uint8_t verify_rx_checksum() {
           rx.val.cs2 == ((cs1 ^ 0xFF) & 0xFE));
 }
 
+static void servo_leds_updated() {
+  MIXER_EN = !!(servo_leds & 1); // GREEN bit
+  LED_BLUE = !!(servo_leds & 2); // BLUE bit
+  LASER_EN = !!(servo_leds & 4); // RED bit
+}
+
 // Handle write of 1 byte. Return 1 on error.
 static uint8_t handle_ram_write(uint8_t addr, uint8_t val) {
   if (addr == 53) { // LED Control
+    servo_leds_timeout = 200; // 2 seconds
     servo_leds = val;
-    LED_BLUE = !!(servo_leds & 2);  // parse out blue LED
-    LASER_EN = !!(servo_leds & 4);  // parse out red LED
-  }
+    servo_leds_updated();
+  } else if (addr == 77) { // magic fire time
+    servo_fire_time = val;
+  }    
   return 0;
 }
 
@@ -192,12 +183,13 @@ static void handle_RAMWRITE_cmd() {
 
 static uint8_t handle_ram_read(uint8_t addr) {
   switch (addr) {
-    case 7: return SERVO_ADDR;
-    case 43: return servo_status_err;
-    case 44: return servo_status_det;
-    case 53: return servo_leds;
-    default:
-      return 0;
+  case 7: return SERVO_ADDR;
+  case 43: return servo_status_err;
+  case 44: return servo_status_det;
+  case 53: return servo_leds;
+  case 77: return servo_fire_time;
+  default:
+    return 0;
   }
 
 }
@@ -239,9 +231,19 @@ int main(void) {
   DDRC = 0;
   PORTC = ~DDRC;
 
+  // set up timer/counter 0 to overflow every ~10mS (in CTC mode)
+  TCCR0A = (1<<WGM01);
+  TIMSK0 = 0; // no interrupts, will check flag by hand.
+#if (F_CPU == 16000000)
+  TCCR0B = (1<<CS02)|(1<<CS00);  // Prescaler 1/1024
+  OCR0A = 156; // 10.048 mS interval
+#else
+  #error Unsupported CPU speed
+#endif
+
   // Do not enable TX for now, enable serial bypass.
-  DDRD = (1<<2) | (1<<4);
-  PORTD = (1<<1) | (1<<3) | (1<<5) | (1<<6) | (1<<7);
+  DDRD = (1<<2) | (1<<4) | (1<<6) | (1<<7);
+  PORTD = (1<<1) | (1<<3) | (1<<5);
 
   hwuart_init();
   hwuart_connect_stdout();
@@ -249,8 +251,8 @@ int main(void) {
   disable_tx();
 
   sei();
-  uint8_t i = 0;
-  uint8_t step = 0;
+  //uint8_t i = 0;
+  uint16_t step = 0;
 
   while (1) {
     if (rx_status == RXS_READY) {
@@ -260,6 +262,10 @@ int main(void) {
       } else if (rx.val.cmd == 0x09) { // REBOOT
         servo_status_err = 0;
         servo_status_det = 0;
+        servo_leds = 0;
+        servo_leds_updated();
+        servo_fire_time = 0;
+        FIRE_MOTOR_EN = 0;
       } else if (rx.val.cmd == 0x07) { // STAT
         handle_STAT_command();
       } else if (rx.val.cmd == 0x03 &&
@@ -279,23 +285,48 @@ int main(void) {
       rx_status = RXS_BAD;
     };
 
-    _delay_ms(1);
-    step++;
-    if (step == 0) {
-      // blink LED only if it is not explicilty set
-      if (servo_leds == 0) {
-        //LED_BLUE ^= 1;
-      }
-      i++;
-      //if ((i % 8) == 0) { LASER_EN ^= 1; }
-      /*
-      if ((i % 64) == 2) {
-        enable_tx();
-        printf_PSTR("SERIAL TEST %d ST=%d LC=%d LEN=%d CMD=%d\n",
-                    i, rx_status, rx_len, rx.val.cmd);
-        disable_tx();
-      }
-      */
+    if (!(TIFR0 & (1<<OCF0A))) {
+      // Timer not elapsed yet. Spin more.
+      continue;
     }
+    TIFR0 = (1<<OCF0A);
+    // ~10mS has elapsed.
+    
+    // expire servo
+    if (servo_leds_timeout) {
+      servo_leds_timeout--;
+      if (!servo_leds_timeout) {
+        servo_leds = 0;
+        servo_leds_updated();
+      }
+    }
+
+    // expire fire timer
+    if (servo_fire_time) {
+      FIRE_MOTOR_EN = 1;
+      servo_fire_time--;
+    } else {
+      FIRE_MOTOR_EN = 0;
+    }
+
+    step++;
+    // blink LED only if it is not explicilty set
+    // turn it on for 100mS every 10 seconds
+    if (!servo_leds_timeout) {
+      if (step == 10) {
+        LED_BLUE = 0;
+      } else if (step >= 1000) {
+        LED_BLUE = 1;
+        step = 0;
+      }
+    }
+    /*
+      if ((i % 64) == 2) {
+      enable_tx();
+      printf_PSTR("SERIAL TEST %d ST=%d LC=%d LEN=%d CMD=%d\n",
+      i, rx_status, rx_len, rx.val.cmd);
+      disable_tx();
+      }
+    */
   }
 }

@@ -31,8 +31,8 @@
    D3 ? D3     - connected to servo pin header
    D4 O D4(16) - LASER FET
    D5 ? D5     - connected to servo pin header
-   D6 ? D6(14) -
-   D7 ? D7(13) -
+   D6 O D6(14) - mixer output (hooked to green LED)
+   D7 O D7(13) - fire output
 
 */
 
@@ -50,5 +50,7 @@
 #define LASER_EN         BITVAR(PORTD, 4)
 #define LED_BLUE         BITVAR(PORTB, 5)
 
+#define MIXER_EN         BITVAR(PORTD, 6)
+#define FIRE_MOTOR_EN    BITVAR(PORTD, 7)
 
 #endif
