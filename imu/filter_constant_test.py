@@ -17,12 +17,12 @@ import scipy
 import scipy.integrate
 import sys
 
-import ahrs
-from ahrs import Quaternion
+import estimator
+from estimator import Quaternion
 import imu_error_model
 
 sys.path.append('build')
-import _ahrs
+import _estimator
 
 SAMPLE_FREQUENCY_HZ = 100.0
 G = 9.81
@@ -412,10 +412,10 @@ def run(options):
                      ('true_gyro_z_bias', 0)]
 
         if options.python:
-            module = ahrs
+            module = estimator
             kwargs['extra_log'] = extra_log
         else:
-            module = _ahrs
+            module = _estimator
 
         if not options.attitude:
             estimator_class = module.PitchEstimator

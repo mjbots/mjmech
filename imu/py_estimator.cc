@@ -1,6 +1,6 @@
 // Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-#include "ahrs.h"
+#include "estimator.h"
 
 #include <boost/python.hpp>
 #include <boost/python/args.hpp>
@@ -8,7 +8,7 @@
 
 namespace bp = boost::python;
 
-BOOST_PYTHON_MODULE(_ahrs) {
+BOOST_PYTHON_MODULE(_estimator) {
   bp::class_<std::vector<double> >("doublevec")
       .def(bp::vector_indexing_suite<std::vector<double> >())
       ;

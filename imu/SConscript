@@ -8,13 +8,13 @@ env.ParseConfig('pkg-config --cflags --libs eigen3')
 pyenv = env.Clone()
 pyenv.Append(CPPPATH=['/usr/include/python2.7/'])
 pyenv.Append(LIBS=['boost_python-py27'])
-pyahrs = pyenv.SharedLibrary('_ahrs', 'py_ahrs.cc', SHLIBPREFIX='')
+pyahrs = pyenv.SharedLibrary('_estimator', 'py_estimator.cc', SHLIBPREFIX='')
 
 test_env = env.Clone()
 test_env.Append(LIBS=['boost_unit_test_framework'])
 
 TEST_SOURCES = ['test/' + x for x in [
-        'test_ahrs.cc',
+        'test_estimator.cc',
         'test_ukf_filter.cc',
         'test_quaternion.cc',
         'test_main.cc',

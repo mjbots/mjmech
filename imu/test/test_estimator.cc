@@ -1,6 +1,6 @@
 // Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
-#include "ahrs.h"
+#include "estimator.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
