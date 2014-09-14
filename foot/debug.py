@@ -27,11 +27,10 @@ def main():
         data = result.split(' ')[2]
         pressure = int(data[0:4], 16) >> 6
         temp = int(data[4:8], 16) >> 6
-        
+
         print pressure, temp
 
-        time.sleep(1)
+        time.sleep(.1)
 
 if __name__ == '__main__':
     main()
-    
