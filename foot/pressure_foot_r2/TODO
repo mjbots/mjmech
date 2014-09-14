@@ -2,5 +2,3 @@
  * Would be nice to have test points for SDA/SCL if room
  * Leave a little more room around the inner post, to allow for a
    custom machined post with a lip
- * ensure QFN packages have sufficient outward dimension for hand
-   solder fillet
