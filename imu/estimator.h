@@ -20,7 +20,9 @@ class AttitudeEstimator {
 
   AttitudeEstimator(Float process_noise_gyro,
                     Float process_noise_bias,
-                    Float measurement_noise_accel)
+                    Float measurement_noise_accel,
+                    Float initial_noise_attitude,
+                    Float initial_noise_bias)
       : initialized_(false),
         filter_(
           (Filter::State() <<
@@ -28,10 +30,13 @@ class AttitudeEstimator {
            0.0, 0.0, 0.0).finished(),
           Eigen::DiagonalMatrix<Float, 7, 7>(
               (Filter::State() <<
-               1e-3, 1e-3, 1e-3, 1e-3,
-               std::pow(DegToRad(0.001), 2),
-               std::pow(DegToRad(0.001), 2),
-               std::pow(DegToRad(0.001), 2)).finished()),
+               initial_noise_attitude,
+               initial_noise_attitude,
+               initial_noise_attitude,
+               initial_noise_attitude,
+               initial_noise_bias,
+               initial_noise_bias,
+               initial_noise_bias).finished()),
           Eigen::DiagonalMatrix<Float, 7, 7>(
               (Filter::State() <<
                process_noise_gyro,
@@ -153,6 +158,9 @@ class AttitudeEstimator {
              measurement_noise_accel_,
              measurement_noise_accel_,
              measurement_noise_accel_).finished())));
+    if (!current_gyro_.empty()) {
+      last_gyro_ = current_gyro_.back();
+    }
     current_gyro_.clear();
   }
 
@@ -168,9 +176,11 @@ class AttitudeEstimator {
 
     Gyro(Float yaw_rps, Float pitch_rps, Float roll_rps)
         : yaw_rps(yaw_rps), pitch_rps(pitch_rps), roll_rps(roll_rps) {}
+    Gyro() : yaw_rps(0.), pitch_rps(0.), roll_rps(0.) {}
   };
 
   std::vector<Gyro> current_gyro_;
+  Gyro last_gyro_;
 };
 
 

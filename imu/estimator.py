@@ -83,11 +83,15 @@ class AttitudeEstimator(object):
                  process_noise_gyro,
                  process_noise_bias,
                  measurement_noise_accel,
+                 initial_noise_attitude,
+                 initial_noise_bias,
                  log_filename="/tmp/rotate.log",
                  extra_log=None):
         self.process_noise_gyro = process_noise_gyro
         self.process_noise_bias = process_noise_bias
         self.measurement_noise_accel = measurement_noise_accel
+        self.initial_noise_attitude = initial_noise_attitude
+        self.initial_noise_bias = initial_noise_bias
         self.current_gyro = []
         self.init = False
         if log_filename:
@@ -197,10 +201,8 @@ class AttitudeEstimator(object):
                                  [0.],
                                  [0.],
                                  [0.]])
-            covariance = numpy.diag([1e-3, 1e-3, 1e-3, 1e-3,
-                                     math.radians(0.01)**2,
-                                     math.radians(0.01)**2,
-                                     math.radians(0.01)**2])
+            covariance = numpy.diag([self.initial_noise_attitude] * 4 +
+                                    [self.initial_noise_bias] * 3)
 
             self.ukf = ukf_filter.UkfFilter(
                 initial_state=state,
