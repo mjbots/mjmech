@@ -25,12 +25,13 @@ class UkfFilter {
   }
 
   const State& state() const { return state_; }
+  State& state() { return state_; }
   const Covariance& covariance() const { return covariance_; }
 
   template <typename ProcessFunction>
   void UpdateState(_Scalar dt_s, ProcessFunction process_function) {
     const int N = _NumStates * 2;
-    
+
     State sigma_points[N];
     StoreSigmaPoints(sigma_points);
 
@@ -133,7 +134,7 @@ class UkfFilter {
     // Lower Cholesky decomposition to calculate the matrix square
     // root.
     Covariance delta = (n * covariance_).llt().matrixL();
-    
+
     for (int i = 0; i < _NumStates; i++) {
       array[i] = state_ + delta.col(i);
       array[i + _NumStates] = state_ - delta.col(i);

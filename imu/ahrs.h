@@ -21,7 +21,8 @@ class AttitudeEstimator {
   AttitudeEstimator(Float process_noise_gyro,
                     Float process_noise_bias,
                     Float measurement_noise_accel)
-      : filter_(
+      : initialized_(false),
+        filter_(
           (Filter::State() <<
            1.0, 0.0, 0.0, 0.0,
            0.0, 0.0, 0.0).finished(),
@@ -117,12 +118,29 @@ class AttitudeEstimator {
         Quaternion<Float>(s(0), s(1), s(2), s(3)).normalized());
   }
 
+  static Quaternion<Float> AccelToOrientation(
+      Float x, Float y, Float z) {
+    Float roll = std::atan2(-x, z);
+    Float pitch = std::atan2(y, std::sqrt(x * x + z * z));
+
+    return Quaternion<Float>::FromEuler(roll, pitch, 0.0);
+  }
+
   void ProcessAccel(Float x_g, Float y_g, Float z_g) {
     Float norm = std::sqrt(x_g * x_g + y_g * y_g + z_g * z_g);
 
     x_g /= norm;
     y_g /= norm;
     z_g /= norm;
+
+    if (!initialized_) {
+      initialized_ = true;
+      Quaternion<Float> start = AccelToOrientation(x_g, y_g, z_g);
+      filter_.state()(0) = start.w();
+      filter_.state()(1) = start.x();
+      filter_.state()(2) = start.y();
+      filter_.state()(3) = start.z();
+    }
 
     using namespace std::placeholders;
     filter_.UpdateState(
@@ -139,6 +157,7 @@ class AttitudeEstimator {
   }
 
  private:
+  bool initialized_;
   Filter filter_;
   Float measurement_noise_accel_;
 
