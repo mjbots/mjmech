@@ -38,16 +38,18 @@ if [[ "$1" == "assemble" ]]; then
     exit 0
 fi
 
+RHOST=odroid@odroid
+
 echo Uploading
-rsync -a --delete $TMPDIR odroid:/tmp/
+rsync -a --delete $TMPDIR $RHOST:/tmp/
 if [[ "$1" == "start" ]]; then
     echo Starting vserver
-    ssh odroid -t exec /tmp/vserver/start.sh
+    ssh $RHOST -t exec /tmp/vserver/start.sh
 elif [[ "$1" == "install" ]]; then
     echo Installing vserver to flash
-    ssh odroid -t rsync -av --delete /tmp/vserver/ /home/odroid/vserver/
+    ssh $RHOST -t rsync -av --delete /tmp/vserver/ /home/odroid/vserver/
 elif [[ "$1" = "exec" ]]; then
     shift
     set -x
-    ssh odroid -Yt cd /tmp/vserver \&\& "$@"
+    ssh $RHOST -Yt cd /tmp/vserver \&\& "$@"
 fi
