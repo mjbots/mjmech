@@ -138,6 +138,24 @@ class HerkuleXController(object):
         raise Return(result)
 
     @asyncio.coroutine
+    def get_clear_status(self, ident):
+        """Get a list of pending servo errors, and clear these errors,
+        if any.
+        @returns list of strings -- status flags
+        """
+        try:
+            status = yield From(self.port.status(ident))
+        except asyncio.TimeoutError:
+            status = None
+
+        if status is None:
+            raise Return(['servo-offline'])
+
+        if status.has_errors():
+            yield From(self.port.clear_errors(ident))
+        raise Return(status.active_flags())
+
+    @asyncio.coroutine
     def set_leds(self, ident, red=False, green=False, blue=False):
         flags = 0
         if red:
@@ -148,6 +166,42 @@ class HerkuleXController(object):
             flags |= self.port.LED_BLUE
 
         yield From(self.port.set_leds(ident, flags))
+
+    _MJMECH_ID = 99
+
+    @asyncio.coroutine
+    def mjmech_fire(self, fire_time, fire_pwm):
+        fire_time_ticks = int(fire_time / 0.10)
+        assert 1 <= fire_time_ticks <= 255, (
+            'Invalid fire_time value: %r sec (%d ticks)' % (
+                fire_time, fire_time_ticks))
+
+        fire_pwm_raw = int(fire_pwm * 255.0)
+        assert 0 <= fire_pwm_raw <= 255, (
+            'Invalid fire_pwm value: %r (%d raw)' % (
+                fire_pwm, fire_pwm_raw))
+        yield From(self.port.ram_write(
+                self._MJMECH_ID, 80, [fire_time_ticks, fire_pwm_raw]))
+
+
+    @asyncio.coroutine
+    def  mjmech_set_outputs(self, laser=False, green=False, blue=False,
+                            agitator=0):
+        flags = 0
+        if laser:
+            flags |= self.port.LED_RED
+        if green:
+            flags |= self.port.LED_GREEN
+        if blue:
+            flags |= self.port.LED_BLUE
+        agitator_raw = int(agitator * 255.0)
+        assert 0 <= agitator_raw <= 255, (
+            'Invalid agitator value: %r (%d raw)' % (
+                agitator, agitator_raw))
+        yield From(self.port.ram_write(
+                self._MJMECH_ID, 82, [agitator_raw, flags]))
+
+
 
 class GazeboController(object):
     def __init__(self, model_name, servo_name_map=None):

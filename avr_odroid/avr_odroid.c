@@ -95,6 +95,8 @@ uint8_t servo_status_det = 0;
 uint8_t servo_leds = 0;
 uint8_t servo_leds_timeout = 0;
 uint8_t servo_fire_time = 0;
+uint8_t servo_fire_pwm = 0;
+uint8_t servo_agitator_pwm = 0;
 
 enum {
   // servo_status_err
@@ -149,21 +151,45 @@ static uint8_t verify_rx_checksum() {
           rx.val.cs2 == ((cs1 ^ 0xFF) & 0xFE));
 }
 
-static void servo_leds_updated() {
-  MIXER_EN = !!(servo_leds & 1); // GREEN bit
-  LED_BLUE = !!(servo_leds & 2); // BLUE bit
-  LASER_EN = !!(servo_leds & 4); // RED bit
-}
 
 // Handle write of 1 byte. Return 1 on error.
 static uint8_t handle_ram_write(uint8_t addr, uint8_t val) {
-  if (addr == 53) { // LED Control
-    servo_leds_timeout = 200; // 2 seconds
-    servo_leds = val;
-    servo_leds_updated();
-  } else if (addr == 77) { // magic fire time
-    servo_fire_time = val;
-  }    
+  switch (addr) {
+    case 43: {
+      servo_status_err = val;
+      break;
+    }
+    case 44: {
+      servo_status_det = val;
+      break;
+    }
+    case 53: case 83: { // LED Control
+      servo_leds_timeout = 200; // 2 seconds
+      servo_leds = val;
+      break;
+    }
+    case 80: { // FIRE TIME
+      servo_fire_time = val;
+      break;
+    }
+    case 81: { // FIRE PWM
+      servo_fire_pwm = val;
+      break;
+    }
+    case 82: { // AGITATOR PWM
+      servo_agitator_pwm = val;
+      break;
+    }
+    case 84: { // invalid index
+      return 1;
+    }
+  }
+
+  // Set MOVING flag right now, so it instantly appears in our status.
+  if (servo_fire_pwm && servo_fire_time) {
+    servo_status_det |= 0x01; // MOVING flag
+  }
+
   return 0;
 }
 
@@ -183,13 +209,16 @@ static void handle_RAMWRITE_cmd() {
 
 static uint8_t handle_ram_read(uint8_t addr) {
   switch (addr) {
-  case 7: return SERVO_ADDR;
-  case 43: return servo_status_err;
-  case 44: return servo_status_det;
-  case 53: return servo_leds;
-  case 77: return servo_fire_time;
-  default:
-    return 0;
+    case 7: return SERVO_ADDR;
+    case 43: return servo_status_err;
+    case 44: return servo_status_det;
+    case 53: case 83:
+      return servo_leds;
+    case 80: return servo_fire_time;
+    case 81: return servo_fire_pwm;
+    case 82: return servo_agitator_pwm;
+    default:
+      return 0;
   }
 
 }
@@ -220,16 +249,32 @@ static void handle_RAMREAD_cmd() {
   send_rx_buffer();
 }
 
+static void apply_servo_values() {
+    // Apply LED values
+    LED_GREEN = !!(servo_leds & 1); // GREEN bit
+    LED_BLUE  = !!(servo_leds & 2); // BLUE bit
+    LASER_EN  = !!(servo_leds & 4); // RED bit
+
+    // Apply PWM values
+    OCR1A = servo_fire_pwm;
+    OCR1B = servo_agitator_pwm;
+}
+
 
 int main(void) {
   INIT_SYSTEM_CLOCK();
 
   // Set up ports. Enable pullups on all unused inputs.
-  DDRB = (1<<5);
+  DDRB = (1<<1) | (1<<2) | (1<<5);
   PORTB = ~DDRB;
 
   DDRC = 0;
   PORTC = ~DDRC;
+
+  // Do not enable TX for now, enable serial bypass.
+  DDRD = (1<<2) | (1<<4) | (1<<6);
+  // No pullups on serial RX, pullups on all other inputs
+  PORTD = ~(DDRD | (1<<0));
 
   // set up timer/counter 0 to overflow every ~10mS (in CTC mode)
   TCCR0A = (1<<WGM01);
@@ -241,9 +286,13 @@ int main(void) {
   #error Unsupported CPU speed
 #endif
 
-  // Do not enable TX for now, enable serial bypass.
-  DDRD = (1<<2) | (1<<4) | (1<<6) | (1<<7);
-  PORTD = (1<<1) | (1<<3) | (1<<5);
+  // set up t/c 1 as phase-correct 8-bit non-inverted PWM on both channels
+  // prescaler is 4, which works out to 4kHz  @ 16 MHz clock
+  // (as motor boards can only take up to 10kHz PWM frequency)
+  OCR1A = 0;
+  OCR1B = 0;
+  TCCR1A = (1<<COM1A1) | (1<<COM1B1) | (1<<WGM10);
+  TCCR1B = (1<<CS11);
 
   hwuart_init();
   hwuart_connect_stdout();
@@ -251,7 +300,6 @@ int main(void) {
   disable_tx();
 
   sei();
-  //uint8_t i = 0;
   uint16_t step = 0;
 
   while (1) {
@@ -263,20 +311,22 @@ int main(void) {
         servo_status_err = 0;
         servo_status_det = 0;
         servo_leds = 0;
-        servo_leds_updated();
         servo_fire_time = 0;
-        FIRE_MOTOR_EN = 0;
+        servo_fire_pwm = 0;
+        servo_agitator_pwm = 0;
+        apply_servo_values();
       } else if (rx.val.cmd == 0x07) { // STAT
         handle_STAT_command();
       } else if (rx.val.cmd == 0x03 &&
                  rx.val.size >= 8) { // RAM WRITE + at least 1 byte
         handle_RAMWRITE_cmd();
+        // Do not apply servo values now (to maintain uniform interval)
       } else if (rx.val.cmd == 0x04 &&
                  rx.val.size == 9) { // RAM READ + 2 data bytes
         handle_RAMREAD_cmd();
       } else if (rx.val.cmd == 0x05 || // I_JOG
                  rx.val.cmd == 0x06 || // S_JOG
-                 rx.val.cmd == 0x08) { // ROLLBACL
+                 rx.val.cmd == 0x08) { // ROLLBACK
         ; // silently ignore
       } else {
         servo_status_err |= kSSEInvalidPacket;
@@ -291,22 +341,23 @@ int main(void) {
     }
     TIFR0 = (1<<OCF0A);
     // ~10mS has elapsed.
-    
-    // expire servo
+
+    // expire LEDs
     if (servo_leds_timeout) {
       servo_leds_timeout--;
-      if (!servo_leds_timeout) {
-        servo_leds = 0;
-        servo_leds_updated();
-      }
+    } else {
+      servo_leds = 0;
+      servo_agitator_pwm = 0;
     }
+
+    apply_servo_values();
 
     // expire fire timer
     if (servo_fire_time) {
-      FIRE_MOTOR_EN = 1;
       servo_fire_time--;
     } else {
-      FIRE_MOTOR_EN = 0;
+      servo_fire_pwm = 0;
+      servo_status_det &= ~0x01; // MOVING flag
     }
 
     step++;

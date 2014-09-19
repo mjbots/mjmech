@@ -11,9 +11,10 @@ import time
 import signal
 import serial
 import fcntl
+import itertools
 
 import trollius as asyncio
-from trollius import Task
+from trollius import Task, From
 
 from gi.repository import GObject, Gtk
 gobject = GObject
@@ -36,11 +37,15 @@ def wrap_event(callback, *args1, **kwargs1):
         except BaseException as e:
             logging.error("Callback %r crashed:", callback)
             logging.error(" %s %s" % (e.__class__.__name__, e))
-            # TODO mafanasyev: this does not work. Should probably use
-            # asyncio-specific method (if implemented).
+            for line in traceback.format_exc().split('\n'):
+                logging.error('| %s', line)
+            asyncio.get_event_loop().stop()
             Gtk.main_quit()
             raise
     return wrapped
+
+# How often to poll servo status, in absense of other commands
+SERVO_SEND_INTERVAL = 0.5
 
 class UdpAnnouncer(object):
     PORT = 13355
@@ -49,7 +54,8 @@ class UdpAnnouncer(object):
     def __init__(self):
         self.logger = logging.getLogger('announcer')
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.sock = socket.socket(
+            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         #self.logger.info('Binding to port %d' % self.PORT)
         #self.sock.bind(('', self.PORT))
@@ -83,15 +89,33 @@ class ControlInterface(object):
 
         self.opts = opts
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.sock = socket.socket(
+            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         self.logger.info('Binding to port %d' % self.PORT)
         self.sock.bind(('', self.PORT))
 
         self.src_addr = None
+        # Packets since timeout expiration
         self.recent_packets = 0
-        self.last_seq = None
-        self.last_fire_cmd_count = None
+        # timeout intervals with no packets
+        self.no_packet_intervals = 0
+        # Last packet received from the network (set to None after timeout)
+        self.net_packet = None
+        # Last packet applied to servoe (set to None if restart detected or
+        #  net_packet is None)
+        self.servo_packet = None
+
+        # Per-servo status (address->string)
+        self.last_servo_status = dict()
+
+        # Iterator which returns next servo to poll
+        self.next_servo_to_poll = itertools.cycle([12, 13, 99])
+
+        # Normally we refresh state periodically. Set this flag to force
+        # re-sending the data.
+        self.servo_send_now = asyncio.Event()
+        self.servo_send_task = Task(self._send_servo_commands())
 
         if self.opts.no_mech:
             self.mech_driver = None
@@ -108,13 +132,29 @@ class ControlInterface(object):
                              wrap_event(self._on_readable))
 
     def _on_timeout(self):
+        if self.servo_send_task and self.servo_send_task.done():
+            # super ugly hack to get real exception: lose the object
+            # (if we call result(), then stack trace is lost; otherwise
+            # default exception handler is activated which prints proper
+            # traceback)
+            self.servo_send_task = None
+            raise Exception("Servo send task exited")
+
         if self.recent_packets:
             self.logger.debug('Remote peer %r sent %d packet(s)' % (
                     self.src_addr, self.recent_packets))
             self.recent_packets = 0
+            self.no_packet_intervals = 0
+        elif self.no_packet_intervals < 3:
+            self.no_packet_intervals += 1
+            self.logger.info(
+                'No data from peer %r (%d times). It possibly went away',
+                self.src_addr, self.no_packet_intervals)
         elif self.src_addr:
             self.logger.debug('Remote peer %r went away' % (self.src_addr, ))
             self._set_src_addr(None)
+            self.net_packet = None
+            self.servo_packet = None
         else:
             self._set_video_dest(None)
         return True
@@ -147,51 +187,94 @@ class ControlInterface(object):
         else:
             self._set_video_dest((self.src_addr[0], vport))
 
-        if (pkt['seq'] - 1) != self.last_seq:
-            self.logger.info('Seq number jump: %r->%r' % (self.last_seq, pkt['seq']))
-        self.last_seq = pkt['seq']
+        if self.net_packet is None:
+            pass
+        elif self.net_packet['boot_time'] != pkt['boot_time']:
+            self.logging.warn('Client restart detected, new seq %r',
+                              pkt['seq'])
+            self.servo_packet = None
+        elif self.net_packet['seq'] != (pkt['seq'] - 1):
+            self.logger.info('Seq number jump: %r->%r',
+                             self.net_packet['seq'], pkt['seq'])
 
-        f_c_c = pkt.get('fire_cmd_count')
-        if self.last_fire_cmd_count is None or f_c_c is None:
-            fire_diff = 0
-        else:
-            fire_diff = f_c_c - self.last_fire_cmd_count
-            if (fire_diff < 0) or (fire_diff > 3):
-                self.logger.info('fire_cmd_count jump: %r->%r' % (
-                    self.last_fire_cmd_count, f_c_c))
-                fire_diff = 0
-        self.last_fire_cmd_count = f_c_c
-        if fire_diff > 0:
-            self.logger.info('bang bang (%dx)' % fire_diff)
+        self.net_packet = pkt
+        # Wake up servo sender so it processes new state
+        self.servo_send_now.set()
 
-        #self.logger.debug('Remote packet: %r' % (pkt, ))
+    @asyncio.coroutine
+    @wrap_event
+    def _send_servo_commands(self):
+        while True:
+            if not self.servo_send_now.is_set():
+                # Make sure we wake up periodically
+                asyncio.get_event_loop().call_later(
+                    SERVO_SEND_INTERVAL, self.servo_send_now.set)
+            yield From(self.servo_send_now.wait())
+            self.servo_send_now.clear()
 
+            new_pkt = self.net_packet
+            old_pkt = self.servo_packet
+            if new_pkt is not None:
+                yield From(self._send_servo_commands_once(
+                        new_pkt, old_pkt))
+            self.servo_packet = new_pkt
+
+    @asyncio.coroutine
+    def _send_servo_commands_once(self, data, olddata):
         if not self.mech_driver:
             return
+        servo = self.mech_driver.servo
 
-        if fire_diff > 0:
-            # TODO mafanasyev: give fire command
-            pass
+        if olddata is None:
+            olddata = dict()   # so one can use 'get'
+
+        if 'fire_cmd_count' in olddata:
+            fire_diff = data['fire_cmd_count'] - olddata['fire_cmd_count']
+        else:
+            fire_diff = 0
+
+        if (fire_diff < 0) or (fire_diff > 3):
+            self.logger.warn('fire_cmd_count jump too big, ignored: %r->%r' % (
+                    olddata['fire_cmd_count'], data['fire_cmd_count']))
+        elif fire_diff == 0:
+            pass  # Do nothing
+        else:
+            self.logger.info('bang bang (%dx)' % fire_diff)
+            # TODO mafanasyev: take care of fire_diff > 1
+            # (wait for previous fire command to finish and start again)
+            # (or multiply fire duration, but take care to keep it <2.55 sec)
+            yield From(servo.mjmech_fire(
+                    fire_time=data['fire_duration'],
+                    fire_pwm=data['fire_motor_pwm']))
 
         # re-sent magic servo command. Unlike real servo,
         # it will timeout and turn off all LEDs if there were no
-        # commands for a while (TODO implement this on avr side)
-        Task(self.mech_driver.servo.set_leds(
-            99,
-            red=pkt.get('laser_on'),
-            green=pkt.get('mixer_on'),
-            # LED_BLUE is an actual blue LED on the board. Flash it
-            # as we receive the packets.
-            blue=(self.recent_packets % 2)))
+        # commands for a while.
+        yield From(servo.mjmech_set_outputs(
+                laser=data['laser_on'],
+                green=data['green_led_on'],
+                # LED_BLUE is an actual blue LED on the board. Flash it
+                # as we receive the packets.
+                blue=(self.recent_packets % 2),
+                agitator=(data['agitator_pwm'] if data['agitator_on'] else 0)
+                ))
 
-        if pkt.get('turret'):
-            servo_x, servo_y = pkt['turret']
-            Task(self.mech_driver.servo.set_pose(
+        # poll servos (one at a time)
+        servo_id = self.next_servo_to_poll.next()
+        status_list = yield From(servo.get_clear_status(servo_id))
+        status_str = ','.join(status_list) or 'OK'
+        if status_str != self.last_servo_status.get(servo_id):
+            self.logger.info('Servo status for %r: %s' % (servo_id, status_str))
+            self.last_servo_status[servo_id] = status_str
+
+        if data.get('turret'):
+            servo_x, servo_y = data['turret']
+            yield From(self.mech_driver.servo.set_pose(
                     {12: servo_x,
                      13: servo_y}))
 
-        if 'gait' in pkt:
-            gait = pkt['gait']
+        if 'gait' in data:
+            gait = data['gait']
             if gait is None:
                 self.mech_driver.set_idle()
             else:
@@ -200,6 +283,7 @@ class ControlInterface(object):
                     setattr(command, key, value)
 
                 self.mech_driver.set_command(command)
+
 
     def _set_video_dest(self, addr):
         """This function should be called periodically -- it might not

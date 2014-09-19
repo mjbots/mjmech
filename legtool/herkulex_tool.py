@@ -21,6 +21,7 @@ import trollius as asyncio
 from trollius import From, Return
 import optparse
 import sys
+import time
 
 from legtool.servo import herkulex
 
@@ -47,8 +48,28 @@ def do_reboot(servo, options):
     yield From(servo.reboot(get_address(options)))
 
 @asyncio.coroutine
-def do_status(servo, options):
-    print(yield From(servo.status(get_address(options))))
+def do_status(servo, options, do_print=True):
+    addr = get_address(options)
+    status = yield From(servo.status(addr))
+    result = 'Servo %d: (0x%02x, 0x%02x) %s' % (
+        addr, status.reg48, status.reg49,
+        ','.join(status.active_flags()) or 'none')
+    if do_print:
+        print result
+    else:
+        raise Return(result)
+
+@asyncio.coroutine
+def do_status_loop(servo, options):
+    t0 = time.time()
+    last_status = None
+    while True:
+        dt = time.time() - t0
+        status = yield From(do_status(servo, options, do_print=False))
+        if status != last_status:
+            print '[%6.2f]' % dt, status
+            last_status = status
+        yield From(asyncio.sleep(0.1))
 
 @asyncio.coroutine
 def do_voltage(servo, options):
@@ -57,6 +78,10 @@ def do_voltage(servo, options):
 @asyncio.coroutine
 def do_temperature(servo, options):
     print(yield From(servo.temperature_C(get_address(options))))
+
+@asyncio.coroutine
+def do_write_ram(servo, options, addr, data):
+    yield From(servo.ram_write(get_address(options), addr, data))
 
 @asyncio.coroutine
 def do_blink_led(servo, options):
@@ -86,12 +111,19 @@ def main():
                       help='reboot servos')
     parser.add_option('-s', '--status', action='store_true', default=None,
                       help='query status of servo')
+    parser.add_option('-S', '--status-loop', action='store_true', default=None,
+                      help='continuously query status of servo and print '
+                      'any changes')
     parser.add_option('-v', '--voltage', action='store_true', default=None,
                       help='query voltage of servo')
     parser.add_option('-t', '--temperature', action='store_true', default=None,
                       help='query temperature of servo')
     parser.add_option('-b', '--blink_led', action='store_true', default=None,
                       help='Blink servo\'s LEDs')
+    parser.add_option('-w', '--write-ram', action='append', default=[],
+                      metavar='ADDR:D0:[D1..]',
+                      help="Execute 'write ram' command. May be specified "
+                      "multiple times")
 
     (options, args) = parser.parse_args()
 
@@ -103,26 +135,37 @@ def main():
         'set_address': do_set_address,
         'reboot': do_reboot,
         'status': do_status,
+        'status_loop': do_status_loop,
         'voltage': do_voltage,
         'temperature': do_temperature,
         'blink_led': do_blink_led,
         }
 
-    action_func = None
-    for key in actions.keys():
-        if hasattr(options, key) and getattr(options, key) is not None:
-            if action_func is not None:
-                raise RuntimeError('more than one action set')
-            action_func = actions[key]
+
+    write_commands = []
+    for cmd in options.write_ram:
+        write_commands.append(
+            [int(p, 0) for p in cmd.split(':')])
 
     servo = herkulex.HerkuleX(options.device)
 
+    @asyncio.coroutine
+    def run_actions():
+        ran_any = False
+        for cmd in write_commands:
+            yield From(do_write_ram(servo, options, cmd[0], cmd[1:]))
+            ran_any = True
+
+        for key, callback in sorted(actions.items()):
+            if getattr(options, key) is not None:
+                yield From(callback(servo, options))
+                ran_any = True
+
+        if not ran_any:
+            raise RuntimeError('no action specified')
+
     loop = asyncio.get_event_loop()
-    if action_func is not None:
-        loop.run_until_complete(action_func(servo, options))
-        return
-    else:
-        raise RuntimeError('no action specified')
+    loop.run_until_complete(run_actions())
 
 if __name__ == '__main__':
     main()

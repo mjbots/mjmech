@@ -73,6 +73,27 @@ class StatusResponse(Response):
         self.reg48 = reg48
         self.reg49 = reg49
 
+    def active_flags(self):
+        """Return list of short strings, one for each flag which is set"""
+        result = list()
+        for attr in (
+            "exceed_input_voltage_limit", "exceed_allowed_pot_limit",
+            "exceed_temperature_limit", "invalid_packet",
+            "overload_detected", "driver_fault_detected",
+            "eep_reg_distorted",
+
+            "moving", "inposition", "checksum_error", "unknown_command",
+            "exceed_reg_range", "garbage_detected", "motor_on"):
+            if getattr(self, attr):
+                result.append(attr)
+        return result
+
+    def has_errors(self):
+        """Return True if any of user-resettable error flags are set.
+        This should function should return False after clear_errors"""
+        return ((self.reg48 & 0x7F) != 0 or
+                (self.reg49 & 0x3C) != 0)
+
 
 class MemReadResponse(Response):
     def __init__(self, data):
@@ -322,6 +343,10 @@ class HerkuleX(object):
         result = StatusResponse(reg48, reg49)
 
         raise Return(result)
+
+    @asyncio.coroutine
+    def clear_status(self, servo):
+        yield From(self.ram_write(servo, 48, [0, 0]))
 
     @asyncio.coroutine
     def reboot(self, servo):

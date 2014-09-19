@@ -10,9 +10,9 @@
 
   Port B:
    B0 ? D8(6)  -
-   B1 ? D9(5)  -
-   B2 ? D10    -
-   B3 ? D11    -
+   B1 O D9(5)  - Fire motor output (OC1A)
+   B2 O D10(4) - Agitator output (OC1B)
+   B3 ? D11(3) -
    B4 ? D12(2) -
    B5 O D13(1) - Blue LED
 
@@ -31,8 +31,8 @@
    D3 ? D3     - connected to servo pin header
    D4 O D4(16) - LASER FET
    D5 ? D5     - connected to servo pin header
-   D6 O D6(14) - mixer output (hooked to green LED)
-   D7 O D7(13) - fire output
+   D6 O D6(14) - GREEN LED (reserved for future fancy lights)
+   D7 ? D7(13)
 
 */
 
@@ -49,8 +49,6 @@
 
 #define LASER_EN         BITVAR(PORTD, 4)
 #define LED_BLUE         BITVAR(PORTB, 5)
-
-#define MIXER_EN         BITVAR(PORTD, 6)
-#define FIRE_MOTOR_EN    BITVAR(PORTD, 7)
+#define LED_GREEN        BITVAR(PORTD, 6)
 
 #endif

@@ -41,6 +41,7 @@ LOG_DIR_LOCATIONS = [
 # docs:
 # http://pygstdocs.berlios.de/pygst-reference/gst-class-reference.html
 
+g_main_loop = None
 def wrap_event(callback):
     """Wrap event callback so the app exit if it crashes"""
     def wrapped(*args, **kwargs):
@@ -49,6 +50,11 @@ def wrap_event(callback):
         except BaseException as e:
             logging.error("Callback %r crashed:", callback)
             logging.error(" %s %s" % (e.__class__.__name__, e))
+            for line in traceback.format_exc().split('\n'):
+                logging.error('| %s', line)
+            if g_main_loop is not None:
+                g_main_loop.call_soon_threadsafe(
+                    g_main_loop.stop)
             Gtk.main_quit()
             raise
     return wrapped
@@ -145,16 +151,25 @@ class ControlInterface(object):
 
         self.seq = 0
         self.control_dict = dict(
+            boot_time = time.time(),
+
             video_port=self.VIDEO_PORT,
             # Not set: turret - pair of (x, y) degrees
             # Not set: gait - a dict based off NULL_COMMAND
 
-            # 0 = laser off; 1 = laser on
+            # 0 = off; 1 = on
             laser_on = 0,
+            agitator_on = 0,
+            green_led_on = 0,
+
+            # pwm values in 0..1 range
+            agitator_pwm = 0.1,
+            fire_motor_pwm = 0.2,
+            # fire command duration (seconds)
+            fire_duration = 0.5,
 
             # fire a shot every time this changes; should only ever increase
             fire_cmd_count = 0,
-            mixer_on = 0,
             )
 
         # state log file and last svg
@@ -198,7 +213,6 @@ class ControlInterface(object):
         # Log state before video, to check for code errors in rendering function
         self._state_updated()
 
-
         if not opts.external_video:
             video_log = None
             if opts.log_prefix:
@@ -223,12 +237,11 @@ class ControlInterface(object):
         joysticks = enumerator.joysticks()
         if len(joysticks):
             self.joystick = joysticks[0]
-            self.joystick_task = Task(self.read_joystick())
+            self.joystick_task = Task(self._read_joystick())
         else:
             self.joystick = None
             self.joystick_task = None
             self.logger.info("No joysticks found!")
-
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
                          self._on_send_timer)
@@ -238,36 +251,34 @@ class ControlInterface(object):
                           self._on_readable)
 
     @asyncio.coroutine
-    def read_joystick(self):
-        try:
-            while True:
-                ev = yield From(self.joystick.read())
+    @wrap_event
+    def _read_joystick(self):
+        while True:
+            ev = yield From(self.joystick.read())
 
-                if ev.ev_type != linux_input.EV.ABS:
-                    continue
+            if ev.ev_type != linux_input.EV.ABS:
+                continue
 
-                dx = self.joystick.absinfo(linux_input.ABS.X).scaled()
-                dy = self.joystick.absinfo(linux_input.ABS.Y).scaled()
-                dr = self.joystick.absinfo(linux_input.ABS.RX).scaled()
+            dx = self.joystick.absinfo(linux_input.ABS.X).scaled()
+            dy = self.joystick.absinfo(linux_input.ABS.Y).scaled()
+            dr = self.joystick.absinfo(linux_input.ABS.RX).scaled()
 
-                if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
-                    self.control_dict['gait'] = None
-                else:
-                    gait = NULL_COMMAND.copy()
-                    gait['translate_x_mm_s'] = dx * 50
-                    gait['translate_y_mm_s'] = -dy * 200
-                    gait['rotate_deg_s'] = dr * 50
-                    self.control_dict['gait'] = gait
-        except Exception as e:
-            print >>sys.stderr, "ERROR!:", str(e)
-            raise
+            if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
+                self.control_dict['gait'] = None
+            else:
+                gait = NULL_COMMAND.copy()
+                gait['translate_x_mm_s'] = dx * 50
+                gait['translate_y_mm_s'] = -dy * 200
+                gait['rotate_deg_s'] = dr * 50
+                self.control_dict['gait'] = gait
+
 
     @wrap_event
     def _on_send_timer(self):
-        if self.joystick_task:
-            if self.joystick_task.done():
-                self.joystick_task.result()
-                self.joystick_task = None
+        # Raise exception if any of tasks terminate
+        if self.joystick_task and self.joystick_task.done():
+            self.joystick_task.result()
+            self.joystick_task = None
 
         self._send_control()
 
@@ -380,9 +391,14 @@ class ControlInterface(object):
             self.logger.info('Laser set to %d',
                              self.control_dict['laser_on'])
         elif name == 'm':
-            self.control_dict['mixer_on'] ^= 1
-            self.logger.info('Mixer set to %d',
-                             self.control_dict['mixer_on'])
+            self.control_dict['agitator_on'] ^= 1
+            self.logger.info('Agitator set to %d (pwm %.3f)',
+                             self.control_dict['agitator_on'],
+                             self.control_dict['agitator_pwm'])
+        elif name == 'G':
+            self.control_dict['green_led_on'] ^= 1
+            self.logger.info('Green LED set to %d',
+                             self.control_dict['green_led_on'])
         elif name in ['Return']:
             self.control_dict['fire_cmd_count'] += 1
             self.logger.info('Sent fire command')
@@ -418,7 +434,8 @@ class ControlInterface(object):
         print '  w/s, a/d - move'
         print '  q/e      - rotate'
         print '  l        - laser on/off'
-        print '  m        - mixer on/off'
+        print '  m        - agitator on/off'
+        print '  G        - green LED on/off'
         print '  c        - enable && center turret'
         print '  click    - point turret to this location (must center first)'
         print '  ENTER    - fire'
@@ -531,6 +548,7 @@ class VideoWindow(object):
 
         self.pipeline = Gst.Pipeline()
         self.rtpbin = self.make_element("rtpbin", do_retransmission=True)
+        self.rtpbin_last_pad = None
 
         caps = Gst.Caps.from_string(
             "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
@@ -640,8 +658,16 @@ class VideoWindow(object):
     @wrap_event
     def _on_new_rtpbin_pad(self, source, pad):
         name = pad.get_name()
-        self.logger.info('Got new rtpbin pad: %r' % (name, ))
+        self.logger.info('Got new rtpbin pad: %r', name)
         if name.startswith('recv_rtp_src'):
+            if self.rtpbin_last_pad is not None:
+                # Since we do not know dest pad, unlink all.
+                #ok = self.rtpbin.unlink(
+                #    self.rtpbin_last_pad, self.play_elements[0], None)
+                ok = self.rtpbin.unlink(self.play_elements[0])
+                if ok is not None:
+                    self.logger.info('Unlinking old pad: %r', ok)
+            self.rtpbin_last_pad = name
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
 
     @wrap_event
@@ -785,6 +811,9 @@ def main(opts):
 
     #GObject.threads_init()
     Gst.init(None)
+
+    global g_main_loop
+    g_main_loop = asyncio.get_event_loop()
 
     if opts.addr is None:
         ann = UdpAnnounceReceiver(opts)
