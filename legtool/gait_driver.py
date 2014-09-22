@@ -289,12 +289,12 @@ class MechDriver(object):
         assert self.servo is None, 'Trying to connect to servo twice'
         self.servo = servo
 
+        self.driver = GaitDriver(self.gait.get_idle_state(), self.servo)
+
     @asyncio.coroutine
     def run(self):
         if self.servo is None:
             yield From(self.connect_servo())
-
-        self.driver = GaitDriver(self.gait.get_idle_state(), self.servo)
 
         idle_task = Task(self._make_idle())
         driver_task = Task(self.driver.run())
