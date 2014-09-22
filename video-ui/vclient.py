@@ -163,8 +163,8 @@ class ControlInterface(object):
             green_led_on = 0,
 
             # pwm values in 0..1 range
-            agitator_pwm = 0.1,
-            fire_motor_pwm = 0.2,
+            agitator_pwm = 0.5,
+            fire_motor_pwm = 0.75,
             # fire command duration (seconds)
             fire_duration = 0.5,
 
@@ -277,7 +277,7 @@ class ControlInterface(object):
     def _on_send_timer(self):
         # Raise exception if any of tasks terminate
         if self.joystick_task and self.joystick_task.done():
-            self.joystick_task.result()
+            #self.joystick_task.result()
             self.joystick_task = None
 
         self._send_control()

@@ -276,6 +276,10 @@ class HerkuleX(object):
         yield From(self.mem_write(self.CMD_RAM_WRITE, servo, reg, data))
 
     @asyncio.coroutine
+    def clear_errors(self, servo):
+        yield From(self.ram_write(servo, 48, [0, 0]))
+
+    @asyncio.coroutine
     def i_jog(self, targets):
         """Set the position of one or more servos with unique play
         times for each servo.
@@ -333,9 +337,10 @@ class HerkuleX(object):
     @asyncio.coroutine
     def status(self, servo):
         received = yield From(self.send_recv_packet(servo, self.CMD_STAT, ''))
-        assert received.servo == servo or servo == self.BROADCAST
-        assert received.cmd == (0x40 | self.CMD_STAT)
-        assert len(received.data) == 2
+        assert ((received.servo == servo or servo == self.BROADCAST) and
+                (received.cmd == (0x40 | self.CMD_STAT)) and
+                (len(received.data) == 2)), (
+            "Received wrong STATUS response from servo %d: %s" % (servo, received))
 
         reg48 = ord(received.data[0])
         reg49 = ord(received.data[1])

@@ -901,7 +901,13 @@ class InputDevice(object):
         return self._fd
 
     def absinfo(self, axis):
-        return self.abs[axis]
+        if axis in self.abs:
+            return self.abs[axis]
+        result = AbsInfo()
+        result.minimum = -100
+        result.maximum = 100
+        result.resolution = 100
+        return result
 
     def get_features(self, ev_type):
         if ev_type == EV.ABS:

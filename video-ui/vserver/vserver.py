@@ -45,7 +45,16 @@ def wrap_event(callback, *args1, **kwargs1):
     return wrapped
 
 # How often to poll servo status, in absense of other commands
+# (polling only starts once first remote command is received)
 SERVO_SEND_INTERVAL = 0.5
+
+# Turret ranges: (min, max) pairs in degrees
+TURRET_RANGE_X = (-90, 90)
+TURRET_RANGE_Y = (-90, 90)
+
+# Which servo IDs to poll for status
+# (set to false value to disable mechanism)
+SERVO_IDS_TO_POLL = [12, 13, 99]
 
 class UdpAnnouncer(object):
     PORT = 13355
@@ -110,7 +119,10 @@ class ControlInterface(object):
         self.last_servo_status = dict()
 
         # Iterator which returns next servo to poll
-        self.next_servo_to_poll = itertools.cycle([12, 13, 99])
+        if SERVO_IDS_TO_POLL:
+            self.next_servo_to_poll = itertools.cycle(SERVO_IDS_TO_POLL)
+        else:
+            self.next_servo_to_poll = None
 
         # Normally we refresh state periodically. Set this flag to force
         # re-sending the data.
@@ -190,7 +202,7 @@ class ControlInterface(object):
         if self.net_packet is None:
             pass
         elif self.net_packet['boot_time'] != pkt['boot_time']:
-            self.logging.warn('Client restart detected, new seq %r',
+            self.logger.warn('Client restart detected, new seq %r',
                               pkt['seq'])
             self.servo_packet = None
         elif self.net_packet['seq'] != (pkt['seq'] - 1):
@@ -260,15 +272,20 @@ class ControlInterface(object):
                 ))
 
         # poll servos (one at a time)
-        servo_id = self.next_servo_to_poll.next()
-        status_list = yield From(servo.get_clear_status(servo_id))
-        status_str = ','.join(status_list) or 'OK'
-        if status_str != self.last_servo_status.get(servo_id):
-            self.logger.info('Servo status for %r: %s' % (servo_id, status_str))
-            self.last_servo_status[servo_id] = status_str
+        if self.next_servo_to_poll is not None:
+            servo_id = self.next_servo_to_poll.next()
+            status_list = yield From(servo.get_clear_status(servo_id))
+            status_str = ','.join(status_list) or 'OK'
+            if status_str != self.last_servo_status.get(servo_id):
+                self.logger.info('Servo status for %r: %s' % (servo_id, status_str))
+                self.last_servo_status[servo_id] = status_str
 
         if data.get('turret'):
             servo_x, servo_y = data['turret']
+            servo_x = min(TURRET_RANGE_X[1], 
+                          max(TURRET_RANGE_X[0], servo_x))
+            servo_y = min(TURRET_RANGE_Y[1], 
+                          max(TURRET_RANGE_Y[0], servo_y))
             yield From(self.mech_driver.servo.set_pose(
                     {12: servo_x,
                      13: servo_y}))
