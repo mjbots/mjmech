@@ -548,9 +548,12 @@ class VideoWindow(object):
     # How often to print framerate info
     VIDEO_INFO_INTERVAL = 30.0
 
-    # UDP source will generate a warning after that many seconds without
+    # UDP sources will generate a warning when that many seconds without
     # packets pass
-    UDP_WARN_TIMEOUT = 2.0
+    RTP_UDP_WARN_TIMEOUT = 5.0
+    # RTCP has quite low packet rate (once every 5 seconds or so), so timeout is
+    # much longer
+    RTCP_UDP_WARN_TIMEOUT = 30.0
 
     def __init__(self, host, port, rotate=False, video_log=None):
         self.host = host
@@ -589,12 +592,12 @@ class VideoWindow(object):
             "encoding-name=(string)H264")
         rtp_src = self.make_element(
             "udpsrc", caps=caps, port=self.port,
-            name="rtp_src", timeout=long(self.UDP_WARN_TIMEOUT * 1.0e9))
+            name="rtp_src", timeout=long(self.RTP_UDP_WARN_TIMEOUT * 1.0e9))
         self.link_pads(rtp_src, None, self.rtpbin, "recv_rtp_sink_0")
 
         rtcp_src = self.make_element(
             "udpsrc", port=self.port + 1,
-            name="rtcp_src", timeout=long(self.UDP_WARN_TIMEOUT * 1.0e9))
+            name="rtcp_src", timeout=long(self.RTCP_UDP_WARN_TIMEOUT * 1.0e9))
         self.link_pads(rtcp_src, None, self.rtpbin, "recv_rtcp_sink_0")
 
         rtcp_sink = self.make_element("udpsink", host=self.host,
@@ -618,8 +621,9 @@ class VideoWindow(object):
             self.make_element("h264parse"),
             self.make_element("tee"),
         ]
+        self.queue_dec = self.make_element('queue')
         play_elements = decode_elements + [
-            self.make_element('queue'),
+            self.queue_dec,
             self.make_element("avdec_h264"),
             self.make_element("videoconvert"),
             ]
@@ -640,11 +644,12 @@ class VideoWindow(object):
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
 
 
+        self.queue_save = self.make_element('queue')
         if video_log is not None:
             self.logger.info('Recording video to %r' % video_log)
             save_elements = [
                 decode_elements[-1],
-                self.make_element('queue'),
+                self.queue_save,
                 self.make_element('matroskamux'),
                 self.make_element('filesink', location=video_log)
             ]
@@ -725,7 +730,7 @@ class VideoWindow(object):
         # This is run in internal thread. Try to do as little as possible there.
         struct_name = msg.get_structure().get_name()
         if struct_name == 'prepare-window-handle':
-            self.logger.info('Embedding video window')
+            self.logger.debug('Embedding video window')
             msg.src.set_window_handle(self.xid)
         return True
 
@@ -746,9 +751,15 @@ class VideoWindow(object):
             pass
         elif msg.type == Gst.MessageType.STREAM_STATUS:
             status, owner = msg.parse_stream_status()
-            self.logger.debug("Stream status changed for %r: %s for owner %r",
-                              msg.src.get_name(),
-                              status.value_nick, owner.get_name())
+            if False:
+                # Boring.
+                self.logger.debug(
+                    "Stream status changed for %r: %s for owner %r",
+                    msg.src.get_name(),
+                    status.value_name, owner.get_name())
+            # TODO mafanasyev: wait for 'rtpjitterbuffer0' element, then
+            # record it's pointer so one can query 'stats' with usefull stuff
+            # linke udp packet loss/duplication.
 
         elif msg.type == Gst.MessageType.STREAM_START:
             has_group, group_id = msg.parse_group_id()
@@ -772,7 +783,7 @@ class VideoWindow(object):
                                  msg.src.get_property('port'),
                                  mstruct.get_value('timeout') / 1.e9)
             else:
-                self.logger.debug("Element bus message from %s: %s" % (
+                self.logger.debug("Element %r says: %s" % (
                         msg.src.get_name(), mstruct.to_string()))
         elif msg.type in [Gst.MessageType.ASYNC_DONE,
                           Gst.MessageType.NEW_CLOCK]:
@@ -883,6 +894,13 @@ class VideoWindow(object):
                 diffs[0] / dt, diffs[1] / dt,
                 100.0 * diffs[3] / (diffs[1] or 1.0),
                 100.0 * diffs[2] / (diffs[0] or 1.0)))
+
+        self.logger.info(
+            'queue info: %r',
+            (self.queue_dec.get_property('current-level-time'),
+             self.queue_dec.get_property('current-level-buffers'),
+             self.queue_dec.get_property('current-level-bytes'),
+             self.queue_save.get_property('current-level-time')))
 
         # Keep timer going
         return True

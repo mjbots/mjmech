@@ -108,8 +108,9 @@ class ControlInterface(object):
         self.src_addr = None
         # Packets since timeout expiration
         self.recent_packets = 0
-        # timeout intervals with no packets
-        self.no_packet_intervals = 0
+        # timeout intervals with no packets (start with very high value to
+        # suppress warnings until client is connected)
+        self.no_packet_intervals = 10000
         # Last packet received from the network (set to None after timeout)
         self.net_packet = None
         # Last packet applied to servoe (set to None if restart detected or
@@ -167,8 +168,6 @@ class ControlInterface(object):
         elif self.src_addr:
             self.logger.debug('Remote peer %r went away' % (self.src_addr, ))
             self._set_src_addr(None)
-            self.net_packet = None
-            self.servo_packet = None
         else:
             self._set_video_dest(None)
         return True
@@ -189,27 +188,34 @@ class ControlInterface(object):
     def _set_src_addr(self, addr):
         self.logger.info('Remote peer address is now %r' % (addr, ))
         self.src_addr = addr
+        if addr is None:
+            self.net_packet = None
+            self.servo_packet = None
         self._set_video_dest(None)
 
     def _handle_packet(self, pkt_bin):
         self.recent_packets += 1
         pkt = json.loads(pkt_bin)
 
-        vport = pkt.get('video_port', 0)
-        if not vport:
-            self._set_video_dest(None)
-        else:
-            self._set_video_dest((self.src_addr[0], vport))
 
         if self.net_packet is None:
             pass
         elif self.net_packet['boot_time'] != pkt['boot_time']:
             self.logger.warn('Client restart detected, new seq %r',
                               pkt['seq'])
-            self.servo_packet = None
+            # Wipe out all internal state
+            # (we will re-start with the next packet)
+            self._set_src_addr(None)
+            return
         elif self.net_packet['seq'] != (pkt['seq'] - 1):
             self.logger.info('Seq number jump: %r->%r',
                              self.net_packet['seq'], pkt['seq'])
+
+        vport = pkt.get('video_port', 0)
+        if not vport:
+            self._set_video_dest(None)
+        else:
+            self._set_video_dest((self.src_addr[0], vport))
 
         self.net_packet = pkt
         # Wake up servo sender so it processes new state
@@ -354,7 +360,8 @@ def main(opts):
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s.%(msecs).3d [%(levelname).1s] %(name)s: %(message)s",
+        format=("%(asctime)s.%(msecs).3d [%(levelname).1s]"
+                " %(name)s: %(message)s"),
         datefmt="%T")
 
     if opts.check:
