@@ -263,7 +263,7 @@ class MechDriver(object):
 
         config = ConfigParser.ConfigParser()
         successful = config.read(options.config)
-        assert successful, ('No config files found, searched: ' + 
+        assert successful, ('No config files found, searched: ' +
                             str(options.config))
 
         self.leg_ik_map = _load_ik(config)
@@ -275,16 +275,24 @@ class MechDriver(object):
                 self.servo_name_map[int(name)] = value
 
     @asyncio.coroutine
-    def run(self):
+    def connect_servo(self):
         kwargs = {}
         if self.options.serial_port:
             kwargs['serial_port'] = self.options.serial_port
         if self.options.model_name:
             kwargs['model_name'] = self.options.model_name
         kwargs['servo_name_map'] = self.servo_name_map
-        self.servo = yield From(selector.select_servo(
+        servo = yield From(selector.select_servo(
                 self.options.servo,
                 **kwargs))
+        # Detect races
+        assert self.servo is None, 'Trying to connect to servo twice'
+        self.servo = servo
+
+    @asyncio.coroutine
+    def run(self):
+        if self.servo is None:
+            yield From(self.connect_servo())
 
         self.driver = GaitDriver(self.gait.get_idle_state(), self.servo)
 

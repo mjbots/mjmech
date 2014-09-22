@@ -62,11 +62,16 @@ def wrap_event(callback):
 def add_pair(a, b):
     return (a[0] + b[0], a[1] + b[1])
 
-NULL_COMMAND = {
+RIPPLE_COMMAND = {
+    'type': 'ripple',
     'translate_x_mm_s': 0,
     'translate_y_mm_s': 0,
     'rotate_deg_s': 0,
     }
+
+IDLE_COMMAND = {
+    'type': 'idle'
+}
 
 class UdpAnnounceReceiver(object):
     PORT = 13355
@@ -155,7 +160,7 @@ class ControlInterface(object):
 
             video_port=self.VIDEO_PORT,
             # Not set: turret - pair of (x, y) degrees
-            # Not set: gait - a dict based off NULL_COMMAND
+            # Not set: gait - a dict based off IDLE/RIPPLE_COMMAND
 
             # 0 = off; 1 = on
             laser_on = 0,
@@ -171,6 +176,9 @@ class ControlInterface(object):
             # fire a shot every time this changes; should only ever increase
             fire_cmd_count = 0,
             )
+
+        # If True, some gait-related key is being held.
+        self.key_gait_active = False
 
         # state log file and last svg
         self.state_log_file = None
@@ -264,9 +272,10 @@ class ControlInterface(object):
             dr = self.joystick.absinfo(linux_input.ABS.RX).scaled()
 
             if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
-                self.control_dict['gait'] = None
+                if self.control_dict['gait'] is not None:
+                    self.control_dict['gait'] = IDLE_COMMAND
             else:
-                gait = NULL_COMMAND.copy()
+                gait = RIPPLE_COMMAND.copy()
                 gait['translate_x_mm_s'] = dx * 50
                 gait['translate_y_mm_s'] = -dy * 200
                 gait['rotate_deg_s'] = dr * 50
@@ -379,11 +388,12 @@ class ControlInterface(object):
 
         if name in self._GAIT_KEYS:
             dx, dy, dr = self._GAIT_KEYS[name]
-            gait = NULL_COMMAND.copy()
+            gait = RIPPLE_COMMAND.copy()
             gait['translate_x_mm_s'] = dx * 50
             gait['translate_y_mm_s'] = dy * 100
             gait['rotate_deg_s'] = dr * 30
             self.control_dict['gait'] = gait
+            self.key_gait_active = True
         elif name == 'h':
             self._print_help()
         elif name == 'l':
@@ -425,8 +435,10 @@ class ControlInterface(object):
         self._send_control()
 
     def _handle_key_release(self, evt):
-        if self.control_dict.get('gait') is not None:
-            self.control_dict['gait'] = None
+        if self.key_gait_active:
+            self.key_gait_active = False
+            if self.control_dict['gait'] is not None:
+                self.control_dict['gait'] = IDLE_COMMAND
             self._send_control()
 
     def _print_help(self):

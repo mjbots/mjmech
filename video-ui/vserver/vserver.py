@@ -76,6 +76,7 @@ class UdpAnnouncer(object):
         self.start_time = time.time()
         gobject.timeout_add(int(self.INTERVAL * 1000),
                             wrap_event(self._broadcast))
+
     def _broadcast(self):
         #self.logger.debug('Broadcasting anouncement')
         self.seq += 1
@@ -129,11 +130,12 @@ class ControlInterface(object):
         self.servo_send_now = asyncio.Event()
         self.servo_send_task = Task(self._send_servo_commands())
 
+        self.mech_driver_started = False
         if self.opts.no_mech:
             self.mech_driver = None
         else:
             self.mech_driver = gait_driver.MechDriver(opts)
-            Task(self.mech_driver.run())
+            Task(self.mech_driver.connect_servo())
 
         self.video_addr = None
         self.video_proc = None
@@ -236,6 +238,9 @@ class ControlInterface(object):
         if not self.mech_driver:
             return
         servo = self.mech_driver.servo
+        if servo is None:
+            self.logger.warn('Not sending commands -- no servo yet')
+            raise Return()
 
         if olddata is None:
             olddata = dict()   # so one can use 'get'
@@ -275,31 +280,40 @@ class ControlInterface(object):
         if self.next_servo_to_poll is not None:
             servo_id = self.next_servo_to_poll.next()
             status_list = yield From(servo.get_clear_status(servo_id))
-            status_str = ','.join(status_list) or 'OK'
+            status_str = ','.join(status_list) or 'idle'
             if status_str != self.last_servo_status.get(servo_id):
-                self.logger.info('Servo status for %r: %s' % (servo_id, status_str))
+                self.logger.info('Servo status for %r: %s'
+                                 % (servo_id, status_str))
                 self.last_servo_status[servo_id] = status_str
 
         if data.get('turret'):
             servo_x, servo_y = data['turret']
-            servo_x = min(TURRET_RANGE_X[1], 
+            servo_x = min(TURRET_RANGE_X[1],
                           max(TURRET_RANGE_X[0], servo_x))
-            servo_y = min(TURRET_RANGE_Y[1], 
+            servo_y = min(TURRET_RANGE_Y[1],
                           max(TURRET_RANGE_Y[0], servo_y))
             yield From(self.mech_driver.servo.set_pose(
                     {12: servo_x,
                      13: servo_y}))
 
-        if 'gait' in data:
+        if data.get('gait'):
+            # We got a gait command. Start the mech driver.
+            if self.mech_driver and not self.mech_driver_started:
+                self.mech_driver_started = True
+                Task(self.mech_driver.run())
+
             gait = data['gait']
-            if gait is None:
+            if gait['type'] == 'idle':
                 self.mech_driver.set_idle()
-            else:
+            elif gait['type'] == 'ripple':
                 command = legtool.gait.ripple.Command()
                 for key, value in gait.iteritems():
-                    setattr(command, key, value)
+                    if key != 'type':
+                        setattr(command, key, value)
 
                 self.mech_driver.set_command(command)
+            else:
+                assert False, 'Invalid gait type %r' % gait['type']
 
 
     def _set_video_dest(self, addr):
