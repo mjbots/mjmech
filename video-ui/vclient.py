@@ -235,12 +235,10 @@ class ControlInterface(object):
 
         def metric(device):
             abs_axis = device.get_features(linux_input.EV.ABS)
-            for x in [linux_input.ABS.X,
-                      linux_input.ABS.Y,
-                      linux_input.ABS.RX]:
-                if not x in abs_axis:
-                    return -1
-            return 1
+            if len(abs_axis) >= 3:
+                return 1
+
+            return -1
 
         enumerator = joystick.JoystickEnumerator(metric)
         joysticks = enumerator.joysticks()
@@ -259,18 +257,35 @@ class ControlInterface(object):
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
 
-    @asyncio.coroutine
+    def select_axes(self):
+        complete = self.joystick.get_features(linux_input.EV.ABS)
+
+        # If we have all of X, Y, and RX, RY, then the axes are
+        # probably mapped correctly and we can return what we expect.
+        if (linux_input.ABS.X in complete and
+            linux_input.ABS.Y in complete and
+            linux_input.ABS.RX in complete and
+            linux_input.ABS.RY in complete):
+            return [linux_input.ABS.X, linux_input.ABS.Y, linux_input.ABS.RX]
+
+        # Otherwise, just return the first three axes on the hope that
+        # this is meaningful.
+        return complete[0:3]
+
     @wrap_event
     def _read_joystick(self):
+        axes = self.select_axes()
+        print "Selected joystick axes:", axes
+
         while True:
             ev = yield From(self.joystick.read())
 
             if ev.ev_type != linux_input.EV.ABS:
                 continue
 
-            dx = self.joystick.absinfo(linux_input.ABS.X).scaled()
-            dy = self.joystick.absinfo(linux_input.ABS.Y).scaled()
-            dr = self.joystick.absinfo(linux_input.ABS.RX).scaled()
+            dx = self.joystick.absinfo(axes[0]).scaled()
+            dy = self.joystick.absinfo(axes[1]).scaled()
+            dr = self.joystick.absinfo(axes[2]).scaled()
 
             if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
                 if self.control_dict['gait'] is not None:
@@ -281,7 +296,6 @@ class ControlInterface(object):
                 gait['translate_y_mm_s'] = -dy * 200
                 gait['rotate_deg_s'] = dr * 50
                 self.control_dict['gait'] = gait
-
 
     @wrap_event
     def _on_send_timer(self):
