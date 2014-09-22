@@ -298,6 +298,10 @@ class GazeboController(object):
         """
         raise Return(None)
 
+    @asyncio.coroutine
+    def set_leds(self, ident, red=False, green=False, blue=False):
+        pass
+
 @asyncio.coroutine
 def select_servo(servo_type, **kwargs):
     if servo_type == 'herkulex':
