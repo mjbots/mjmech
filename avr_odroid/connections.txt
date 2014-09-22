@@ -8,17 +8,16 @@ Latching .100 4-pin (OSEPP pinout)
 Servo connector:
  .100   servo
  molex  conn
-   4      ?    GND
-   3      ?    TXD (from servo)
-   2      ?    RXD (to servo)
-   1      ?    Vcc
-servo pins: 1=GND/2=Vcc/3=TxD/4=RxD
+   4      1    GND
+   3      3    TXD (from servo)
+   2      4    RXD (to servo)
+   1      2    Vcc
 
 Fire/misc connector (8 pin, low profile):
    1 BLACK   - Motor driver GND
    2 RED     - Motor driver +5V
-   3 BLACK   - Motor driver agitator
-   4 WHITE   - Motor driver FIRE
+   3 BLACK (paited white) - Motor driver FIRE
+   4 WHITE   - Motor driver agitator
    5 BLUE    - Battery power output
    6 BLACK   - GND
    7 GREEN   - Green LED (+)
@@ -28,20 +27,24 @@ Fire/misc connector (8 pin, low profile):
   1E  -
   1A  - GND
   1B  - +5V
-  1P  - Motor driver agitator
+  1P  - Motor driver agitator (white wire)
   1CS -
   ----
   Vin -
-  G   -
+  G   - GND or N/C
   S   - +5V
-  G   - GND
+  G   - GND or N/C
   Vin -
   ---
   2CS -
-  2P  - Motor driver FIRE
+  2P  - Motor driver FIRE (painted black wire)
   2B  - +5V
   2A  - GND
   2E  -
+
+NOTE: left and right side are identical, except for motor being driven.
+Thicker wires go to FIRE side.
+Central connection may be plugged in any orientation.
 
 
 Serial mux:
