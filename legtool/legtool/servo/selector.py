@@ -302,6 +302,19 @@ class GazeboController(object):
     def set_leds(self, ident, red=False, green=False, blue=False):
         pass
 
+    @asyncio.coroutine
+    def mjmech_fire(self, fire_time, fire_pwm):
+        pass
+
+    @asyncio.coroutine
+    def mjmech_set_outputs(self, laser=False, green=False, blue=False,
+                           agitator=0):
+        pass
+
+    @asyncio.coroutine
+    def get_clear_status(self, ident):
+        raise Return([])
+
 @asyncio.coroutine
 def select_servo(servo_type, **kwargs):
     if servo_type == 'herkulex':
