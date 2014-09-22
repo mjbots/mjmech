@@ -1,0 +1,9 @@
+ * Make unit tests which verify performance parameters for a given IMU
+   configuration.
+   * IMU configuration should include:
+     * MiniIMUv2, MAX21000
+     * At least the minimum and maximum gyro scale factors
+     * All can be at max accel scale
+   * tests over multiple random seeds
+ * Test saturating the gyro sensors
+ * Test saturating the accelerometer sensors
