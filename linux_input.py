@@ -835,7 +835,7 @@ class Event(object):
             code_str = str(KEY(self.code))
         else:
             code_str = '0x%x' % self.code
-            
+
         return '<Event time:%f type:%s code:%s value:%d>' % (
             self.time, self.ev_type,
             code_str, self.value)
@@ -854,15 +854,14 @@ class AbsInfo(object):
             self.value, self.minimum, self.maximum)
 
     def scaled(self):
-        if self.value >= 0:
-            return float(self.value) / self.maximum
-        return -(float(self.value) / self.minimum)
+        center = 0.5 * (self.maximum + self.minimum)
+        return (self.value - center) / (0.5 * (self.maximum - self.minimum))
 
-            
+
 class InputDevice(object):
     def __init__(self, filename):
         self._fd = os.open(filename, os.O_RDONLY | os.O_NONBLOCK)
-        
+
         name = fcntl.ioctl(self._fd, EVIOCGNAME(256), chr(0) * 256)
         self.name = name.replace(chr(0), '')
 
@@ -962,7 +961,7 @@ class InputDevice(object):
             self.abs[ABS(ev.code)].value = value
 
         return ev
-        
+
     def __str__(self):
         def feature_str(val):
             try:
@@ -973,11 +972,11 @@ class InputDevice(object):
         def flags_str(bitvec, cls):
             return '|'.join([str(cls(bit)) for bit in range(32)
                              if bitvec & (1 << bit)])
-            
+
         feature_flags = flags_str(self.features, EV)
         rel_flags = flags_str(self.features_rel, REL)
         abs_flags = flags_str(self.features_abs, ABS)
-        
+
         return ('<InputDevice "%s" bus=%x vendor=0x%04x '
                 'product=0x%04x %s %s %s>' % (
                 self.name, self.id_bus, self.id_vendor, self.id_product,
