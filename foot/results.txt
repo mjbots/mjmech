@@ -1,0 +1,12 @@
+Vacuum formed
+
+
+in-line force: 5 counts/lb
+highest-sensitivity angle: 15 counts/lb
+
+
+
+Non-vacuum formed:
+
+in-line force: 2 counts/lb
+highest sensitivity angle: 5 counts/lb
