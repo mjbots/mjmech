@@ -545,6 +545,13 @@ class ControlInterface(object):
 
 
 class VideoWindow(object):
+    # How often to print framerate info
+    VIDEO_INFO_INTERVAL = 30.0
+
+    # UDP source will generate a warning after that many seconds without
+    # packets pass
+    UDP_WARN_TIMEOUT = 2.0
+
     def __init__(self, host, port, rotate=False, video_log=None):
         self.host = host
         self.port = port
@@ -580,24 +587,31 @@ class VideoWindow(object):
         caps = Gst.Caps.from_string(
             "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
             "encoding-name=(string)H264")
-        rtp_src = self.make_element("udpsrc", caps=caps, port=self.port)
+        rtp_src = self.make_element(
+            "udpsrc", caps=caps, port=self.port,
+            name="rtp_src", timeout=long(self.UDP_WARN_TIMEOUT * 1.0e9))
         self.link_pads(rtp_src, None, self.rtpbin, "recv_rtp_sink_0")
 
-        rtcp_src = self.make_element("udpsrc", port=self.port + 1)
+        rtcp_src = self.make_element(
+            "udpsrc", port=self.port + 1,
+            name="rtcp_src", timeout=long(self.UDP_WARN_TIMEOUT * 1.0e9))
         self.link_pads(rtcp_src, None, self.rtpbin, "recv_rtcp_sink_0")
 
-        rtcp_sink = self.make_element("udpsink", host=self.host, port=self.port + 2,
+        rtcp_sink = self.make_element("udpsink", host=self.host,
+                                      port=self.port + 2,
                                       sync=False, async=False)
         self.link_pads(self.rtpbin, "send_rtcp_src_0", rtcp_sink, None)
 
-        #self.info_overlay = self.make_element(
-        #    "textoverlay",
-        #    shaded_background=True, font_desc="16", auto_resize=False,
-        #    valignment="bottom", halignment="left", line_alignment="left",
-        #    text="Video info\nNo data yet")
         self.info_overlay = self.make_element(
             "rsvgoverlay",
             fit_to_frame=True)
+
+        # 'videorate' element has two properties:
+        #  - it provides counters of frames received
+        #  - since 'info_overlay' updates on video frames only, it keeps
+        #    info_overlay responsive even if video is not present.
+        self.videorate = self.make_element("videorate")
+        self.last_video_stats = None
 
         decode_elements = [
             self.make_element("rtph264depay"),
@@ -608,16 +622,19 @@ class VideoWindow(object):
             self.make_element('queue'),
             self.make_element("avdec_h264"),
             self.make_element("videoconvert"),
-            self.make_element("timeoverlay", shaded_background=True,
-                              font_desc="8",
-                              valignment="bottom", halignment="right"),
-            self.info_overlay,
-            self.make_element("videoconvert"),
             ]
         if rotate:
             play_elements.append(self.make_element(
                     "videoflip", method="clockwise"))
-        play_elements.append(self.make_element("xvimagesink"))
+        play_elements += [
+            self.make_element("timeoverlay", shaded_background=True,
+                              font_desc="8",
+                              valignment="bottom", halignment="right"),
+            self.videorate,
+            self.info_overlay,
+            self.make_element("videoconvert"),
+            self.make_element("xvimagesink")
+            ]
         self.link_list_of_pads(play_elements)
         self.play_elements = play_elements
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
@@ -636,9 +653,16 @@ class VideoWindow(object):
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message::error", self._on_error)
-        bus.connect("message::eos", self._on_end_of_stream)
+        bus.connect("message", self._on_any_message)
+
+        # Enable 'sync' messages which are not thread-safe. We should do as
+        # little as possible there to avoid random crashes.
         bus.enable_sync_message_emission()
         bus.connect('sync-message::element', self._on_sync_message)
+
+        # Start periodic video information timer
+        GLib.timeout_add(int(self.VIDEO_INFO_INTERVAL * 1000),
+                         self._on_video_info_timer)
 
         # Callback functions
         self.on_video_click_1 = None
@@ -646,9 +670,9 @@ class VideoWindow(object):
         self.on_key_release = None
         self.on_got_video = None
 
-    def make_element(self, etype, **kwargs):
-        elt = Gst.ElementFactory.make(etype)
-        assert elt, 'Failed to make element of type %r' % etype
+    def make_element(self, etype, name=None, **kwargs):
+        elt = Gst.ElementFactory.make(etype, name)
+        assert elt, 'Failed to make element %r of type %r' % (name, etype)
         self.pipeline.add(elt)
         for n, v in sorted(kwargs.items()):
             elt.set_property(n.replace('_', '-'), v)
@@ -692,21 +716,73 @@ class VideoWindow(object):
                 #ok = self.rtpbin.unlink(
                 #    self.rtpbin_last_pad, self.play_elements[0], None)
                 ok = self.rtpbin.unlink(self.play_elements[0])
-                if ok is not None:
-                    self.logger.info('Unlinking old pad: %r', ok)
+                self.logger.info('Unlinking old pad: %r', ok)
             self.rtpbin_last_pad = name
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
 
     @wrap_event
     def _on_sync_message(self, bus, msg):
+        # This is run in internal thread. Try to do as little as possible there.
         struct_name = msg.get_structure().get_name()
         if struct_name == 'prepare-window-handle':
             self.logger.info('Embedding video window')
             msg.src.set_window_handle(self.xid)
-        else:
-            self.logger.debug('sync message: %r' % struct_name)
+        return True
+
+    @wrap_event
+    def _on_any_message(self, bus, msg):
+        if msg.type == Gst.MessageType.STATE_CHANGED:
+            old, new, pending = msg.parse_state_changed()
+            # Only log this for some elements
+            if msg.src == self.play_elements[-1]:
+                # enum has value_name='GST_STATE_PAUSED', value_nick='playing'
+                msg_text = '%s->%s' % (old.value_nick, new.value_nick)
+                if pending != Gst.State.VOID_PENDING:
+                    msg_text += ' (pending %s)' % pending.value_nick
+                self.logger.debug("GST State changed for %s: %s",
+                                 msg.src.get_name(), msg_text)
+        elif msg.type == Gst.MessageType.QOS:
+            # Too many of these
+            pass
+        elif msg.type == Gst.MessageType.STREAM_STATUS:
+            status, owner = msg.parse_stream_status()
+            self.logger.debug("Stream status changed for %r: %s for owner %r",
+                              msg.src.get_name(),
+                              status.value_nick, owner.get_name())
+
+        elif msg.type == Gst.MessageType.STREAM_START:
+            has_group, group_id = msg.parse_group_id()
+            if not has_group:
+                group_id = None
+            self.logger.info("Stream started (source %s, group %r)",
+                             msg.src.get_name(), group_id)
             if self.on_got_video:
                 self.on_got_video()
+
+        elif msg.type == Gst.MessageType.ELEMENT:
+            # Element-specific message
+            mstruct = msg.get_structure()
+            struct_name = mstruct.get_name()
+            if struct_name == 'prepare-window-handle':
+                pass    # We handle this as sync message
+            elif struct_name == 'GstUDPSrcTimeout':
+                self.logger.warn('No data on UDP sink %r '
+                                 '(port %d, timeout %.3f sec)',
+                                 msg.src.get_name(),
+                                 msg.src.get_property('port'),
+                                 mstruct.get_value('timeout') / 1.e9)
+            else:
+                self.logger.debug("Element bus message from %s: %s" % (
+                        msg.src.get_name(), mstruct.to_string()))
+        elif msg.type in [Gst.MessageType.ASYNC_DONE,
+                          Gst.MessageType.NEW_CLOCK]:
+            pass   # internal, boring
+        else:
+            # Unknown pre-defined message
+            self.logger.debug("Unknown system message from %s: %s" % (
+                    msg.src.get_name(),  msg.type.value_names))
+
+        return True
 
     @wrap_event
     def _on_error(self, bus, msg):
@@ -715,10 +791,7 @@ class VideoWindow(object):
         if debug:
             for line in debug.split('\n'):
                 self.logger.info('| %s' % line)
-
-    @wrap_event
-    def _on_end_of_stream(self, bus, msg):
-        self.logger.info("End of stream: %r" % (msg, ))
+        return True
 
     def _evt_get_video_coord(self, evt):
         # Get size of window
@@ -731,11 +804,13 @@ class VideoWindow(object):
         caps = self.play_elements[-1].sinkpad.get_current_caps()
         if caps is None:
             return None
-        struct = caps.get_structure(0)  # Assume these are simple caps with a single struct.
+
+        # Assume these are simple caps with a single struct.
+        struct = caps.get_structure(0)
         video_size = (struct.get_int('width')[1], struct.get_int('height')[1])
 
-        # Calculate image position in (-1..1) range (taking in the account that video is
-        # scaled, but aspect ratio is preserved)
+        # Calculate image position in (-1..1) range (taking in the account
+        # that video is scaled, but aspect ratio is preserved)
         scale = min(wnd_size[0] * 1.0 / video_size[0],
                     wnd_size[1] * 1.0 / video_size[1])
         rel_pos = (0.5 + (evt.x - wnd_size[0]/2.0) / scale / video_size[0],
@@ -748,7 +823,6 @@ class VideoWindow(object):
     @wrap_event
     def _on_da_move(self, src, evt):
         assert src == self.drawingarea, src
-        #self.logger.info('DrawingArea move: %r' % ((evt.x, evt.y, evt.state, ), ))
 
         if evt.state & Gdk.ModifierType.BUTTON1_MASK:
             # Button is being held.
@@ -785,6 +859,32 @@ class VideoWindow(object):
         assert src == self.window, src
         if self.on_key_release:
             self.on_key_release(evt)
+        return True
+
+    @wrap_event
+    def _on_video_info_timer(self):
+        new_stats = (
+            self.videorate.get_property('in'),
+            self.videorate.get_property('out'),
+            self.videorate.get_property('drop'),
+            self.videorate.get_property('duplicate'))
+        if self.last_video_stats is None:
+            diffs = new_stats
+        else:
+            diffs = tuple(
+                a - b for a, b in zip(new_stats, self.last_video_stats))
+        self.last_video_stats = new_stats
+
+        # Assume loop has no large delays
+        dt = self.VIDEO_INFO_INTERVAL * 1.0
+        self.logger.info(
+            'Video: input FPS is %.2f, display FPS is %.2f (%.1f%% frames '
+            'duplicated, %.1f%% frames dropped)' % (
+                diffs[0] / dt, diffs[1] / dt,
+                100.0 * diffs[3] / (diffs[1] or 1.0),
+                100.0 * diffs[2] / (diffs[0] or 1.0)))
+
+        # Keep timer going
         return True
 
     def set_svg_overlay(self, data):
