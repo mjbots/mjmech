@@ -10,6 +10,7 @@ import errno
 import time
 import cStringIO as StringIO
 import functools
+import signal
 
 import trollius as asyncio
 from trollius import Task, From
@@ -776,6 +777,11 @@ class VideoWindow(object):
         self.info_overlay.set_property("data", data)
 
 
+@wrap_event
+def _sigint_handler():
+    # wrap_event decorator will make sure the exception stops event loop.
+    raise Exception('Got SIGINT')
+
 def main(opts):
     asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
 
@@ -826,6 +832,7 @@ def main(opts):
 
     global g_main_loop
     g_main_loop = asyncio.get_event_loop()
+    g_main_loop.add_signal_handler(signal.SIGINT, _sigint_handler)
 
     if opts.addr is None:
         ann = UdpAnnounceReceiver(opts)
