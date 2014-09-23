@@ -1,3 +1,25 @@
+ * Extract out a standalone test for:
+   * gyro rate exceeded with ideal IMU for each filter
+     * after a limited amount of time being stationary, the attitude
+       should be within some bounds
+   * stationary performance for each IMU and each filter
+ * Switch all estimators to process joined gyro and accelerometer
+   readings
+ * Try to disable memory location in Eigen
+ * Create some more sane way of creating plots of arbitrary quantities
+   from any simulation run
+
+Open Questions
+ * How should I handle bias initialization?  Require that you have a
+   1s period at power on with no movement?
+ * For my tests, do I want to allow different constants for the
+   different IMU categories?
+   * I think probably not, because otherwise the number of constants
+     to tune will explode, and I really only care about one type of IMU
+     at a time.
+
+
+Random / Old:
  * Make unit tests which verify performance parameters for a given IMU
    configuration.
    * IMU configuration should include:

@@ -19,7 +19,9 @@
 BOOST_AUTO_TEST_CASE(BasicPitchEstimator) {
   imu::PitchEstimator estimator(0.0008 * 0.0008,
                                 0.0512 * 0.0512,
-                                1.0 * 1.0);
+                                1.0 * 1.0,
+                                1e-3,
+                                1e-8);
 
   for (int i = 0; i < 1000; i++) {
     estimator.ProcessGyro(0.0);

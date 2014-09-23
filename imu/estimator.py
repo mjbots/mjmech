@@ -58,10 +58,7 @@ class AttitudeEstimator(object):
             delta = delta * advance
 
         next_attitude = (this_attitude * delta).normalized()
-        # yaw = advanced_attitude.euler().yaw
-        # next_attitude = (Quaternion.from_euler(0., 0., -yaw) *
-        #                  advanced_attitude)
-        # next_attitude = next_attitude.normalized()
+
         result[0] = next_attitude.w
         result[1] = next_attitude.x
         result[2] = next_attitude.y
@@ -227,6 +224,27 @@ class AttitudeEstimator(object):
                 covariance_limit=self.covariance_limit)
 
         self.ukf.update_state(IMU_UPDATE_PERIOD)
+
+        for g in self.current_gyro:
+            extra = Euler(0., 0., 0.)
+            if abs(g.yaw) > 0.95 * math.radians(250):
+                extra.yaw = math.radians(2000.0)
+            if abs(g.roll) > 0.95 * math.radians(250):
+                extra.roll = math.radians(2000.0)
+            if abs(g.pitch) > 0.95 * math.radians(250):
+                extra.pitch = math.radians(2000.0)
+            if extra.yaw or extra.roll or extra.pitch:
+                delta = Quaternion.integrate_rotation_rate(
+                    extra.roll, extra.pitch, extra.yaw, IMU_UPDATE_PERIOD)
+                ta = self.attitude()
+                na = (ta * delta).normalized()
+                da = Quaternion(na.w - ta.w,
+                                na.x - ta.x,
+                                na.y - ta.y,
+                                na.z - ta.z)
+                self.ukf.covariance += numpy.diag(
+                    [da.w, da.x, da.y, da.z, 0., 0., 0.]) ** 2
+
         self.ukf.update_measurement(numpy.array([[x],[y],[z]]),
                                     mahal_limit=None)
 
@@ -306,9 +324,11 @@ class PitchEstimator(object):
         return [math.sqrt(x) for x in list(numpy.diag(self.ukf.covariance)[1])][0]
 
     def __init__(self,
-                 process_noise_gyro=1e-8,
-                 process_noise_bias=math.radians(1e-6),
-                 measurement_noise_accel=10.,
+                 process_noise_gyro,
+                 process_noise_bias,
+                 measurement_noise_accel,
+                 initial_noise_attitude,
+                 initial_noise_bias,
                  accel_filter=None,
                  log_filename=None,
                  extra_log=None):
@@ -324,6 +344,8 @@ class PitchEstimator(object):
         self.process_noise_gyro = process_noise_gyro
         self.process_noise_bias = process_noise_bias
         self.measurement_noise_accel = measurement_noise_accel
+        self.initial_noise_attitude = initial_noise_attitude
+        self.initial_noise_bias = initial_noise_bias
         if accel_filter is None:
             self.accel_y_filter = lambda x: x
             self.accel_z_filter = lambda x: x
@@ -398,8 +420,8 @@ class PitchEstimator(object):
             pitch = self.accel_to_orientation(y, z)
             state = numpy.array([[pitch],
                                  [0.]])
-            covariance = numpy.diag([math.radians(5) ** 2,
-                                     math.radians(1) ** 2])
+            covariance = numpy.diag([self.initial_noise_attitude,
+                                     self.initial_noise_bias])
 
             self.ukf = ukf_filter.UkfFilter(
                 initial_state=state,

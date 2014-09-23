@@ -202,15 +202,17 @@ class PitchEstimator {
 
   PitchEstimator(Float process_noise_gyro,
                  Float process_noise_bias,
-                 Float measurement_noise_accel)
+                 Float measurement_noise_accel,
+                 Float initial_noise_attitude,
+                 Float initial_noise_bias)
       : process_noise_gyro_(process_noise_gyro),
         process_noise_bias_(process_noise_bias),
         measurement_noise_accel_(measurement_noise_accel),
         pitch_filter_(
             PitchFilter::State::Zero(),
             (PitchFilter::Covariance() <<
-             std::pow(5. / 180 * M_PI, 2.0), 0.0,
-             0.0, std::pow(1.0 / 180 * M_PI, 2.0)).finished(),
+             initial_noise_attitude, 0.0,
+             0.0, initial_noise_bias).finished(),
             (PitchFilter::Covariance() <<
              process_noise_gyro, 0.0,
              0.0, process_noise_bias).finished()) {

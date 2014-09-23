@@ -32,44 +32,16 @@ import sys
 import estimator
 from estimator import Quaternion
 import imu_error_model
+from filter_test_cases import TestCase, StationaryTest
+import imu_simulator
+from imu_simulator import MiniImuV2, Max21000, JbImuV2, IdealImu
 
 sys.path.append('build')
 import _estimator
 
 SAMPLE_FREQUENCY_HZ = 100.0
 G = 9.81
-
-class TestCase(object):
-    def advance(self, dt):
-        raise NotImplementedError
-
-    def gyro(self):
-        raise NotImplementedError
-
-    def accel_yz(self):
-        raise NotImplementedError
-
-    def expected_pitch(self):
-        raise NotImplementedError
-
-class StationaryTest(TestCase):
-    def name(self):
-        return 'stationary'
-
-    def advance(self, dt):
-        pass
-
-    def gyro(self):
-        return 0.0
-
-    def accel_yz(self):
-        return 0., 1.
-
-    def expected_pitch(self):
-        return 0.
-
-    def pos(self):
-        return 0., 0.
+TEST_CASE_TIME = 50.0
 
 def rotate(vec, val):
     s = math.sin(val)
@@ -106,13 +78,13 @@ class RotatingTest(TestCase):
     def gyro(self):
         return self.gyro_rad_s
 
-    def accel_yz(self):
+    def accel_yz_mps2(self):
         x = 0.0
         y = 1.0
 
         y, z = rotate((x, y), -self.pitch_rad)
 
-        return y, z
+        return y * G, z * G
 
     def expected_pitch(self):
         return self.pitch_rad
@@ -169,7 +141,7 @@ class BouncingTest(RotatingTest):
         self.velx_mps += self.accelx_mps2 * dt
         self.vely_mps += self.accely_mps2 * dt
 
-    def accel_yz(self):
+    def accel_yz_mps2(self):
         # The gravity component.
         x = 0.0
         y = 1.0
@@ -180,7 +152,7 @@ class BouncingTest(RotatingTest):
 
         y, z = rotate((x, y), -self.pitch_rad)
 
-        return y, z
+        return y * G, z * G
 
     def pos(self):
         return self.posx_m, self.posy_m
@@ -203,7 +175,7 @@ class PendulumTest(TestCase):
     def gyro(self):
         return self.velocity_rad_s
 
-    def accel_yz(self):
+    def accel_yz_mps2(self):
         # The gravity component.
         x = 0.0
         y = 1.0
@@ -214,7 +186,7 @@ class PendulumTest(TestCase):
 
         y, z = rotate((x, y), -self.pitch_rad)
 
-        return y, z
+        return y * G, z * G
 
     def dydt(self, y, t):
         theta, theta_dot = y
@@ -259,7 +231,7 @@ def plot_pendulum():
                         pc.gyro(),
                         pc.accelx_mps2 / G,
                         pc.accely_mps2 / G,
-                        pc.accel_yz()))
+                        pc.accel_yz_mps2()))
         pc.advance(0.01)
 
     pylab.plot([x[0] for x in results], label='pitch_rad')
@@ -301,7 +273,9 @@ def animate_case(pc):
 #            [ax, ax],
 #            [ay, ay + 1.0])
 
-        ay, az = pc.accel_yz()
+        ay, az = pc.accel_yz_mps2()
+        ay /= G
+        az /= G
         y_line.set_data([px, px + ay * math.cos(pc.pitch_rad)],
                         [py, py + ay * math.sin(pc.pitch_rad)])
         z_line.set_data([px, px + az * math.sin(-pc.pitch_rad)],
@@ -310,62 +284,40 @@ def animate_case(pc):
     ani = animation.FuncAnimation(fig, animate, frames=600, interval=10)
     plt.show()
 
-def run_case(options, test_case, estimator):
-    rng = random.Random(0)
 
-    # These constants are from the Pololu MiniIMU v2 @8g.
-    accel_x_error, accel_y_error, accel_z_error = [
-        imu_error_model.InertialErrorModel(
-            rng,
-            SAMPLE_FREQUENCY_HZ,
-            1.9e-2,
-            1.2e-3,
-            1.3e-5)
-        for x in range(3)]
-
-    # These constants are from the Pololu MiniIMU v2 at 2000dps
-    # maximum rate.
-    gyro_x_error, gyro_y_error, gyro_z_error = [
-        imu_error_model.InertialErrorModel(
-            rng,
-            SAMPLE_FREQUENCY_HZ,
-            3e-4,  # 5.3e-4 rad/sqrt(s), 0.0303 deg/sqrt(s)
-            1e-4,  # 1.4e-4 rad/s, 0.0080 deg/s
-            3.6e-6)               # 3.6e-6 rad/sqrt(s)
-        for x in range(3)]
+def run_case(options, test_case, imu_parameters, estimator):
+    imusim = imu_simulator.ImuSimulator(
+        imu_parameters, SAMPLE_FREQUENCY_HZ, options.seed)
 
     if options.attitude:
         estimator.process_accel(0., 0., 1.0)
     else:
         estimator.process_accel(0, 1.0)
 
-    NUM_COUNT = 90000
+    NUM_COUNT = int(TEST_CASE_TIME * 100.0)
     error = 0.0
     diff = 0.0
 
     for count in range(NUM_COUNT):
         test_case.advance(1.0 / SAMPLE_FREQUENCY_HZ)
-        true_accel_y, true_accel_z = test_case.accel_yz()
+        true_accel_y, true_accel_z = test_case.accel_yz_mps2()
 
-        accel_x = accel_x_error.sample() / 9.81
-        accel_y = true_accel_y + (accel_y_error.sample() / 9.81)
-        accel_z = true_accel_z + (accel_z_error.sample() / 9.81)
-        gyro_x = test_case.gyro() + gyro_x_error.sample()
-        gyro_y = gyro_y_error.sample()
-        gyro_z = gyro_z_error.sample()
+        imusim.update_reality(0.0, true_accel_y, true_accel_z,
+                              test_case.gyro(), 0., 0.)
 
-        gyro_x_bias = gyro_x_error.bias()
-        gyro_y_bias = gyro_y_error.bias()
-        gyro_z_bias = gyro_z_error.bias()
+        accel_x = imusim.measured_accel_x_mps2
+        accel_y = imusim.measured_accel_y_mps2
+        accel_z = imusim.measured_accel_z_mps2
+        gyro_x = imusim.measured_gyro_x_rps
+        gyro_y = imusim.measured_gyro_y_rps
+        gyro_z = imusim.measured_gyro_z_rps
 
         if options.attitude:
             estimator.process_gyro(
                 yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y)
             extra_log = [('true_pitch', test_case.expected_pitch()),
                          ('pitch_err', diff),
-                         ('true_gyro_x_bias', gyro_x_bias),
-                         ('true_gyro_y_bias', gyro_y_bias),
-                         ('true_gyro_z_bias', gyro_z_bias)]
+                         ]
             kwargs = {}
             if options.python:
                 kwargs['extra_log'] = extra_log
@@ -387,22 +339,25 @@ def run_case(options, test_case, estimator):
 def run(options):
 
     cases = []
-    cases += [BouncingTest(damp_vel=0.1)]
-    cases += [BouncingTest()]
-    cases += [BouncingTest(noise_level=5.0, accel_noise=20.)]
-    cases += [RotatingTest()]
-    cases += [RotatingTest(noise_level=5)]
-    cases += [RotatingTest(noise_level=10)]
-    cases += [StationaryTest()]
-    cases += [PendulumTest(v=0.5)]
-    cases += [PendulumTest(v=1.0)]
-    cases += [PendulumTest(v=2.0)]
-    cases += [PendulumTest(v=4.0)]
+    cases += [lambda: BouncingTest(damp_vel=0.1)]
+    cases += [lambda: BouncingTest()]
+    cases += [lambda: BouncingTest(noise_level=5.0, accel_noise=20.)]
+    cases += [lambda: RotatingTest()]
+    cases += [lambda: RotatingTest(noise_level=5)]
+    cases += [lambda: RotatingTest(noise_level=10)]
+    cases += [lambda: RotatingTest(noise_level=15)]
+    cases += [lambda: StationaryTest()]
+    cases += [lambda: PendulumTest(v=0.5)]
+    cases += [lambda: PendulumTest(v=1.0)]
+    cases += [lambda: PendulumTest(v=2.0)]
+    cases += [lambda: PendulumTest(v=4.0)]
+
+    imus = [MiniImuV2(), JbImuV2(), Max21000(), IdealImu()]
 
     if len(options.limit):
         def match(case):
             for exp in options.limit:
-                if re.search(exp, x.name()):
+                if re.search(exp, x().name()):
                     return True
             return False
 
@@ -413,42 +368,49 @@ def run(options):
         animate_case(cases[0])
         return
 
-    print '%20s %10s   %s' % ('test case', 'err', 'covar')
+    print '%20s %s' % ('test_case', ' '.join('%12s' % x.name for x in imus))
 
-    for case in cases:
-        kwargs = {}
-        extra_log = [('true_pitch', 0),
-                     ('pitch_err', 0),
-                     ('true_gyro_x_bias', 0),
-                     ('true_gyro_y_bias', 0),
-                     ('true_gyro_z_bias', 0)]
+    for case_gen in cases:
+        case = case_gen()
+        print '%20s' % case.name(),
 
-        if options.python:
-            module = estimator
-            kwargs['extra_log'] = extra_log
-        else:
-            module = _estimator
+        for imu in imus:
+            case = case_gen()
+            kwargs = {}
+            extra_log = [('true_pitch', 0),
+                         ('pitch_err', 0),
+                         ('true_gyro_x_bias', 0),
+                         ('true_gyro_y_bias', 0),
+                         ('true_gyro_z_bias', 0)]
 
-        if not options.attitude:
-            estimator_class = module.PitchEstimator
-        else:
-            estimator_class = module.AttitudeEstimator
+            if options.python:
+                module = estimator
+                kwargs['extra_log'] = extra_log
+            else:
+                module = _estimator
 
-        estimator = estimator_class(
-            process_noise_gyro=math.radians(0.0002)**2,
-            process_noise_bias=math.radians(0.0032)**2,
-            measurement_noise_accel=3.0**2,
-            **kwargs)
+            if not options.attitude:
+                estimator_class = module.PitchEstimator
+            else:
+                estimator_class = module.AttitudeEstimator
 
-        result = run_case(options, case, estimator)
+            my_estimator = estimator_class(
+                process_noise_gyro=math.radians(0.0002)**2,
+                process_noise_bias=math.radians(0.0256)**2,
+                measurement_noise_accel=4.0**2,
+                initial_noise_attitude=1e-3,
+                initial_noise_bias=1e-4,
+                **kwargs)
 
-        covar = ' '.join('%s=%f' % (x, math.degrees(y))
-                         for x, y in zip(estimator.state_names(),
-                                         result['uncert']))
-        if len(covar) > 40:
-            covar = covar[0:40]
-        print '%20s %10s %s' % (
-            case.name(), '%.4f' % result['rms_error'], covar)
+            result = run_case(options, case, imu, my_estimator)
+
+            covar = ' '.join('%s=%f' % (x, math.degrees(y))
+                             for x, y in zip(my_estimator.state_names(),
+                                             result['uncert']))
+            if len(covar) > 40:
+                covar = covar[0:40]
+            print '%12s' % ('%.4f' % result['rms_error']),
+        print
 
 def main():
     parser = optparse.OptionParser()
@@ -460,6 +422,7 @@ def main():
                       help='Use python filter')
     parser.add_option('-a', '--attitude', action='store_true', default=False,
                       help='Use full 2d attitude filter')
+    parser.add_option('-s', '--seed', type='int', default=0)
 
     options, args = parser.parse_args()
     assert len(args) == 0
