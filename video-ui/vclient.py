@@ -289,12 +289,12 @@ class ControlInterface(object):
             dr = self.joystick.absinfo(axes[2]).scaled()
 
             if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
-                if self.control_dict['gait'] is not None:
+                if self.control_dict.get('gait') is not None:
                     self.control_dict['gait'] = IDLE_COMMAND
             else:
                 gait = RIPPLE_COMMAND.copy()
-                gait['translate_x_mm_s'] = dx * 50
-                gait['translate_y_mm_s'] = -dy * 200
+                gait['translate_x_mm_s'] = dx * 100
+                gait['translate_y_mm_s'] = -dy * 350
                 gait['rotate_deg_s'] = dr * 50
                 self.control_dict['gait'] = gait
 
