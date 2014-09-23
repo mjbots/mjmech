@@ -555,6 +555,9 @@ class VideoWindow(object):
     # If True, will crash app if video stops
     CRASH_ON_VIDEO_STOP = True
 
+    # Is camera upside down?
+    CAMERA_ROTATE = False
+
     # UDP sources will generate a warning when that many seconds without
     # packets pass
     RTP_UDP_WARN_TIMEOUT = 5.0
@@ -562,7 +565,7 @@ class VideoWindow(object):
     # much longer
     RTCP_UDP_WARN_TIMEOUT = 30.0
 
-    def __init__(self, host, port, rotate=False, video_log=None):
+    def __init__(self, host, port, video_log=None):
         self.host = host
         self.port = port
         self.logger = logging.getLogger('video')
@@ -679,9 +682,10 @@ class VideoWindow(object):
             self.make_element("avdec_h264"),
             self.make_element("videoconvert"),
             ]
-        if rotate:
+        if self.CAMERA_ROTATE:
             play_elements.append(self.make_element(
                     "videoflip", method="clockwise"))
+        self.imagesink = self.make_element("xvimagesink")
         play_elements += [
             self.make_element("timeoverlay", shaded_background=True,
                               font_desc="8",
@@ -689,12 +693,28 @@ class VideoWindow(object):
             self.detector_decoded,
             self.info_overlay,
             self.make_element("videoconvert"),
-            self.make_element("xvimagesink")
+            self.imagesink,
             ]
+
         self.link_list_of_pads(play_elements)
         self.play_elements = play_elements
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
         self.rtpbin.connect("pad-removed", self._on_removed_rtpbin_pad)
+
+        if False:
+            # Connect something to the old queue, so pipeline can start.
+            self.link_list_of_pads(
+                [self.make_element("fakesrc", is_live=True),
+                 self.make_element("capsfilter", caps=caps),
+                 self.play_elements[0]])
+
+            # Create new play elements queue which is empty.
+            self.play_elements = [
+                self.detector_decoded,
+                self.make_element("fakesink")
+                ]
+            self.link_list_of_pads(self.play_elements)
+
 
         if video_log is not None:
             self.logger.info('Recording video to %r' % video_log)
@@ -742,7 +762,7 @@ class VideoWindow(object):
         else:
             res = elt1.link_pads(pad1, elt2, pad2)
         assert res, 'Failed to link (%r,%r) to (%r,%r)' % (
-            elt1, pad1, elt2, pad2)
+            elt1.get_name(), pad1, elt2.get_name(), pad2)
 
     def link_list_of_pads(self, elements):
         for i in range(1, len(elements)):
@@ -770,9 +790,9 @@ class VideoWindow(object):
         self.logger.info('Got new rtpbin pad: %r', name)
         if name.startswith('recv_rtp_src'):
             if self.rtpbin_last_pad is not None:
-                # Since we do not know dest pad, unlink all.
                 #ok = self.rtpbin.unlink(
                 #    self.rtpbin_last_pad, self.play_elements[0], None)
+                # Since we do not know dest pad, unlink all.
                 ok = self.rtpbin.unlink(self.play_elements[0])
                 self.logger.info('Unlinking old pad: %r', ok)
             self.rtpbin_last_pad = name
@@ -894,11 +914,11 @@ class VideoWindow(object):
         # Get size of window
         alloc = self.drawingarea.get_allocation()
         wnd_size = (alloc.width, alloc.height)
-        #wnd_size = (self.play_elements[-1].get_property('window-width'),
-        #            self.play_elements[-1].get_property('window-height'))
+        #wnd_size = (self.imagesink.get_property('window-width'),
+        #            self.imagesink.get_property('window-height'))
 
         # Get original size of video stream
-        caps = self.play_elements[-1].sinkpad.get_current_caps()
+        caps = self.imagesink.sinkpad.get_current_caps()
         if caps is None:
             return None
 

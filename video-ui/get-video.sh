@@ -10,11 +10,20 @@ if [[ "$HOST" == "" ]]; then
 fi
 
 
-gst-launch-1.0 -v rtpbin name=rtpbin do-retransmission=true  \
+if [[ "$DISPLAY" == "" ]]; then
+    echo No X, using text output
+    # this will print a line for each buffer received
+    SINK='fakesink silent=false'
+else
+    SINK=xvimagesink
+fi
+
+set -x -e
+gst-launch-1.0 -v rtpbin name=rtpbin do-retransmission=true \
     udpsrc caps="application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264" \
       port=$PORT ! rtpbin.recv_rtp_sink_0 \
-    rtpbin. ! rtph264depay ! h264parse ! avdec_h264 ! videoflip method=clockwise ! \
-    xvimagesink \
+    rtpbin. ! rtph264depay ! h264parse ! avdec_h264 ! \
+    $SINK \
     udpsrc port=$PORT1 ! rtpbin.recv_rtcp_sink_0 \
     rtpbin.send_rtcp_src_0 ! udpsink host=$HOST port=$PORT2 sync=false async=false
 
