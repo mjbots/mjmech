@@ -548,6 +548,9 @@ class VideoWindow(object):
     # How often to print framerate info
     VIDEO_INFO_INTERVAL = 30.0
 
+    # If True, will dump info for all pads when framerate expires
+    DUMP_PAD_INFO_BY_TIMER = False
+
     # UDP sources will generate a warning when that many seconds without
     # packets pass
     RTP_UDP_WARN_TIMEOUT = 5.0
@@ -584,7 +587,21 @@ class VideoWindow(object):
         self.xid = self.drawingarea.get_property('window').get_xid()
 
         self.pipeline = Gst.Pipeline()
-        self.rtpbin = self.make_element("rtpbin", do_retransmission=True)
+
+        # List of all elements made, for debugging
+        self.element_list = list()
+
+        self.rtpbin = self.make_element(
+            "rtpbin",
+            do_retransmission=True,
+            # notify on individual packet losses(TODO mafanasyev: hook this)
+            do_lost=True,
+            # remove pad when client disappears
+            autoremove=True,
+            # TODO mafanasyev: try settings below, maybe they will help
+            #use_pipeline_clock=True,
+            #buffer_mode=2,   # RTP_JITTER_BUFFER_MODE_BUFFER
+            )
         self.rtpbin_last_pad = None
 
         caps = Gst.Caps.from_string(
@@ -617,13 +634,14 @@ class VideoWindow(object):
         self.last_video_stats = None
 
         decode_elements = [
+            # Add a queue just in case
+            self.make_element('queue', name='queue_decode'),
             self.make_element("rtph264depay"),
             self.make_element("h264parse"),
             self.make_element("tee"),
         ]
-        self.queue_dec = self.make_element('queue')
         play_elements = decode_elements + [
-            self.queue_dec,
+            self.make_element('queue', name='queue_play'),
             self.make_element("avdec_h264"),
             self.make_element("videoconvert"),
             ]
@@ -642,14 +660,13 @@ class VideoWindow(object):
         self.link_list_of_pads(play_elements)
         self.play_elements = play_elements
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
+        self.rtpbin.connect("pad-removed", self._on_removed_rtpbin_pad)
 
-
-        self.queue_save = self.make_element('queue')
         if video_log is not None:
             self.logger.info('Recording video to %r' % video_log)
             save_elements = [
                 decode_elements[-1],
-                self.queue_save,
+                self.make_element('queue', name='queue_save'),
                 self.make_element('matroskamux'),
                 self.make_element('filesink', location=video_log)
             ]
@@ -657,7 +674,6 @@ class VideoWindow(object):
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
-        bus.connect("message::error", self._on_error)
         bus.connect("message", self._on_any_message)
 
         # Enable 'sync' messages which are not thread-safe. We should do as
@@ -681,6 +697,7 @@ class VideoWindow(object):
         self.pipeline.add(elt)
         for n, v in sorted(kwargs.items()):
             elt.set_property(n.replace('_', '-'), v)
+        self.element_list.append(elt)
         return elt
 
     def link_pads(self, elt1, pad1, elt2, pad2):
@@ -724,6 +741,11 @@ class VideoWindow(object):
                 self.logger.info('Unlinking old pad: %r', ok)
             self.rtpbin_last_pad = name
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
+
+    @wrap_event
+    def _on_removed_rtpbin_pad(self, source, pad):
+        name = pad.get_name()
+        self.logger.info('Rtpbin pad got removed: %r', name)
 
     @wrap_event
     def _on_sync_message(self, bus, msg):
@@ -770,6 +792,20 @@ class VideoWindow(object):
             if self.on_got_video:
                 self.on_got_video()
 
+        elif msg.type == Gst.MessageType.ERROR:
+            err, debug = msg.parse_error()
+            self.logger.error("GstError from %s: %s", msg.src.get_name(), err)
+            if debug:
+                for line in debug.split('\n'):
+                    self.logger.info('| %s' % line)
+
+        elif msg.type == Gst.MessageType.WARNING:
+            err, debug = msg.parse_warning()
+            self.logger.error("GstWarning from %s: %s", msg.src.get_name(), err)
+            if debug:
+                for line in debug.split('\n'):
+                    self.logger.info('| %s' % line)
+
         elif msg.type == Gst.MessageType.ELEMENT:
             # Element-specific message
             mstruct = msg.get_structure()
@@ -793,15 +829,6 @@ class VideoWindow(object):
             self.logger.debug("Unknown system message from %s: %s" % (
                     msg.src.get_name(),  msg.type.value_names))
 
-        return True
-
-    @wrap_event
-    def _on_error(self, bus, msg):
-        err, debug = msg.parse_error()
-        self.logger.error("GstError: %s" % err)
-        if debug:
-            for line in debug.split('\n'):
-                self.logger.info('| %s' % line)
         return True
 
     def _evt_get_video_coord(self, evt):
@@ -895,15 +922,72 @@ class VideoWindow(object):
                 100.0 * diffs[3] / (diffs[1] or 1.0),
                 100.0 * diffs[2] / (diffs[0] or 1.0)))
 
-        self.logger.info(
-            'queue info: %r',
-            (self.queue_dec.get_property('current-level-time'),
-             self.queue_dec.get_property('current-level-buffers'),
-             self.queue_dec.get_property('current-level-bytes'),
-             self.queue_save.get_property('current-level-time')))
+        if diffs[1] == 0:
+            self._dump_pad_info()
+            assert False, 'Video stream broken'
+
+        if self.DUMP_PAD_INFO_BY_TIMER:
+            self._dump_pad_info()
 
         # Keep timer going
         return True
+
+    def _dump_pad_info(self):
+        now = self.pipeline.get_clock().get_internal_time() / 1.e9
+        self.logger.debug('Dumping pad info at time %f' % now)
+        to_check = [ ('', self.pipeline) ]
+
+        while to_check:
+            prefix, elt = to_check.pop(0)
+
+            # Extract type without __main__ prefix
+            typename = type(elt).__name__.split('.', 1)[-1]
+            if typename == 'GstQueue':
+                stats = (
+                    elt.get_property('current-level-time') / 1.e9,
+                    elt.get_property('current-level-buffers'),
+                    elt.get_property('current-level-bytes')
+                    )
+                if sum(stats) != 0:
+                    self.logger.debug(
+                        '  Queue %r level: time=%.5f, buffers=%d, bytes=%d',
+                        elt.get_name(), *stats)
+
+            if hasattr(elt, 'children'):
+                # GstBin or subclass
+                if elt == self.pipeline:
+                    ename = ''
+                else:
+                    ename = prefix + elt.get_name() + '.'
+                to_check += [(ename, child)
+                             for child in elt.children]
+                self.logger.debug(' Bin %r', prefix + elt.get_name())
+
+            for pad in reversed(elt.pads):
+                tags = list()
+
+                if pad.is_blocked(): tags.append('BLOCKED')
+                if pad.is_blocking(): tags.append('BLOCKING')
+                if not (pad.is_linked() or tags):
+                    # It is a bad idea to query unlinked elements
+                    continue
+
+                ok, pos_bytes = pad.query_position(Gst.Format.BYTES)
+                if ok and pos_bytes != 0:
+                    tags.append('pos_bytes=%d' % pos_bytes)
+
+                ok, pos_time = pad.query_position(Gst.Format.TIME)
+                if ok and pos_time != 0:
+                    if pos_time:
+                        tags.append('pos_time=%.6f' % (pos_time / 1.e9))
+                    else:
+                        tags.append('pos_time=0')
+
+                if tags:
+                    self.logger.debug(
+                        '  Pad %s%s.%s: %s',
+                        prefix, elt.get_name(), pad.get_name(), ', '.join(tags))
+
 
     def set_svg_overlay(self, data):
         self.info_overlay.set_property("data", data)
