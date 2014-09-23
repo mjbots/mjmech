@@ -1,16 +1,17 @@
 #!/usr/bin/python
-import sys
-import os
-import traceback
-import logging
-import socket
-import optparse
-import json
-import errno
-import time
+import collections
 import cStringIO as StringIO
+import errno
 import functools
+import json
+import logging
+import optparse
+import os
 import signal
+import socket
+import sys
+import time
+import traceback
 
 import trollius as asyncio
 from trollius import Task, From
@@ -551,6 +552,9 @@ class VideoWindow(object):
     # If True, will dump info for all pads when framerate expires
     DUMP_PAD_INFO_BY_TIMER = False
 
+    # If True, will crash app if video stops
+    CRASH_ON_VIDEO_STOP = True
+
     # UDP sources will generate a warning when that many seconds without
     # packets pass
     RTP_UDP_WARN_TIMEOUT = 5.0
@@ -562,6 +566,7 @@ class VideoWindow(object):
         self.host = host
         self.port = port
         self.logger = logging.getLogger('video')
+        self.stats_logger = self.logger.getChild('stats')
 
         self.window = Gtk.Window()
         self.window.set_title("VClient %s:%d" % (self.host, self.port))
@@ -588,8 +593,27 @@ class VideoWindow(object):
 
         self.pipeline = Gst.Pipeline()
 
-        # List of all elements made, for debugging
-        self.element_list = list()
+        # info for detectors to write to.
+        self.detector_stats = dict()
+
+        # Create 'identity' elements which will notify us of all passing buffers
+        self.detector_decoded = self.make_element(
+            "identity", name="detector_decoded", silent=False)
+        self.detector_decoded.connect(
+            "handoff", self._on_detector_handoff,
+            self.detector_stats.setdefault("decoded", self._DetectorStats()))
+
+        self.detector_raw = self.make_element(
+            "identity", name="detector_raw", silent=False)
+        self.detector_raw.connect(
+            "handoff", self._on_detector_handoff,
+            self.detector_stats.setdefault("raw", self._DetectorStats()))
+
+        self.detector_udp_rtp = self.make_element(
+            "identity", name="detector_udp_rtp", silent=False)
+        self.detector_udp_rtp.connect(
+            "handoff", self._on_detector_handoff,
+            self.detector_stats.setdefault("udp_rtp", self._DetectorStats()))
 
         self.rtpbin = self.make_element(
             "rtpbin",
@@ -610,7 +634,9 @@ class VideoWindow(object):
         rtp_src = self.make_element(
             "udpsrc", caps=caps, port=self.port,
             name="rtp_src", timeout=long(self.RTP_UDP_WARN_TIMEOUT * 1.0e9))
-        self.link_pads(rtp_src, None, self.rtpbin, "recv_rtp_sink_0")
+        self.link_pads(rtp_src, None, self.detector_udp_rtp, None)
+        self.link_pads(self.detector_udp_rtp, None,
+                       self.rtpbin, "recv_rtp_sink_0")
 
         rtcp_src = self.make_element(
             "udpsrc", port=self.port + 1,
@@ -626,17 +652,25 @@ class VideoWindow(object):
             "rsvgoverlay",
             fit_to_frame=True)
 
-        # 'videorate' element has two properties:
-        #  - it provides counters of frames received
-        #  - since 'info_overlay' updates on video frames only, it keeps
-        #    info_overlay responsive even if video is not present.
-        self.videorate = self.make_element("videorate")
-        self.last_video_stats = None
+        # We have a problem: info_overlay only updates when there are video
+        # frames. Thus, if video stops, so does OSD. This is inconvinient.
+        # There is 'videorate' element which supposedly can repeat frames to
+        # maintain framerate, but it is designed for offline processing, and
+        # will not output anything if there is no input.
+        #
+        # How can we fix this?
+        #  - fix videorate.c to add timer, or write our own component from
+        #    scratch
+        #  - use 'input-selector' to select 'videotestsrc' if there is no data
+        #    for a while.
+        #  - use 'appsrc'/'appsink' to do duplicate frames without overhead of
+        #    full component.
 
         decode_elements = [
             # Add a queue just in case
             self.make_element('queue', name='queue_decode'),
             self.make_element("rtph264depay"),
+            self.detector_raw,
             self.make_element("h264parse"),
             self.make_element("tee"),
         ]
@@ -652,7 +686,7 @@ class VideoWindow(object):
             self.make_element("timeoverlay", shaded_background=True,
                               font_desc="8",
                               valignment="bottom", halignment="right"),
-            self.videorate,
+            self.detector_decoded,
             self.info_overlay,
             self.make_element("videoconvert"),
             self.make_element("xvimagesink")
@@ -681,6 +715,9 @@ class VideoWindow(object):
         bus.enable_sync_message_emission()
         bus.connect('sync-message::element', self._on_sync_message)
 
+        # dropped packet info. tuple (drop-count, drop-time)
+        self.qos_dropped_info = dict()
+
         # Start periodic video information timer
         GLib.timeout_add(int(self.VIDEO_INFO_INTERVAL * 1000),
                          self._on_video_info_timer)
@@ -697,7 +734,6 @@ class VideoWindow(object):
         self.pipeline.add(elt)
         for n, v in sorted(kwargs.items()):
             elt.set_property(n.replace('_', '-'), v)
-        self.element_list.append(elt)
         return elt
 
     def link_pads(self, elt1, pad1, elt2, pad2):
@@ -769,8 +805,31 @@ class VideoWindow(object):
                 self.logger.debug("GST State changed for %s: %s",
                                  msg.src.get_name(), msg_text)
         elif msg.type == Gst.MessageType.QOS:
-            # Too many of these
-            pass
+            sname = msg.src.get_name()
+            live, t_running, t_stream, t_timestamp, drop_dur = msg.parse_qos()
+
+            if sname not in ['rsvgoverlay0', 'xvimagesink0', 'videoconvert0']:
+                st_format, st_processed, st_dropped = msg.parse_qos_stats()
+                v_jitter, v_proportion, v_quality = msg.parse_qos_values()
+
+                # Only print stats from unusual sources
+                self.logger.debug(
+                    'QOS drop info from %s: live=%r, running_time=%.4f, '
+                    'stream_time=%.4f, timestamp=%.4f, drop_duration=%.4f',
+                    sname, live, t_running / 1.e9, t_stream / 1.e9,
+                    t_timestamp / 1.e9, drop_dur / 1.e9)
+                self.logger.debug(
+                    'QOS stats for %s: (%s) processed=%d, dropped=%d',
+                    sname, st_format.value_nick, st_processed, st_dropped)
+                self.logger.debug(
+                    'QOS values for %s: jitter=%.4f proportion=%.5f quality=%d',
+                    sname, v_jitter, v_proportion / 1.e9, v_quality)
+
+            if drop_dur not in [0, Gst.CLOCK_TIME_NONE]:
+                old = self.qos_dropped_info.get(sname, (0, 0))
+                self.qos_dropped_info[sname] = (old[0] + 1,
+                                                old[1] + drop_dur / 1.e9)
+
         elif msg.type == Gst.MessageType.STREAM_STATUS:
             status, owner = msg.parse_stream_status()
             if False:
@@ -781,7 +840,7 @@ class VideoWindow(object):
                     status.value_name, owner.get_name())
             # TODO mafanasyev: wait for 'rtpjitterbuffer0' element, then
             # record it's pointer so one can query 'stats' with usefull stuff
-            # linke udp packet loss/duplication.
+            # like udp packet loss/duplication.
 
         elif msg.type == Gst.MessageType.STREAM_START:
             has_group, group_id = msg.parse_group_id()
@@ -892,6 +951,48 @@ class VideoWindow(object):
             self.on_key_press(evt)
         return True
 
+
+    class _DetectorStats(object):
+        """Detector stats object, filled by detectors' handoff signal."""
+        def __init__(self):
+            self.clear()
+
+        def clear(self):
+            self.count = 0
+            self.duration = 0.0
+            self.size = 0
+            self.last_dts = 0
+            self.last_pts = 0
+
+        def to_str_dt(self, dt, level=0):
+            tags = ['%.2f FPS' % (self.count / dt)]
+            if level >= 2:
+                tags.append('%.1f%% miss' % ((dt - self.duration) / dt))
+            if level >= 1:
+                if self.size > (1024 * 1024 * 50):
+                    tags.append('%.1fMB/s' % (self.size / 1024.0 / 1024.0 / dt))
+                else:
+                    tags.append('%.1fkB/s' % (self.size / 1024.0 / dt))
+            return ', '.join(tags)
+
+    @wrap_event
+    def _on_detector_handoff(self, sender, gbuffer, statrec):
+        # This is a callback for identity object which is called after each
+        # frame. It runs from video thread and should do as little as possible.
+        statrec.count += 1
+        statrec.size += gbuffer.get_size()
+        if gbuffer.dts != Gst.CLOCK_TIME_NONE:
+            statrec.last_dts = gbuffer.dts / 1.e9
+        if gbuffer.pts != Gst.CLOCK_TIME_NONE:
+            statrec.last_pts = gbuffer.pts / 1.e9
+        if gbuffer.duration != Gst.CLOCK_TIME_NONE:
+            statrec.duration += gbuffer.duration / 1.e9
+
+        # GstBuffer's documentation also mentions flags, but I do not know
+        # how to access them.
+        #statrec['last_flags'] = int(gbuffer.flags)
+
+
     @wrap_event
     def _on_da_release(self, src, evt):
         assert src == self.window, src
@@ -901,28 +1002,31 @@ class VideoWindow(object):
 
     @wrap_event
     def _on_video_info_timer(self):
-        new_stats = (
-            self.videorate.get_property('in'),
-            self.videorate.get_property('out'),
-            self.videorate.get_property('drop'),
-            self.videorate.get_property('duplicate'))
-        if self.last_video_stats is None:
-            diffs = new_stats
-        else:
-            diffs = tuple(
-                a - b for a, b in zip(new_stats, self.last_video_stats))
-        self.last_video_stats = new_stats
-
         # Assume loop has no large delays
         dt = self.VIDEO_INFO_INTERVAL * 1.0
-        self.logger.info(
-            'Video: input FPS is %.2f, display FPS is %.2f (%.1f%% frames '
-            'duplicated, %.1f%% frames dropped)' % (
-                diffs[0] / dt, diffs[1] / dt,
-                100.0 * diffs[3] / (diffs[1] or 1.0),
-                100.0 * diffs[2] / (diffs[0] or 1.0)))
 
-        if diffs[1] == 0:
+        # print out drop info from QoS mesages
+        drop_tags = list()
+        for name, (count, duration) in sorted(self.qos_dropped_info.items()):
+            drop_tags.append('%s: %d (%.3fs)' % (name, count, duration))
+        if drop_tags:
+            self.stats_logger.info('Frames dropped: %s', '; '.join(drop_tags))
+        self.qos_dropped_info.clear()
+
+
+        decoded_frames = self.detector_stats['decoded'].count
+
+        # print out statistics from QoS messages
+        det_tags = list()
+        for name, value in sorted(self.detector_stats.items()):
+            det_tags.append(
+                '%s: %s' % (name, value.to_str_dt(dt, level=1)))
+            value.clear()
+
+        self.stats_logger.info(
+            'Video stats: %s', '; '.join(det_tags) or 'No frames detected')
+
+        if not decoded_frames and self.CRASH_ON_VIDEO_STOP:
             self._dump_pad_info()
             assert False, 'Video stream broken'
 
