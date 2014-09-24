@@ -253,8 +253,10 @@ class PitchEstimator {
   Float pitch_rad() const { return pitch_filter_.state()(0); }
   Float gyro_bias_rps() const { return pitch_filter_.state()(1); }
 
-  void ProcessGyro(Float gyro_rps) {
-    current_gyro_.push_back(gyro_rps);
+  void ProcessGyro(Float gyro_yaw_rps,
+                   Float gyro_pitch_rps,
+                   Float gyro_roll_rps) {
+    current_gyro_.push_back(gyro_pitch_rps);
   }
 
   PitchFilter::State ProcessFunction(
@@ -285,7 +287,7 @@ class PitchEstimator {
     return OrientationToAccel(s(0));
   }
 
-  void ProcessAccel(Float y_g, Float z_g) {
+  void ProcessAccel(Float x_g, Float y_g, Float z_g) {
     Float norm = std::sqrt(y_g * y_g + z_g * z_g);
 
     y_g /= norm;

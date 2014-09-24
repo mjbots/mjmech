@@ -377,7 +377,7 @@ class PitchEstimator(object):
                  list(self.state.flatten()) +
                  list(self.covariance.flatten())]) + '\n')
 
-    def process_gyro(self, pitch_rps):
+    def process_gyro(self, yaw_rps, pitch_rps, roll_rps):
         self.current_gyro += [ pitch_rps ]
 
     @staticmethod
@@ -409,7 +409,7 @@ class PitchEstimator(object):
 #                P[x, x] = math.radians(50)
         return P
 
-    def process_accel(self, y, z):
+    def process_accel(self, x, y, z):
         # Filter
         y = self.accel_y_filter(y)
         z = self.accel_z_filter(z)

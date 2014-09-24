@@ -41,7 +41,7 @@ import _estimator
 
 SAMPLE_FREQUENCY_HZ = 100.0
 G = 9.81
-TEST_CASE_TIME = 50.0
+TEST_CASE_TIME = 500.0
 
 def rotate(vec, val):
     s = math.sin(val)
@@ -289,10 +289,7 @@ def run_case(options, test_case, imu_parameters, estimator):
     imusim = imu_simulator.ImuSimulator(
         imu_parameters, SAMPLE_FREQUENCY_HZ, options.seed)
 
-    if options.attitude:
-        estimator.process_accel(0., 0., 1.0)
-    else:
-        estimator.process_accel(0, 1.0)
+    estimator.process_accel(0., 0., 1.0)
 
     NUM_COUNT = int(TEST_CASE_TIME * SAMPLE_FREQUENCY_HZ)
     error = 0.0
@@ -330,21 +327,9 @@ def run_case(options, test_case, imu_parameters, estimator):
         gyro_y = imusim.measured_gyro_y_rps
         gyro_z = imusim.measured_gyro_z_rps
 
-        if options.attitude:
-            estimator.process_gyro(
-                yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y)
-            extra_log = [('true_pitch', test_case.expected_pitch()),
-                         ('pitch_err', diff),
-                         ]
-            kwargs = {}
-            if options.python:
-                kwargs['extra_log'] = extra_log
-            estimator.process_accel(
-                accel_x, accel_y, accel_z,
-                **kwargs)
-        else:
-            estimator.process_gyro(gyro_x)
-            estimator.process_accel(accel_y, accel_z)
+        estimator.process_gyro(
+            yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y)
+        estimator.process_accel(accel_x, accel_y, accel_z)
 
         diff = estimator.pitch_error(test_case.expected_pitch())
         error += diff ** 2
