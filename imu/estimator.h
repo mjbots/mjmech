@@ -65,6 +65,13 @@ class AttitudeEstimator {
     return { "w", "x", "y", "z", "gx", "gy", "gz" };
   }
 
+  void SetInitialGyroBias(
+      Float yaw_rps, Float pitch_rps, Float roll_rps) {
+    filter_.state()(4) = yaw_rps;
+    filter_.state()(5) = pitch_rps;
+    filter_.state()(6) = roll_rps;
+  }
+
   Filter::Covariance covariance() const {
     return filter_.covariance();
   }
@@ -220,6 +227,11 @@ class PitchEstimator {
 
   std::vector<std::string> state_names() const {
     return { "pitch", "gyro_bias" };
+  }
+
+  void SetInitialGyroBias(
+      Float yaw_rps, Float pitch_rps, Float roll_rps) {
+    pitch_filter_.state()(1) = pitch_rps;
   }
 
   PitchFilter::Covariance covariance() const {

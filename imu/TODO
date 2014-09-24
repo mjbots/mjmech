@@ -10,8 +10,6 @@
    from any simulation run
 
 Open Questions
- * How should I handle bias initialization?  Require that you have a
-   1s period at power on with no movement?
  * For my tests, do I want to allow different constants for the
    different IMU categories?
    * I think probably not, because otherwise the number of constants

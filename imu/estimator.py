@@ -65,6 +65,11 @@ class AttitudeEstimator(object):
         result[3] = next_attitude.z
         return result
 
+    def set_initial_gyro_bias(self, yaw_rps, pitch_rps, roll_rps):
+        self.ukf.state[4, 0] = yaw_rps
+        self.ukf.state[5, 0] = pitch_rps
+        self.ukf.state[6, 0] = roll_rps
+
     def attitude(self):
         return Quaternion(*self.ukf.state[0:4,0]).normalized()
 
@@ -289,6 +294,9 @@ class PitchEstimator(object):
 
     def state_names(self):
         return ['pitch', 'gyro_bias']
+
+    def set_initial_gyro_bias(self, yaw_rps, pitch_rps, roll_rps):
+        self.ukf.state[1, 0] = pitch_rps
 
     def state_function(self, state, dt):
         result = state

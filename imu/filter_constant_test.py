@@ -294,9 +294,27 @@ def run_case(options, test_case, imu_parameters, estimator):
     else:
         estimator.process_accel(0, 1.0)
 
-    NUM_COUNT = int(TEST_CASE_TIME * 100.0)
+    NUM_COUNT = int(TEST_CASE_TIME * SAMPLE_FREQUENCY_HZ)
     error = 0.0
     diff = 0.0
+
+    # Measure the noise for N seconds and set that as the bias for
+    # each channel.
+    INIT_COUNT = int(2 * SAMPLE_FREQUENCY_HZ)
+    gyro_x_bias, gyro_y_bias, gyro_z_bias = 0., 0., 0.
+    for count in range(INIT_COUNT):
+        imusim.update_reality(0.0, 0.0, G,
+                              0., 0., 0.)
+        gyro_x_bias += imusim.measured_gyro_x_rps
+        gyro_y_bias += imusim.measured_gyro_y_rps
+        gyro_z_bias += imusim.measured_gyro_z_rps
+
+    gyro_x_bias /= INIT_COUNT
+    gyro_y_bias /= INIT_COUNT
+    gyro_z_bias /= INIT_COUNT
+    estimator.set_initial_gyro_bias(yaw_rps=-gyro_z_bias,
+                                    pitch_rps=-gyro_x_bias,
+                                    roll_rps=-gyro_y_bias)
 
     for count in range(NUM_COUNT):
         test_case.advance(1.0 / SAMPLE_FREQUENCY_HZ)
@@ -399,7 +417,7 @@ def run(options):
                 process_noise_bias=math.radians(0.0256)**2,
                 measurement_noise_accel=4.0**2,
                 initial_noise_attitude=1e-3,
-                initial_noise_bias=1e-4,
+                initial_noise_bias=1e-6,
                 **kwargs)
 
             result = run_case(options, case, imu, my_estimator)

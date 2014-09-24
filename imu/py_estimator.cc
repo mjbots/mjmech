@@ -40,6 +40,8 @@ BOOST_PYTHON_MODULE(_estimator) {
            bp::arg("initial_noise_attitude"),
            bp::arg("initial_noise_bias"))))
       .def("state_names", &imu::PitchEstimator::state_names)
+      .def("set_initial_gyro_bias", &imu::PitchEstimator::SetInitialGyroBias,
+           (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps")))
       .def("pitch", &imu::PitchEstimator::pitch_rad)
       .def("pitch_error", &imu::PitchEstimator::pitch_error)
       .def("gyro_bias_rps", &imu::PitchEstimator::gyro_bias_rps)
@@ -57,6 +59,9 @@ BOOST_PYTHON_MODULE(_estimator) {
            bp::arg("initial_noise_attitude"),
            bp::arg("initial_noise_bias"))))
       .def("state_names", &imu::AttitudeEstimator::state_names)
+      .def("set_initial_gyro_bias",
+           &imu::AttitudeEstimator::SetInitialGyroBias,
+           (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps")))
       .def("pitch", &imu::AttitudeEstimator::pitch_rad)
       .def("pitch_error", &imu::AttitudeEstimator::pitch_error)
       .def("gyro_bias_rps", &imu::AttitudeEstimator::gyro_bias_rps)
