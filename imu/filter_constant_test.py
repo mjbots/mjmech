@@ -289,7 +289,8 @@ def run_case(options, test_case, imu_parameters, estimator):
     imusim = imu_simulator.ImuSimulator(
         imu_parameters, SAMPLE_FREQUENCY_HZ, options.seed)
 
-    estimator.process_accel(0., 0., 1.0)
+    estimator.process_measurement(0., 0., 0.,
+                                  0., 0., 1.0)
 
     NUM_COUNT = int(TEST_CASE_TIME * SAMPLE_FREQUENCY_HZ)
     error = 0.0
@@ -327,9 +328,9 @@ def run_case(options, test_case, imu_parameters, estimator):
         gyro_y = imusim.measured_gyro_y_rps
         gyro_z = imusim.measured_gyro_z_rps
 
-        estimator.process_gyro(
-            yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y)
-        estimator.process_accel(accel_x, accel_y, accel_z)
+        estimator.process_measurement(
+            yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y,
+            x_g = accel_x, y_g = accel_y, z_g = accel_z)
 
         diff = estimator.pitch_error(test_case.expected_pitch())
         error += diff ** 2

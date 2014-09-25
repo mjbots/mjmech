@@ -49,13 +49,13 @@ class AttitudeEstimator(object):
         this_attitude = Quaternion(
             result[0], result[1], result[2], result[3]).normalized()
         delta = Quaternion()
-        for x in self.current_gyro:
-            advance = Quaternion.integrate_rotation_rate(
-                x.roll + result[6],
-                x.pitch + result[5],
-                x.yaw + result[4],
-                dt)
-            delta = delta * advance
+
+        advance = Quaternion.integrate_rotation_rate(
+            self.current_gyro.roll + result[6],
+            self.current_gyro.pitch + result[5],
+            self.current_gyro.yaw + result[4],
+            dt)
+        delta = delta * advance
 
         next_attitude = (this_attitude * delta).normalized()
 
@@ -106,7 +106,7 @@ class AttitudeEstimator(object):
         self.measurement_noise_accel = measurement_noise_accel
         self.initial_noise_attitude = initial_noise_attitude
         self.initial_noise_bias = initial_noise_bias
-        self.current_gyro = []
+        self.current_gyro = Euler(0., 0., 0.)
         self.init = False
         if log_filename:
             self.log = open(log_filename, 'w')
@@ -141,10 +141,6 @@ class AttitudeEstimator(object):
                  [e.roll, e.pitch, e.yaw] +
                  list(self.ukf.state.flatten()) +
                  list(self.ukf.covariance.flatten())]) + '\n')
-
-    def process_gyro(self, yaw_rps, pitch_rps, roll_rps):
-        e = Euler(yaw=yaw_rps, pitch=pitch_rps, roll=roll_rps)
-        self.current_gyro += [ e ]
 
     @staticmethod
     def orientation_to_accel(quaternion):
@@ -194,20 +190,24 @@ class AttitudeEstimator(object):
             measurement_function=yaw_meas,
             measurement_noise=numpy.array([[math.radians(5)]]))
 
-    def process_accel(self, x, y, z, extra_log=None):
-        # First, normalize.
-        norm = math.sqrt(x * x + y * y + z * z)
+    def process_measurement(self, yaw_rps, pitch_rps, roll_rps,
+                            x_g, y_g, z_g):
+        e = Euler(yaw=yaw_rps, pitch=pitch_rps, roll=roll_rps)
+        self.current_gyro = e
 
-        x /= norm
-        y /= norm
-        z /= norm
+        # First, normalize.
+        norm = math.sqrt(x_g * x_g + y_g * y_g + z_g * z_g)
+
+        x_g /= norm
+        y_g /= norm
+        z_g /= norm
 
         # If this is our first update, then initialize the state with
         # the expected attitude based on the accelerometers.
         if not self.init:
             self.init = True
 
-            quat = self.accel_to_orientation(x, y, z)
+            quat = self.accel_to_orientation(x_g, y_g, z_g)
             state = numpy.array([[quat.w],
                                  [quat.x],
                                  [quat.y],
@@ -230,34 +230,8 @@ class AttitudeEstimator(object):
 
         self.ukf.update_state(IMU_UPDATE_PERIOD)
 
-        for g in self.current_gyro:
-            extra = Euler(0., 0., 0.)
-            if abs(g.yaw) > 0.95 * math.radians(250):
-                extra.yaw = math.radians(2000.0)
-            if abs(g.roll) > 0.95 * math.radians(250):
-                extra.roll = math.radians(2000.0)
-            if abs(g.pitch) > 0.95 * math.radians(250):
-                extra.pitch = math.radians(2000.0)
-            if extra.yaw or extra.roll or extra.pitch:
-                delta = Quaternion.integrate_rotation_rate(
-                    extra.roll, extra.pitch, extra.yaw, IMU_UPDATE_PERIOD)
-                ta = self.attitude()
-                na = (ta * delta).normalized()
-                da = Quaternion(na.w - ta.w,
-                                na.x - ta.x,
-                                na.y - ta.y,
-                                na.z - ta.z)
-                self.ukf.covariance += numpy.diag(
-                    [da.w, da.x, da.y, da.z, 0., 0., 0.]) ** 2
-
-        self.ukf.update_measurement(numpy.array([[x],[y],[z]]),
+        self.ukf.update_measurement(numpy.array([[x_g],[y_g],[z_g]]),
                                     mahal_limit=None)
-
-        gyro = Euler(0., 0., 0.)
-        if len(self.current_gyro):
-            gyro = self.current_gyro[0]
-        self.emit_log(gyro, (x, y, z), extra_log)
-        self.current_gyro = []
 
 class Dummy(object):
     def __init__(self):
@@ -302,8 +276,7 @@ class PitchEstimator(object):
         result = state
 
         delta = 0.0
-        for x in self.current_gyro:
-            delta += (x + result[1]) * dt
+        delta += (self.current_gyro + result[1]) * dt
 
         result[0] +=  delta
         return result
@@ -340,7 +313,7 @@ class PitchEstimator(object):
                  accel_filter=None,
                  log_filename=None,
                  extra_log=None):
-        self.current_gyro = []
+        self.current_gyro = 0.
         self.init = False
         if log_filename:
             self.log = open(log_filename, 'w')
@@ -377,9 +350,6 @@ class PitchEstimator(object):
                  list(self.state.flatten()) +
                  list(self.covariance.flatten())]) + '\n')
 
-    def process_gyro(self, yaw_rps, pitch_rps, roll_rps):
-        self.current_gyro += [ pitch_rps ]
-
     @staticmethod
     def orientation_to_accel(pitch):
         gravity = numpy.array([0, 0, 1.0])
@@ -409,23 +379,26 @@ class PitchEstimator(object):
 #                P[x, x] = math.radians(50)
         return P
 
-    def process_accel(self, x, y, z):
+    def process_measurement(self, yaw_rps, pitch_rps, roll_rps,
+                            x_g, y_g, z_g):
+        self.current_gyro = pitch_rps
+
         # Filter
-        y = self.accel_y_filter(y)
-        z = self.accel_z_filter(z)
+        y_g = self.accel_y_filter(y_g)
+        z_g = self.accel_z_filter(z_g)
 
         # Normalize
-        norm = math.sqrt(y * y + z * z)
+        norm = math.sqrt(y_g * y_g + z_g * z_g)
 
-        y /= norm
-        z /= norm
+        y_g /= norm
+        z_g /= norm
 
         # If this is our first update, then initialize the state with
         # the expected attitude based on the accelerometers.
         if not self.init:
             self.init = True
 
-            pitch = self.accel_to_orientation(y, z)
+            pitch = self.accel_to_orientation(y_g, z_g)
             state = numpy.array([[pitch],
                                  [0.]])
             covariance = numpy.diag([self.initial_noise_attitude,
@@ -444,7 +417,7 @@ class PitchEstimator(object):
                 covariance_limit=self.covariance_limit)
 
         self.ukf.update_state(IMU_UPDATE_PERIOD)
-        self.ukf.update_measurement(numpy.array([[y],[z]]))
+        self.ukf.update_measurement(numpy.array([[y_g],[z_g]]))
 
         self.current_gyro = []
         self.emit_log()

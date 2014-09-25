@@ -107,14 +107,13 @@ class AttitudeEstimator {
     Quaternion<Float> this_attitude = Quaternion<Float>(
         result(0), result(1), result(2), result(3)).normalized();
     Quaternion<Float> delta;
-    for (const auto& x: current_gyro_) {
-      Quaternion<Float> advanced = Quaternion<Float>::IntegrateRotationRate(
-          x.roll_rps + result(6),
-          x.pitch_rps + result(5),
-          x.yaw_rps + result(4),
-          dt_s);
-      delta = delta * advanced;
-    }
+
+    Quaternion<Float> advanced = Quaternion<Float>::IntegrateRotationRate(
+        current_gyro_.roll_rps + result(6),
+        current_gyro_.pitch_rps + result(5),
+        current_gyro_.yaw_rps + result(4),
+        dt_s);
+    delta = delta * advanced;
 
     Quaternion<Float> next_attitude = (this_attitude * delta).normalized();
     result(0) = next_attitude.w();
@@ -122,10 +121,6 @@ class AttitudeEstimator {
     result(2) = next_attitude.y();
     result(3) = next_attitude.z();
     return result;
-  }
-
-  void ProcessGyro(Float yaw_rps, Float pitch_rps, Float roll_rps) {
-    current_gyro_.push_back(Gyro(yaw_rps, pitch_rps, roll_rps));
   }
 
   static Eigen::Matrix<Float, 3, 1> OrientationToAccel(
@@ -150,7 +145,11 @@ class AttitudeEstimator {
     return Quaternion<Float>::FromEuler(roll, pitch, 0.0);
   }
 
-  void ProcessAccel(Float x_g, Float y_g, Float z_g) {
+  void ProcessMeasurement(
+      Float yaw_rps, Float pitch_rps, Float roll_rps,
+      Float x_g, Float y_g, Float z_g) {
+    current_gyro_ = Gyro(yaw_rps, pitch_rps, roll_rps);
+
     Float norm = std::sqrt(x_g * x_g + y_g * y_g + z_g * z_g);
 
     x_g /= norm;
@@ -177,10 +176,6 @@ class AttitudeEstimator {
              measurement_noise_accel_,
              measurement_noise_accel_,
              measurement_noise_accel_).finished())));
-    if (!current_gyro_.empty()) {
-      last_gyro_ = current_gyro_.back();
-    }
-    current_gyro_.clear();
   }
 
  private:
@@ -198,8 +193,7 @@ class AttitudeEstimator {
     Gyro() : yaw_rps(0.), pitch_rps(0.), roll_rps(0.) {}
   };
 
-  std::vector<Gyro> current_gyro_;
-  Gyro last_gyro_;
+  Gyro current_gyro_;
 };
 
 
@@ -222,7 +216,8 @@ class PitchEstimator {
              0.0, initial_noise_bias).finished(),
             (PitchFilter::Covariance() <<
              process_noise_gyro, 0.0,
-             0.0, process_noise_bias).finished()) {
+             0.0, process_noise_bias).finished()),
+        current_gyro_(0.0) {
   }
 
   std::vector<std::string> state_names() const {
@@ -253,20 +248,12 @@ class PitchEstimator {
   Float pitch_rad() const { return pitch_filter_.state()(0); }
   Float gyro_bias_rps() const { return pitch_filter_.state()(1); }
 
-  void ProcessGyro(Float gyro_yaw_rps,
-                   Float gyro_pitch_rps,
-                   Float gyro_roll_rps) {
-    current_gyro_.push_back(gyro_pitch_rps);
-  }
-
   PitchFilter::State ProcessFunction(
       const PitchFilter::State& state, Float dt_s) const {
     PitchFilter::State result = state;
 
     Float delta = 0.0;
-    for (Float x: current_gyro_) {
-      delta += (x + result[1]) * dt_s;
-    }
+    delta += (current_gyro_ + result[1]) * dt_s;
 
     result[0] += delta;
     return result;
@@ -287,7 +274,11 @@ class PitchEstimator {
     return OrientationToAccel(s(0));
   }
 
-  void ProcessAccel(Float x_g, Float y_g, Float z_g) {
+  void ProcessMeasurement(
+      Float gyro_yaw_rps, Float gyro_pitch_rps, Float gyro_roll_rps,
+      Float x_g, Float y_g, Float z_g) {
+    current_gyro_ = gyro_pitch_rps;
+
     Float norm = std::sqrt(y_g * y_g + z_g * z_g);
 
     y_g /= norm;
@@ -306,8 +297,6 @@ class PitchEstimator {
         (Eigen::Matrix<Float, 2, 2>() <<
          measurement_noise_accel_, static_cast<Float>(0.0),
          static_cast<Float>(0.0), measurement_noise_accel_).finished());
-
-    current_gyro_.clear();
   }
 
  private:
@@ -316,6 +305,6 @@ class PitchEstimator {
   Float measurement_noise_accel_;
 
   PitchFilter pitch_filter_;
-  std::vector<Float> current_gyro_; // TODO jpieper - no malloc
+  Float current_gyro_;
 };
 }

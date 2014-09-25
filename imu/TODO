@@ -3,8 +3,6 @@
      * after a limited amount of time being stationary, the attitude
        should be within some bounds
    * stationary performance for each IMU and each filter
- * Switch all estimators to process joined gyro and accelerometer
-   readings
  * Try to disable memory location in Eigen
  * Create some more sane way of creating plots of arbitrary quantities
    from any simulation run

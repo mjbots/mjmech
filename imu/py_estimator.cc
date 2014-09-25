@@ -46,9 +46,9 @@ BOOST_PYTHON_MODULE(_estimator) {
       .def("pitch_error", &imu::PitchEstimator::pitch_error)
       .def("gyro_bias_rps", &imu::PitchEstimator::gyro_bias_rps)
       .def("covariance_diag", &imu::PitchEstimator::covariance_diag)
-      .def("process_gyro", &imu::PitchEstimator::ProcessGyro,
-           (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps")))
-      .def("process_accel", &imu::PitchEstimator::ProcessAccel)
+      .def("process_measurement", &imu::PitchEstimator::ProcessMeasurement,
+           (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps"),
+            bp::arg("x_g"), bp::arg("y_g"), bp::arg("z_g")))
       ;
 
   bp::class_<imu::AttitudeEstimator>(
@@ -67,8 +67,8 @@ BOOST_PYTHON_MODULE(_estimator) {
       .def("pitch_error", &imu::AttitudeEstimator::pitch_error)
       .def("gyro_bias_rps", &imu::AttitudeEstimator::gyro_bias_rps)
       .def("covariance_diag", &imu::AttitudeEstimator::covariance_diag)
-      .def("process_gyro", &imu::AttitudeEstimator::ProcessGyro,
-           (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps")))
-      .def("process_accel", &imu::AttitudeEstimator::ProcessAccel)
+      .def("process_measurement", &imu::AttitudeEstimator::ProcessMeasurement,
+           (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps"),
+            bp::arg("x_g"), bp::arg("y_g"), bp::arg("z_g")))
       ;
 }
