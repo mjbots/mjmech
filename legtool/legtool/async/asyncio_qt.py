@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class QtEventLoopPolicy(asyncio.AbstractEventLoopPolicy):
     def __init__(self):
         self.loops = {}
-    
+
     def get_event_loop(self):
         ident = thread.get_ident()
         if ident not in self.loops:
@@ -69,7 +69,7 @@ class _Invoker(QtCore.QObject):
             this, self._callbacks = self._callbacks, []
             for callback in this:
                 callback()
-    
+
 
 class QtEventLoop(asyncio.AbstractEventLoop):
     def __init__(self):
@@ -79,8 +79,8 @@ class QtEventLoop(asyncio.AbstractEventLoop):
         self._exceptions = {}
         self._exception_handler = None
         self._invoker = _Invoker()
-        
-        
+
+
     def run_forever(self):
         self._is_running = True
         QtCore.QCoreApplication.exec_()
@@ -115,7 +115,9 @@ class QtEventLoop(asyncio.AbstractEventLoop):
 
     def call_later(self, delay, callback, *args):
         result = asyncio.Handle(callback, args, self)
-        QtCore.QTimer.singleShot(int(delay * 1000.0), lambda: result._run())
+        QtCore.QTimer.singleShot(
+            int(delay * 1000.0),
+            lambda: result._run() if not result._cancelled else None)
         return result
 
     def call_at(self, when, callback, *args):
@@ -326,6 +328,6 @@ class QtEventLoop(asyncio.AbstractEventLoop):
                                  'while handling an unexpected error '
                                  'in custom exception handler',
                                  exc_info=True)
-        
+
     def create_task(self, coro):
         return Task(coro)
