@@ -21,6 +21,8 @@ import threading
 
 from ..async import asyncio_serial
 
+from . import port
+
 logger = logging.getLogger(__name__)
 
 class ChecksumError(RuntimeError):
@@ -129,12 +131,12 @@ class HerkuleX(object):
 
     def __init__(self, serial_port):
         self.baud_rate = 115200
-        if isinstance(serial_port, str) or isinstance(serial_port, unicode):
-            self.serial = asyncio_serial.AsyncioSerial(
-                serial_port, baudrate=115200)
-        else:
-            # Assume it is a file like object.
-            self.serial = serial_port
+        self.serial_port_name = serial_port
+        self.serial = None
+
+    @asyncio.coroutine
+    def start(self):
+        self.serial = yield From(port.open(self.serial_port_name))
 
     @asyncio.coroutine
     def enumerate(self):

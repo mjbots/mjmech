@@ -39,7 +39,9 @@ class HerkuleXController(object):
         self.port = herkulex.HerkuleX(serial_port=serial_port)
         self.default_pose_time = 0.03
 
+    @asyncio.coroutine
     def start(self):
+        yield From(self.port.start())
         raise Return(self)
 
     def _angle_to_counts(self, angle_deg):

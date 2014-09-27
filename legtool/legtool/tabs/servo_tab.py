@@ -108,6 +108,8 @@ class ServoTab(object):
             self.ui.statusText.setText('connected')
             self.update_connected(True)
         except Exception as e:
+            print e
+            print ''.join(e.__frames__)
             self.ui.statusText.setText('error: %s' % str(e))
             self.update_connected(False)
 
