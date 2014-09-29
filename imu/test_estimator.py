@@ -1,0 +1,76 @@
+#!/usr/bin/python
+
+# Copyright 2014 Josh Pieper, jjp@pobox.com.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import sys
+import unittest
+
+sys.path.append('build')
+import _estimator
+from filter_constant import FilterConstant
+import filter_test_cases
+import imu_simulator
+from run_case import run_case
+
+class EstimatorTest(unittest.TestCase):
+    def run_stationary(self, imu_class, filter_class, seed):
+        imu = imu_class()
+        fc = FilterConstant()
+        estimator = filter_class(
+            process_noise_gyro=fc.process_noise_gyro,
+            process_noise_bias=fc.process_noise_bias,
+            initial_noise_attitude=fc.initial_noise_attitude,
+            initial_noise_bias=fc.initial_noise_bias,
+            measurement_noise_accel=fc.measurement_noise_accel
+            )
+        case = filter_test_cases.StationaryTest()
+
+        result = run_case(case, imu, estimator,
+                          sample_frequency_hz=100.0,
+                          test_time=1800.0, seed=seed)
+        return result['rms_error']
+
+
+    def test_stationary(self):
+        #         IMU                      RMS degree error
+        imus = [
+            (imu_simulator.MiniImuV2, 2.0),
+            (imu_simulator.JbImuV2,   0.4),
+            (imu_simulator.Max21000,  0.1),
+            (imu_simulator.IdealImu,  0.1),
+                 ]
+        filters = { 'attitude': _estimator.AttitudeEstimator,
+                    'pitch:':_estimator.PitchEstimator,
+                    }
+
+        fmt = '%20s %20s %10s %10s'
+
+        print fmt % ('imu', 'filter', 'error', 'max')
+
+        for imu_class, expected_error in imus:
+            for filter_name, filter_class in filters.iteritems():
+                error = max(
+                    [self.run_stationary(imu_class, filter_class, seed)
+                     for seed in xrange(5)])
+                print fmt % (
+                    imu_class().name,
+                    filter_name,
+                    '%.3f' % error,
+                    '%.3f' % expected_error)
+
+                self.assertLess(error, expected_error)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -32,9 +32,11 @@ import sys
 import estimator
 from estimator import Quaternion
 import imu_error_model
+from filter_constant import FilterConstant
 from filter_test_cases import TestCase, StationaryTest
 import imu_simulator
 from imu_simulator import MiniImuV2, Max21000, JbImuV2, IdealImu
+from run_case import run_case
 
 sys.path.append('build')
 import _estimator
@@ -285,60 +287,6 @@ def animate_case(pc):
     plt.show()
 
 
-def run_case(options, test_case, imu_parameters, estimator):
-    imusim = imu_simulator.ImuSimulator(
-        imu_parameters, SAMPLE_FREQUENCY_HZ, options.seed)
-
-    estimator.process_measurement(0., 0., 0.,
-                                  0., 0., 1.0)
-
-    NUM_COUNT = int(TEST_CASE_TIME * SAMPLE_FREQUENCY_HZ)
-    error = 0.0
-    diff = 0.0
-
-    # Measure the noise for N seconds and set that as the bias for
-    # each channel.
-    INIT_COUNT = int(2 * SAMPLE_FREQUENCY_HZ)
-    gyro_x_bias, gyro_y_bias, gyro_z_bias = 0., 0., 0.
-    for count in range(INIT_COUNT):
-        imusim.update_reality(0.0, 0.0, G,
-                              0., 0., 0.)
-        gyro_x_bias += imusim.measured_gyro_x_rps
-        gyro_y_bias += imusim.measured_gyro_y_rps
-        gyro_z_bias += imusim.measured_gyro_z_rps
-
-    gyro_x_bias /= INIT_COUNT
-    gyro_y_bias /= INIT_COUNT
-    gyro_z_bias /= INIT_COUNT
-    estimator.set_initial_gyro_bias(yaw_rps=-gyro_z_bias,
-                                    pitch_rps=-gyro_x_bias,
-                                    roll_rps=-gyro_y_bias)
-
-    for count in range(NUM_COUNT):
-        test_case.advance(1.0 / SAMPLE_FREQUENCY_HZ)
-        true_accel_y, true_accel_z = test_case.accel_yz_mps2()
-
-        imusim.update_reality(0.0, true_accel_y, true_accel_z,
-                              test_case.gyro(), 0., 0.)
-
-        accel_x = imusim.measured_accel_x_mps2
-        accel_y = imusim.measured_accel_y_mps2
-        accel_z = imusim.measured_accel_z_mps2
-        gyro_x = imusim.measured_gyro_x_rps
-        gyro_y = imusim.measured_gyro_y_rps
-        gyro_z = imusim.measured_gyro_z_rps
-
-        estimator.process_measurement(
-            yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y,
-            x_g = accel_x, y_g = accel_y, z_g = accel_z)
-
-        diff = estimator.pitch_error(test_case.expected_pitch())
-        error += diff ** 2
-
-    diag = estimator.covariance_diag()
-
-    return { 'rms_error': math.degrees(math.sqrt((error / NUM_COUNT))),
-             'uncert': numpy.sqrt(diag) }
 
 def run(options):
 
@@ -381,32 +329,30 @@ def run(options):
         for imu in imus:
             case = case_gen()
             kwargs = {}
-            extra_log = [('true_pitch', 0),
-                         ('pitch_err', 0),
-                         ('true_gyro_x_bias', 0),
-                         ('true_gyro_y_bias', 0),
-                         ('true_gyro_z_bias', 0)]
 
             if options.python:
                 module = estimator
-                kwargs['extra_log'] = extra_log
             else:
                 module = _estimator
 
-            if not options.attitude:
-                estimator_class = module.PitchEstimator
-            else:
+            if options.attitude:
                 estimator_class = module.AttitudeEstimator
+            else:
+                estimator_class = module.PitchEstimator
 
+            fc = FilterConstant()
             my_estimator = estimator_class(
-                process_noise_gyro=math.radians(0.0002)**2,
-                process_noise_bias=math.radians(0.0256)**2,
-                measurement_noise_accel=4.0**2,
-                initial_noise_attitude=1e-3,
-                initial_noise_bias=1e-6,
+                process_noise_gyro=fc.process_noise_gyro,
+                process_noise_bias=fc.process_noise_bias,
+                measurement_noise_accel=fc.measurement_noise_accel,
+                initial_noise_attitude=fc.initial_noise_attitude,
+                initial_noise_bias=fc.initial_noise_bias,
                 **kwargs)
 
-            result = run_case(options, case, imu, my_estimator)
+            result = run_case(case, imu, my_estimator,
+                              sample_frequency_hz=SAMPLE_FREQUENCY_HZ,
+                              test_time=TEST_CASE_TIME,
+                              seed=options.seed)
 
             covar = ' '.join('%s=%f' % (x, math.degrees(y))
                              for x, y in zip(my_estimator.state_names(),
