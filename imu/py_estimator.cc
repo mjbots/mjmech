@@ -42,6 +42,8 @@ BOOST_PYTHON_MODULE(_estimator) {
       .def("state_names", &imu::PitchEstimator::state_names)
       .def("set_initial_gyro_bias", &imu::PitchEstimator::SetInitialGyroBias,
            (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps")))
+      .def("set_initial_accel", &imu::PitchEstimator::SetInitialAccel,
+           (bp::arg("x_g"), bp::arg("y_g"), bp::arg("z_g")))
       .def("yaw", &imu::PitchEstimator::yaw_rad)
       .def("pitch", &imu::PitchEstimator::pitch_rad)
       .def("roll", &imu::PitchEstimator::roll_rad)
@@ -68,6 +70,8 @@ BOOST_PYTHON_MODULE(_estimator) {
       .def("set_initial_gyro_bias",
            &imu::AttitudeEstimator::SetInitialGyroBias,
            (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps")))
+      .def("set_initial_accel", &imu::AttitudeEstimator::SetInitialAccel,
+           (bp::arg("x_g"), bp::arg("y_g"), bp::arg("z_g")))
       .def("yaw", &imu::AttitudeEstimator::yaw_rad)
       .def("pitch", &imu::AttitudeEstimator::pitch_rad)
       .def("roll", &imu::AttitudeEstimator::roll_rad)

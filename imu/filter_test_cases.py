@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+
 class TestCase(object):
     def advance(self, dt):
         raise NotImplementedError
@@ -28,8 +30,15 @@ class TestCase(object):
         raise NotImplementedError
 
 class StationaryTest(TestCase):
+    def __init__(self, pitch_deg=0.0):
+        self.pitch_deg = pitch_deg
+        self.y_g = math.sin(math.radians(self.pitch_deg))
+        self.z_g = math.cos(math.radians(self.pitch_deg))
+
     def name(self):
-        return 'stationary'
+        if self.pitch_deg == 0.0:
+            return 'stationary'
+        return 'stationary %d' % int(self.pitch_deg)
 
     def advance(self, dt):
         pass
@@ -38,10 +47,10 @@ class StationaryTest(TestCase):
         return 0.0
 
     def accel_yz_mps2(self):
-        return 0., 9.81
+        return self.y_g * 9.81, self.z_g * 9.81
 
     def expected_pitch(self):
-        return 0.
+        return math.radians(self.pitch_deg)
 
     def pos(self):
         return 0., 0.

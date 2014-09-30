@@ -43,7 +43,7 @@ import _estimator
 
 SAMPLE_FREQUENCY_HZ = 100.0
 G = 9.81
-TEST_CASE_TIME = 500.0
+TEST_CASE_TIME = 1800.0
 
 def rotate(vec, val):
     s = math.sin(val)
@@ -299,6 +299,7 @@ def run(options):
     cases += [lambda: RotatingTest(noise_level=10)]
     cases += [lambda: RotatingTest(noise_level=15)]
     cases += [lambda: StationaryTest()]
+    cases += [lambda: StationaryTest(pitch_deg=40.0)]
     cases += [lambda: PendulumTest(v=0.5)]
     cases += [lambda: PendulumTest(v=1.0)]
     cases += [lambda: PendulumTest(v=2.0)]

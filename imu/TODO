@@ -1,3 +1,8 @@
+ * Be able to plot covariances in a usable way
+ * Try stationary tests that aren't exactly level and see if all three
+   gyros can get good bias estimates
+   * figure out why angled tests don't result in lower effective yaw
+     rates?
  * Extract out a standalone test for:
    * gyro rate exceeded with ideal IMU for each filter
      * after a limited amount of time being stationary, the attitude
@@ -5,8 +10,6 @@
    * stationary performance for each IMU and each filter
      * Verify that yaw rate goes to zero in attitude filter
  * Try to disable memory location in Eigen
- * Create some more sane way of creating plots of arbitrary quantities
-   from any simulation run
 
 Open Questions
  * For my tests, do I want to allow different constants for the

@@ -40,9 +40,6 @@ def run_case(test_case, imu_parameters, estimator,
     imusim = imu_simulator.ImuSimulator(
         imu_parameters, sample_frequency_hz, seed)
 
-    estimator.process_measurement(0., 0., 0.,
-                                  0., 0., 1.0)
-
     NUM_COUNT = int(test_time * sample_frequency_hz)
     error = 0.0
     diff = 0.0
@@ -51,19 +48,33 @@ def run_case(test_case, imu_parameters, estimator,
     # each channel.
     INIT_COUNT = int(2 * sample_frequency_hz)
     gyro_x_bias, gyro_y_bias, gyro_z_bias = 0., 0., 0.
+    accel_x_avg, accel_y_avg, accel_z_avg = 0., 0., 0.
     for count in range(INIT_COUNT):
-        imusim.update_reality(0.0, 0.0, G,
+        true_accel_y, true_accel_z = test_case.accel_yz_mps2()
+        imusim.update_reality(0.0, true_accel_y, true_accel_z,
                               0., 0., 0.)
         gyro_x_bias += imusim.measured_gyro_x_rps
         gyro_y_bias += imusim.measured_gyro_y_rps
         gyro_z_bias += imusim.measured_gyro_z_rps
 
+        accel_x_avg += imusim.measured_accel_x_mps2
+        accel_y_avg += imusim.measured_accel_y_mps2
+        accel_z_avg += imusim.measured_accel_z_mps2
+
     gyro_x_bias /= INIT_COUNT
     gyro_y_bias /= INIT_COUNT
     gyro_z_bias /= INIT_COUNT
+
+    accel_x_avg /= INIT_COUNT
+    accel_y_avg /= INIT_COUNT
+    accel_z_avg /= INIT_COUNT
+
     estimator.set_initial_gyro_bias(yaw_rps=-gyro_z_bias,
                                     pitch_rps=-gyro_x_bias,
                                     roll_rps=-gyro_y_bias)
+    estimator.set_initial_accel(x_g=accel_x_avg/G,
+                                y_g=accel_y_avg/G,
+                                z_g=accel_z_avg/G)
 
     for count in range(NUM_COUNT):
         pa.advance_time(count / float(sample_frequency_hz))

@@ -72,6 +72,21 @@ class AttitudeEstimator {
     filter_.state()(6) = roll_rps;
   }
 
+  void SetInitialAccel(Float x_g, Float y_g, Float z_g) {
+    Float norm = std::sqrt(x_g * x_g + y_g * y_g + z_g * z_g);
+    x_g /= norm;
+    y_g /= norm;
+    z_g /= norm;
+
+    Quaternion<Float> a = AccelToOrientation(x_g, y_g, z_g);
+    filter_.state()(0) = a.w();
+    filter_.state()(1) = a.x();
+    filter_.state()(2) = a.y();
+    filter_.state()(3) = a.z();
+
+    initialized_ = true;
+  }
+
   Filter::Covariance covariance() const {
     return filter_.covariance();
   }
@@ -242,6 +257,16 @@ class PitchEstimator {
   void SetInitialGyroBias(
       Float yaw_rps, Float pitch_rps, Float roll_rps) {
     pitch_filter_.state()(1) = pitch_rps;
+  }
+
+  void SetInitialAccel(Float x_g, Float y_g, Float z_g) {
+    Float norm = std::sqrt(x_g * x_g + y_g * y_g + z_g * z_g);
+    x_g /= norm;
+    y_g /= norm;
+    z_g /= norm;
+
+    pitch_filter_.state()(0) =
+        std::atan2(y_g, std::sqrt(x_g * x_g + z_g * z_g));
   }
 
   PitchFilter::Covariance covariance() const {
