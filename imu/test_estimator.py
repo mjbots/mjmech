@@ -42,35 +42,61 @@ class EstimatorTest(unittest.TestCase):
                           test_time=1800.0, seed=seed)
         return result['rms_error']
 
-
-    def test_stationary(self):
-        #         IMU                      RMS degree error
-        imus = [
-            (imu_simulator.MiniImuV2, 2.0),
-            (imu_simulator.JbImuV2,   0.4),
-            (imu_simulator.Max21000,  0.1),
-            (imu_simulator.IdealImu,  0.1),
-                 ]
-        filters = { 'attitude': _estimator.AttitudeEstimator,
-                    'pitch:':_estimator.PitchEstimator,
-                    }
-
+    def run_seeds(self, imu_class, filter_name, filter_class, expected_error):
         fmt = '%20s %20s %10s %10s'
 
-        print fmt % ('imu', 'filter', 'error', 'max')
+        error = max(
+            [self.run_stationary(imu_class, filter_class, seed)
+             for seed in xrange(5)])
+        print fmt % (
+            imu_class().name,
+            filter_name,
+            '%.3f' % error,
+            '%.3f' % expected_error)
 
-        for imu_class, expected_error in imus:
-            for filter_name, filter_class in filters.iteritems():
-                error = max(
-                    [self.run_stationary(imu_class, filter_class, seed)
-                     for seed in xrange(5)])
-                print fmt % (
-                    imu_class().name,
-                    filter_name,
-                    '%.3f' % error,
-                    '%.3f' % expected_error)
+        self.assertLess(error, expected_error)
 
-                self.assertLess(error, expected_error)
+
+    def test_miniimuv2_pitch(self):
+        self.run_seeds(
+            imu_simulator.MiniImuV2,
+            'pitch', _estimator.PitchEstimator, 2.0)
+
+    def test_miniimuv2_attitude(self):
+        self.run_seeds(
+            imu_simulator.MiniImuV2,
+            'attitude', _estimator.AttitudeEstimator, 2.0)
+
+    def test_jbimuv2_pitch(self):
+        self.run_seeds(
+            imu_simulator.JbImuV2,
+            'pitch', _estimator.PitchEstimator, 0.4)
+
+    def test_jbimuv2_attitude(self):
+        self.run_seeds(
+            imu_simulator.JbImuV2,
+            'attitude', _estimator.AttitudeEstimator, 0.4)
+
+    def test_max21000_pitch(self):
+        self.run_seeds(
+            imu_simulator.Max21000,
+            'pitch', _estimator.PitchEstimator, 0.1)
+
+    def test_max21000_attitude(self):
+        self.run_seeds(
+            imu_simulator.Max21000,
+            'attitude', _estimator.AttitudeEstimator, 0.1)
+
+    def test_ideal_pitch(self):
+        self.run_seeds(
+            imu_simulator.IdealImu,
+            'pitch', _estimator.PitchEstimator, 0.1)
+
+    def test_ideal_attitude(self):
+        self.run_seeds(
+            imu_simulator.IdealImu,
+            'attitude', _estimator.AttitudeEstimator, 0.1)
+
 
 if __name__ == '__main__':
     unittest.main()

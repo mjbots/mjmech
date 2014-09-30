@@ -90,7 +90,22 @@ class AttitudeEstimator {
             conjugated()).euler().pitch_rad;
   }
 
+  Float yaw_rad() const { return attitude().euler().yaw_rad; }
   Float pitch_rad() const { return attitude().euler().pitch_rad; }
+  Float roll_rad() const { return attitude().euler().roll_rad; }
+
+  Float yaw_rps() const {
+    return current_gyro_.yaw_rps + filter_.state()(4);
+  }
+
+  Float pitch_rps() const {
+    return current_gyro_.pitch_rps + filter_.state()(5);
+  }
+
+  Float roll_rps() const {
+    return current_gyro_.roll_rps + filter_.state()(6);
+  }
+
   Float gyro_bias_rps() const { return filter_.state()(4, 0); }
 
   Quaternion<Float> attitude() const {
@@ -245,7 +260,15 @@ class PitchEstimator {
     return pitch - pitch_rad();
   }
 
+  Float yaw_rad() const { return 0.; }
   Float pitch_rad() const { return pitch_filter_.state()(0); }
+  Float roll_rad() const { return 0.; }
+
+  Float yaw_rps() const { return 0.; }
+  Float pitch_rps() const {
+    return current_gyro_ + pitch_filter_.state()(1);
+  }
+  Float roll_rps() const { return 0.; }
   Float gyro_bias_rps() const { return pitch_filter_.state()(1); }
 
   PitchFilter::State ProcessFunction(

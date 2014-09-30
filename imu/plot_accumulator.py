@@ -45,6 +45,16 @@ class PlotAccumulator(object):
     def close(self):
         self.fd.close()
 
+class NullAccumulator(object):
+    def add(self, **kwargs):
+        pass
+
+    def advance_time(self, time=None):
+        pass
+
+    def close(self):
+        pass
+
 class PlotReader(object):
     def __init__(self, filename):
         self.identifiers = {}
@@ -82,4 +92,13 @@ class PlotReader(object):
 
     def plot(self, name):
         times, values = self.items[name]
+        assert len(times) == len(values)
+
+        MAX_LENGTH = 10000
+        if len(times) > MAX_LENGTH:
+            subsample = int(len(times) / MAX_LENGTH)
+            times = [times[x] for x in xrange(0, len(times), subsample)]
+            values = [sum(values[x:x+subsample])/subsample
+                      for x in xrange(0, len(values), subsample)]
+
         pylab.plot(times, values, label=name)
