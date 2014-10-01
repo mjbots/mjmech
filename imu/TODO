@@ -2,7 +2,6 @@
    * gyro rate exceeded with ideal IMU for each filter
      * after a limited amount of time being stationary, the attitude
        should be within some bounds
- * Try to disable memory location in Eigen
 
 Open Questions
  * For my tests, do I want to allow different constants for the

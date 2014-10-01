@@ -4,6 +4,7 @@ Import('canonenv')
 env = canonenv.Clone()
 env.Append(CPPPATH=['.'])
 env.ParseConfig('pkg-config --cflags --libs eigen3')
+env.Append(CPPDEFINES=['EIGEN_NO_MALLOC'])
 
 pyenv = env.Clone()
 pyenv.Append(CPPPATH=['/usr/include/python2.7/'])
