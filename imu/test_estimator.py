@@ -33,7 +33,8 @@ class EstimatorTest(unittest.TestCase):
             process_noise_bias=fc.process_noise_bias,
             initial_noise_attitude=fc.initial_noise_attitude,
             initial_noise_bias=fc.initial_noise_bias,
-            measurement_noise_accel=fc.measurement_noise_accel
+            measurement_noise_accel=fc.measurement_noise_accel,
+            measurement_noise_stationary=fc.measurement_noise_stationary
             )
         case = filter_test_cases.StationaryTest()
 

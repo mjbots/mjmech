@@ -33,10 +33,11 @@ BOOST_PYTHON_MODULE(_estimator) {
 
   bp::class_<imu::PitchEstimator>(
       "PitchEstimator",
-      bp::init<double, double, double, double, double>(
+      bp::init<double, double, double, double, double, double>(
           (bp::arg("process_noise_gyro"),
            bp::arg("process_noise_bias"),
            bp::arg("measurement_noise_accel"),
+           bp::arg("measurement_noise_stationary"),
            bp::arg("initial_noise_attitude"),
            bp::arg("initial_noise_bias"))))
       .def("state_names", &imu::PitchEstimator::state_names)
@@ -56,14 +57,16 @@ BOOST_PYTHON_MODULE(_estimator) {
       .def("process_measurement", &imu::PitchEstimator::ProcessMeasurement,
            (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps"),
             bp::arg("x_g"), bp::arg("y_g"), bp::arg("z_g")))
+      .def("process_stationary", &imu::PitchEstimator::ProcessStationary)
       ;
 
   bp::class_<imu::AttitudeEstimator>(
       "AttitudeEstimator",
-      bp::init<double, double, double, double, double>(
+      bp::init<double, double, double, double, double, double>(
           (bp::arg("process_noise_gyro"),
            bp::arg("process_noise_bias"),
            bp::arg("measurement_noise_accel"),
+           bp::arg("measurement_noise_stationary"),
            bp::arg("initial_noise_attitude"),
            bp::arg("initial_noise_bias"))))
       .def("state_names", &imu::AttitudeEstimator::state_names)
@@ -84,5 +87,6 @@ BOOST_PYTHON_MODULE(_estimator) {
       .def("process_measurement", &imu::AttitudeEstimator::ProcessMeasurement,
            (bp::arg("yaw_rps"), bp::arg("pitch_rps"), bp::arg("roll_rps"),
             bp::arg("x_g"), bp::arg("y_g"), bp::arg("z_g")))
+      .def("process_stationary", &imu::AttitudeEstimator::ProcessStationary)
       ;
 }

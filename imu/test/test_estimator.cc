@@ -20,6 +20,7 @@ BOOST_AUTO_TEST_CASE(BasicPitchEstimator) {
   imu::PitchEstimator estimator(0.0008 * 0.0008,
                                 0.0512 * 0.0512,
                                 1.0 * 1.0,
+                                0.1 * 0.1,
                                 1e-3,
                                 1e-8);
 

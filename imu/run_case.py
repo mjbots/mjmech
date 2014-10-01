@@ -76,6 +76,8 @@ def run_case(test_case, imu_parameters, estimator,
                                 y_g=accel_y_avg/G,
                                 z_g=accel_z_avg/G)
 
+    stationary_count = 0
+
     for count in range(NUM_COUNT):
         pa.advance_time(count / float(sample_frequency_hz))
 
@@ -110,6 +112,27 @@ def run_case(test_case, imu_parameters, estimator,
             yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y,
             x_g=accel_x/G, y_g=accel_y/G, z_g=accel_z/G)
 
+        rotation = math.sqrt(estimator.yaw_rps() ** 2 +
+                             estimator.pitch_rps() ** 2 +
+                             estimator.roll_rps() ** 2)
+        accel_mag = math.sqrt(accel_x ** 2 +
+                              accel_y ** 2 +
+                              accel_z ** 2) / G
+        pa.add(accel_mag_g=accel_mag)
+        pa.add(rotation_rps=rotation)
+
+        accel_err = abs(1.0 - accel_mag)
+
+        # TODO jpieper: These should be related to the expected noise
+        # on the sensors.
+        if math.degrees(rotation) < 1.0 and accel_err < 0.05:
+            stationary_count += 1
+        else:
+            stationary_count = 0
+
+        if stationary_count > 200:
+            estimator.process_stationary()
+
         pa.add(true_yaw_deg=0.,
                true_pitch_deg=math.degrees(test_case.expected_pitch()),
                true_roll_deg=0.)
@@ -120,6 +143,10 @@ def run_case(test_case, imu_parameters, estimator,
                yaw_dps=math.degrees(estimator.yaw_rps()),
                pitch_dps=math.degrees(estimator.pitch_rps()),
                roll_dps=math.degrees(estimator.roll_rps()))
+
+        cl = estimator.covariance_diag()
+        pa.add(covariance=dict([('sd%d' % i, math.sqrt(cl[i]))
+                                for i in range(len(cl))]))
 
         diff = estimator.pitch_error(test_case.expected_pitch())
         error += diff ** 2

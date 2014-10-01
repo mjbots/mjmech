@@ -20,5 +20,6 @@ class FilterConstant(object):
     process_noise_gyro = math.radians(0.0002) ** 2
     process_noise_bias = math.radians(0.0256) ** 2
     measurement_noise_accel = 4.0 ** 2
+    measurement_noise_stationary = math.radians(2) ** 2
     initial_noise_attitude = 3e-2 ** 2
-    initial_noise_bias = math.radians(0.05) ** 2
+    initial_noise_bias = math.radians(0.2) ** 2

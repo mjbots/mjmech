@@ -90,9 +90,10 @@ class PlotReader(object):
     def get(self, name):
         return self.items[name]
 
-    def plot(self, name):
-        times, values = self.items[name]
-        assert len(times) == len(values)
+    def plot(self, name, tx=lambda x: x):
+        times, orig_values = self.items[name]
+        assert len(times) == len(orig_values)
+        values = [tx(x) for x in orig_values]
 
         MAX_LENGTH = 10000
         if len(times) > MAX_LENGTH:

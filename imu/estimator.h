@@ -33,6 +33,7 @@ class AttitudeEstimator {
   AttitudeEstimator(Float process_noise_gyro,
                     Float process_noise_bias,
                     Float measurement_noise_accel,
+                    Float measurement_noise_stationary,
                     Float initial_noise_attitude,
                     Float initial_noise_bias)
       : initialized_(false),
@@ -58,7 +59,8 @@ class AttitudeEstimator {
                process_noise_bias,
                process_noise_bias,
                process_noise_bias).finished())),
-        measurement_noise_accel_(measurement_noise_accel) {
+        measurement_noise_accel_(measurement_noise_accel),
+        measurement_noise_stationary_(measurement_noise_stationary) {
   }
 
   std::vector<std::string> state_names() const {
@@ -167,12 +169,30 @@ class AttitudeEstimator {
         Quaternion<Float>(s(0), s(1), s(2), s(3)).normalized());
   }
 
+  Eigen::Matrix<Float, 1, 1> MeasureRotation(
+      const Filter::State& s) const {
+    Quaternion<Float>::Vector3D rotation(
+        current_gyro_.pitch_rps + s(5),
+        current_gyro_.roll_rps + s(6),
+        current_gyro_.yaw_rps + s(4));
+    return (Eigen::Matrix<Float, 1, 1>() << rotation.norm()).finished();
+  }
+
   static Quaternion<Float> AccelToOrientation(
       Float x, Float y, Float z) {
     Float roll = std::atan2(-x, z);
     Float pitch = std::atan2(y, std::sqrt(x * x + z * z));
 
     return Quaternion<Float>::FromEuler(roll, pitch, 0.0);
+  }
+
+  void ProcessStationary() {
+    using namespace std::placeholders;
+    filter_.UpdateMeasurement(
+        std::bind(&AttitudeEstimator::MeasureRotation, this, _1),
+        (Eigen::Matrix<Float, 1, 1>() << 0.0).finished(),
+        (Eigen::Matrix<Float, 1, 1>() <<
+         measurement_noise_stationary_).finished());
   }
 
   void ProcessMeasurement(
@@ -212,6 +232,7 @@ class AttitudeEstimator {
   bool initialized_;
   Filter filter_;
   Float measurement_noise_accel_;
+  Float measurement_noise_stationary_;
 
   struct Gyro {
     Float yaw_rps;
@@ -234,6 +255,7 @@ class PitchEstimator {
   PitchEstimator(Float process_noise_gyro,
                  Float process_noise_bias,
                  Float measurement_noise_accel,
+                 Float measurement_noise_stationary,
                  Float initial_noise_attitude,
                  Float initial_noise_bias)
       : process_noise_gyro_(process_noise_gyro),
@@ -320,6 +342,9 @@ class PitchEstimator {
   static Eigen::Matrix<Float, 2, 1> MeasureAccel(
       const PitchFilter::State& s) {
     return OrientationToAccel(s(0));
+  }
+
+  void ProcessStationary() {
   }
 
   void ProcessMeasurement(

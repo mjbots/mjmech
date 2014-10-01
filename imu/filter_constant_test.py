@@ -43,7 +43,6 @@ import _estimator
 
 SAMPLE_FREQUENCY_HZ = 100.0
 G = 9.81
-TEST_CASE_TIME = 1800.0
 
 def rotate(vec, val):
     s = math.sin(val)
@@ -294,6 +293,7 @@ def run(options):
     cases += [lambda: BouncingTest(damp_vel=0.1)]
     cases += [lambda: BouncingTest()]
     cases += [lambda: BouncingTest(noise_level=5.0, accel_noise=20.)]
+    cases += [lambda: RotatingTest(noise_level=1)]
     cases += [lambda: RotatingTest()]
     cases += [lambda: RotatingTest(noise_level=5)]
     cases += [lambda: RotatingTest(noise_level=10)]
@@ -315,6 +315,15 @@ def run(options):
             return False
 
         cases = [x for x in cases if match(x)]
+
+    if len(options.imu):
+        def match(imu):
+            for exp in options.imu:
+                if re.search(exp, x.name):
+                    return True
+            return False
+
+        imus = [x for x in imus if match(x)]
 
     if options.animate:
         print 'Animating:', cases[0].name()
@@ -346,13 +355,14 @@ def run(options):
                 process_noise_gyro=fc.process_noise_gyro,
                 process_noise_bias=fc.process_noise_bias,
                 measurement_noise_accel=fc.measurement_noise_accel,
+                measurement_noise_stationary=fc.measurement_noise_stationary,
                 initial_noise_attitude=fc.initial_noise_attitude,
                 initial_noise_bias=fc.initial_noise_bias,
                 **kwargs)
 
             result = run_case(case, imu, my_estimator,
                               sample_frequency_hz=SAMPLE_FREQUENCY_HZ,
-                              test_time=TEST_CASE_TIME,
+                              test_time=options.time,
                               seed=options.seed)
 
             covar = ' '.join('%s=%f' % (x, math.degrees(y))
@@ -367,6 +377,8 @@ def main():
     parser = optparse.OptionParser()
     parser.add_option('-l', '--limit', action='append', default=[],
                       help='Only consider tests matching these regular exps')
+    parser.add_option('-i', '--imu', action='append', default=[],
+                      help='Only consider the following IMUs')
     parser.add_option('--animate', action='store_true', default=False,
                       help='Animate the first selected test')
     parser.add_option('-p', '--python', action='store_true', default=False,
@@ -374,6 +386,9 @@ def main():
     parser.add_option('-a', '--attitude', action='store_true', default=False,
                       help='Use full 2d attitude filter')
     parser.add_option('-s', '--seed', type='int', default=0)
+    parser.add_option('-t', '--time', default=1800.0, type='float',
+                      help='test case time')
+
 
     options, args = parser.parse_args()
     assert len(args) == 0
