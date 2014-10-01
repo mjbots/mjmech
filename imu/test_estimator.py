@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 import sys
 import unittest
 
@@ -38,17 +39,18 @@ class EstimatorTest(unittest.TestCase):
             )
         case = filter_test_cases.StationaryTest()
 
-        result = run_case(case, imu, estimator,
-                          sample_frequency_hz=100.0,
-                          test_time=1800.0, seed=seed)
-        return result['rms_error']
+        return run_case(case, imu, estimator,
+                        sample_frequency_hz=100.0,
+                        test_time=1800.0, seed=seed)
 
-    def run_seeds(self, imu_class, filter_name, filter_class, expected_error):
+    def run_stationary_seeds(self, imu_class, filter_name,
+                             filter_class, expected_error, expected_yaw_deg):
         fmt = '%20s %20s %10s %10s'
 
-        error = max(
-            [self.run_stationary(imu_class, filter_class, seed)
-             for seed in xrange(5)])
+        results = [self.run_stationary(imu_class, filter_class, seed)
+                   for seed in xrange(5)]
+        error = max(x['rms_error'] for x in results)
+
         print fmt % (
             imu_class().name,
             filter_name,
@@ -57,46 +59,51 @@ class EstimatorTest(unittest.TestCase):
 
         self.assertLess(error, expected_error)
 
+        worst_yaw_rad = max(abs(x['yaw_rad']) for x in results)
+        # Assume for stationary, we should stay within 20 degrees per
+        # hour of drift.
+        self.assertLess(math.degrees(worst_yaw_rad), expected_yaw_deg)
+
 
     def test_miniimuv2_pitch(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.MiniImuV2,
-            'pitch', _estimator.PitchEstimator, 2.0)
+            'pitch', _estimator.PitchEstimator, 2.0, 50.0)
 
     def test_miniimuv2_attitude(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.MiniImuV2,
-            'attitude', _estimator.AttitudeEstimator, 2.0)
+            'attitude', _estimator.AttitudeEstimator, 2.0, 50.0)
 
     def test_jbimuv2_pitch(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.JbImuV2,
-            'pitch', _estimator.PitchEstimator, 0.4)
+            'pitch', _estimator.PitchEstimator, 0.4, 10.0)
 
     def test_jbimuv2_attitude(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.JbImuV2,
-            'attitude', _estimator.AttitudeEstimator, 0.4)
+            'attitude', _estimator.AttitudeEstimator, 0.4, 10.0)
 
     def test_max21000_pitch(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.Max21000,
-            'pitch', _estimator.PitchEstimator, 0.1)
+            'pitch', _estimator.PitchEstimator, 0.1, 10.0)
 
     def test_max21000_attitude(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.Max21000,
-            'attitude', _estimator.AttitudeEstimator, 0.1)
+            'attitude', _estimator.AttitudeEstimator, 0.1, 10.0)
 
     def test_ideal_pitch(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.IdealImu,
-            'pitch', _estimator.PitchEstimator, 0.1)
+            'pitch', _estimator.PitchEstimator, 0.1, 10.0)
 
     def test_ideal_attitude(self):
-        self.run_seeds(
+        self.run_stationary_seeds(
             imu_simulator.IdealImu,
-            'attitude', _estimator.AttitudeEstimator, 0.1)
+            'attitude', _estimator.AttitudeEstimator, 0.1, 10.0)
 
 
 if __name__ == '__main__':

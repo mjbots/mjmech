@@ -125,7 +125,7 @@ def run_case(test_case, imu_parameters, estimator,
 
         # TODO jpieper: These should be related to the expected noise
         # on the sensors.
-        if math.degrees(rotation) < 1.0 and accel_err < 0.05:
+        if math.degrees(rotation) < 1.5 and accel_err < 0.05:
             stationary_count += 1
         else:
             stationary_count = 0
@@ -154,4 +154,5 @@ def run_case(test_case, imu_parameters, estimator,
     diag = estimator.covariance_diag()
 
     return { 'rms_error': math.degrees(math.sqrt((error / NUM_COUNT))),
-             'uncert': numpy.sqrt(diag) }
+             'uncert': numpy.sqrt(diag),
+             'yaw_rad': estimator.yaw()}
