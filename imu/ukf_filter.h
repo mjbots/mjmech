@@ -39,6 +39,7 @@ class UkfFilter {
   const State& state() const { return state_; }
   State& state() { return state_; }
   const Covariance& covariance() const { return covariance_; }
+  Covariance& covariance() { return covariance_; }
 
   template <typename ProcessFunction>
   void UpdateState(_Scalar dt_s, ProcessFunction process_function) {

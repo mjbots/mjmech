@@ -60,7 +60,8 @@ class AttitudeEstimator {
                process_noise_bias,
                process_noise_bias).finished())),
         measurement_noise_accel_(measurement_noise_accel),
-        measurement_noise_stationary_(measurement_noise_stationary) {
+        measurement_noise_stationary_(measurement_noise_stationary),
+        initial_bias_uncertainty_(initial_noise_bias) {
   }
 
   std::vector<std::string> state_names() const {
@@ -233,6 +234,7 @@ class AttitudeEstimator {
   Filter filter_;
   Float measurement_noise_accel_;
   Float measurement_noise_stationary_;
+  Float initial_bias_uncertainty_;
 
   struct Gyro {
     Float yaw_rps;
@@ -261,6 +263,7 @@ class PitchEstimator {
       : process_noise_gyro_(process_noise_gyro),
         process_noise_bias_(process_noise_bias),
         measurement_noise_accel_(measurement_noise_accel),
+        initial_bias_uncertainty_(initial_noise_bias),
         pitch_filter_(
             PitchFilter::State::Zero(),
             (PitchFilter::Covariance() <<
@@ -376,6 +379,7 @@ class PitchEstimator {
   Float process_noise_gyro_;
   Float process_noise_bias_;
   Float measurement_noise_accel_;
+  Float initial_bias_uncertainty_;
 
   PitchFilter pitch_filter_;
   Float current_gyro_;

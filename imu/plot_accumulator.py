@@ -95,7 +95,7 @@ class PlotReader(object):
         assert len(times) == len(orig_values)
         values = [tx(x) for x in orig_values]
 
-        MAX_LENGTH = 10000
+        MAX_LENGTH = 20000
         if len(times) > MAX_LENGTH:
             subsample = int(len(times) / MAX_LENGTH)
             times = [times[x] for x in xrange(0, len(times), subsample)]

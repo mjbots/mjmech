@@ -26,7 +26,8 @@ import imu_simulator
 from run_case import run_case
 
 class EstimatorTest(unittest.TestCase):
-    def run_stationary(self, imu_class, filter_class, seed):
+    def run_test(self, imu_class, filter_class, test_case, seed,
+                 test_time=1800.0):
         imu = imu_class()
         fc = FilterConstant()
         estimator = filter_class(
@@ -37,11 +38,33 @@ class EstimatorTest(unittest.TestCase):
             measurement_noise_accel=fc.measurement_noise_accel,
             measurement_noise_stationary=fc.measurement_noise_stationary
             )
-        case = filter_test_cases.StationaryTest()
 
-        return run_case(case, imu, estimator,
+        return run_case(test_case, imu, estimator,
                         sample_frequency_hz=100.0,
                         test_time=1800.0, seed=seed)
+
+    def test_rate_exceeded(self):
+        pass
+
+        # TODO jpieper: It would be nice to be able to verify
+        # something about the result here.  I was unable to actually
+        # make the filter converge on attitude faster, even when the
+        # rate exceeding was properly identified.  My belief is that
+        # this is because of the non-linearity of the measurement
+        # function with respect to attitude.
+
+        # case = filter_test_cases.RateExceededTest(
+        #     magnitude_dps=100.0, period=2.0)
+        # imu_class = lambda: imu_simulator.IdealImu(
+        #     gyro_max_rps=math.radians(75))
+        # filter_class = _estimator.AttitudeEstimator
+
+        # result = self.run_test(imu_class, filter_class, case, 0,
+        #                        test_time=500.0)
+
+    def run_stationary(self, imu_class, filter_class, seed):
+        case = filter_test_cases.StationaryTest()
+        return self.run_test(imu_class, filter_class, case, seed)
 
     def run_stationary_seeds(self, imu_class, filter_name,
                              filter_class, expected_error, expected_yaw_deg):

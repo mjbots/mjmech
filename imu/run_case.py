@@ -93,42 +93,43 @@ def run_case(test_case, imu_parameters, estimator,
         imusim.update_reality(0.0, true_accel_y, true_accel_z,
                               test_case.gyro(), 0., 0.)
 
-        accel_x = imusim.measured_accel_x_mps2
-        accel_y = imusim.measured_accel_y_mps2
-        accel_z = imusim.measured_accel_z_mps2
-        gyro_x = imusim.measured_gyro_x_rps
-        gyro_y = imusim.measured_gyro_y_rps
-        gyro_z = imusim.measured_gyro_z_rps
+        accel_x_mps2 = imusim.measured_accel_x_mps2
+        accel_y_mps2 = imusim.measured_accel_y_mps2
+        accel_z_mps2 = imusim.measured_accel_z_mps2
+        gyro_x_rps = imusim.measured_gyro_x_rps
+        gyro_y_rps = imusim.measured_gyro_y_rps
+        gyro_z_rps = imusim.measured_gyro_z_rps
 
-        pa.add(accel_x_mps2=accel_x,
-               accel_y_mps2=accel_y,
-               accel_z_mps2=accel_z)
+        pa.add(accel_x_mps2=accel_x_mps2,
+               accel_y_mps2=accel_y_mps2,
+               accel_z_mps2=accel_z_mps2)
 
-        pa.add(gyro_x_dps=math.degrees(gyro_x),
-               gyro_y_dps=math.degrees(gyro_y),
-               gyro_z_dps=math.degrees(gyro_z))
+        pa.add(gyro_x_dps=math.degrees(gyro_x_rps),
+               gyro_y_dps=math.degrees(gyro_y_rps),
+               gyro_z_dps=math.degrees(gyro_z_rps))
 
         estimator.process_measurement(
-            yaw_rps=gyro_z, pitch_rps=gyro_x, roll_rps=gyro_y,
-            x_g=accel_x/G, y_g=accel_y/G, z_g=accel_z/G)
+            yaw_rps=gyro_z_rps, pitch_rps=gyro_x_rps, roll_rps=gyro_y_rps,
+            x_g=accel_x_mps2/G, y_g=accel_y_mps2/G, z_g=accel_z_mps2/G)
 
-        rotation = math.sqrt(estimator.yaw_rps() ** 2 +
-                             estimator.pitch_rps() ** 2 +
-                             estimator.roll_rps() ** 2)
-        accel_mag = math.sqrt(accel_x ** 2 +
-                              accel_y ** 2 +
-                              accel_z ** 2) / G
-        pa.add(accel_mag_g=accel_mag)
-        pa.add(rotation_rps=rotation)
+        rotation_rps = math.sqrt(estimator.yaw_rps() ** 2 +
+                                 estimator.pitch_rps() ** 2 +
+                                 estimator.roll_rps() ** 2)
+        accel_mag_g = math.sqrt(accel_x_mps2 ** 2 +
+                                accel_y_mps2 ** 2 +
+                                accel_z_mps2 ** 2) / G
+        pa.add(accel_mag_g=accel_mag_g)
+        pa.add(rotation_rps=rotation_rps)
 
-        accel_err = abs(1.0 - accel_mag)
+        accel_err_g = abs(1.0 - accel_mag_g)
 
         # TODO jpieper: These should be related to the expected noise
         # on the sensors.
-        if math.degrees(rotation) < 1.5 and accel_err < 0.05:
+        if math.degrees(rotation_rps) < 1.5 and accel_err_g < 0.05:
             stationary_count += 1
         else:
             stationary_count = 0
+        pa.add(stationary_count=stationary_count)
 
         if stationary_count > 200:
             estimator.process_stationary()

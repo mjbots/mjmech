@@ -54,3 +54,55 @@ class StationaryTest(TestCase):
 
     def pos(self):
         return 0., 0.
+
+class RateExceededTest(TestCase):
+    '''starts out stationary, runs a large sine wave rate for some
+    amount of time, then ends at a new orientation.'''
+    def __init__(self, magnitude_dps=1000.0, target_pitch_deg=40.0,
+                 duration=100.0, period=5.0):
+        self.pitch_deg = 0.0
+        self.magnitude_dps = magnitude_dps
+        self.target_pitch_deg = target_pitch_deg
+        self.duration = duration
+        self.period = period
+        self.start = 100.0
+        self.time = 0.0
+        self.rate_dps = 0.0
+
+    def advance(self, dt):
+        self.time += dt
+        force_pitch = False
+
+        if self.time < self.start:
+            self.rate_dps = 0.0
+        elif self.time < (self.start + self.duration):
+            delta = self.time - self.start
+            self.rate_dps = self.magnitude_dps * math.sin(
+                2 * math.pi * delta / self.period)
+        else:
+            delta = self.pitch_deg - self.target_pitch_deg
+            max_rate = min(self.magnitude_dps, abs(delta) / dt)
+            if max_rate < self.magnitude_dps:
+                force_pitch = True
+            self.rate_dps = max_rate * (-1 if delta > 0 else 1)
+
+        self.pitch_deg += dt * self.rate_dps
+        if force_pitch:
+            self.pitch_deg = self.target_pitch_deg
+
+    def gyro(self):
+        return math.radians(self.rate_dps)
+
+    def name(self):
+        return 'rate_exceed dps=%d' % self.magnitude_dps
+
+    def accel_yz_mps2(self):
+        y_g = math.sin(math.radians(self.pitch_deg))
+        z_g = math.cos(math.radians(self.pitch_deg))
+        return y_g * 9.81, z_g * 9.81
+
+    def expected_pitch(self):
+        return math.radians(self.pitch_deg)
+
+    def pos(self):
+        return 0., 0.
