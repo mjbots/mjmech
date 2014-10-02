@@ -44,7 +44,7 @@ class MiniImuV2(object):
     gyro_noise = 5.3e-4
     gyro_bias_stability = 1.4e-4
 
-    def __init__(self, gyro_max_rps=math.radians(250)):
+    def __init__(self, gyro_max_rps=math.radians(1000)):
         self.gyro_max_rps = gyro_max_rps
 
 class Max21000(object):
@@ -57,7 +57,7 @@ class Max21000(object):
     gyro_noise = 2.2e-5
     gyro_bias_stability = 8.4e-6
 
-    def __init__(self, gyro_max_rps=math.radians(250)):
+    def __init__(self, gyro_max_rps=math.radians(1000)):
         self.gyro_max_rps = gyro_max_rps
 
 class JbImuV2(object):
@@ -70,7 +70,7 @@ class JbImuV2(object):
     gyro_noise = 3.0e-4
     gyro_bias_stability = 6.5e-5
 
-    def __init__(self, gyro_max_rps=math.radians(250)):
+    def __init__(self, gyro_max_rps=math.radians(1000)):
         self.gyro_max_rps = gyro_max_rps
 
 def limit(value, top):
