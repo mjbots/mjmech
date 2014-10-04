@@ -45,7 +45,7 @@ class AsyncSocket(object):
         loop = asyncio.get_event_loop()
         result = yield From(loop.sock_recv(self.socket, size))
 
-        raise Result(result)
+        raise Return(result)
 
 
 @asyncio.coroutine
