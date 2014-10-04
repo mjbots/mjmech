@@ -29,6 +29,7 @@ from legtool.async import trollius_trace
 from legtool.servo import selector
 from legtool.gait import leg_ik
 from legtool.gait import ripple
+from legtool.gait.common import Command
 
 UPDATE_TIME = 0.04
 
@@ -134,7 +135,12 @@ class GaitDriver(object):
         assert self.next_command is not None
 
         self.gait = self.next_gait
-        self.gait.set_state(self.state, self.next_command)
+        try:
+            self.gait.set_state(self.state, self.next_command)
+        except ripple.NotSupported:
+            print "Unsupported command, ignoring!"
+            pass
+
         self.next_command = None
 
         yield From(self._run_while(
@@ -273,6 +279,24 @@ class MechDriver(object):
         if config.has_section('servo.names'):
             for name, value in config.items('servo.names'):
                 self.servo_name_map[int(name)] = value
+
+        self.default_command = {}
+        if config.has_section('gaitconfig'):
+            for key in ['command_body_x_mm',
+                        'command_body_y_mm',
+                        'command_body_z_mm',
+                        'command_body_pitch_deg',
+                        'command_body_roll_deg',
+                        'command_body_yaw_deg']:
+                if config.has_option('gaitconfig', key):
+                    self.default_command[key.split('command_')[1]] = (
+                        config.getfloat('gaitconfig', key))
+
+    def create_default_command(self):
+        result = Command()
+        for key, value in self.default_command.iteritems():
+            setattr(result, key, value)
+        return result
 
     @asyncio.coroutine
     def connect_servo(self):

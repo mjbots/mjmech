@@ -312,7 +312,9 @@ class ControlInterface(object):
             if gait['type'] == 'idle':
                 self.mech_driver.set_idle()
             elif gait['type'] == 'ripple':
-                command = legtool.gait.ripple.Command()
+                command = self.mech_driver.create_default_command()
+                
+                # Now apply any values we received from the client.
                 for key, value in gait.iteritems():
                     if key != 'type':
                         setattr(command, key, value)

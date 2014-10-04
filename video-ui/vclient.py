@@ -292,9 +292,12 @@ class ControlInterface(object):
                 if self.control_dict.get('gait') is not None:
                     self.control_dict['gait'] = IDLE_COMMAND
             else:
+                if abs(dy) > 0.1:
+                    dx = 0.0
+
                 gait = RIPPLE_COMMAND.copy()
-                gait['translate_x_mm_s'] = dx * 100
-                gait['translate_y_mm_s'] = -dy * 350
+                gait['translate_x_mm_s'] = dx * 40
+                gait['translate_y_mm_s'] = -dy * 100
                 gait['rotate_deg_s'] = dr * 50
                 self.control_dict['gait'] = gait
 
