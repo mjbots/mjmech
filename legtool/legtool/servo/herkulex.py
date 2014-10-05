@@ -160,6 +160,11 @@ class HerkuleX(object):
                 reduce(lambda a, b: a ^ b, [ord(x) for x in data], 0x00))
 
     @asyncio.coroutine
+    def flush(self):
+        with (yield From(self.serial.read_lock)):
+            yield From(self.serial.flush())
+
+    @asyncio.coroutine
     def _raw_send_packet(self, servo, cmd, data):
         assert servo >= 0 and servo <= 0xfe
         assert cmd >= 0 and cmd <= 0xff
@@ -239,7 +244,12 @@ class HerkuleX(object):
 
         received = yield From(self.send_recv_packet(
                 servo, cmd, chr(reg) + chr(length)))
-        assert received.servo == servo or servo == self.BROADCAST
+        if received.servo != servo and received.servo != self.BROADCAST:
+            yield From(self.serial.flush())
+            raise RuntimeError(
+                'synchronization error detected, sent '
+                'request for servo %d, response from %d, flushed' %
+                (servo, received.servo))
         assert received.cmd == (0x40 | cmd)
         assert len(received.data) == length + 4
 
@@ -430,3 +440,4 @@ class HerkuleX(object):
     def set_position_ki(self, servo, value):
         yield From(
             self.ram_write(servo, 28, [ value & 0xff, (value >> 8) & 0xff ]))
+

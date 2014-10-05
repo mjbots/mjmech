@@ -36,6 +36,13 @@ class AsyncSocket(object):
         yield From(loop.sock_connect(self.socket, (host, int(port))))
 
     @asyncio.coroutine
+    def flush(self):
+        try:
+            yield From(asyncio.wait_for(self.read(256), 0.02))
+        except asyncio.TimeoutError:
+            pass
+
+    @asyncio.coroutine
     def write(self, data):
         loop = asyncio.get_event_loop()
         yield From(loop.sock_sendall(self.socket, data))

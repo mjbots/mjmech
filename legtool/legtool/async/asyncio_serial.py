@@ -47,6 +47,15 @@ class AsyncioSerial(object):
         raise Return()
 
     @asyncio.coroutine
+    def flush(self):
+        assert self.read_lock.locked()
+
+        try:
+            yield From(asyncio.wait_for(self.read(256), 0.02))
+        except asyncio.TimeoutError:
+            pass
+
+    @asyncio.coroutine
     def read(self, size):
         assert self.read_lock.locked()
 

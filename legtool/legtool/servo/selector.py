@@ -44,6 +44,10 @@ class HerkuleXController(object):
         yield From(self.port.start())
         raise Return(self)
 
+    @asyncio.coroutine
+    def flush(self):
+        yield From(self.port.flush())
+
     def _angle_to_counts(self, angle_deg):
         return min(1023, max(0, int(512 + angle_deg / 0.325)))
 
@@ -239,6 +243,10 @@ class GazeboController(object):
         self.joint_cmd.position.d_gain = 0.2
 
         self._servo_angles = {}
+
+    @asyncio.coroutine
+    def flush(self):
+        raise Return(None)
 
     def _receive_joint_cmd(self, data):
         joint_cmd = joint_cmd_pb2.JointCmd.FromString(data)
