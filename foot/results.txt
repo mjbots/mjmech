@@ -1,4 +1,10 @@
-Vacuum formed
+Vytaflex 20, non-vacuum formed:
+
+in-line force: 7 counts/lb
+highest-sensitivity angle: 12 counts/lb
+
+
+Vacuum formed 2014-09-15
 
 
 in-line force: 5 counts/lb
@@ -6,7 +12,7 @@ highest-sensitivity angle: 15 counts/lb
 
 
 
-Non-vacuum formed:
+Non-vacuum formed 2014-09-11
 
 in-line force: 2 counts/lb
 highest sensitivity angle: 5 counts/lb
