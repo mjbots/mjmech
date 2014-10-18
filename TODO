@@ -12,7 +12,7 @@
    * re-draw camera jaw, include spacer support holes
    * determine if there is room for M2 washers between plate and servo
      bracket
-    
+
 
  * Design chassis plate
 
@@ -22,6 +22,23 @@
  * Simulate herkuleX serial protocol
 
  * Model turret
+
+ * UI: One-click shooting -- should shoot once both servoes report INPOSITION
+ * UI: Logs overlay
+ * UI: report back status, esp. battery level and servo temperature
+ * UI: Make fire motor time adjustable (or at least longer)
+ * Consider: UI: another marker (adjustable) where the gun will shoot
+ * Forward server's logs to client
+ * Fix bug where the playback speed of record mkv's is too high.
+
+ * Consider: wrapper script which only starts server when client has connected.
+ * Consider: no script in robot's flash at all; upload on every boot (must be
+   integrated with client, not require open TCP connection)
+ * Consider: record OSD into final video (as subtitles or re-code video properly)
+
+ * Shoot qualification video and post it.
+   2013 rules say: 5 minutes of motion, 4 plastic cups 8-12" from the ground.
+
 
 DONE 2014-03-02
  * First rough draft of turret freecad model
