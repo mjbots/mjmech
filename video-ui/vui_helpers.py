@@ -33,10 +33,32 @@ def _sigint_handler():
     # wrap_event decorator will make sure the exception stops event loop.
     raise Exception('Got SIGINT')
 
+@wrap_event
+def _sigterm_handler():
+    # wrap_event decorator will make sure the exception stops event loop.
+    raise Exception('Got SIGTERM')
+
 def asyncio_misc_init():
     asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
 
     main_loop = asyncio.get_event_loop()
     main_loop.add_signal_handler(signal.SIGINT, _sigint_handler)
+    main_loop.add_signal_handler(signal.SIGTERM, _sigterm_handler)
     g_quit_handlers.append(
         lambda:  main_loop.call_soon_threadsafe(main_loop.stop))
+
+def logging_init(verbose=True):
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+
+    # Code below is like basicConfig, but we do not apply limits on loggers;
+    # instead we apply them on handlers.
+    outhandler = logging.StreamHandler()
+    outhandler.setFormatter(
+        logging.Formatter(
+            fmt=("%(asctime)s.%(msecs).3d [%(levelname).1s]"
+                    " %(name)s: %(message)s"),
+            datefmt="%T"))
+    root.addHandler(outhandler)
+    if not verbose:
+        outhandler.setLevel(logging.INFO)

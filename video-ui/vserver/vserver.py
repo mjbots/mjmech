@@ -16,33 +16,19 @@ import itertools
 import trollius as asyncio
 from trollius import Task, From
 
-from gi.repository import GObject, Gtk
+from gi.repository import GObject
 gobject = GObject
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../legtool'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'legtool'))
 
 import gait_driver
 import gbulb
 import legtool
 
-def wrap_event(callback, *args1, **kwargs1):
-    """Wrap event callback so the app exit if it crashes"""
-    def wrapped(*args2, **kwargs2):
-        try:
-            kwargs = kwargs1.copy()
-            kwargs.update(**kwargs2)
-            return callback(*(args1 + args2), **kwargs)
-        except BaseException as e:
-            logging.error("Callback %r crashed:", callback)
-            logging.error(" %s %s" % (e.__class__.__name__, e))
-            for line in traceback.format_exc().split('\n'):
-                logging.error('| %s', line)
-            asyncio.get_event_loop().stop()
-            Gtk.main_quit()
-            raise
-    return wrapped
+from vui_helpers import wrap_event, asyncio_misc_init, logging_init
 
 # How often to poll servo status, in absense of other commands
 # (polling only starts once first remote command is received)
@@ -313,7 +299,7 @@ class ControlInterface(object):
                 self.mech_driver.set_idle()
             elif gait['type'] == 'ripple':
                 command = self.mech_driver.create_default_command()
-                
+
                 # Now apply any values we received from the client.
                 for key, value in gait.iteritems():
                     if key != 'type':
@@ -358,13 +344,9 @@ class ControlInterface(object):
         #gobject.g_spawn_close_pid(pid)
 
 def main(opts):
-    asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())
+    asyncio_misc_init()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format=("%(asctime)s.%(msecs).3d [%(levelname).1s]"
-                " %(name)s: %(message)s"),
-        datefmt="%T")
+    logging_init(verbose=True)
 
     if opts.check:
         logging.info('Check passed')

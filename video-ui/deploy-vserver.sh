@@ -30,8 +30,10 @@ RSCMD=(rsync -a --exclude '*~' --exclude '*.pyc' --delete )
 
 
 "${RSCMD[@]}" --exclude=legtool --exclude=install-packages.sh \
-    --exclude=gbulb --exclude=real.cfg vserver $TMPDIR/..
-"${RSCMD[@]}" ../legtool ../install-packages.sh ../gbulb ../real.cfg $TMPDIR
+    --exclude=gbulb --exclude=real.cfg --exclude=vui_helpers.py \
+    vserver $TMPDIR/..
+"${RSCMD[@]}" ../legtool ../install-packages.sh ../gbulb ../real.cfg \
+    vui_helpers.py $TMPDIR
 
 if [[ "$1" == "assemble" ]]; then
     echo Assembled

@@ -13,7 +13,7 @@ import time
 import trollius as asyncio
 from trollius import Task, From
 
-from vui_helpers import wrap_event, asyncio_misc_init
+from vui_helpers import wrap_event, asyncio_misc_init, logging_init
 from video_window import VideoWindow, video_window_init, video_window_main
 
 # must be after video_window
@@ -516,15 +516,9 @@ class ControlInterface(object):
 def main(opts):
     asyncio_misc_init()
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format=("%(asctime)s.%(msecs).3d "
-                "[%(levelname).1s] %(name)s: %(message)s"),
-        datefmt="%T")
+    logging_init(verbose=True)
 
     root = logging.getLogger()
-    # Do not apply limits on loggers; instead apply them on handlers.
-    root.setLevel(logging.DEBUG)
 
     if opts.log_dir is None:
         for pdir in LOG_DIR_LOCATIONS:
