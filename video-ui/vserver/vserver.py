@@ -111,6 +111,7 @@ class ControlInterface(object):
             self.next_servo_to_poll = itertools.cycle(SERVO_IDS_TO_POLL)
         else:
             self.next_servo_to_poll = None
+        self.servo_poll_count = 0
 
         # Normally we refresh state periodically. Set this flag to force
         # re-sending the data.
@@ -142,8 +143,8 @@ class ControlInterface(object):
             raise Exception("Servo send task exited")
 
         if self.recent_packets:
-            self.logger.debug('Remote peer %r sent %d packet(s)' % (
-                    self.src_addr, self.recent_packets))
+            #self.logger.debug('Remote peer %r sent %d packet(s)' % (
+            #        self.src_addr, self.recent_packets))
             self.recent_packets = 0
             self.no_packet_intervals = 0
         elif self.no_packet_intervals < 3:
@@ -271,12 +272,19 @@ class ControlInterface(object):
         # poll servos (one at a time)
         if self.next_servo_to_poll is not None:
             servo_id = self.next_servo_to_poll.next()
-            status_list = yield From(servo.get_clear_status(servo_id))
-            status_str = ','.join(status_list) or 'idle'
-            if status_str != self.last_servo_status.get(servo_id):
-                self.logger.info('Servo status for %r: %s'
+            self.servo_poll_count += 1
+            if ((self.servo_poll_count % 100) == 1):
+                voltage = yield From(servo.get_voltage([servo_id]))
+                self.logger.info('Servo voltage for %r: %.1f',
+                                 servo_id, voltage.get(servo_id, -1))
+            else:
+                status_list = yield From(servo.get_clear_status(servo_id))
+                status_str = ','.join(status_list) or 'idle'
+                if status_str != self.last_servo_status.get(servo_id):
+                    self.logger.info('Servo status for %r: %s'
                                  % (servo_id, status_str))
-                self.last_servo_status[servo_id] = status_str
+                    self.last_servo_status[servo_id] = status_str
+
 
         if data.get('turret'):
             servo_x, servo_y = data['turret']
