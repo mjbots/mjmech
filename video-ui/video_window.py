@@ -27,7 +27,7 @@ class VideoWindow(object):
     DUMP_PAD_INFO_BY_TIMER = False
 
     # If True, will crash app if video stops
-    CRASH_ON_VIDEO_STOP = True
+    CRASH_ON_VIDEO_STOP = False
 
     # Is camera upside down?
     CAMERA_ROTATE = False
