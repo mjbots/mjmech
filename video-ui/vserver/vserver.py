@@ -14,7 +14,7 @@ import fcntl
 import itertools
 
 import trollius as asyncio
-from trollius import Task, From
+from trollius import Task, From, Return
 
 from gi.repository import GObject
 gobject = GObject
@@ -28,7 +28,8 @@ import gait_driver
 import gbulb
 import legtool
 
-from vui_helpers import wrap_event, asyncio_misc_init, logging_init
+from vui_helpers import wrap_event
+import vui_helpers
 
 # How often to poll servo status, in absense of other commands
 # (polling only starts once first remote command is received)
@@ -41,6 +42,8 @@ TURRET_RANGE_Y = (-90, 90)
 # Which servo IDs to poll for status
 # (set to false value to disable mechanism)
 SERVO_IDS_TO_POLL = [12, 13, 99]
+
+_start_time = time.time()
 
 class UdpAnnouncer(object):
     PORT = 13355
@@ -59,7 +62,6 @@ class UdpAnnouncer(object):
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.dest = ('255.255.255.255', self.PORT)
         self.seq = 0
-        self.start_time = time.time()
         gobject.timeout_add(int(self.INTERVAL * 1000),
                             wrap_event(self._broadcast))
 
@@ -69,7 +71,7 @@ class UdpAnnouncer(object):
         msg = json.dumps({'type': 'announce',
                           'seq': self.seq,
                           'cport': ControlInterface.PORT,
-                          'start_time': self.start_time,
+                          'start_time': _start_time,
                           'host': os.uname()[1]})
         self.sock.sendto(msg + '\n', self.dest)
         return True
@@ -80,9 +82,10 @@ class ControlInterface(object):
 
     TIMEOUT = 1.0
 
-    def __init__(self, opts):
+    def __init__(self, opts, logsaver):
         self.logger = logging.getLogger('control')
 
+        self.logsaver = logsaver
         self.opts = opts
 
         self.sock = socket.socket(
@@ -94,12 +97,15 @@ class ControlInterface(object):
         self.src_addr = None
         # Packets since timeout expiration
         self.recent_packets = 0
+
         # timeout intervals with no packets (start with very high value to
         # suppress warnings until client is connected)
         self.no_packet_intervals = 10000
+
         # Last packet received from the network (set to None after timeout)
         self.net_packet = None
-        # Last packet applied to servoe (set to None if restart detected or
+
+        # Last packet applied to servoes (set to None if restart detected or
         #  net_packet is None)
         self.servo_packet = None
 
@@ -117,6 +123,24 @@ class ControlInterface(object):
         # re-sending the data.
         self.servo_send_now = asyncio.Event()
         self.servo_send_task = Task(self._send_servo_commands())
+
+
+        # We send status every time this event is set (but in a rate-limited
+        # way)
+        self.status_send_now = asyncio.Event()
+
+        # The contents of the status packet to send.
+        self.status_packet = {
+            "start_time": _start_time,
+            "seq": 0,
+            "servo_status": dict(),
+            "servo_voltage": dict(),
+            }
+
+        self.status_send_task = Task(self._send_status_packets())
+        self.status_send_now = asyncio.Event()
+
+
 
         self.mech_driver_started = False
         if self.opts.no_mech:
@@ -141,6 +165,12 @@ class ControlInterface(object):
             # traceback)
             self.servo_send_task = None
             raise Exception("Servo send task exited")
+
+        if self.status_send_task and self.status_send_task.done():
+            # ditto
+            self.status_send_task = None
+            raise Exception("Status send task exited")
+
 
         if self.recent_packets:
             #self.logger.debug('Remote peer %r sent %d packet(s)' % (
@@ -210,6 +240,36 @@ class ControlInterface(object):
 
     @asyncio.coroutine
     @wrap_event
+    def _send_status_packets(self):
+        while True:
+            yield From(self.status_send_now.wait())
+            self.status_send_now.clear()
+
+            self.status_packet["seq"] += 1
+            self.status_packet["srv_time"] = time.time()
+            if self.src_addr:
+                # Add most recent log messages if requested
+                if self.net_packet and self.net_packet.get('logs_from'):
+                    ts_min = self.net_packet['logs_from']
+                    # Discard already-seen messages
+                    while (self.logsaver.data and
+                           self.logsaver.data[0][0] <= ts_min):
+                        self.logsaver.data.pop(0)
+                    dest = self.status_packet['logs_data'] = list()
+                    # Insert up to new messages (but not all, to limit the size)
+                    dest += self.logsaver.data[:16]
+                else:
+                    # Do not send logs_data if logs_from is missing.
+                    self.status_packet.pop('logs_data', None)
+
+                # send packet
+                payload = json.dumps(self.status_packet)
+                self.sock.sendto(payload, self.src_addr)
+
+            # ratelimit
+            yield From(asyncio.sleep(0.1))
+
+    @asyncio.coroutine
     def _send_servo_commands(self):
         while True:
             if not self.servo_send_now.is_set():
@@ -225,6 +285,9 @@ class ControlInterface(object):
                 yield From(self._send_servo_commands_once(
                         new_pkt, old_pkt))
             self.servo_packet = new_pkt
+
+            # send any status updates
+            self.status_send_now.set()
 
     @asyncio.coroutine
     def _send_servo_commands_once(self, data, olddata):
@@ -274,9 +337,11 @@ class ControlInterface(object):
             servo_id = self.next_servo_to_poll.next()
             self.servo_poll_count += 1
             if ((self.servo_poll_count % 100) == 1):
-                voltage = yield From(servo.get_voltage([servo_id]))
-                self.logger.info('Servo voltage for %r: %.1f',
-                                 servo_id, voltage.get(servo_id, -1))
+                voltage_dict = yield From(servo.get_voltage([servo_id]))
+                voltage = voltage_dict.get(servo_id, None)
+                self.logger.debug('Servo voltage for %r: %.1f',
+                                  servo_id, voltage or -1)
+                self.status_packet['servo_voltage'][servo_id] = voltage
             else:
                 status_list = yield From(servo.get_clear_status(servo_id))
                 status_str = ','.join(status_list) or 'idle'
@@ -284,7 +349,7 @@ class ControlInterface(object):
                     self.logger.info('Servo status for %r: %s'
                                  % (servo_id, status_str))
                     self.last_servo_status[servo_id] = status_str
-
+                self.status_packet['servo_status'][servo_id] = status_str
 
         if data.get('turret'):
             servo_x, servo_y = data['turret']
@@ -352,9 +417,11 @@ class ControlInterface(object):
         #gobject.g_spawn_close_pid(pid)
 
 def main(opts):
-    asyncio_misc_init()
+    vui_helpers.asyncio_misc_init()
 
-    logging_init(verbose=True)
+    vui_helpers.logging_init(verbose=True)
+
+    logsaver = vui_helpers.MemoryLoggingHandler(install=True)
 
     if opts.check:
         logging.info('Check passed')
@@ -363,7 +430,7 @@ def main(opts):
     os.system("killall -v gst-launch-1.0")
 
     ann = UdpAnnouncer()
-    cif = ControlInterface(opts)
+    cif = ControlInterface(opts, logsaver=logsaver)
     logging.info('Running')
 
     asyncio.get_event_loop().run_forever()

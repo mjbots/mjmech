@@ -62,3 +62,61 @@ def logging_init(verbose=True):
     root.addHandler(outhandler)
     if not verbose:
         outhandler.setLevel(logging.INFO)
+
+class MemoryLoggingHandler(logging.Handler):
+    """Handler that just appends data to python array.
+    The elements are tuples:
+       (time, level, logger_name, message)
+    """
+    def __init__(self, install=False, max_records=10000):
+        logging.Handler.__init__(self)
+        self.data = list()
+        self.max_records = 10000
+        self.on_record = list()
+        self.last_time = 0
+        if install:
+            logging.getLogger().addHandler(self)
+
+    def emit(self, record):
+        """Part of logging.Handler interface"""
+        ts = record.created
+        if ts <= self.last_time:
+            # timestamp must always increase
+            ts = self.last_time + 1.0e-6
+        self.last_time = ts
+        self.data.append(
+            (ts,
+             record.levelno,
+             record.name,
+             record.getMessage()))
+        while len(self.data) > self.max_records:
+            self.data.pop(0)
+        for cb in self.on_record:
+            cb()
+
+    @staticmethod
+    def to_dict(mtuple, time_field='time'):
+        """Given a 4-tuple, convert it to dict"""
+        return {
+            time_field: mtuple[0],
+            'levelno': mtuple[1],
+            'name': mtuple[2],
+            'message': mtuple[3]}
+
+    @staticmethod
+    def relog(mtuple, delta_t=0, prefix=''):
+        """Given a 4-tuple, re-log it to local logger"""
+        # NOTE: this igores whole logger hierarchy. If we ever use it, pass a
+        # name here.
+        root = logging.getLogger()
+        assert len(mtuple) == 4
+        rec = root.makeRecord(
+            prefix + mtuple[2], mtuple[1], 'remote-file', -1, mtuple[3],
+            [], None, 'remote-func', None)
+        # Override time. There is no better way.
+        ct = delta_t + mtuple[0]
+        rec.created = ct
+        rec.msecs = (ct - long(ct)) * 1000
+        rec.relativeCreated = (rec.created - logging._startTime) * 1000
+        # Dispatch.
+        root.handle(rec)

@@ -8,17 +8,18 @@ import optparse
 import os
 import socket
 import sys
+import textwrap
 import time
 
 import trollius as asyncio
 from trollius import Task, From
 
-from vui_helpers import wrap_event, asyncio_misc_init, logging_init
+from vui_helpers import (
+    wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler)
 from video_window import VideoWindow, video_window_init, video_window_main
 
 # must be after video_window
 from gi.repository import GLib
-
 
 import joystick
 import legtool.async.trollius_trace
@@ -49,11 +50,13 @@ IDLE_COMMAND = {
 class UdpAnnounceReceiver(object):
     PORT = 13355
 
-    def __init__(self, opts):
+    def __init__(self, opts, logsaver=None):
         self.opts = opts
+        self.logsaver = logsaver
         self.logger = logging.getLogger('announce-receiver')
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                  socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         self.logger.info('Binding to port %d' % self.PORT)
         self.sock.bind(('', self.PORT))
@@ -105,17 +108,24 @@ class UdpAnnounceReceiver(object):
             'IP change not supported'
         self.server = info
         if self.control is None:
-            self.control = ControlInterface(self.opts, self.server['addr'],
-                                            self.server['cport'])
+            if opts.no_upload:
+                # Start UI now
+                self.control = ControlInterface(
+                    self.opts, self.server['addr'], self.server['cport'],
+                    logsaver=self.logsaver)
+            else:
+                # Start upload
+                raise NotImplemented
 
 class ControlInterface(object):
     SEND_INTERVAL = 0.25
     VIDEO_PORT = 13357
     UI_STATE_SAVEFILE = "last.jsonlist"
 
-    def __init__(self, opts, host, port=13356):
+    def __init__(self, opts, host, port=13356, logsaver=None):
         self.opts = opts
         self.logger = logging.getLogger('control')
+        self.logsaver = logsaver
         self.addr = (host, port)
         self.sock = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -172,8 +182,15 @@ class ControlInterface(object):
 
         # Control UI state. Should be a simple dict, as we will be serializing
         # it for later log replay.
-        self.state = dict(self._INITIAL_STATE)
+        self.ui_state = dict(self._INITIAL_STATE)
         self._logged_state = None
+
+        # timestamp of last received remote log message
+        # (set to 0 or None to disable received logs)
+        self.remote_logs_from = 1
+
+        # Most recent server state
+        self.server_state = dict()
 
         restore_from = opts.restore_state
 
@@ -188,7 +205,7 @@ class ControlInterface(object):
             logging.info('Loading saved state from %r', restore_from)
             with open(restore_from, 'r') as fh:
                 restored = json.load(fh)
-            self.state.update(restored)
+            self.ui_state.update(restored)
 
         self.video = None
 
@@ -314,13 +331,37 @@ class ControlInterface(object):
     def _send_control(self):
         self.seq += 1
         pkt = self.control_dict.copy()
-        pkt.update(seq=self.seq)
+        pkt.update(seq=self.seq,
+                   logs_from=self.remote_logs_from)
         self.sock.send(json.dumps(pkt))
         if self.seq == 3 and self.video:
             self.video.start()
 
-    def _handle_packet(self, pkt):
-        self.logger.info('Remote packet: %r' % (pkt, ))
+    def _handle_packet(self, pkt_raw):
+        # Get the structure
+        pkt = json.loads(pkt_raw)
+
+        # Prepare to log
+        pkt.update(cli_time=time.time(),
+                   _type='srv-state')
+
+        # Parse out messages -- no need to log them twice
+        logs = pkt.pop('logs_data', None) or []
+        for entry in logs:
+            if entry[0] > self.remote_logs_from:
+                # new record
+                self.remote_logs_from = entry[0]
+                log_dict = MemoryLoggingHandler.to_dict(
+                    entry, time_field='srv_time')
+                log_dict.update(
+                    _type='srv-log', cli_time=pkt['cli_time'])
+                self._log_struct(log_dict)
+                MemoryLoggingHandler.relog(entry, prefix='srv.')
+
+        # Log it and store (for display)
+        self._log_struct(pkt)
+        self.server_state = pkt
+
 
     _CAMERA_VIEW_ANGLE_DIAG = 78.0   # from camera datasheet
     _CAMERA_VIEW_ANGLE_HOR = _CAMERA_VIEW_ANGLE_DIAG / (16*16 + 9*9)**(0.5) * 16
@@ -339,9 +380,9 @@ class ControlInterface(object):
             return
         ang_x, ang_y = old_turret
 
-        ang_x -= (pos[0] - 0.5 - self.state['reticle_offset'][0]) \
+        ang_x -= (pos[0] - 0.5 - self.ui_state['reticle_offset'][0]) \
                  * self._CAMERA_VIEW_ANGLE_HOR
-        ang_y += (pos[1] - 0.5 - self.state['reticle_offset'][1]) \
+        ang_y += (pos[1] - 0.5 - self.ui_state['reticle_offset'][1]) \
                  * self._CAMERA_VIEW_ANGLE_VERT
         # TODO mafanasyev: add reticle_rotate support
 
@@ -407,11 +448,14 @@ class ControlInterface(object):
                 step = 0.002
             else:
                 step = 0.010
-            self.state['reticle_offset'] = add_pair(
-                self.state['reticle_offset'], (step * dx, step * dy))
+            self.ui_state['reticle_offset'] = add_pair(
+                self.ui_state['reticle_offset'], (step * dx, step * dy))
         elif name == 'r':
-            self.state['reticle_on'] ^= True
-            self.logger.info('Set reticle_on=%r', self.state['reticle_on'])
+            self.ui_state['reticle_on'] ^= True
+            self.logger.info('Set reticle_on=%r', self.ui_state['reticle_on'])
+        elif name == 'Esc':
+            if self.logsaver:
+                self.logsaver.data.clear()
         else:
             self.logger.info('Unknown key %r' % name)
 
@@ -426,28 +470,45 @@ class ControlInterface(object):
             self._send_control()
 
     def _print_help(self):
-        print 'Keys:'
-        print '  w/s, a/d - move'
-        print '  q/e      - rotate'
-        print '  l        - laser on/off'
-        print '  m        - agitator on/off'
-        print '  G        - green LED on/off'
-        print '  c        - enable && center turret'
-        print '  click    - point turret to this location (must center first)'
-        print '  ENTER    - fire'
-        print '  C+arrows - set reticle center (use shift for more precision)'
-        print '  r        - toggle reticle'
+        helpmsg = """
+        Keys:
+          w/s, a/d - move
+          q/e      - rotate
+          l        - laser on/off
+          m        - agitator on/off
+          G        - green LED on/off
+          c        - enable && center turret
+          click    - point turret to this location (must center first)
+          ENTER    - fire
+          C+arrows - set reticle center (use shift for more precision)
+          r        - toggle reticl
+          ESC      - clear logs from OSD
+        """
+        for line in textwrap.dedent(helpmsg).splitlines():
+            self.logger.info('| ' + line)
+
+    def _log_struct(self, rec):
+        """Log @p rec (which must be a json-serialized dict) to logfile.
+        @p rec must contain fields '_type' and 'cli_time'
+        @returns serialized string
+        """
+        sertext = json.dumps(rec, sort_keys=True)
+        if self.state_log_file:
+            print >>self.state_log_file, sertext
+            # No need to flush, file should have autoflush
+
+        return sertext
 
     def _state_updated(self, force=False):
-        sertext = json.dumps(self.state, sort_keys=True)
+        sertext = json.dumps(self.ui_state, sort_keys=True)
         if (sertext == self._logged_state) and not force:
             return
-        self._logged_text = sertext
 
-        if self.state_log_file:
-            # TODO mafanasyev: add video timestamp
-            print >>self.state_log_file, sertext
-            # No need to flush
+        # TODO mafanasyev: add video timestamp
+        self.ui_state['cli_time'] = time.time()
+        sertext = self._log_struct(self.ui_state)
+
+        self._logged_text = sertext
 
         if self.state_savefile_name is not None:
             with open(self.state_savefile_name + '~', 'w') as fh:
@@ -456,9 +517,8 @@ class ControlInterface(object):
             os.rename(self.state_savefile_name + '~',
                       self.state_savefile_name)
 
-
         stream = StringIO.StringIO()
-        self._render_svg(stream, self.state)
+        self._render_svg(stream, self.ui_state)
         if self.video:
             self.video.set_svg_overlay(stream.getvalue())
 
@@ -469,6 +529,8 @@ class ControlInterface(object):
 
 
     _INITIAL_STATE = dict(
+        # type marker used to recognize records in logfile. Do not change.
+        _type = 'ui-state',
         # SVG is stretched to video after rendering, so small width/height
         # will make all lines thicker. Force to video resolution: 1920x1080
         image_size=(1928, 1080),
@@ -517,6 +579,7 @@ def main(opts):
     asyncio_misc_init()
 
     logging_init(verbose=True)
+    logsaver = MemoryLoggingHandler(install=True)
 
     root = logging.getLogger()
 
@@ -555,9 +618,9 @@ def main(opts):
     video_window_init()
 
     if opts.addr is None:
-        ann = UdpAnnounceReceiver(opts)
+        ann = UdpAnnounceReceiver(opts, logsaver=logsaver)
     else:
-        cif = ControlInterface(opts, opts.addr)
+        cif = ControlInterface(opts, opts.addr, logsaver=logsaver)
 
     logging.info('Running')
     video_window_main()
@@ -567,7 +630,12 @@ if __name__ == '__main__':
     parser.add_option('--check', action='store_true',
                       help='Exit immediately after loading program')
     parser.add_option('--addr', metavar='IP',
-                      help='Client address (default autodiscover)')
+                      help='Client address (default autodiscover, explicit '
+                      'address disables code upload)')
+    parser.add_option('--no-upload', action='store_true',
+                      # permanently disable for now -- not implemented
+                      default=True,
+                      help='Do not upload/run server code on odroid')
     parser.add_option('--external-video', action='store_true',
                       help='Use external process for video playing')
     parser.add_option('--log-prefix', default=None,
