@@ -7,6 +7,7 @@ import logging
 import optparse
 import os
 import socket
+import subprocess
 import sys
 import textwrap
 import time
@@ -54,7 +55,6 @@ class UdpAnnounceReceiver(object):
         self.opts = opts
         self.logsaver = logsaver
         self.logger = logging.getLogger('announce-receiver')
-
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                                   socket.IPPROTO_UDP)
         self.sock.setblocking(0)
@@ -67,10 +67,10 @@ class UdpAnnounceReceiver(object):
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
         self.logger.info('Waiting for address broadcast')
-        # active server info
-        self.server = None
-        self.recent_sources = list()
+        self.last_info = None
         self.control = None
+        self.deploying = False
+        self.old_running_since = None
 
     @wrap_event
     def _on_readable(self, source, cond):
@@ -82,51 +82,94 @@ class UdpAnnounceReceiver(object):
                     raise
                 break
             data = json.loads(pkt)
-            if (self.server is None or
-                self.server['host'] != data['host'] or
-                self.server['start_time'] != data['start_time'] or
-                addr not in self.recent_sources):
-                # The server got restarted, or source address has changed.
-                server = dict(host=data['host'],
-                              start_time=data['start_time'],
-                              cport=data['cport'], # control port
-                              addr=addr[0],
-                              aport=addr[1] # announce port
-                              )
-                self._on_new_server(server)
-                self.recent_sources.append(addr)
-            while len(self.recent_sources) > 10:
-                self.recent_sources.pop(0)
+            # Inject source address info
+            data.update(addr = addr[0],
+                        aport = addr[1]) # announce port
+            self._on_server_packet(data)
         return True
 
-    def _on_new_server(self, info):
-        self.logger.info(
-            'Found a server at %s:%d (a-port %s, host %r, started %s)',
-            info['addr'], info['cport'], info['aport'], info['host'],
-            time.strftime('%F_%T', time.localtime(info['start_time'])))
-        assert self.server is None or self.server['addr'] == info['addr'], \
-            'IP change not supported'
-        self.server = info
-        if self.control is None:
-            if opts.no_upload:
-                # Start UI now
-                self.control = ControlInterface(
-                    self.opts, self.server['addr'], self.server['cport'],
-                    logsaver=self.logsaver)
-            else:
-                # Start upload
-                raise NotImplemented
+    def _on_server_packet(self, data):
+        if data['running_since']:
+            run_info = time.strftime('running since %F_%T',
+                                     time.localtime(data['running_since']))
+        else:
+            run_info = 'not running'
+        info = ('Launcher is at %s (port %s, hostname %r, start_time %s), '
+                'vserver %s'
+                ) % (data['addr'], data['aport'], data['host'],
+                     time.strftime('%F_%T', time.localtime(data['start_time'])),
+                     run_info)
+        if info != self.last_info:
+            self.logger.info(info)
+            self.last_info = info
+        # TODO mafanasyev: assert IP did not change
+
+        if self.control is not None:
+            return
+
+        if not opts.no_upload:
+            # Start deploy process, but only once
+            if not self.deploying:
+                # deploy will restart vserver. So do not start control interface
+                # while old vserver is running
+                self.old_running_since = data['running_since']
+                self.deploying = True
+                asyncio.Task(self._run_deploy_process(data['addr']))
+
+            # Return if program is not running yet
+            if data['running_since'] in [None, self.old_running_since]:
+                return
+
+        # Start UI now
+        self.control = ControlInterface(
+            self.opts, data['addr'], data.get('cport', None),
+            logsaver=self.logsaver)
+
+    @asyncio.coroutine
+    @wrap_event
+    def _run_deploy_process(self, addr):
+        # subprocess_exec is broken in gbulb/base_events.py, so use shell
+
+        deploy_cmd = "RHOST=%s %s start" % (
+            'odroid@' + addr,
+            os.path.join(
+                os.path.dirname(__file__), 'deploy-vserver.sh'))
+        logger = logging.getLogger('deploy')
+        logger.warning('Running: %s', deploy_cmd)
+
+        # We would like to capture stdout/stderr and redirect to logger, so that
+        # we properly record deploy error messages, but gbulb seems to be
+        # broken.
+        proc = yield From(
+            asyncio.create_subprocess_shell(
+                deploy_cmd,
+                close_fds=True,
+                #stdin=open('/dev/stdin', 'r'),
+                #stdout=asyncio.subprocess.PIPE,
+                #stderr=asyncio.subprocess.STDOUT
+                ))
+
+        #while True:
+        #    line = yield From(proc.stdout.readline())
+        #    logger.info(repr(line))
+        #    if line == '':
+        #        break
+
+        retcode = yield From(proc.wait())
+        logger.warning('Process exited, code %r', retcode)
+
 
 class ControlInterface(object):
     SEND_INTERVAL = 0.25
+    DEFAULT_PORT = 13356
     VIDEO_PORT = 13357
     UI_STATE_SAVEFILE = "last.jsonlist"
 
-    def __init__(self, opts, host, port=13356, logsaver=None):
+    def __init__(self, opts, host, port=None, logsaver=None):
         self.opts = opts
         self.logger = logging.getLogger('control')
         self.logsaver = logsaver
-        self.addr = (host, port)
+        self.addr = (host, port or self.DEFAULT_PORT)
         self.sock = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
@@ -321,7 +364,7 @@ class ControlInterface(object):
                 pkt, addr = self.sock.recvfrom(65535)
             except socket.error as e:
                 if e.errno != errno.EAGAIN:
-                    raise
+                    self.logger.error('Cannot read response: %s', e)
                 break
             assert addr == self.addr, \
                 'Got packet from %r, expected from %r' % (addr, self.addr)
@@ -633,8 +676,6 @@ if __name__ == '__main__':
                       help='Client address (default autodiscover, explicit '
                       'address disables code upload)')
     parser.add_option('--no-upload', action='store_true',
-                      # permanently disable for now -- not implemented
-                      default=True,
                       help='Do not upload/run server code on odroid')
     parser.add_option('--external-video', action='store_true',
                       help='Use external process for video playing')

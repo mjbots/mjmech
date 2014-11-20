@@ -45,38 +45,6 @@ SERVO_IDS_TO_POLL = [12, 13, 99]
 
 _start_time = time.time()
 
-class UdpAnnouncer(object):
-    PORT = 13355
-    INTERVAL = 0.5
-
-    def __init__(self):
-        self.logger = logging.getLogger('announcer')
-
-        self.sock = socket.socket(
-            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.sock.setblocking(0)
-        #self.logger.info('Binding to port %d' % self.PORT)
-        #self.sock.bind(('', self.PORT))
-        self.logger.info('Will broadcast on port %d every %.2f seconds' %
-                         (self.PORT, self.INTERVAL))
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        self.dest = ('255.255.255.255', self.PORT)
-        self.seq = 0
-        gobject.timeout_add(int(self.INTERVAL * 1000),
-                            wrap_event(self._broadcast))
-
-    def _broadcast(self):
-        #self.logger.debug('Broadcasting anouncement')
-        self.seq += 1
-        msg = json.dumps({'type': 'announce',
-                          'seq': self.seq,
-                          'cport': ControlInterface.PORT,
-                          'start_time': _start_time,
-                          'host': os.uname()[1]})
-        self.sock.sendto(msg + '\n', self.dest)
-        return True
-
-
 class ControlInterface(object):
     PORT = 13356
 
@@ -92,6 +60,8 @@ class ControlInterface(object):
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         self.logger.info('Binding to port %d' % self.PORT)
+        # Bind to port early (before opening serial device).
+        # This ensures only once instance is active.
         self.sock.bind(('', self.PORT))
 
         self.src_addr = None
@@ -429,7 +399,6 @@ def main(opts):
     # cleanup hack
     os.system("killall -v gst-launch-1.0")
 
-    ann = UdpAnnouncer()
     cif = ControlInterface(opts, logsaver=logsaver)
     logging.info('Running')
 
