@@ -24,16 +24,15 @@
  * Model turret
 
  * UI: One-click shooting -- should shoot once both servoes report INPOSITION
- * UI: Logs overlay
- * UI: report back status, esp. battery level and servo temperature
+ * UI: report back status -- servo temperature
  * UI: Make fire motor time adjustable (or at least longer)
  * Consider: UI: another marker (adjustable) where the gun will shoot
- * Forward server's logs to client
+ * UI: move turret with arrow keys
+ * UI: do not always restart vserver on vclient start
+ * power-off all servoes when client goes away
+ * power-on turret with 'c' command
  * Fix bug where the playback speed of record mkv's is too high.
 
- * Consider: wrapper script which only starts server when client has connected.
- * Consider: no script in robot's flash at all; upload on every boot (must be
-   integrated with client, not require open TCP connection)
  * Consider: record OSD into final video (as subtitles or re-code video properly)
 
  * Shoot qualification video and post it.

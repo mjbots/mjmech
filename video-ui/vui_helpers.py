@@ -3,6 +3,7 @@ import signal
 import sys
 import os
 import traceback
+import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../legtool/'))
@@ -68,10 +69,18 @@ class MemoryLoggingHandler(logging.Handler):
     The elements are tuples:
        (time, level, logger_name, message)
     """
+    SHORT_LEVEL_NAMES = {
+        logging.CRITICAL: 'C',
+        logging.ERROR: 'E',
+        logging.WARNING: 'W',
+        logging.INFO: 'I',
+        logging.DEBUG: 'D',
+        }
+
     def __init__(self, install=False, max_records=10000):
         logging.Handler.__init__(self)
         self.data = list()
-        self.max_records = 10000
+        self.max_records = max_records
         self.on_record = list()
         self.last_time = 0
         if install:
@@ -102,6 +111,15 @@ class MemoryLoggingHandler(logging.Handler):
             'levelno': mtuple[1],
             'name': mtuple[2],
             'message': mtuple[3]}
+
+    @classmethod
+    def to_string(cls, mtuple):
+        """Given a 4-tuple, convert it to string (default formatted)
+        """
+        return "%s [%s] %s: %s" % (
+            time.strftime("%T", time.localtime(mtuple[0])),
+            cls.SHORT_LEVEL_NAMES.get(mtuple[1], mtuple[1]),
+            mtuple[2], mtuple[3])
 
     @staticmethod
     def relog(mtuple, delta_t=0, prefix=''):

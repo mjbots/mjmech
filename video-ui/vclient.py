@@ -67,7 +67,8 @@ class UdpAnnounceReceiver(object):
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
         self.logger.info('Waiting for address broadcast')
-        self.last_info = None
+        self.last_ann_info = None
+        self.last_run_info = None
         self.control = None
         self.deploying = False
         self.old_running_since = None
@@ -89,20 +90,24 @@ class UdpAnnounceReceiver(object):
         return True
 
     def _on_server_packet(self, data):
-        if data['running_since']:
-            run_info = time.strftime('running since %F_%T',
-                                     time.localtime(data['running_since']))
-        else:
-            run_info = 'not running'
-        info = ('Launcher is at %s (port %s, hostname %r, start_time %s), '
-                'vserver %s'
-                ) % (data['addr'], data['aport'], data['host'],
-                     time.strftime('%F_%T', time.localtime(data['start_time'])),
-                     run_info)
-        if info != self.last_info:
-            self.logger.info(info)
-            self.last_info = info
+        ann_info = ('Launcher is at %s (port %s, hostname %r, start_time %s)'
+                    ) % (
+            data['addr'], data['aport'], data['host'],
+            time.strftime('%F_%T', time.localtime(data['start_time'])))
+        if ann_info != self.last_ann_info:
+            self.logger.info(ann_info)
+            self.last_ann_info = ann_info
         # TODO mafanasyev: assert IP did not change
+
+        run_info = 'vserver '
+        if data['running_since']:
+            run_info += time.strftime('running since %F_%T',
+                                      time.localtime(data['running_since']))
+        else:
+            run_info += 'not running'
+        if run_info != self.last_run_info:
+            self.logger.info(run_info)
+            self.last_run_info = run_info
 
         if self.control is not None:
             return
@@ -169,6 +174,7 @@ class ControlInterface(object):
         self.opts = opts
         self.logger = logging.getLogger('control')
         self.logsaver = logsaver
+        self.asyncio_loop = asyncio.get_event_loop()
         self.addr = (host, port or self.DEFAULT_PORT)
         self.sock = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -252,6 +258,8 @@ class ControlInterface(object):
 
         self.video = None
 
+        self._update_video_overlay_pending = False
+
         # Log state before video, to check for code errors in rendering function
         self._state_updated()
 
@@ -289,6 +297,12 @@ class ControlInterface(object):
                           GLib.PRIORITY_DEFAULT,
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
+
+        # Refresh overlay when new logs are arriving
+        if self.logsaver:
+            self.logsaver.on_record.append(
+                lambda *_: self.update_video_overlay())
+
 
     def select_axes(self):
         complete = self.joystick.get_features(linux_input.EV.ABS)
@@ -404,6 +418,7 @@ class ControlInterface(object):
         # Log it and store (for display)
         self._log_struct(pkt)
         self.server_state = pkt
+        self.update_video_overlay()
 
 
     _CAMERA_VIEW_ANGLE_DIAG = 78.0   # from camera datasheet
@@ -496,11 +511,24 @@ class ControlInterface(object):
         elif name == 'r':
             self.ui_state['reticle_on'] ^= True
             self.logger.info('Set reticle_on=%r', self.ui_state['reticle_on'])
-        elif name == 'Esc':
-            if self.logsaver:
-                self.logsaver.data.clear()
+        elif name == 'KP_Add':
+            self.ui_state['msg_font_size'] += 1
+        elif name == 'KP_Subtract':
+            self.ui_state['msg_font_size'] = max(
+                4, self.ui_state['msg_font_size'] - 1)
+        elif name == 'Escape':
+            if self.logsaver and self.logsaver.data:
+                self.logger.info('Cleared on-screen display (%d lines)',
+                                 len(self.logsaver.data))
+                # TODO mafanasyev: when we will log logs properly, we should
+                # also log 'clear' events, so we can reconstruct OSD properly
+                del self.logsaver.data[:]
+            else:
+                self.ui_state['servo_status_on'] ^= True
+                self.logger.debug('Set servo_status_on=%r',
+                                  self.ui_state['servo_status_on'])
         else:
-            self.logger.info('Unknown key %r' % name)
+            self.logger.debug('Unknown key %r' % name)
 
         self._state_updated()
         self._send_control()
@@ -514,7 +542,7 @@ class ControlInterface(object):
 
     def _print_help(self):
         helpmsg = """
-        Keys:
+        Help on Keys:
           w/s, a/d - move
           q/e      - rotate
           l        - laser on/off
@@ -525,9 +553,10 @@ class ControlInterface(object):
           ENTER    - fire
           C+arrows - set reticle center (use shift for more precision)
           r        - toggle reticl
-          ESC      - clear logs from OSD
+          ESC      - clear logs from OSD; then toggle servo status
+          Numpad +/-  - change OSD font size
         """
-        for line in textwrap.dedent(helpmsg).splitlines():
+        for line in textwrap.dedent(helpmsg).strip().splitlines():
             self.logger.info('| ' + line)
 
     def _log_struct(self, rec):
@@ -559,9 +588,26 @@ class ControlInterface(object):
             # Atomically install new version
             os.rename(self.state_savefile_name + '~',
                       self.state_savefile_name)
+        self.update_video_overlay()
 
+    def update_video_overlay(self):
+        """Request update of video overlay in thread-safe way"""
+        if self._update_video_overlay_pending:
+            # An update is pending
+            return
+        self._update_video_overlay_pending = True
+        self.asyncio_loop.call_soon_threadsafe(self._update_video_overlay_now)
+
+    @wrap_event
+    def _update_video_overlay_now(self):
+        self._update_video_overlay_pending = False
+
+        if self.logsaver:
+            logs = self.logsaver.data
+        else:
+            logs = []
         stream = StringIO.StringIO()
-        self._render_svg(stream, self.ui_state)
+        self._render_svg(stream, self.ui_state, self.server_state, logs)
         if self.video:
             self.video.set_svg_overlay(stream.getvalue())
 
@@ -576,25 +622,28 @@ class ControlInterface(object):
         _type = 'ui-state',
         # SVG is stretched to video after rendering, so small width/height
         # will make all lines thicker. Force to video resolution: 1920x1080
-        image_size=(1928, 1080),
+        image_size=(1920, 1080),
         reticle_on=True,
         reticle_offset=(0, 0),
         reticle_rotate=0,
+        servo_status_on=True,
+        msg_font_size=20,
     )
 
     @staticmethod
-    def _render_svg(out, state):
+    def _render_svg(out, ui_state, server_state, logs):
         """Render SVG for a given state. Should not access anything other
-        than parameters, as this will be called during replay.
+        than parameters, as this function may be called during replay.
         """
         print >>out, '<svg width="{image_size[0]}" height="{image_size[1]}">'\
-            .format(**state)
+            .format(**ui_state)
 
-        if state['reticle_on']:
-            reticle_center_rel = add_pair((0.5, 0.5), state['reticle_offset'])
+        if ui_state['reticle_on']:
+            reticle_center_rel = add_pair((0.5, 0.5),
+                                          ui_state['reticle_offset'])
             reticle_center = (
-                state['image_size'][0] * reticle_center_rel[0],
-                state['image_size'][1] * reticle_center_rel[1])
+                ui_state['image_size'][0] * reticle_center_rel[0],
+                ui_state['image_size'][1] * reticle_center_rel[1])
 
             print >>out, '''
 <g transform='rotate({0[reticle_rotate]}) translate({1[0]} {1[1]})'
@@ -612,9 +661,58 @@ class ControlInterface(object):
   <line x1="-40" x2="40"  y1="60" y2="60" />
   <line x1="-20" x2="20"  y1="80" y2="80" />
 </g>
-'''.format(state, reticle_center)
+'''.format(ui_state, reticle_center)
 
-        print >>out, '<text x="0" y="15" fill="red">Logs will go here</text>'
+        servo_status_lines = list()
+        if ui_state['servo_status_on'] and server_state:
+            s_voltage = server_state.get('servo_voltage', {})
+            s_status = server_state.get('servo_status', {})
+            line_num = 0
+            for servo in sorted(set(s_voltage.keys() + s_status.keys())):
+                tags = []
+                if s_status.get(servo):
+                    tags.append(str(s_status[servo]))
+                if s_voltage.get(servo):
+                    tags.append('%.2fV' % s_voltage[servo])
+                if not tags:
+                    continue
+                tags.append("%-2s" % servo)
+                servo_status_lines.append(' '.join(tags))
+            if not servo_status_lines:
+                servo_status_lines.append('No servo status available')
+                #print 'FAIL', s_voltage, s_status
+        else:
+            servo_status_lines.append('[OFF]')
+
+        # We output each text twice: first text outline in black, then text
+        # itself in bright color. This ensures good visibility over both black
+        # and green background.
+        for tp in ['stroke="black" fill="black"', 'fill="COLOR"']:
+            print >>out, '''
+<text transform="translate(10 {0})" {1}
+   font-family="Helvetica,sans-serif"
+   font-size="{2}" text-anchor="left" dominant-baseline="text-before-edge">
+'''.format(ui_state['image_size'][1] - 15,
+           tp.replace('COLOR', 'lime'), ui_state['msg_font_size'])
+            # Total number of lines is specified in MemoryLoggingHandler
+            # constructor.
+            for line_num, mtuple in enumerate(reversed(logs)):
+                line = MemoryLoggingHandler.to_string(mtuple)
+                print >>out, '<tspan x="0" y="%d"><![CDATA[%s]]></tspan>' % (
+                    (-1 - line_num) * ui_state['msg_font_size'], line)
+            print >>out, '</text>'
+
+            print >>out, '''
+<text transform="translate({0} 15)" {1}
+   font-family="Courier,fixed" font-weight="bold"
+   font-size="{2}" text-anchor="end" dominant-baseline="text-before-edge">
+'''.format(ui_state['image_size'][0] - 10, tp.replace('COLOR', 'white'),
+           ui_state['msg_font_size'])
+            for line_num, line in enumerate(servo_status_lines):
+                print >>out, ('<tspan x="0" y="%d"><![CDATA[%s]]></tspan>'
+                              % (line_num * ui_state['msg_font_size'], line))
+            print >>out, '</text>'
+
         print >>out, '</svg>'
 
 
@@ -622,7 +720,7 @@ def main(opts):
     asyncio_misc_init()
 
     logging_init(verbose=True)
-    logsaver = MemoryLoggingHandler(install=True)
+    logsaver = MemoryLoggingHandler(install=True, max_records=30)
 
     root = logging.getLogger()
 

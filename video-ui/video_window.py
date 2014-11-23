@@ -389,12 +389,18 @@ class VideoWindow(object):
 
         return True
 
-    def _evt_get_video_coord(self, evt):
+    def get_video_window_size(self):
         # Get size of window
         alloc = self.drawingarea.get_allocation()
-        wnd_size = (alloc.width, alloc.height)
+
         #wnd_size = (self.imagesink.get_property('window-width'),
         #            self.imagesink.get_property('window-height'))
+
+        return (alloc.width, alloc.height)
+
+    def _evt_get_video_coord(self, evt):
+        # Get size of window
+        wnd_size = self.get_video_window_size()
 
         # Get original size of video stream
         caps = self.imagesink.sinkpad.get_current_caps()

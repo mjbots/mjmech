@@ -155,7 +155,7 @@ class HerkuleXController(object):
             status = None
 
         if status is None:
-            raise Return(['servo-offline'])
+            raise Return(['offline'])
 
         if status.has_errors():
             yield From(self.port.clear_errors(ident))

@@ -41,7 +41,7 @@ TURRET_RANGE_Y = (-90, 90)
 
 # Which servo IDs to poll for status
 # (set to false value to disable mechanism)
-SERVO_IDS_TO_POLL = [12, 13, 99]
+SERVO_IDS_TO_POLL = [1, 3, 5, 7, 12, 13, 99]
 
 _start_time = time.time()
 
@@ -306,18 +306,21 @@ class ControlInterface(object):
         if self.next_servo_to_poll is not None:
             servo_id = self.next_servo_to_poll.next()
             self.servo_poll_count += 1
-            if ((self.servo_poll_count % 100) == 1):
+            # Note that mod-factor should be relatively prime to number
+            # of servoes
+            if ((self.servo_poll_count % 103) == 10) and (servo_id != 99) and \
+                    self.last_servo_status.get(servo_id) != 'offline':
                 voltage_dict = yield From(servo.get_voltage([servo_id]))
                 voltage = voltage_dict.get(servo_id, None)
-                self.logger.debug('Servo voltage for %r: %.1f',
-                                  servo_id, voltage or -1)
+                #self.logger.debug('Servo voltage for %r: %.1f',
+                #                  servo_id, voltage or -1)
                 self.status_packet['servo_voltage'][servo_id] = voltage
             else:
                 status_list = yield From(servo.get_clear_status(servo_id))
                 status_str = ','.join(status_list) or 'idle'
                 if status_str != self.last_servo_status.get(servo_id):
-                    self.logger.info('Servo status for %r: %s'
-                                 % (servo_id, status_str))
+                    self.logger.debug('Servo status for %r: %s'
+                                      % (servo_id, status_str))
                     self.last_servo_status[servo_id] = status_str
                 self.status_packet['servo_status'][servo_id] = status_str
 
