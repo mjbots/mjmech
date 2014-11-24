@@ -319,20 +319,20 @@ class ControlInterface(object):
                 status_list = yield From(servo.get_clear_status(servo_id))
                 status_str = ','.join(status_list) or 'idle'
                 if status_str != self.last_servo_status.get(servo_id):
-                    self.logger.debug('Servo status for %r: %s'
-                                      % (servo_id, status_str))
+                    #self.logger.debug('Servo status for %r: %s'
+                    #                  % (servo_id, status_str))
                     self.last_servo_status[servo_id] = status_str
                 self.status_packet['servo_status'][servo_id] = status_str
 
         if data.get('turret'):
             servo_x, servo_y = data['turret']
-            servo_x = min(TURRET_RANGE_X[1],
-                          max(TURRET_RANGE_X[0], servo_x))
-            servo_y = min(TURRET_RANGE_Y[1],
-                          max(TURRET_RANGE_Y[0], servo_y))
+            send_x = min(TURRET_RANGE_X[1],
+                         max(TURRET_RANGE_X[0], -servo_x))
+            send_y = min(TURRET_RANGE_Y[1],
+                         max(TURRET_RANGE_Y[0], servo_y))
             yield From(self.mech_driver.servo.set_pose(
-                    {12: servo_x,
-                     13: servo_y}))
+                    {12: send_x,
+                     13: send_y}))
 
         if data.get('gait'):
             # We got a gait command. Start the mech driver.

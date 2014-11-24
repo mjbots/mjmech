@@ -4,6 +4,7 @@ import errno
 import functools
 import json
 import logging
+import math
 import optparse
 import os
 import socket
@@ -25,6 +26,7 @@ from gi.repository import GLib
 import joystick
 import legtool.async.trollius_trace
 import linux_input
+import calibration
 
 # Possible locations for logdir. If any of the paths exist, will use this one.
 # else, will use the last entry.
@@ -34,8 +36,9 @@ LOG_DIR_LOCATIONS = [
     './mjmech-data' ]
 
 
-def add_pair(a, b):
-    return (a[0] + b[0], a[1] + b[1])
+def add_pair(a, b, scale=1.0):
+    return (a[0] + b[0] * scale,
+            a[1] + b[1] * scale)
 
 RIPPLE_COMMAND = {
     'type': 'ripple',
@@ -170,6 +173,51 @@ class ControlInterface(object):
     VIDEO_PORT = 13357
     UI_STATE_SAVEFILE = "last.jsonlist"
 
+    _INITIAL_UI_STATE = dict(
+        # type marker used to recognize records in logfile. Do not change.
+        _type = 'ui-state',
+        # SVG is stretched to video after rendering, so small width/height
+        # will make all lines thicker. Force to video resolution: 1920x1080
+        image_size=(1920, 1080),
+        reticle_on=True,
+        reticle_offset=(0, 0),
+        reticle_rotate=0,
+        status_on=True,
+        msg_font_size=20,
+    )
+
+    _INITIAL_CONTROL_DICT = dict(
+        # type marker used to recognize records in logfile. Do not change.
+        _type = 'control-dict',
+
+        boot_time = time.time(),
+
+        # Incremented on each packet TX
+        seq = 0,
+
+        # Set before each packet TX
+        cli_time = None,
+
+        video_port=VIDEO_PORT,
+        # Not set: turret - pair of (x, y) degrees
+        # Not set: gait - a dict based off IDLE/RIPPLE_COMMAND
+
+        # 0 = off; 1 = on
+        laser_on = 0,
+        agitator_on = 0,
+        green_led_on = 0,
+
+        # pwm values in 0..1 range
+        agitator_pwm = 0.5,
+        fire_motor_pwm = 0.75,
+        # fire command duration (seconds)
+        fire_duration = 0.5,
+
+        # fire a shot every time this changes; should only ever increase
+        fire_cmd_count = 0,
+        )
+
+
     def __init__(self, opts, host, port=None, logsaver=None):
         self.opts = opts
         self.logger = logging.getLogger('control')
@@ -178,37 +226,20 @@ class ControlInterface(object):
         self.addr = (host, port or self.DEFAULT_PORT)
         self.sock = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.c_cal = calibration.CameraCalibration()
+        # TODO mafanasyev: load yaml here? Does it make sense if we do
+        # not support distortion?
 
         self.sock.setblocking(0)
         self.logger.info('Connecting to %s:%d' % self.addr)
         self.sock.connect(self.addr)
 
+
         # Wallclock and pipeline time
         self.last_video_wall_time = None
         self.last_video_pp_time = None
 
-        self.seq = 0
-        self.control_dict = dict(
-            boot_time = time.time(),
-
-            video_port=self.VIDEO_PORT,
-            # Not set: turret - pair of (x, y) degrees
-            # Not set: gait - a dict based off IDLE/RIPPLE_COMMAND
-
-            # 0 = off; 1 = on
-            laser_on = 0,
-            agitator_on = 0,
-            green_led_on = 0,
-
-            # pwm values in 0..1 range
-            agitator_pwm = 0.5,
-            fire_motor_pwm = 0.75,
-            # fire command duration (seconds)
-            fire_duration = 0.5,
-
-            # fire a shot every time this changes; should only ever increase
-            fire_cmd_count = 0,
-            )
+        self.control_dict = dict(self._INITIAL_CONTROL_DICT)
 
         # If True, some gait-related key is being held.
         self.key_gait_active = False
@@ -231,7 +262,7 @@ class ControlInterface(object):
 
         # Control UI state. Should be a simple dict, as we will be serializing
         # it for later log replay.
-        self.ui_state = dict(self._INITIAL_STATE)
+        self.ui_state = dict(self._INITIAL_UI_STATE)
         self._logged_state = None
 
         # timestamp of last received remote log message
@@ -268,7 +299,7 @@ class ControlInterface(object):
             if opts.log_prefix:
                 video_log = opts.log_prefix + '.mkv'
             self.video = VideoWindow(host, self.VIDEO_PORT, video_log=video_log)
-            self.video.on_video_click_1 = self._handle_video_click_1
+            self.video.on_video_click = self._handle_video_click
             self.video.on_key_press = self._handle_key_press
             self.video.on_key_release = self._handle_key_release
             self.video.on_got_video = functools.partial(
@@ -386,12 +417,13 @@ class ControlInterface(object):
         return True
 
     def _send_control(self):
-        self.seq += 1
-        pkt = self.control_dict.copy()
-        pkt.update(seq=self.seq,
-                   logs_from=self.remote_logs_from)
-        self.sock.send(json.dumps(pkt))
-        if self.seq == 3 and self.video:
+        self.control_dict['seq'] += 1
+        self.control_dict.update(
+            logs_from=self.remote_logs_from,
+            cli_time=time.time())
+        serialized = self._log_struct(self.control_dict)
+        self.sock.send(serialized)
+        if self.control_dict['seq'] == 3 and self.video:
             self.video.start()
 
     def _handle_packet(self, pkt_raw):
@@ -421,38 +453,48 @@ class ControlInterface(object):
         self.update_video_overlay()
 
 
-    _CAMERA_VIEW_ANGLE_DIAG = 78.0   # from camera datasheet
-    _CAMERA_VIEW_ANGLE_HOR = _CAMERA_VIEW_ANGLE_DIAG / (16*16 + 9*9)**(0.5) * 16
-    _CAMERA_VIEW_ANGLE_VERT = _CAMERA_VIEW_ANGLE_DIAG / (16*16 + 9*9)**(0.5) * 9
-
-    def _handle_video_click_1(self, pos, moved=False):
+    def _handle_video_click(self, pos, button, moved=False):
         """User clicked button 1 on video window.
         pos is (x, y) tuple in 0..1 range"""
         assert len(pos) == 2
         if moved:
             # Only care about initial click.
             return
+
+        # This image_size will be broken if aspect ratio is different -- this
+        # usually means truncated image, not resized pixels; but we do not care
+        # for now.
+        w2d = self.c_cal.to_world2d(pos, image_size=(1.0, 1.0))
+        w2ang = (
+             math.degrees(math.atan(w2d[0])),
+             math.degrees(math.atan(w2d[1]))
+             )
+
+        if button != 1:
+            self.logger.info('Click with B%d at (w2d %.3f,%.3f, w2a '
+                             '%.1f,%.1f)' % ((button, ) + w2d + w2ang))
+            return
+
         old_turret = self.control_dict.get('turret')
         if old_turret is None:
-            self.logger.warn('Cannot move turret -- center it first')
+            self.logger.warn('Cannot move turret -- center it first '
+                             '(w2d %.3f,%.3f, w2a %.1f,%.1f)' % (w2d + w2ang))
             return
-        ang_x, ang_y = old_turret
 
-        ang_x -= (pos[0] - 0.5 - self.ui_state['reticle_offset'][0]) \
-                 * self._CAMERA_VIEW_ANGLE_HOR
-        ang_y += (pos[1] - 0.5 - self.ui_state['reticle_offset'][1]) \
-                 * self._CAMERA_VIEW_ANGLE_VERT
+        ang_x, ang_y = old_turret
+        ang_x += w2ang[0]
+        ang_y += w2ang[1]
         # TODO mafanasyev: add reticle_rotate support
 
-        self.logger.info('Setting turret to (%+.1f, %+.1f) deg in response '
-                         'to click at (%.4f, %.4f)',
-                         ang_x, ang_y, pos[0], pos[1])
+        self.logger.debug('Moving turret to (%+.1f, %+.1f) deg in response '
+                          'to click at (%+.4f, %+.4f)',
+                         ang_x, ang_y, w2d[0], w2d[1])
         self.control_dict['turret'] = (ang_x, ang_y)
         self._send_control()
 
     _GAIT_KEYS = {  #  key->(dx,dy,dr)
-        'w': (0, -1, 0),
-        's': (0, 1, 0),
+        'w': (0, 1, 0),
+        's': (0, -1, 0),
         'a': (-1, 0, 0),
         'd': (1, 0, 0),
         'q': (0, 0, -1),
@@ -467,6 +509,10 @@ class ControlInterface(object):
     }
 
     def _handle_key_press(self, base_name, modifiers):
+        arrows = self._ARROW_KEYS.get(base_name)
+        if arrows:
+            base_name = 'Arrows'
+
         name = modifiers + base_name
 
         if name in self._GAIT_KEYS:
@@ -488,7 +534,7 @@ class ControlInterface(object):
             self.logger.info('Agitator set to %d (pwm %.3f)',
                              self.control_dict['agitator_on'],
                              self.control_dict['agitator_pwm'])
-        elif name == 'G':
+        elif name == 'S-G':
             self.control_dict['green_led_on'] ^= 1
             self.logger.info('Green LED set to %d',
                              self.control_dict['green_led_on'])
@@ -498,16 +544,19 @@ class ControlInterface(object):
         elif name == 'c':
             self.control_dict['turret'] = (0.0, 0.0)
             self.logger.info('Centered turret')
-        elif base_name in self._ARROW_KEYS and 'C-' in modifiers:
+        elif name in ['C-Arrows', 'C-S-Arrows']:
             # Ctrl + arrows to move reticle center
-            dx, dy = self._ARROW_KEYS[base_name]
-            # Shift makes it slower
-            if 'S-' in modifiers:
-                step = 0.002
-            else:
-                step = 0.010
+            step = 0.010 if ('S-' in modifiers) else 0.002
             self.ui_state['reticle_offset'] = add_pair(
-                self.ui_state['reticle_offset'], (step * dx, step * dy))
+                self.ui_state['reticle_offset'], arrows, step)
+        elif name in ['Arrows', 'S-Arrows']:
+            # Move turret
+            step = 5.0 if ('S-' in modifiers) else 0.5
+            if self.control_dict.get('turret') is None:
+                self.logger.warn('Cannot move turret -- center it first')
+            else:
+                self.control_dict['turret'] = add_pair(
+                    self.control_dict['turret'], arrows, step)
         elif name == 'r':
             self.ui_state['reticle_on'] ^= True
             self.logger.info('Set reticle_on=%r', self.ui_state['reticle_on'])
@@ -524,9 +573,14 @@ class ControlInterface(object):
                 # also log 'clear' events, so we can reconstruct OSD properly
                 del self.logsaver.data[:]
             else:
-                self.ui_state['servo_status_on'] ^= True
-                self.logger.debug('Set servo_status_on=%r',
-                                  self.ui_state['servo_status_on'])
+                self.ui_state['status_on'] ^= True
+                self.logger.debug('Set status_on=%r',
+                                  self.ui_state['status_on'])
+        elif base_name in ['Shift_R', 'Shift_L',
+                           'Control_R', 'Control_L',
+                           'Alt_R', 'Alt_L']:
+            # Ignore modifiers
+            pass
         else:
             self.logger.debug('Unknown key %r' % name)
 
@@ -551,7 +605,10 @@ class ControlInterface(object):
           c        - enable && center turret
           click    - point turret to this location (must center first)
           ENTER    - fire
+          arrows   - move turret
+          S+arrows - move turret (move faster)
           C+arrows - set reticle center (use shift for more precision)
+          C+S+arrows - set reticle center (move faster)
           r        - toggle reticl
           ESC      - clear logs from OSD; then toggle servo status
           Numpad +/-  - change OSD font size
@@ -607,7 +664,8 @@ class ControlInterface(object):
         else:
             logs = []
         stream = StringIO.StringIO()
-        self._render_svg(stream, self.ui_state, self.server_state, logs)
+        self._render_svg(stream, self.ui_state, self.control_dict,
+                         self.server_state, logs)
         if self.video:
             self.video.set_svg_overlay(stream.getvalue())
 
@@ -616,22 +674,8 @@ class ControlInterface(object):
                 f.write(stream.getvalue())
             os.rename(self.last_svg_name + '~', self.last_svg_name)
 
-
-    _INITIAL_STATE = dict(
-        # type marker used to recognize records in logfile. Do not change.
-        _type = 'ui-state',
-        # SVG is stretched to video after rendering, so small width/height
-        # will make all lines thicker. Force to video resolution: 1920x1080
-        image_size=(1920, 1080),
-        reticle_on=True,
-        reticle_offset=(0, 0),
-        reticle_rotate=0,
-        servo_status_on=True,
-        msg_font_size=20,
-    )
-
     @staticmethod
-    def _render_svg(out, ui_state, server_state, logs):
+    def _render_svg(out, ui_state, control_dict, server_state, logs):
         """Render SVG for a given state. Should not access anything other
         than parameters, as this function may be called during replay.
         """
@@ -663,12 +707,38 @@ class ControlInterface(object):
 </g>
 '''.format(ui_state, reticle_center)
 
-        servo_status_lines = list()
-        if ui_state['servo_status_on'] and server_state:
-            s_voltage = server_state.get('servo_voltage', {})
-            s_status = server_state.get('servo_status', {})
-            line_num = 0
-            for servo in sorted(set(s_voltage.keys() + s_status.keys())):
+        status_lines = list()
+        if not ui_state['status_on']:
+            status_lines.append('[OFF]')
+        else:
+            # Add turret position
+            if control_dict.get('turret') is None:
+                status_lines.append('Turret OFF')
+            else:
+                status_lines.append('Turret: ({:+5.1f}, {:+5.1f})'
+                                    .format(*control_dict['turret']))
+
+            # Add GPIO status
+            tags = list()
+            if control_dict['laser_on']:
+                tags.append('LAS')
+            if control_dict['agitator_on']:
+                tags.append('AGT')
+            if control_dict['green_led_on']:
+                tags.append('GRN')
+            if not tags:
+                tags.append('(all off)')
+            status_lines.append(','.join(tags))
+
+            # Add servo status
+            if server_state:
+                s_voltage = server_state.get('servo_voltage', {})
+                s_status = server_state.get('servo_status', {})
+            else:
+                s_voltage = s_status = {}
+            got_any = False
+            for servo in sorted(set(s_voltage.keys() + s_status.keys()),
+                                key=int):
                 tags = []
                 if s_status.get(servo):
                     tags.append(str(s_status[servo]))
@@ -677,12 +747,10 @@ class ControlInterface(object):
                 if not tags:
                     continue
                 tags.append("%-2s" % servo)
-                servo_status_lines.append(' '.join(tags))
-            if not servo_status_lines:
-                servo_status_lines.append('No servo status available')
-                #print 'FAIL', s_voltage, s_status
-        else:
-            servo_status_lines.append('[OFF]')
+                status_lines.append(' '.join(tags))
+                got_any = True
+            if not got_any:
+                status_lines.append('No servo status available')
 
         # We output each text twice: first text outline in black, then text
         # itself in bright color. This ensures good visibility over both black
@@ -708,7 +776,7 @@ class ControlInterface(object):
    font-size="{2}" text-anchor="end" dominant-baseline="text-before-edge">
 '''.format(ui_state['image_size'][0] - 10, tp.replace('COLOR', 'white'),
            ui_state['msg_font_size'])
-            for line_num, line in enumerate(servo_status_lines):
+            for line_num, line in enumerate(status_lines):
                 print >>out, ('<tspan x="0" y="%d"><![CDATA[%s]]></tspan>'
                               % (line_num * ui_state['msg_font_size'], line))
             print >>out, '</text>'

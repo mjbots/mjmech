@@ -217,7 +217,7 @@ class VideoWindow(object):
                          self._on_video_info_timer)
 
         # Callback functions
-        self.on_video_click_1 = None
+        self.on_video_click = None
         self.on_key_press = None
         self.on_key_release = None
         self.on_got_video = None
@@ -376,6 +376,10 @@ class VideoWindow(object):
                                  msg.src.get_name(),
                                  msg.src.get_property('port'),
                                  mstruct.get_value('timeout') / 1.e9)
+            elif struct_name == 'application/x-rtp-source-sdes':
+                self.logger.debug("Source appears: tool %r at %r",
+                                  mstruct.get_value('tool'),
+                                  mstruct.get_value('cname'))
             else:
                 self.logger.debug("Element %r says: %s" % (
                         msg.src.get_name(), mstruct.to_string()))
@@ -390,18 +394,14 @@ class VideoWindow(object):
         return True
 
     def get_video_window_size(self):
-        # Get size of window
+        """Get visible size of video window. Returns (width, height) tuple"""
         alloc = self.drawingarea.get_allocation()
-
-        #wnd_size = (self.imagesink.get_property('window-width'),
-        #            self.imagesink.get_property('window-height'))
-
         return (alloc.width, alloc.height)
 
-    def _evt_get_video_coord(self, evt):
-        # Get size of window
-        wnd_size = self.get_video_window_size()
-
+    def get_video_size(self):
+        """Get video size. Returns (width, height) tuple, or None
+        if video is not ready yet.
+        """
         # Get original size of video stream
         caps = self.imagesink.sinkpad.get_current_caps()
         if caps is None:
@@ -409,10 +409,22 @@ class VideoWindow(object):
 
         # Assume these are simple caps with a single struct.
         struct = caps.get_structure(0)
-        video_size = (struct.get_int('width')[1], struct.get_int('height')[1])
+        return (struct.get_int('width')[1], struct.get_int('height')[1])
 
-        # Calculate image position in (-1..1) range (taking in the account
-        # that video is scaled, but aspect ratio is preserved)
+
+    def _evt_get_video_coord(self, evt):
+        """Given a mouse-click event from the video window, convert it to
+        video coordinates scaled into (0-1) range.
+        Returns None for click outside of window, else 2-tuple.
+        """
+        # Get size of window
+        wnd_size = self.get_video_window_size()
+        video_size = self.get_video_size()
+        if video_size is None:
+            return None
+
+        # imagesink centers the video while preserving aspect ratio. Reproduce
+        # the scaling logic.
         scale = min(wnd_size[0] * 1.0 / video_size[0],
                     wnd_size[1] * 1.0 / video_size[1])
         rel_pos = (0.5 + (evt.x - wnd_size[0]/2.0) / scale / video_size[0],
@@ -427,10 +439,11 @@ class VideoWindow(object):
         assert src == self.drawingarea, src
 
         if evt.state & Gdk.ModifierType.BUTTON1_MASK:
-            # Button is being held.
+            # Button 1 is being held.
+            # (we do not support moves for other buttons)
             rel_pos = self._evt_get_video_coord(evt)
-            if rel_pos and self.on_video_click_1:
-                self.on_video_click_1(rel_pos, moved=True)
+            if rel_pos and self.on_video_click:
+                self.on_video_click(rel_pos, moved=True, button=1)
 
     @wrap_event
     def _on_da_click(self, src, evt):
@@ -445,8 +458,8 @@ class VideoWindow(object):
         self.logger.debug(
             'Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d',
             evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state)
-        if evt.button == 1 and self.on_video_click_1:
-            self.on_video_click_1(rel_pos, moved=False)
+        if self.on_video_click:
+            self.on_video_click(rel_pos, moved=False, button=evt.button)
         return True
 
     @wrap_event

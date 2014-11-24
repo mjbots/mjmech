@@ -85,9 +85,13 @@ class StatusResponse(Response):
             "eep_reg_distorted",
 
             "moving", "inposition", "checksum_error", "unknown_command",
-            "exceed_reg_range", "garbage_detected", "motor_on"):
+            "exceed_reg_range", "garbage_detected"):
             if getattr(self, attr):
                 result.append(attr)
+        # 'motor_on' is enabled all the time while operating; to keep statuses
+        #  short, hide it and use 'motor_off' instead
+        if not self.motor_on:
+            result.append("motor_off")
         return result
 
     def has_errors(self):
@@ -440,4 +444,3 @@ class HerkuleX(object):
     def set_position_ki(self, servo, value):
         yield From(
             self.ram_write(servo, 28, [ value & 0xff, (value >> 8) & 0xff ]))
-
