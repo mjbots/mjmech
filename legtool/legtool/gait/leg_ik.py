@@ -16,7 +16,7 @@
 
 import math
 
-from ..tf.tf import Point3D
+from ..tf.tf import Point3D, Frame, Quaternion
 
 class Configuration(object):
     coxa_min_deg = None
@@ -25,6 +25,7 @@ class Configuration(object):
     coxa_length_mm = None
     coxa_sign = 1
     coxa_ident = None
+    coxa_mass_kg = None
 
     femur_min_deg = None
     femur_idle_deg = None
@@ -32,6 +33,7 @@ class Configuration(object):
     femur_length_mm = None
     femur_sign = 1
     femur_ident = None
+    femur_mass_kg = None
 
     tibia_min_deg = None
     tibia_idle_deg = None
@@ -39,6 +41,7 @@ class Configuration(object):
     tibia_length_mm = None
     tibia_sign = 1
     tibia_ident = None
+    tibia_mass_kg = None
 
     servo_speed_dps = 360.0
 
@@ -186,9 +189,58 @@ def lizard_3dof_ik(point_mm, config):
 class LizardIk(object):
     def __init__(self, config):
         self.config = config
+        self.base_frame = Frame()
+        self.coxa_frame = Frame(parent=self.base_frame)
+        self.femur_frame = Frame(
+            parent=self.coxa_frame,
+            translation=Point3D(0., self.config.coxa_length_mm, 0.))
+        self.tibia_frame = Frame(
+            parent=self.femur_frame,
+            translation=Point3D(0., self.config.femur_length_mm, 0.))
+
+        self.coxa_relation = self.coxa_frame.relation_to_frame(self.base_frame)
+        self.femur_relation = self.femur_frame.relation_to_frame(self.base_frame)
+        self.tibia_relation = self.tibia_frame.relation_to_frame(self.base_frame)
 
     def do_ik(self, point_mm):
         return lizard_3dof_ik(point_mm, self.config)
+
+    def cog_mass(self, point_mm):
+        ik = self.do_ik(point_mm)
+
+        if ik is None:
+            return None, None
+
+        coxa_deg = (ik.coxa_deg -
+                    self.config.coxa_idle_deg) * self.config.coxa_sign
+        tibia_deg = (ik.tibia_deg -
+                     self.config.tibia_idle_deg) * self.config.tibia_sign
+        femur_deg = (ik.femur_deg -
+                     self.config.femur_idle_deg) * self.config.femur_sign
+
+        self.coxa_frame.transform.rotation = Quaternion.from_euler(
+            roll_rad=0., pitch_rad=0., yaw_rad=math.radians(coxa_deg))
+        self.femur_frame.transform.rotation = Quaternion.from_euler(
+            roll_rad=math.radians(femur_deg), pitch_rad=0., yaw_rad=0)
+        self.tibia_frame.transform.rotation = Quaternion.from_euler(
+            roll_rad=math.radians(tibia_deg), pitch_rad=0., yaw_rad=0.)
+
+        coxa_pos = self.coxa_relation.transform().apply(
+            Point3D(0., 0.5 * self.config.coxa_length_mm, 0.))
+        femur_pos = self.femur_relation.transform().apply(
+            Point3D(0., 0.5 * self.config.femur_length_mm, 0.))
+        tibia_pos = self.tibia_relation.transform().apply(
+            Point3D(0., 0, -0.5 * self.config.tibia_length_mm))
+
+        total_mass_kg = (self.config.coxa_mass_kg +
+                         self.config.femur_mass_kg +
+                         self.config.tibia_mass_kg)
+        cog = (coxa_pos.scaled(self.config.coxa_mass_kg) +
+               femur_pos.scaled(self.config.femur_mass_kg) +
+               tibia_pos.scaled(self.config.tibia_mass_kg)).scaled(
+            1.0 / total_mass_kg)
+
+        return cog, total_mass_kg
 
     def worst_case_speed_mm_s(self, point_mm, direction_mm=None):
         '''Return the worst case linear velocity the end effector can

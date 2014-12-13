@@ -547,6 +547,7 @@ class GaitTab(object):
         for spin in [self.ui.bodyCogXSpin,
                      self.ui.bodyCogYSpin,
                      self.ui.bodyCogZSpin,
+                     self.ui.bodyMassSpin,
                      self.ui.idlePositionXSpin,
                      self.ui.idlePositionYSpin,
                      self.ui.idlePositionZSpin,
@@ -561,6 +562,8 @@ class GaitTab(object):
             spin.valueChanged.connect(self.handle_gait_config_change)
 
         self.ui.staticEnableCheck.toggled.connect(
+            self.handle_gait_config_change)
+        self.ui.accurateCogCheck.toggled.connect(
             self.handle_gait_config_change)
 
         self.ui.legOrderEdit.editingFinished.connect(
@@ -692,6 +695,7 @@ class GaitTab(object):
                 (self.ui.bodyCogXSpin, m.body_cog_x_mm),
                 (self.ui.bodyCogYSpin, m.body_cog_y_mm),
                 (self.ui.bodyCogZSpin, m.body_cog_z_mm),
+                (self.ui.bodyMassSpin, m.body_mass_kg),
                 (self.ui.idlePositionXSpin, l.idle_x_mm),
                 (self.ui.idlePositionYSpin, l.idle_y_mm),
                 (self.ui.idlePositionZSpin, l.idle_z_mm),
@@ -709,6 +713,7 @@ class GaitTab(object):
                 spin.setValue(value)
 
             self.ui.staticEnableCheck.setChecked(c.statically_stable)
+            self.ui.accurateCogCheck.setChecked(c.accurate_cog)
             self.ui.legOrderEdit.setText(c.str_leg_order(c.leg_order))
 
             self.handle_leg_change(self.ui.gaitLegList.currentItem())
@@ -886,6 +891,8 @@ class GaitTab(object):
             self.ui.bodyCogYSpin.value()
         self.ripple_config.mechanical.body_cog_z_mm = \
             self.ui.bodyCogZSpin.value()
+        self.ripple_config.mechanical.body_mass_kg = \
+            self.ui.bodyMassSpin.value()
 
         self.ripple_config.max_cycle_time_s = self.ui.maxCycleTimeSpin.value()
         self.ripple_config.lift_height_mm = self.ui.liftHeightSpin.value()
@@ -902,6 +909,8 @@ class GaitTab(object):
 
         self.ripple_config.statically_stable = \
             self.ui.staticEnableCheck.isChecked()
+        self.ripple_config.accurate_cog = \
+            self.ui.accurateCogCheck.isChecked()
         self.ripple_config.static_center_factor = \
             self.ui.staticCenterSpin.value()
         self.ripple_config.static_stable_factor = \

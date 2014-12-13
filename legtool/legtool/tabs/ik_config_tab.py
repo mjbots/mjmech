@@ -108,6 +108,7 @@ class IkTester(object):
     def set_config(self,
                    x_offset_mm, y_offset_mm, z_offset_mm,
                    coxa_length_mm, femur_length_mm, tibia_length_mm,
+                   coxa_mass_kg, femur_mass_kg, tibia_mass_kg,
                    leg_ik,
                    plane,
                    length_scale,
@@ -119,6 +120,9 @@ class IkTester(object):
         self.coxa_length_mm = coxa_length_mm
         self.femur_length_mm = femur_length_mm
         self.tibia_length_mm = tibia_length_mm
+        self.coxa_mass_kg = coxa_mass_kg
+        self.femur_mass_kg = femur_mass_kg
+        self.tibia_mass_kg = tibia_mass_kg
         self.leg_ik = leg_ik
         self.plane = plane
         self.length_scale = length_scale
@@ -288,6 +292,7 @@ class IkConfigTab(object):
         result.coxa_idle_deg = idle_values[coxa_servo]
         result.coxa_max_deg = maximum_values[coxa_servo]
         result.coxa_length_mm = self.ui.coxaLengthSpin.value()
+        result.coxa_mass_kg = self.ui.coxaMassSpin.value()
         result.coxa_sign = leg.coxa_sign
         result.coxa_ident = coxa_servo
 
@@ -296,6 +301,7 @@ class IkConfigTab(object):
         result.femur_idle_deg = idle_values[femur_servo]
         result.femur_max_deg = maximum_values[femur_servo]
         result.femur_length_mm = self.ui.femurLengthSpin.value()
+        result.femur_mass_kg = self.ui.femurMassSpin.value()
         result.femur_sign = leg.femur_sign
         result.femur_ident = femur_servo
 
@@ -304,6 +310,7 @@ class IkConfigTab(object):
         result.tibia_idle_deg = idle_values[tibia_servo]
         result.tibia_max_deg = maximum_values[tibia_servo]
         result.tibia_length_mm = self.ui.tibiaLengthSpin.value()
+        result.tibia_mass_kg = self.ui.tibiaMassSpin.value()
         result.tibia_sign = leg.tibia_sign
         result.tibia_ident = tibia_servo
 
@@ -392,6 +399,9 @@ class IkConfigTab(object):
             coxa_length_mm=self.ui.coxaLengthSpin.value(),
             femur_length_mm=self.ui.femurLengthSpin.value(),
             tibia_length_mm=self.ui.tibiaLengthSpin.value(),
+            coxa_mass_kg=self.ui.coxaMassSpin.value(),
+            femur_mass_kg=self.ui.femurMassSpin.value(),
+            tibia_mass_kg=self.ui.tibiaMassSpin.value(),
             leg_ik=leg_ik,
             plane=self.get_plane(),
             length_scale=self.ui.lengthScaleSpin.value(),
@@ -418,7 +428,10 @@ class IkConfigTab(object):
                 (self.ui.zOffsetSpin, 'z_offset'),
                 (self.ui.coxaLengthSpin, 'coxa_length'),
                 (self.ui.femurLengthSpin, 'femur_length'),
-                (self.ui.tibiaLengthSpin, 'tibia_length')]
+                (self.ui.tibiaLengthSpin, 'tibia_length'),
+                (self.ui.coxaMassSpin, 'coxa_mass'),
+                (self.ui.femurMassSpin, 'femur_mass'),
+                (self.ui.tibiaMassSpin, 'tibia_mass'),]
 
     def read_settings(self, config):
         self.handle_current_changed()
@@ -484,4 +497,3 @@ class IkConfigTab(object):
             if leg_config.present:
                 self.get_leg_ik(leg_num).config.write_settings(
                     config, 'ikconfig.leg.%d' % leg_num)
-

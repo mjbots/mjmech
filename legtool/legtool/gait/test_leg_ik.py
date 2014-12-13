@@ -24,17 +24,21 @@ def get_lizard_config():
     config.coxa_min_deg = -90
     config.coxa_idle_deg = 0
     config.coxa_max_deg = 90
+    config.coxa_mass_kg = 0.06
     config.femur_min_deg = -90
     config.femur_idle_deg = 0
     config.femur_max_deg = 90
+    config.femur_mass_kg = 0.07
     config.tibia_min_deg = -90
     config.tibia_idle_deg = 0
     config.tibia_max_deg = 90
+    config.tibia_mass_kg = 0.08
     config.coxa_ident = 3
     config.femur_ident = 4
     config.tibia_ident = 5
 
     return config
+
 
 def test_lizard_3dof():
     config = get_lizard_config()
@@ -127,3 +131,24 @@ def test_lizard_3dof():
 
     # We'll assume the other bounds (min, and tibia) are correct for
     # now.
+
+
+def test_lizard_3dof_cog():
+    # Test some COG measurements.
+    ik = leg_ik.LizardIk(get_lizard_config())
+
+    point = leg_ik.Point3D(0, 90, -30)
+    cog, mass = ik.cog_mass(point)
+
+    assert abs(mass - 0.21) < 0.01
+    assert abs(cog.x - 0.0) < 0.01
+    assert abs(cog.y - 64.76) < 0.01
+    assert abs(cog.z + 5.71) < 0.01
+
+    point = leg_ik.Point3D(15, 90, -40)
+    cog, mass = ik.cog_mass(point)
+
+    assert abs(mass - 0.21) < 0.01
+    assert abs(cog.x - 10.17) < 0.01
+    assert abs(cog.y - 63.96) < 0.01
+    assert abs(cog.z + 5.69) < 0.01

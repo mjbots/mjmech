@@ -41,6 +41,7 @@ class RippleConfig(object):
         self.static_center_factor = 3.0
         self.static_stable_factor = 10.0
         self.static_margin_mm = 20.0
+        self.accurate_cog = False
 
     def copy(self):
         result = RippleConfig()
@@ -57,6 +58,7 @@ class RippleConfig(object):
         result.static_center_factor = self.static_center_factor
         result.static_stable_factor = self.static_stable_factor
         result.static_margin_mm = self.static_margin_mm
+        result.accurate_cog = self.accurate_cog
 
         return result
 
@@ -153,6 +155,10 @@ class RippleConfig(object):
             result.leg_order = RippleConfig.parse_leg_order(
                 config.get(group_name, 'leg_order'))
 
+        if config.has_option(group_name, 'accurate_cog'):
+            result.accurate_cog = config.getboolean(
+                group_name, 'accurate_cog')
+
         return result
 
     def write_settings(self, config, group_name):
@@ -167,6 +173,7 @@ class RippleConfig(object):
 
         config.set(group_name, 'statically_stable', self.statically_stable)
         config.set(group_name, 'leg_order', self.str_leg_order(self.leg_order))
+        config.set(group_name, 'accurate_cog', self.accurate_cog)
 
 class RippleState(CommonState):
     def __init__(self):
@@ -466,12 +473,7 @@ class RippleGait(object):
             leg_state.leg_ik = leg_config.leg_ik
 
         result.body_frame.transform.translation.z = self.config.body_z_offset_mm
-        result.cog_frame.transform.translation.x = \
-            self.config.mechanical.body_cog_x_mm
-        result.cog_frame.transform.translation.y = \
-            self.config.mechanical.body_cog_y_mm
-        result.cog_frame.transform.translation.z = \
-            self.config.mechanical.body_cog_z_mm
+        result.update_cog(self.config.mechanical, self.config.accurate_cog)
 
         return result
 
@@ -593,6 +595,10 @@ class RippleGait(object):
                     leg.point.z = (((1.0 - leg_phase) / lift_fraction) *
                                    self.config.lift_height_mm)
 
+        if self.config.accurate_cog:
+            self.state.update_cog(self.config.mechanical,
+                                  self.config.accurate_cog)
+
         # If we are running with a statically stable gait, update the
         # body position dynamically.
         if self.config.statically_stable:
@@ -660,7 +666,6 @@ class RippleGait(object):
             cog_move = (desired_cog_vel + poly_vel).scaled(dt)
             self.state.body_frame.transform.translation.x += cog_move.x
             self.state.body_frame.transform.translation.y += cog_move.y
-
 
     def _get_current_support_poly_robot_frame(self):
         next_action = self.actions[self.state.action]

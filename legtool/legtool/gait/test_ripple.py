@@ -151,24 +151,33 @@ def verify_symmetric_result(result):
     for stance in stance_bearings.items():
         verify_symmetric_stance(stance)
 
-def test_ripple_basic():
-    config = ripple.RippleConfig()
-
-    mounts = [(90., 90.), (90., -90.), (-90., -90.), (-90., 90.)]
-
+def make_ik_config():
     ik_config = leg_ik.Configuration()
     ik_config.coxa_min_deg = -120.0
     ik_config.coxa_idle_deg = 0.0
     ik_config.coxa_max_deg = 120.0
     ik_config.coxa_length_mm = 60.0
+    ik_config.coxa_mass_kg = 0.06
     ik_config.femur_min_deg = -120.0
     ik_config.femur_idle_deg = 0.0
     ik_config.femur_max_deg = 120.0
     ik_config.femur_length_mm = 60.0
+    ik_config.femur_mass_kg = 0.07
     ik_config.tibia_min_deg = -120.0
     ik_config.tibia_idle_deg = 0.0
     ik_config.tibia_max_deg = 120.0
     ik_config.tibia_length_mm = 60.0
+    ik_config.tibia_mass_kg = 0.08
+
+    return ik_config
+
+
+def make_ripple_config():
+    mounts = [(90., 90.), (90., -90.), (-90., -90.), (-90., 90.)]
+
+    config = ripple.RippleConfig()
+    config.mechanical.body_mass_kg = 1.0
+    ik_config = make_ik_config()
 
     for leg_num in range(4):
         leg = ripple.LegConfig()
@@ -201,6 +210,11 @@ def test_ripple_basic():
     config.leg_order = [0, 2, 1, 3]
     config.body_z_offset_mm = 60.0
 
+    return config
+
+
+def test_ripple_basic():
+    config = make_ripple_config()
     gait = ripple.RippleGait(config)
 
     # We want to:
@@ -287,3 +301,28 @@ def test_config_settings():
 
     copy = ripple.RippleConfig.read_settings(
         config_copy, 'test_group', {})
+
+def test_cog():
+    config = make_ripple_config()
+    config.max_cycle_time_s = 1.0
+    config.swing_percent = 45.0
+    config.position_margin_percent = 90.0
+    config.body_z_offset_mm = 80.0
+    config.leg_order = [(0, 2), (1, 3)]
+    config.mechanical.body_cog_y_mm = 6.2
+    config.statically_stable = True
+    gait = ripple.RippleGait(config)
+
+    idle_state = gait.get_idle_state()
+    begin_state = idle_state
+
+    command = ripple.Command()
+    command.translate_y_mm_s = -80.0
+    gait.set_state(begin_state, command)
+
+    # For now, just verify we can do it at all.
+    phase_step = 0.01
+    current_states = (
+        [begin_state.copy()] +
+        [gait.advance_phase(phase_step).copy()
+         for x in range(100)])

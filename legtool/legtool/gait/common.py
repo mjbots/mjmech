@@ -102,6 +102,8 @@ class MechanicalConfig(object):
         self.body_cog_y_mm = 0.0
         self.body_cog_z_mm = 0.0
 
+        self.body_mass_kg = 1.0
+
     def copy(self):
         result = MechanicalConfig()
         for leg_num, leg in self.leg_config.iteritems():
@@ -236,6 +238,43 @@ class CommonState(object):
         result.robot_frame.transform = self.robot_frame.transform.copy()
         result.body_frame.transform = self.body_frame.transform.copy()
         result.cog_frame.transform = self.cog_frame.transform.copy()
+
+    def update_cog(self, mechanical, accurate):
+        '''Update the COG to be correct given the current leg
+        positions.'''
+        self.cog_frame.transform.translation.x = mechanical.body_cog_x_mm
+        self.cog_frame.transform.translation.y = mechanical.body_cog_y_mm
+        self.cog_frame.transform.translation.z = mechanical.body_cog_z_mm
+
+        # If we're not doing the accurate version, then we are done
+        # here.
+        if not accurate:
+            return
+
+        cog_adjust = tf.Point3D()
+
+        legs = {}
+        total_leg_mass = 0.0
+
+        for leg_num, leg in self.legs.iteritems():
+            shoulder_point = leg.shoulder_frame.map_from_frame(
+                leg.frame, leg.point)
+            leg_cog, leg_mass = leg.leg_ik.cog_mass(shoulder_point)
+            if leg_cog is None or leg_mass is None:
+                continue
+
+            legs[leg_num] = (leg, leg_cog, leg_mass)
+            total_leg_mass += leg_mass
+
+        total_mass = mechanical.body_mass_kg + total_leg_mass
+
+        for leg, leg_cog, leg_mass in legs.itervalues():
+            body_cog = self.body_frame.map_from_frame(
+                leg.shoulder_frame, leg_cog)
+
+            cog_adjust += body_cog.scaled(leg_mass / total_mass)
+
+        self.cog_frame.transform.translation += cog_adjust
 
     def command_dict(self):
         result = {}
