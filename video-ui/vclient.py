@@ -17,8 +17,10 @@ import trollius as asyncio
 from trollius import Task, From
 
 from vui_helpers import (
-    wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler)
+    wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler,
+    add_pair)
 from video_window import VideoWindow, video_window_init, video_window_main
+import osd
 
 # must be after video_window
 from gi.repository import GLib
@@ -34,11 +36,6 @@ LOG_DIR_LOCATIONS = [
     '~/.mjmech-data',
     '~/mjmech-data',
     './mjmech-data' ]
-
-
-def add_pair(a, b, scale=1.0):
-    return (a[0] + b[0] * scale,
-            a[1] + b[1] * scale)
 
 RIPPLE_COMMAND = {
     'type': 'ripple',
@@ -179,7 +176,7 @@ class ControlInterface(object):
         # SVG is stretched to video after rendering, so small width/height
         # will make all lines thicker. Force to video resolution: 1920x1080
         image_size=(1920, 1080),
-        reticle_on=True,
+        reticle_mode=1,
         reticle_offset=(0, 0),
         reticle_rotate=0,
         status_on=True,
@@ -259,6 +256,8 @@ class ControlInterface(object):
             self.state_savefile_name = os.path.join(
                 os.path.dirname(opts.log_prefix + 'test'),
                 self.UI_STATE_SAVEFILE)
+
+        self.osd = osd.OnScreenDisplay()
 
         # Control UI state. Should be a simple dict, as we will be serializing
         # it for later log replay.
@@ -558,8 +557,9 @@ class ControlInterface(object):
                 self.control_dict['turret'] = add_pair(
                     self.control_dict['turret'], arrows, step)
         elif name == 'r':
-            self.ui_state['reticle_on'] ^= True
-            self.logger.info('Set reticle_on=%r', self.ui_state['reticle_on'])
+            newmode = (self.ui_state['reticle_mode'] + 1) % 2
+            self.ui_state['reticle_mode'] = newmode
+            self.logger.info('Set reticle_mode=%r', newmode)
         elif name == 'KP_Add':
             self.ui_state['msg_font_size'] += 1
         elif name == 'KP_Subtract':
@@ -664,8 +664,8 @@ class ControlInterface(object):
         else:
             logs = []
         stream = StringIO.StringIO()
-        self._render_svg(stream, self.ui_state, self.control_dict,
-                         self.server_state, logs)
+        self.osd.render_svg(stream, self.ui_state, self.control_dict,
+                            self.server_state, logs)
         if self.video:
             self.video.set_svg_overlay(stream.getvalue())
 
@@ -673,116 +673,6 @@ class ControlInterface(object):
             with open(self.last_svg_name + '~', 'w') as f:
                 f.write(stream.getvalue())
             os.rename(self.last_svg_name + '~', self.last_svg_name)
-
-    @staticmethod
-    def _render_svg(out, ui_state, control_dict, server_state, logs):
-        """Render SVG for a given state. Should not access anything other
-        than parameters, as this function may be called during replay.
-        """
-        print >>out, '<svg width="{image_size[0]}" height="{image_size[1]}">'\
-            .format(**ui_state)
-
-        if ui_state['reticle_on']:
-            reticle_center_rel = add_pair((0.5, 0.5),
-                                          ui_state['reticle_offset'])
-            reticle_center = (
-                ui_state['image_size'][0] * reticle_center_rel[0],
-                ui_state['image_size'][1] * reticle_center_rel[1])
-
-            print >>out, '''
-<g transform='rotate({0[reticle_rotate]}) translate({1[0]} {1[1]})'
-   stroke="rgb(255,128,0)">
-  <line x1="500"  x2="100"  y1="0" y2="0" stroke-width="4" />
-  <line x1="-500" x2="-100" y1="0" y2="0" stroke-width="4" />
-  <line x1="-100" x2="100"  y1="0" y2="0" />
-  <line y1="500"  y2="100"  x1="0" x2="0" stroke-width="4" />
-  <line y1="-500" y2="-100" x1="0" x2="0" stroke-width="4" />
-  <line y1="-100" y2="100"  x1="0" x2="0" />
-
-  <line x1="-80" x2="80"  y1="-20" y2="-20" />
-  <line x1="-80" x2="80"  y1="20" y2="20" />
-  <line x1="-60" x2="60"  y1="40" y2="40" />
-  <line x1="-40" x2="40"  y1="60" y2="60" />
-  <line x1="-20" x2="20"  y1="80" y2="80" />
-</g>
-'''.format(ui_state, reticle_center)
-
-        status_lines = list()
-        if not ui_state['status_on']:
-            status_lines.append('[OFF]')
-        else:
-            # Add turret position
-            if control_dict.get('turret') is None:
-                status_lines.append('Turret OFF')
-            else:
-                status_lines.append('Turret: ({:+5.1f}, {:+5.1f})'
-                                    .format(*control_dict['turret']))
-
-            # Add GPIO status
-            tags = list()
-            if control_dict['laser_on']:
-                tags.append('LAS')
-            if control_dict['agitator_on']:
-                tags.append('AGT')
-            if control_dict['green_led_on']:
-                tags.append('GRN')
-            if not tags:
-                tags.append('(all off)')
-            status_lines.append(','.join(tags))
-
-            # Add servo status
-            if server_state:
-                s_voltage = server_state.get('servo_voltage', {})
-                s_status = server_state.get('servo_status', {})
-            else:
-                s_voltage = s_status = {}
-            got_any = False
-            for servo in sorted(set(s_voltage.keys() + s_status.keys()),
-                                key=int):
-                tags = []
-                if s_status.get(servo):
-                    tags.append(str(s_status[servo]))
-                if s_voltage.get(servo):
-                    tags.append('%.2fV' % s_voltage[servo])
-                if not tags:
-                    continue
-                tags.append("%-2s" % servo)
-                status_lines.append(' '.join(tags))
-                got_any = True
-            if not got_any:
-                status_lines.append('No servo status available')
-
-        # We output each text twice: first text outline in black, then text
-        # itself in bright color. This ensures good visibility over both black
-        # and green background.
-        for tp in ['stroke="black" fill="black"', 'fill="COLOR"']:
-            print >>out, '''
-<text transform="translate(10 {0})" {1}
-   font-family="Helvetica,sans-serif"
-   font-size="{2}" text-anchor="left" dominant-baseline="text-before-edge">
-'''.format(ui_state['image_size'][1] - 15,
-           tp.replace('COLOR', 'lime'), ui_state['msg_font_size'])
-            # Total number of lines is specified in MemoryLoggingHandler
-            # constructor.
-            for line_num, mtuple in enumerate(reversed(logs)):
-                line = MemoryLoggingHandler.to_string(mtuple)
-                print >>out, '<tspan x="0" y="%d"><![CDATA[%s]]></tspan>' % (
-                    (-1 - line_num) * ui_state['msg_font_size'], line)
-            print >>out, '</text>'
-
-            print >>out, '''
-<text transform="translate({0} 15)" {1}
-   font-family="Courier,fixed" font-weight="bold"
-   font-size="{2}" text-anchor="end" dominant-baseline="text-before-edge">
-'''.format(ui_state['image_size'][0] - 10, tp.replace('COLOR', 'white'),
-           ui_state['msg_font_size'])
-            for line_num, line in enumerate(status_lines):
-                print >>out, ('<tspan x="0" y="%d"><![CDATA[%s]]></tspan>'
-                              % (line_num * ui_state['msg_font_size'], line))
-            print >>out, '</text>'
-
-        print >>out, '</svg>'
-
 
 def main(opts):
     asyncio_misc_init()

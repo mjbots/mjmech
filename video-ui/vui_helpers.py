@@ -48,6 +48,10 @@ def asyncio_misc_init():
     g_quit_handlers.append(
         lambda:  main_loop.call_soon_threadsafe(main_loop.stop))
 
+def add_pair(a, b, scale=1.0):
+    return (a[0] + b[0] * scale,
+            a[1] + b[1] * scale)
+
 def logging_init(verbose=True):
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)

@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+
+from vui_helpers import add_pair, MemoryLoggingHandler
+
+class OnScreenDisplay(object):
+    def __init__(self):
+        pass
+
+    def render_svg(self, out, ui_state, control_dict, server_state, logs):
+        """Render SVG for a given state. Should not access anything other
+        than parameters, as this function may be called during replay.
+        """
+        print >>out, '<svg width="{image_size[0]}" height="{image_size[1]}">'\
+            .format(**ui_state)
+
+        rmode = ui_state['reticle_mode']
+        if rmode:
+            reticle_center_rel = add_pair((0.5, 0.5),
+                                          ui_state['reticle_offset'])
+            reticle_center = (
+                ui_state['image_size'][0] * reticle_center_rel[0],
+                ui_state['image_size'][1] * reticle_center_rel[1])
+
+            print >>out, '''
+<g transform='rotate({0[reticle_rotate]}) translate({1[0]} {1[1]})'
+   stroke="rgb(255,128,0)">
+  <line x1="500"  x2="100"  y1="0" y2="0" stroke-width="4" />
+  <line x1="-500" x2="-100" y1="0" y2="0" stroke-width="4" />
+  <line x1="-100" x2="100"  y1="0" y2="0" />
+  <line y1="500"  y2="100"  x1="0" x2="0" stroke-width="4" />
+  <line y1="-500" y2="-100" x1="0" x2="0" stroke-width="4" />
+  <line y1="-100" y2="100"  x1="0" x2="0" />
+
+  <line x1="-80" x2="80"  y1="-20" y2="-20" />
+  <line x1="-80" x2="80"  y1="20" y2="20" />
+  <line x1="-60" x2="60"  y1="40" y2="40" />
+  <line x1="-40" x2="40"  y1="60" y2="60" />
+  <line x1="-20" x2="20"  y1="80" y2="80" />
+</g>
+'''.format(ui_state, reticle_center)
+
+        status_lines = list()
+        if not ui_state['status_on']:
+            status_lines.append('[OFF]')
+        else:
+            # Add turret position
+            if control_dict.get('turret') is None:
+                status_lines.append('Turret OFF')
+            else:
+                status_lines.append('Turret: ({:+5.1f}, {:+5.1f})'
+                                    .format(*control_dict['turret']))
+
+            # Add GPIO status
+            tags = list()
+            if control_dict['laser_on']:
+                tags.append('LAS')
+            if control_dict['agitator_on']:
+                tags.append('AGT')
+            if control_dict['green_led_on']:
+                tags.append('GRN')
+            if not tags:
+                tags.append('(all off)')
+            status_lines.append(','.join(tags))
+
+            # Add servo status
+            if server_state:
+                s_voltage = server_state.get('servo_voltage', {})
+                s_status = server_state.get('servo_status', {})
+            else:
+                s_voltage = s_status = {}
+            got_any = False
+            for servo in sorted(set(s_voltage.keys() + s_status.keys()),
+
+                                key=int):
+                tags = []
+                if s_status.get(servo):
+                    tags.append(str(s_status[servo]))
+                if s_voltage.get(servo):
+                    tags.append('%.2fV' % s_voltage[servo])
+                if not tags:
+                    continue
+                tags.append("%-2s" % servo)
+                status_lines.append(' '.join(tags))
+                got_any = True
+            if not got_any:
+                status_lines.append('No servo status available')
+
+        # We output each text twice: first text outline in black, then text
+        # itself in bright color. This ensures good visibility over both black
+        # and green background.
+        for tp in ['stroke="black" fill="black"', 'fill="COLOR"']:
+            print >>out, '''
+<text transform="translate(10 {0})" {1}
+   font-family="Helvetica,sans-serif"
+   font-size="{2}" text-anchor="left" dominant-baseline="text-before-edge">
+'''.format(ui_state['image_size'][1] - 15,
+           tp.replace('COLOR', 'lime'), ui_state['msg_font_size'])
+            # Total number of lines is specified in MemoryLoggingHandler
+            # constructor.
+            for line_num, mtuple in enumerate(reversed(logs)):
+                line = MemoryLoggingHandler.to_string(mtuple)
+                print >>out, '<tspan x="0" y="%d"><![CDATA[%s]]></tspan>' % (
+                    (-1 - line_num) * ui_state['msg_font_size'], line)
+            print >>out, '</text>'
+
+            print >>out, '''
+<text transform="translate({0} 15)" {1}
+   font-family="Courier,fixed" font-weight="bold"
+   font-size="{2}" text-anchor="end" dominant-baseline="text-before-edge">
+'''.format(ui_state['image_size'][0] - 10, tp.replace('COLOR', 'white'),
+           ui_state['msg_font_size'])
+            for line_num, line in enumerate(status_lines):
+                print >>out, ('<tspan x="0" y="%d"><![CDATA[%s]]></tspan>'
+                              % (line_num * ui_state['msg_font_size'], line))
+            print >>out, '</text>'
+
+        print >>out, '</svg>'
