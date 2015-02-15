@@ -10,7 +10,7 @@ import re
 
 DEFAULT_CAL = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    'cal-20141109.yaml')
+    'cal-20141222.yaml')
 
 class CameraCalibration(object):
     """This class handles camera calibration -- it translates between
@@ -69,14 +69,20 @@ class CameraCalibration(object):
         c_x = (self.camera_matrix[0, 2] *1.0 / image_size[0] - 0.5) * 100.0
         c_y = (self.camera_matrix[1, 2] *1.0 / image_size[1] - 0.5) * 100.0
 
+        # f_x/f_y - if object size is same a distance to object, how much of a
+        # frame will it take? in percent
+        f_x = self.camera_matrix[0, 0] * 100.0 / image_size[0]
+        f_y = self.camera_matrix[1, 1] * 100.0 / image_size[1]
+
         fov_x, fov_y, focal_len, principal, aspect = \
             cv2.calibrationMatrixValues(self.camera_matrix, image_size,
                                         aperture[0], aperture[0])
 
         return ("FOV(deg)=({fov_x:.1f}/{fov_y:.1f}) "
                 "principal=({principal[0]:.1f}/{principal[1]:.1f}) "
-                "center=({c_x:.1f},{c_y:.1f}) "
-                "focal_len={focal_len:.6f} aspect={aspect:.3f}"
+                "center=({c_x:.1f},{c_y:.1f})% "
+                "focal_len=({f_x:.1f},{f_y:.1f})% "
+                "focal_len_mm={focal_len:.2f} aspect={aspect:.3f}"
                 ).format(**locals())
 
     def to_world2d(self, uv_pos, image_size=None):
