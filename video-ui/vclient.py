@@ -28,7 +28,7 @@ from gi.repository import GLib
 import joystick
 import legtool.async.trollius_trace
 import linux_input
-import calibration
+import calibration_cv as calibration
 
 # Possible locations for logdir. If any of the paths exist, will use this one.
 # else, will use the last entry.
@@ -257,7 +257,7 @@ class ControlInterface(object):
                 os.path.dirname(opts.log_prefix + 'test'),
                 self.UI_STATE_SAVEFILE)
 
-        self.osd = osd.OnScreenDisplay()
+        self.osd = osd.OnScreenDisplay(self.c_cal)
 
         # Control UI state. Should be a simple dict, as we will be serializing
         # it for later log replay.
@@ -463,7 +463,7 @@ class ControlInterface(object):
         # This image_size will be broken if aspect ratio is different -- this
         # usually means truncated image, not resized pixels; but we do not care
         # for now.
-        w2d = self.c_cal.to_world2d(pos, image_size=(1.0, 1.0))
+        w2d, = self.c_cal.to_world2d([pos], image_size=(1.0, 1.0))
         w2ang = (
              math.degrees(math.atan(w2d[0])),
              math.degrees(math.atan(w2d[1]))
@@ -557,7 +557,7 @@ class ControlInterface(object):
                 self.control_dict['turret'] = add_pair(
                     self.control_dict['turret'], arrows, step)
         elif name == 'r':
-            newmode = (self.ui_state['reticle_mode'] + 1) % 2
+            newmode = (self.ui_state['reticle_mode'] + 1) % 3
             self.ui_state['reticle_mode'] = newmode
             self.logger.info('Set reticle_mode=%r', newmode)
         elif name == 'KP_Add':

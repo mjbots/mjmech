@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+import math
 
 from vui_helpers import add_pair, MemoryLoggingHandler
 
 class OnScreenDisplay(object):
-    def __init__(self):
-        pass
+    def __init__(self, calibration):
+        self.calibration = calibration
 
     def render_svg(self, out, ui_state, control_dict, server_state, logs):
         """Render SVG for a given state. Should not access anything other
@@ -14,7 +15,8 @@ class OnScreenDisplay(object):
             .format(**ui_state)
 
         rmode = ui_state['reticle_mode']
-        if rmode:
+        if rmode == 1:
+            # Shooting reticle
             reticle_center_rel = add_pair((0.5, 0.5),
                                           ui_state['reticle_offset'])
             reticle_center = (
@@ -38,6 +40,39 @@ class OnScreenDisplay(object):
   <line x1="-20" x2="20"  y1="80" y2="80" />
 </g>
 '''.format(ui_state, reticle_center)
+        elif rmode == 2:
+            # Calibration reticle
+
+            # Create a list of calibration lines, each line is a list of points
+            # in degrees.
+            lines_deg = []
+            # Start with a cross in the middle. Add many points, as lines are
+            # not straight
+            lines_deg.append([(x, 0) for x in xrange(-30, 31, 5)])
+            lines_deg.append([(0, y) for y in xrange(-15, 16, 5)])
+            # Add a couple of squares
+            for s in (5, 10, 15):
+                lines_deg.append([(-s, s), (0, s), (s, s), (s, 0), (s, -s),
+                                  (0, -s), (-s, -s), (-s, 0), (-s, s)])
+
+            # Re-use reticle_offset to allow reticle movement
+            offs_x, offs_y = ui_state['reticle_offset']
+
+            print >>out, '<g stroke="rgb(255,128,0)">'
+            # Convert degrees to pixels. It may be faster to do all in one go,
+            # but I do not care about it for now.
+            lines_pix = []
+            for one_line in lines_deg:
+                pix = self.calibration.from_world2d(
+                    ((math.tan(math.radians(pt[0]) + offs_x),
+                      math.tan(math.radians(pt[1]) + offs_y))
+                     for pt in one_line),
+                    image_size=ui_state['image_size'])
+                for p1, p2 in zip(pix, pix[1:]):
+                    print >>out, (
+                        '<line x1="%.2f" x2="%.2f" y1="%.2f" y2="%.2f"/>'
+                        % (p1[0], p2[0], p1[1], p2[1]))
+            print >>out, '</g>'
 
         status_lines = list()
         if not ui_state['status_on']:
