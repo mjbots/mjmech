@@ -39,9 +39,13 @@ SERVO_SEND_INTERVAL = 0.5
 TURRET_RANGE_X = (-90, 90)
 TURRET_RANGE_Y = (-90, 90)
 
+# Servo IDs of turret servoes
+TURRET_SERVO_X = 12
+TURRET_SERVO_Y = 13
+
 # Which servo IDs to poll for status
 # (set to false value to disable mechanism)
-SERVO_IDS_TO_POLL = [1, 3, 5, 7, 12, 13, 99]
+SERVO_IDS_TO_POLL = [1, 3, 5, 7, TURRET_SERVO_X, TURRET_SERVO_Y, 99]
 
 _start_time = time.time()
 
@@ -261,6 +265,21 @@ class ControlInterface(object):
             self.status_send_now.set()
 
     @asyncio.coroutine
+    def _poll_servo_status(self, servo_id):
+        """Poll servo's status. Convert result to string, update
+        state vars, return new result.
+        """
+        status_list = yield From(
+            self.mech_driver.servo.get_clear_status(servo_id))
+        status_str = ','.join(status_list) or 'idle'
+        if status_str != self.last_servo_status.get(servo_id):
+            #self.logger.debug('Servo status for %r: %s'
+            #                  % (servo_id, status_str))
+            self.last_servo_status[servo_id] = status_str
+        self.status_packet['servo_status'][servo_id] = status_str
+        raise Return(status_str)
+
+    @asyncio.coroutine
     def _send_servo_commands_once(self, data, olddata):
         if not self.mech_driver:
             return
@@ -316,32 +335,26 @@ class ControlInterface(object):
 
             if special_step == 10:
                 voltage_dict = yield From(servo.get_voltage([servo_id]))
-                voltage = voltage_dict.get(servo_id, None)
-                #self.logger.debug('Servo voltage for %r: %.1f',
-                #                  servo_id, voltage or -1)
-                self.status_packet['servo_voltage'][servo_id] = voltage
+                self.status_packet['servo_voltage'][servo_id] = \
+                    voltage_dict.get(servo_id, None)
             elif special_step == 18:
                 temp_dict = yield From(servo.get_temperature([servo_id]))
                 self.status_packet['servo_temp'][servo_id] = \
                     temp_dict.get(servo_id, None)
             else:
-                status_list = yield From(servo.get_clear_status(servo_id))
-                status_str = ','.join(status_list) or 'idle'
-                if status_str != self.last_servo_status.get(servo_id):
-                    #self.logger.debug('Servo status for %r: %s'
-                    #                  % (servo_id, status_str))
-                    self.last_servo_status[servo_id] = status_str
-                self.status_packet['servo_status'][servo_id] = status_str
+                yield From(self._poll_servo_status(servo_id))
 
         if data.get('turret'):
+            # TODO mafanasyev: Enable and configure servoes if needed
+
             servo_x, servo_y = data['turret']
             send_x = min(TURRET_RANGE_X[1],
                          max(TURRET_RANGE_X[0], -servo_x))
             send_y = min(TURRET_RANGE_Y[1],
                          max(TURRET_RANGE_Y[0], servo_y))
             yield From(self.mech_driver.servo.set_pose(
-                    {12: send_x,
-                     13: send_y}))
+                    {TURRET_SERVO_X: send_x,
+                     TURRET_SERVO_Y: send_y}))
 
         if data.get('gait'):
             # We got a gait command. Start the mech driver.
