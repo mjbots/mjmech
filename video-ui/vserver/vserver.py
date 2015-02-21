@@ -105,6 +105,7 @@ class ControlInterface(object):
             "seq": 0,
             "servo_status": dict(),
             "servo_voltage": dict(),
+            "servo_temp": dict(),
             }
 
         self.status_send_task = Task(self._send_status_packets())
@@ -306,15 +307,23 @@ class ControlInterface(object):
         if self.next_servo_to_poll is not None:
             servo_id = self.next_servo_to_poll.next()
             self.servo_poll_count += 1
-            # Note that mod-factor should be relatively prime to number
-            # of servoes
-            if ((self.servo_poll_count % 103) == 10) and (servo_id != 99) and \
+            special_step = 0
+            if (servo_id != 99) and \
                     self.last_servo_status.get(servo_id) != 'offline':
+                # Note that mod-factor should be relatively prime to number
+                # of servoes
+                special_step = (self.servo_poll_count % 103)
+
+            if special_step == 10:
                 voltage_dict = yield From(servo.get_voltage([servo_id]))
                 voltage = voltage_dict.get(servo_id, None)
                 #self.logger.debug('Servo voltage for %r: %.1f',
                 #                  servo_id, voltage or -1)
                 self.status_packet['servo_voltage'][servo_id] = voltage
+            elif special_step == 18:
+                temp_dict = yield From(servo.get_temperature([servo_id]))
+                self.status_packet['servo_temp'][servo_id] = \
+                    temp_dict.get(servo_id, None)
             else:
                 status_list = yield From(servo.get_clear_status(servo_id))
                 status_str = ','.join(status_list) or 'idle'

@@ -101,17 +101,20 @@ class OnScreenDisplay(object):
             if server_state:
                 s_voltage = server_state.get('servo_voltage', {})
                 s_status = server_state.get('servo_status', {})
+                s_temp = server_state.get('servo_temp', {})
             else:
-                s_voltage = s_status = {}
+                s_voltage = s_status = s_temp = {}
             got_any = False
-            for servo in sorted(set(s_voltage.keys() + s_status.keys()),
-
+            for servo in sorted(set(s_voltage.keys() + s_status.keys() +
+                                    s_temp.keys()),
                                 key=int):
                 tags = []
                 if s_status.get(servo):
                     tags.append(str(s_status[servo]))
                 if s_voltage.get(servo):
                     tags.append('%.2fV' % s_voltage[servo])
+                if s_temp.get(servo):
+                    tags.append('%.1fC' % s_temp[servo])
                 if not tags:
                     continue
                 tags.append("%-2s" % servo)
