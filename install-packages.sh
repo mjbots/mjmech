@@ -37,7 +37,8 @@ set -ex
 apt-get install python-eventlet python-pyside pyside-tools python-pygame \
     python-pip scons avr-libc \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-    gstreamer1.0-plugins-good gstreamer1.0-plugins-bad
+    gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
+    python-opencv
 pip install --pre pygazebo
 pip install --pre trollius
 pip install enum34
