@@ -131,6 +131,7 @@ class HerkuleX(object):
     LED_RED = 0x04
 
     EEP_ID = 6
+    REG_DEAD_ZONE = 10
     REG_TORQUE_CONTROL = 52
 
     def __init__(self, serial_port):

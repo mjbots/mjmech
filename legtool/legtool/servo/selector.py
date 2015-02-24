@@ -94,6 +94,21 @@ class HerkuleXController(object):
                     ident, self.port.REG_TORQUE_CONTROL, [value]))
 
     @asyncio.coroutine
+    def configure_servo(self, settings, idents):
+        """Configure servoes using a dict of settings"""
+        for key, val in sorted(settings.items()):
+            if key == 'dead_zone':
+                addr = self.port.REG_DEAD_ZONE
+                data = [int(val)]
+                assert 0 <= data[0] <= 254
+            else:
+                raise Exception('Unknown configuration key %r' % key)
+
+            for ident in idents:
+                yield From(self.port.ram_write(ident, addr, data))
+
+
+    @asyncio.coroutine
     def get_pose(self, idents=[]):
         """Determine the current pose of the requested servos.
 
@@ -307,6 +322,11 @@ class GazeboController(object):
             None, all servos are configured
         """
         raise Return(None)
+
+    @asyncio.coroutine
+    def configure_servo(self, settings, idents):
+        """Configure servoes using a dict of settings"""
+        pass
 
     @asyncio.coroutine
     def set_leds(self, ident, red=False, green=False, blue=False):

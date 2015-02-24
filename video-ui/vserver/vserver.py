@@ -27,6 +27,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'legtool'))
 import gait_driver
 import gbulb
 import legtool
+import legtool.servo.selector as selector
 
 from vui_helpers import wrap_event
 import vui_helpers
@@ -85,6 +86,7 @@ class ControlInterface(object):
 
         # Per-servo status (address->string)
         self.last_servo_status = dict()
+        self.turret_servoes_ready = False
 
         # Iterator which returns next servo to poll
         if SERVO_IDS_TO_POLL:
@@ -114,8 +116,6 @@ class ControlInterface(object):
 
         self.status_send_task = Task(self._send_status_packets())
         self.status_send_now = asyncio.Event()
-
-
 
         self.mech_driver_started = False
         if self.opts.no_mech:
@@ -246,7 +246,18 @@ class ControlInterface(object):
 
     @asyncio.coroutine
     def _send_servo_commands(self):
+        servo_started_up = False
+
         while True:
+            if ((not servo_started_up)
+                and self.mech_driver
+                and self.mech_driver.servo):
+                servo_started_up = True
+                # Disable all power on startup
+                self.logger.warn('Disabling servo power on startup')
+                yield From(
+                    self.mech_driver.servo.enable_power(selector.POWER_FREE))
+
             if not self.servo_send_now.is_set():
                 # Make sure we wake up periodically
                 asyncio.get_event_loop().call_later(
@@ -345,16 +356,23 @@ class ControlInterface(object):
                 yield From(self._poll_servo_status(servo_id))
 
         if data.get('turret'):
-            # TODO mafanasyev: Enable and configure servoes if needed
+            if not self.turret_servoes_ready:
+                self.turret_servoes_ready = True
+                sid_list = [TURRET_SERVO_X, TURRET_SERVO_Y]
+                # Enable power
+                yield From(servo.enable_power(selector.POWER_ENABLE, sid_list))
+                # Configure deadband
+                yield From(servo.configure_servo(
+                        {'dead_zone': 1},
+                        sid_list))
 
             servo_x, servo_y = data['turret']
             send_x = min(TURRET_RANGE_X[1],
                          max(TURRET_RANGE_X[0], -servo_x))
             send_y = min(TURRET_RANGE_Y[1],
                          max(TURRET_RANGE_Y[0], servo_y))
-            yield From(self.mech_driver.servo.set_pose(
-                    {TURRET_SERVO_X: send_x,
-                     TURRET_SERVO_Y: send_y}))
+            yield From(servo.set_pose({TURRET_SERVO_X: send_x,
+                                       TURRET_SERVO_Y: send_y}))
 
         if data.get('gait'):
             # We got a gait command. Start the mech driver.
