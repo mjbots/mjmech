@@ -64,8 +64,8 @@ class OnScreenDisplay(object):
             lines_pix = []
             for one_line in lines_deg:
                 pix = self.calibration.from_world2d(
-                    ((math.tan(math.radians(pt[0]) + offs_x),
-                      math.tan(math.radians(pt[1]) + offs_y))
+                    ((math.tan(math.radians(pt[0] + offs_x)),
+                      math.tan(math.radians(pt[1] + offs_y)))
                      for pt in one_line),
                     image_size=ui_state['image_size'])
                 for p1, p2 in zip(pix, pix[1:]):

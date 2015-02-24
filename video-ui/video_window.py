@@ -52,15 +52,24 @@ class VideoWindow(object):
         vbox = Gtk.VBox()
         self.window.add(vbox)
 
+        # Either None, or a button number
+        self._mouse_down_info = None
+        # If True, mouse move suppression timer is active
+        self._mouse_move_timer_pending = False
+        # If not None, suppressed mouse move position
+        self._mouse_move_suppressed_pos = None
+
         self.drawingarea = Gtk.DrawingArea()
         self.drawingarea.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
                                     Gdk.EventMask.BUTTON_RELEASE_MASK |
                                     Gdk.EventMask.POINTER_MOTION_MASK
                                     )
-        self.drawingarea.connect("button-press-event", self._on_da_click)
+        self.drawingarea.connect("button-press-event", self._on_da_mouse_press)
+        self.drawingarea.connect("button-release-event",
+                                 self._on_da_mouse_release)
         self.drawingarea.connect("motion-notify-event", self._on_da_move)
-        self.window.connect("key-press-event", self._on_da_key)
-        self.window.connect("key-release-event", self._on_da_release)
+        self.window.connect("key-press-event", self._on_da_key_press)
+        self.window.connect("key-release-event", self._on_da_key_release)
         vbox.add(self.drawingarea)
         self.window.show_all()
         # You need to get the XID after window.show_all().  You shouldn't get it
@@ -217,7 +226,8 @@ class VideoWindow(object):
                          self._on_video_info_timer)
 
         # Callback functions
-        self.on_video_click = None
+        self.on_video_mouse_click = None
+        self.on_video_mouse_move = None
         self.on_key_press = None
         self.on_key_release = None
         self.on_got_video = None
@@ -437,16 +447,45 @@ class VideoWindow(object):
     @wrap_event
     def _on_da_move(self, src, evt):
         assert src == self.drawingarea, src
+        if self._mouse_down_info is None:
+            return True
 
-        if evt.state & Gdk.ModifierType.BUTTON1_MASK:
-            # Button 1 is being held.
-            # (we do not support moves for other buttons)
-            rel_pos = self._evt_get_video_coord(evt)
-            if rel_pos and self.on_video_click:
-                self.on_video_click(rel_pos, moved=True, button=1)
+        # Mouse moved while mouse button is held
+        rel_pos = self._evt_get_video_coord(evt)
+        if not rel_pos:
+            return True
+
+        if self._mouse_move_timer_pending:
+            # Suppression timer active, record position
+            self._mouse_move_suppressed_pos = rel_pos
+        else:
+            # Have not reported mouse moves recently, start suppression timer
+            if self.on_video_mouse_move:
+                self.on_video_mouse_move(rel_pos, self._mouse_down_info)
+            # Set timer to ratelimit events (every 50 mS)
+            self._mouse_move_timer_pending = True
+            GLib.timeout_add(50, self._on_da_move_timeout)
+
+        return True
 
     @wrap_event
-    def _on_da_click(self, src, evt):
+    def _on_da_move_timeout(self):
+        if self._mouse_move_suppressed_pos:
+            # We had suppressed position.
+            if (self._mouse_down_info is not None
+                ) and self.on_video_mouse_move:
+                self.on_video_mouse_move(self._mouse_move_suppressed_pos,
+                                         self._mouse_down_info)
+            self._mouse_move_suppressed_pos = None
+            # Keep timer going
+            return True
+
+        # No mouse motion. Stop timer.
+        self._mouse_move_timer_pending = False
+        return False
+
+    @wrap_event
+    def _on_da_mouse_press(self, src, evt):
         assert src == self.drawingarea, src
         rel_pos = self._evt_get_video_coord(evt)
         if rel_pos is None:
@@ -455,15 +494,22 @@ class VideoWindow(object):
                 'state=%d', evt.x, evt.y, evt.button, evt.state)
             return True
 
-        self.logger.debug(
-            'Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d',
-            evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state)
-        if self.on_video_click:
-            self.on_video_click(rel_pos, moved=False, button=evt.button)
+        self._mouse_down_info = evt.button
+        #self.logger.debug(
+        #    'Video click at wpt=(%d,%d) rel=(%.3f,%.3f) button=%d state=%d',
+        #    evt.x, evt.y, rel_pos[0], rel_pos[1], evt.button, evt.state)
+        if self.on_video_mouse_click:
+            self.on_video_mouse_click(rel_pos, button=evt.button)
         return True
 
     @wrap_event
-    def _on_da_key(self, src, evt):
+    def _on_da_mouse_release(self, src, evt):
+        assert src == self.drawingarea, src
+        self._mouse_down_info = None
+        return True
+
+    @wrap_event
+    def _on_da_key_press(self, src, evt):
         assert src == self.window, src
         if self.on_key_press:
             # Parse out the keys
@@ -519,7 +565,7 @@ class VideoWindow(object):
 
 
     @wrap_event
-    def _on_da_release(self, src, evt):
+    def _on_da_key_release(self, src, evt):
         assert src == self.window, src
         if self.on_key_release:
             self.on_key_release(evt)

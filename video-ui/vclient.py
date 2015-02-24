@@ -288,6 +288,8 @@ class ControlInterface(object):
 
         self.video = None
 
+        self._mouse_click_info = None
+
         self._update_video_overlay_pending = False
 
         # Log state before video, to check for code errors in rendering function
@@ -298,7 +300,8 @@ class ControlInterface(object):
             if opts.log_prefix:
                 video_log = opts.log_prefix + '.mkv'
             self.video = VideoWindow(host, self.VIDEO_PORT, video_log=video_log)
-            self.video.on_video_click = self._handle_video_click
+            self.video.on_video_mouse_click = self._handle_video_mouse_click
+            self.video.on_video_mouse_move = self._handle_video_mouse_move
             self.video.on_key_press = self._handle_key_press
             self.video.on_key_release = self._handle_key_release
             self.video.on_got_video = functools.partial(
@@ -451,27 +454,53 @@ class ControlInterface(object):
         self.server_state = pkt
         self.update_video_overlay()
 
+    def _handle_video_mouse_move(self, pos, orig_button):
+        """User is moving mouse in the window while the button is down
+        (for performance, these events are not sent when button is up)
+        @p pos - current mouse position
+        @p orig_button - button from the click event
+        This function is rate-limited.
+        """
+        if not self._mouse_click_info:
+            self.logger.debug('Ignoring spurious mouse move')
+            return
 
-    def _handle_video_click(self, pos, button, moved=False):
+        # How much we moved (in screen coordinates) -- so the range is
+        # (-0.5..0.5) for each axis.
+        delta_screen = add_pair(pos, self._mouse_click_info[0], -1.0)
+
+        # Convert to new servo position by multiplying by arbitrary factor
+        new_pos = add_pair(self._mouse_click_info[1], delta_screen,
+                           25.0)
+        if False:
+            self.logger.debug(
+                'Moving turret to (%+.1f, %+.1f) deg in response '
+                'to mouse move at (%+.4f, %+.4f)',
+                new_pos[0], new_pos[1], delta_screen[0], delta_screen[1])
+
+        self.control_dict['turret'] = new_pos
+        self._send_control()
+
+
+    def _handle_video_mouse_click(self, pos, button):
         """User clicked button 1 on video window.
         pos is (x, y) tuple in 0..1 range"""
         assert len(pos) == 2
-        if moved:
-            # Only care about initial click.
-            return
 
         # This image_size will be broken if aspect ratio is different -- this
         # usually means truncated image, not resized pixels; but we do not care
         # for now.
         w2d, = self.c_cal.to_world2d([pos], image_size=(1.0, 1.0))
+        offset = self.ui_state['reticle_offset']
         w2ang = (
-             math.degrees(math.atan(w2d[0])),
-             math.degrees(math.atan(w2d[1]))
+             math.degrees(math.atan(w2d[0])) - offset[0],
+             math.degrees(math.atan(w2d[1])) - offset[1]
              )
 
+        self._mouse_click_info = None
         if button != 1:
-            self.logger.info('Click with B%d at (w2d %.3f,%.3f, w2a '
-                             '%.1f,%.1f)' % ((button, ) + w2d + w2ang))
+            self.logger.info('Click with B%d at (w2d %.3f,%.3f, move by '
+                             '%.1f,%.1f deg)' % ((button, ) + w2d + w2ang))
             return
 
         old_turret = self.control_dict.get('turret')
@@ -489,6 +518,10 @@ class ControlInterface(object):
                           'to click at (%+.4f, %+.4f)',
                          ang_x, ang_y, w2d[0], w2d[1])
         self.control_dict['turret'] = (ang_x, ang_y)
+
+        # Remember turret position
+        self._mouse_click_info = (pos, self.control_dict['turret'])
+
         self._send_control()
 
     _GAIT_KEYS = {  #  key->(dx,dy,dr)
@@ -522,7 +555,7 @@ class ControlInterface(object):
             gait['rotate_deg_s'] = dr * 30
             self.control_dict['gait'] = gait
             self.key_gait_active = True
-        elif name == 'h':
+        elif name in ['h', 'S-question']:
             self._print_help()
         elif name == 'l':
             self.control_dict['laser_on'] ^= 1
@@ -545,9 +578,14 @@ class ControlInterface(object):
             self.logger.info('Centered turret')
         elif name in ['C-Arrows', 'C-S-Arrows']:
             # Ctrl + arrows to move reticle center
-            step = 0.010 if ('S-' in modifiers) else 0.002
+            step = 1.0 if ('S-' in modifiers) else 0.25
             self.ui_state['reticle_offset'] = add_pair(
                 self.ui_state['reticle_offset'], arrows, step)
+            self.logger.info('Reticle center offset: %.3f, %.3f' %
+                             self.ui_state['reticle_offset'])
+        elif name == 'C-r':
+            self.ui_state['reticle_offset'] = (0, 0)
+            self.logger.info('Zeroed out reticle center offset')
         elif name in ['Arrows', 'S-Arrows']:
             # Move turret
             step = 5.0 if ('S-' in modifiers) else 0.5
@@ -609,7 +647,8 @@ class ControlInterface(object):
           S+arrows - move turret (move faster)
           C+arrows - set reticle center (use shift for more precision)
           C+S+arrows - set reticle center (move faster)
-          r        - toggle reticl
+          C+r      - zero out reticle offset
+          r        - toggle reticle
           ESC      - clear logs from OSD; then toggle servo status
           Numpad +/-  - change OSD font size
         """

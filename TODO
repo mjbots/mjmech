@@ -37,16 +37,16 @@
   - Option: shoot on right button click
   - Option: shoot on left button click with shift held
 
- * UI: Post-click motion
-   - When you click, if you hold the mouse and shift it, it slightly tweaks
-     gun positions
-   - Esp. great with one-click shooting
-
  * UI: Inactivity timer -- shows contigious time spent not moving
 
  * UI: Make fire motor time adjustable (or at least longer)
 
  * UI: Show bullet count (approx.)
+
+ * Make video more error-resistant. Decrease I-frame interval? (this might
+   require getting uvch264src to work)
+
+ * Tune turret servoes for better performance (possibly mechanically)
 
  * power-off all servoes when client goes away
 
@@ -59,6 +59,12 @@ Low priority TODOs / ideas:
    properly)
  * Fix bug where the playback speed of record mkv's is too high (only present
    in old mlplayer???)
+
+DONE 2014-02-24:
+ * UI: Post-click motion
+   - When you click, if you hold the mouse and shift it, it slightly tweaks
+     gun positions
+   - Esp. great with one-click shooting
 
 DONE 2014-02-23
  * UI: report back status -- servo temperature
