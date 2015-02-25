@@ -44,7 +44,9 @@
  * Make video more error-resistant. Decrease I-frame interval? (this might
    require getting uvch264src to work)
 
- * Tune turret servoes for better performance (possibly mechanically)
+ * Make turret servoes stronger: replace horn
+
+ * Tune turret servoes for better performance
 
  * UI: fix reticle #1 to use proper display mapping, calibration.
 
@@ -53,12 +55,18 @@
  * Shoot qualification video and post it.
    2013 rules say: 5 minutes of motion, 4 plastic cups 8-12" from the ground.
 
+ * Add accelerometer support to detect shots. Maybe run it as standalone C
+  helper?
+  - MVP: Detect # of shots fired
+  - Also detect mis-shots: known we are out of ammo, auto-retry on misshots
+
 Low priority TODOs / ideas:
  * UI: do not always restart vserver on vclient start
  * Consider: record OSD into final video (as subtitles or re-code video
    properly)
  * Fix bug where the playback speed of record mkv's is too high (only present
    in old mlplayer???)
+ * Make turret servoes stronger: add extra bearings
 
 DONE 2014-02-24:
  * UI: Post-click motion
