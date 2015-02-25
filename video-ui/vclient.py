@@ -181,6 +181,8 @@ class ControlInterface(object):
         reticle_rotate=0,
         status_on=True,
         msg_font_size=20,
+        # fire command duration (seconds)
+        fire_duration = 0.5,
     )
 
     _INITIAL_CONTROL_DICT = dict(
@@ -207,8 +209,9 @@ class ControlInterface(object):
         # pwm values in 0..1 range
         agitator_pwm = 0.5,
         fire_motor_pwm = 0.75,
-        # fire command duration (seconds)
-        fire_duration = 0.5,
+        # fire command duration (seconds) -- copied from ui_state
+        # (as records in this struct are not saved)
+        fire_duration = None,
 
         # fire a shot every time this changes; should only ever increase
         fire_cmd_count = 0,
@@ -571,6 +574,7 @@ class ControlInterface(object):
             self.logger.info('Green LED set to %d',
                              self.control_dict['green_led_on'])
         elif name in ['Return']:
+            self.control_dict['fire_duration'] = self.ui_state['fire_duration']
             self.control_dict['fire_cmd_count'] += 1
             self.logger.info('Sent fire command')
         elif name == 'c':
@@ -603,6 +607,15 @@ class ControlInterface(object):
         elif name == 'KP_Subtract':
             self.ui_state['msg_font_size'] = max(
                 4, self.ui_state['msg_font_size'] - 1)
+        elif name in ['S-parenleft', 'S-parenright', 'S-asterisk']:
+            newval = max(
+                0,
+                self.ui_state['fire_duration'] +
+                (-0.05 if name == 'S-parenleft' else
+                  0.05 if name == 'S-parenright' else 0))
+            self.ui_state['fire_duration'] = newval
+            self.logger.info('Fire duration set to %.2f sec', newval)
+
         elif name == 'Escape':
             if self.logsaver and self.logsaver.data:
                 self.logger.info('Cleared on-screen display (%d lines)',
@@ -649,6 +662,8 @@ class ControlInterface(object):
           C+S+arrows - set reticle center (move faster)
           C+r      - zero out reticle offset
           r        - toggle reticle
+          S-( S-)  - change fire duration
+          S-*      - show fire duration
           ESC      - clear logs from OSD; then toggle servo status
           Numpad +/-  - change OSD font size
         """

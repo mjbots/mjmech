@@ -39,14 +39,14 @@
 
  * UI: Inactivity timer -- shows contigious time spent not moving
 
- * UI: Make fire motor time adjustable (or at least longer)
-
  * UI: Show bullet count (approx.)
 
  * Make video more error-resistant. Decrease I-frame interval? (this might
    require getting uvch264src to work)
 
  * Tune turret servoes for better performance (possibly mechanically)
+
+ * UI: fix reticle #1 to use proper display mapping, calibration.
 
  * power-off all servoes when client goes away
 
@@ -65,6 +65,7 @@ DONE 2014-02-24:
    - When you click, if you hold the mouse and shift it, it slightly tweaks
      gun positions
    - Esp. great with one-click shooting
+ * UI: Make fire motor time adjustable (or at least longer)
 
 DONE 2014-02-23
  * UI: report back status -- servo temperature
