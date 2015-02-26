@@ -199,6 +199,12 @@ class ControlInterface(object):
             # (we will re-start with the next packet)
             self._set_src_addr(None)
             return
+        elif (self.net_packet['seq'] - 100) \
+                <= pkt['seq'] <= self.net_packet['seq']:
+            self.logger.info(
+                'Dropping out-of-order packet: last seq %r, got %r',
+                self.net_packet['seq'], pkt['seq'])
+            return
         elif self.net_packet['seq'] != (pkt['seq'] - 1):
             self.logger.info('Seq number jump: %r->%r',
                              self.net_packet['seq'], pkt['seq'])
