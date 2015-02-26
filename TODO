@@ -1,26 +1,3 @@
- * Re-measure where AEG mounting holes are
- * Iterate on AEG mounting plates
-   * fix camera geometry, both top and bottom surfaces are sloped
-     somewhat
-   * get servo holes to be fixed distance away from plate
-   * ensure that AEG mounting holes line up
-   * see if anything looks nice which shrouds the agitator motor
-   * make corners rounded
-   * put holes for spacer supports
-   * move plates to be 30mm apart
-   * switch plates to aluminum thickness
-   * re-draw camera jaw, include spacer support holes
-   * determine if there is room for M2 washers between plate and servo
-     bracket
-
-
- * Design chassis plate
-
- * Order full complement of servos
- * Build power distribution board
-
- * Simulate herkuleX serial protocol
-
  * Model turret
   - Center of coordinates is camera center
   - Laser has offset (cm, Y only, X=0), and roll/pitch errors
@@ -53,14 +30,16 @@
  * power-off all servoes when client goes away
 
  * Shoot qualification video and post it.
-   2013 rules say: 5 minutes of motion, 4 plastic cups 8-12" from the ground.
+   2013 rules say: 5 minutes of motion, 4 plastic cups 8-12'' from the ground.
 
  * Add accelerometer support to detect shots. Maybe run it as standalone C
-  helper?
+   helper?
   - MVP: Detect # of shots fired
   - Also detect mis-shots: known we are out of ammo, auto-retry on misshots
 
-Low priority TODOs / ideas:
+Lower priority:
+~~~~~~~~~~~~~~
+
  * UI: do not always restart vserver on vclient start
  * Consider: record OSD into final video (as subtitles or re-code video
    properly)
@@ -68,17 +47,615 @@ Low priority TODOs / ideas:
    in old mlplayer???)
  * Make turret servoes stronger: add extra bearings
 
-DONE 2014-02-24:
+Software and gait TODOs
+~~~~~~~~~~~~~~~~~~~~~~
+
+___ legtool ___
+
+ * idle gait improvements either
+   * make ripple (and other subsequent gaits) have a specific mode or command
+     for entering the idle state
+     *the current gait architecture has no method for reporting "done"
+   * make a new "idle" gait, which knows how to pick up each leg and move the
+     body into the idle position
+     * how you get into idle, at least from the ripple gait, should really
+       depend upon the ripple parameters, like whether you are being
+       statically stable or not, and which legs are moving in pairs
+     * it is unclear how you could even do a statically stable gait here
+       without replicating all the logic from ripple
+ * when accepting a new command, see how much time would elapse before any of
+   the existing stance legs would become unreachable.  if this is before they
+   are scheduled to be swing, slow down the command to give them time to lift
+
+___ foot transducer ___
+
+ * test vertical mold in vacuum
+ * update firmware to use ttl serial bus
+ * maybe try a differential signaling scheme for firmware (test at higher data
+   rates or increased noise)
+
+___ IMU ___
+
+ * GaitDriver
+   * create a new top level program not in legtool which uses the linux_input
+     stuff for joystick and which has a new gait type:
+   * Implement second gait type which just lifts two legs up in the air (later
+     to be the balancing gait)
+ * figure out how to structure code so that IMU can be exposed from gazebo, or
+   the real IMU, while remaining separate from legtool
+ * measure noise performance of MiniIMUv3
+ * simulate IMU in gazebo
+ * implement 2 leg balancing and static 2 leg gaits in gazebo
+
+___ Improve legtool ____
+ * refactor mafanasyev's random mjmech specific legtool changes out
+ * figure out how to use foot pressure indication
+ * move all servos doesn't update sliders
+ * new tab to test different gaits over different regimes
+ * render achievable leg positions in geometry view
+ * gait graph could be generated from output states, without having to have
+   custom code to generate it
+ * make rendering achievable commands not be so crazy slow
+ * stable gait
+   * _select_command_options needs to somehow be made aware of the statically
+     stable gait so that it selects options which result in achievable leg
+     positions no matter the position margin
+
+History
+~~~~~~~
+
+DONE 2015-02-24:
  * UI: Post-click motion
    - When you click, if you hold the mouse and shift it, it slightly tweaks
      gun positions
    - Esp. great with one-click shooting
  * UI: Make fire motor time adjustable (or at least longer)
 
-DONE 2014-02-23
+DONE 2015-02-23
  * UI: report back status -- servo temperature
  * power-on turret with 'c' command
  * UI: move turret with arrow keys
+
+DONE 2014-12-20
+ * installed safety switch light and re-assembled mech
+
+DONE 2014-10-09
+ * sent off the mold v2 to be built at shapeways for upright casting
+
+DONE 2014-10-07
+ * Evaluated VytaFlex 20 casting
+ *  * in-line force: 7 counts/lb
+ *  * highest-sensitivity angle: 12 counts/lb
+
+DONE 2014-10-05
+ * started a casting with VytaFlex 20
+
+DONE 2014-10-04
+ * got legtool working on odroid
+ * did a first pass at tuning gaits on the real robot
+ * made servo communications more robust over tcp
+
+DONE 2014-10-02
+ * understood why my experiments at compensating for a gyro going over-rate
+   were failing... the quaternion representation just cannot accurately
+   represent large covariances, as after quaternion normalization, adjustments
+   beyond 1.0 just peter out.  The only way to get more rapid convergence is
+   to temporarily increase the attitude process noise, after which arbitrarily
+   fast convergence can be had!
+
+DONE 2014-09-29
+ * got basic IMU plotting working, along with python unittest test cases for
+   stationary performance of different sensors
+
+DONE 2014-09-27
+ * got legtool working with TCP servos
+
+DONE 0214-09-21
+ * first untethered walking!
+ * made joystick input work with logitech joystick too
+
+DONE 2014-09-20
+ * finished all but molding on the next two boards
+
+DONE 2014-09-18
+ * populated two more boards
+ * received vytaflex 20 for testing
+
+DONE 2014-09-15
+ * demolded vacuum formed foot... sensitivity up by 3x, but still not terribly
+   good
+ * sensor 2014-09-15 (vacuum molded, 6mm rubber)
+ *  * in line force: 5 counts/lb
+ *  * highest sensitivity angle: 15 counts/lb
+ * sensor 2014-09-11 (non-vacuum molded, 7mm rubber)
+ *  * in line force: 2 counts/lb
+ *  * highest sensitivity angle: 5 counts/lb
+ * ordered some vytaflex 20 and enough parts from digikey to populate the
+   other 4 boards I have for testing
+
+DONE 2014-09-14
+ * mounted post on second board, prepared for vacuum casting
+
+DONE 2014-09-13
+ * populated second board
+
+DONE 2014-09-11
+ * demolded foot transducer and tested... good news: it measures pressure!
+   bad news: not terribly well
+
+DONE 2014-09-10
+ * made rubber casting of first circuit board!
+
+DONE 2014-09-09
+ * photographed foot board with post and wires
+ * epoxied post into foot board
+
+DONE 2014-09-08
+ * placed post on board with new thinner ecowire... 6 wires just barely fits
+   through a #2 hole, but it did fit
+ * verified that I can program the AVR and snugged everything down
+
+DONE 2014-09-07
+ * Made legtool work with newest trollius
+ * Started work to let gait driver support multiple gait types in one execution
+
+DONE 2014-09-06
+ * updated gbulb to work with newer trollius
+ * got attitude filter mostly working, and c++ port which is at least 20x
+   faster than the python version
+ * ordered thinner gloves
+
+DONE 2014-09-04
+ * Tried threading posts with new collet to anchor them, works for those with
+   #2 hole size, #4 hole size doesn't leave enough material to be structural
+ * Ordered the slightly more expensive wire with a tiny bit smaller diameter
+   that is at least somewhat likely to be able to fit 6 wires in a #2 size
+   hole
+ * Continued working on getting a full attitude filter working, there is some
+   problem on the high rotation rate cases, that doesn't seem to crop up with
+   other acceleration is happening too
+
+DONE 2014-09-02
+ * C++ version speed compares well, 1d is much faster than real time on my
+   desktop
+
+DONE 2014-09-01
+ * analyze what the process and measurement noises should be for gyros and
+   accelerometers with noise model
+
+
+DONE 2014-08-30
+ * practiced threading posts, not very easy with just a vice
+ * ordered a collet and more posts to get more practice
+ * quoted a custom machined part at emachineshop, basically a $100 setup fee,
+   after which parts are $3-5 each.  wouldn't make sense until the design was
+   proven
+
+DONE 2014-08-29
+ * got barometer board working with wires in place instead of pins, had messed
+   up a bunch of stuff when removing the pins
+
+DONE 2014-08-28
+ * released casting with screw, seems to have worked
+
+DONE 2014-08-27
+ * made test mold with screw embedded in foot
+
+DONE 2014-08-24
+ * finished updating firmware for attiny85
+ * verified barometer functioning on board
+ * ordered post with wider hole
+
+DONE 2014-08-22
+ * verified programmer connectivity with attiny85 on transducer board
+
+DONE 2014-08-04
+ * debug firmware to test foot transducer (w/o multiplexed serial bus) complete
+ * ordered ecowire sample for foot transducer, and 6 pin connector/crimp pins
+ * ordered 26 awg hookup wire for general robot use
+
+DONE 2014-07-25
+ * specified wire for foot transducer leads, had to find something thin enough
+   to fit through the center of the post
+
+DONE 2014-07-23
+ * ordered foot mold from shapeways
+
+DONE 2014-07-21
+ * ordered mechanical parts for foot transducer
+ *  * die + handle
+ *  * spacer
+ *  * nuts
+ * ordered urethane rubber, sealant, and release agent
+ *  * smooth on vytaflex 60
+ * ordered misc supplies
+ *  * cutting oil
+ *  * steel epoxy
+
+DONE 2014-07-20
+ * selected barometer - mpl115a2
+ * designed pressure board
+ * sent off to oshpark
+ * made digikey order
+ *  * barometer
+ *  * attiny85
+ *  * passives
+
+DONE 2014-07-19
+ * connect up gait control through vclient and vserver
+ * write non-pygame joystick routines, so that it doesn't spew to stdout all
+   the time
+
+DONE 2014-07-13
+ * posted legtool video and announced
+ * received SSOP adapters from SFE
+
+DONE 2014-07-06
+ * Split out legtool into separate repo, included in mech via "git subtree"
+
+DONE 2014-07-02
+ * gazebo servo names are no longer hard coded
+ * pulled turret specific things out of gait_driver.py
+
+DONE 2014-07-01
+ * refactored all of mtool, now "legtool" into somewhat coherent python modules
+ * checked in code to make vserver use the actual mech interface
+
+DONE 2014-06-27
+ * updated ripple_gait to allow command changes at any time
+
+DONE 2014-06-26
+ * got very basic standalone driving application working
+
+DONE 2014-06-11
+ * fixed: when stopping playback, the idle pose is not reliably commanded.
+   possibly due to the same cause, dragging the mouse around the commander
+   with body coordinates does not result in smooth motion
+ * after adding better logging to temperature loop, identified that it was an
+   assertion failure somewhere, but it hasn't happened again to show which one
+
+DONE 2014-06-10
+ * pushed to github and gitlab pygazebo and mtool versions which at least
+   mostly work running on trollius, there are still a few outstanding bugs in
+   mtool though
+
+DONE 2014-06-06
+ * continued work on moving pygazebo and herkulex.py to asyncio.  Have
+   pygazebo all converted, but need to fill in some test coverage and verify
+   it works actually commanding things
+
+DONE 2014-06-02
+ * got amble gaits (and other random leg groupings) working... they work much
+   better without trying to be statically stable, which isn't possible on a
+   quad anyways
+
+DONE 2014-06-01
+ * need to be able to set max and min on a per-servo basis, without having to
+   worry about accidentally putting it into an infeasible configuration
+ * changing leg number alone in IK tab didn't result in tester pointing at new
+   leg
+ * display servo temperature and voltage in status bar
+ * implement changing leg order
+
+DONE 2014-05-31
+ * constructed prototype turret plate
+ * re-assembled chassis with spacers on top
+
+DONE 2014-05-28
+ * Calibrated the legs so that they all touch the ground
+ * render legs which aren't feasible in red in the gait tab
+ * made static stable constants be proportional to cycle time
+
+DONE 2014-05-26
+ * implemented first pass at statically stable gait
+
+DONE 2014-05-25
+ * Ordered hardware to try a new mounting scheme for the turret, plus hook up
+   wire and connectors to wire up the motor driver board
+ * fixed sluggish playback when updating gait command widget
+
+DONE 2014-05-24
+ * Re-assembled with spacers on bottom, power dist board, motor driver, and
+   battery mounting plate installed
+ * Crimped on 0.1'' connectors to each of the servos cables
+ * Assigned addresses to all servos
+ * first walking!
+
+DONE 2014-05-23
+ * test assembly of legs with polycarb chassis
+
+DONE 2014-05-18
+ * gait tab can drive actual servos
+ * added aliases to get the pan and tilt turret to work in mtool
+ * made gait tab geometry view have square aspect ratio
+ * made mtool resizing work better
+ * it would be nice if the body commands could be set without waiting for a
+   gait transition even if nothing else could be
+
+DONE 2014-05-17
+ * Finished cutting prototype polycarb chassis plates
+
+DONE 2014-05-09
+ * continued work towards letting the gait tab drive actual servos... mostly
+   threading configurations through and cleaning things up
+ * fixed some residual broken-ness in the servo and ik tabs from re-factoring
+ * fixed link between leg config and the ik tester in the ik tab
+
+DONE 2014-05-07
+ * Added tests for symmetric gaits and fixed a couple of bugs to get them
+   closer to being symmetric
+ * stop playback when switching away from the gait tab
+ * generate the actions list on construction, since commands can now not
+   change it
+ * rendered the support polygon
+
+DONE 2014-05-05
+ * Fixed up the rendering of allowable gaits to be a little more responsive
+   and not be obviously incorrect.
+ * Added axes and grid to the geometry view, to verify that yes, the gaits
+   aren't coming out quite right
+
+DONE 2014-04-29
+ * implemented adjusting cycle time and downscaling the command to stay in the
+   achievable regime
+ * implemented the NotSupported exception for configurations that are not
+   possible
+ * rendered the current options in the UI
+ * render achievable commands in command widget
+
+DONE 2014-04-28
+ * redefine IK coordinate system so that it is the same for all legs as viewed
+   from each shoulder
+ * actually implement remainder of gait functionality... changing cycle time
+   and swing timing with speed
+
+DONE 2014-04-27
+ * Started work to verify that a given command is feasible
+
+DONE 2014-04-26
+ * Fixed some bugs and started writing a more comprehensive set of tests for
+   gait generation
+ * Implemented command widget for static gaits
+ * Rendered axes in command widget, and used new code to render axes in IK
+   tester in a slightly cleaner way
+
+DONE 2014-04-24
+ * Implemented steady state in mtool
+ * Fixed gait to combine translation and rotation in the way you would expect
+ * made slider cover two full phases
+ * removed end controls from playback
+ * implemented playback modes
+
+DONE 2014-04-23
+ * Hooked up spin based commands and let geometry viewer look in any reference
+   frame or projection
+
+DONE 2014-04-22
+ * Tried to make a basic implementation of ripple_gait, for zero commands
+   looking from the top it looks like it is working!
+
+DONE 2014-04-20
+ * Implemented rendering the body, shoulder, and leg positions with no
+   niceties (fixed scale, projection, and coordinate frame)
+ * Started work on the basic gait generation
+
+DONE 2014-04-14
+ * Implemented python "tf" library, to be used in gait tab.
+
+DONE 2014-04-13
+ * Continued very slow progress on gait tab of mtool, rendered gait graph.
+
+DONE 2014-04-09
+
+ * Started prototyping rough draft of python gait generator... really just
+   what the APIs should look like, no real functionality has been written yet
+
+DONE 2014-04-08
+
+ * Started prototyping interface in designer for the gait tool, I think I have
+   all or most of the interface elements I want in there, but I'm not yet sure
+   how feasible it will be to implement
+
+DONE 2014-04-06
+
+ * Read the last 5 years of posts on the Trossen Robotics forum, trying to
+   figure out what the state of the art in gait generation was.  Yikes, it
+   looks like NUKE is largely it.  A number of other people have done one-off
+   custom open loop controls, and stag is still the only one I could find
+   doing anything closed-loop-ish with a dynamic gait.  It doesn't look like
+   anyone actually knows how to measure attitude in a robust way using an
+   accel/gyro.
+
+ * mtool
+ *  * mtool needs to support multiple configuration files
+ *  * mtool needs to document what "idle" is
+
+DONE 2014-04-05
+ * Updated gazebo with current 3D models
+ * Ordered full complement of servos
+
+DONE 2014-04-03
+ * Added more missing items to servo order spreadsheet
+ * Figured out how to re-link a sketch to a new face in freecad
+ * Removed antenna from chassis model
+
+ * Started making gazebo visual models from freecad models... mostly just
+   re-learning blender
+
+DONE 2014-04-02
+ * Built servo order spreadsheet to keep track of all the parts we would need
+ *  * https://docs.google.com/spreadsheets/d/17kCEHZO_xlTlWSWM5mOakoSijZrfuTzqZxxZrZQiLXs/edit#gid=0
+ * added holes for servo cables to enter through bottom
+
+DONE 2014-04-01
+ * Added mounting tabs to all servos
+ * add mounting holes for each of the boards
+ * add supporting standoffs between the two chassis plates
+ * add plate to velcro battery to
+ * figure out where the center of mass is going to be, try to get it as close
+   to centered as possible (will allow dynamic gaits)
+ * make more decorative cutouts on the top plate
+
+DONE 2014-03-30
+ * Designed rough draft of chassis plates
+ * Created center of mass spreadsheet, flipped turret around to get it close to centered
+ *  * https://docs.google.com/spreadsheets/d/17kCEHZO_xlTlWSWM5mOakoSijZrfuTzqZxxZrZQiLXs/edit#gid=0
+
+DONE 2014-03-29
+ * Built power cable for odroid
+ * packaged up keyed male 0.1'' headers
+
+DONE 2014-03-28
+ * Moved turret to office
+
+DONE 2014-03-27
+ * Recorded some demo videos of the turret
+
+DONE 2014-03-26
+ * rotated reference frame
+ * decimated accelerometer input to get CPU usage down to 90% on my machine
+
+ * muzzle velocity measured by hitting an aluminum plate and recording with
+   audacity... appears to be around 80ft/s with the 0.2g BBs I have
+
+ * considering demo application complete
+
+DONE 2014-03-25
+
+ * Implemented ukf_filter from the book with inspiration from the pykalman
+   API, seems much more stable, in that it works as I expect instead of
+   exploding randomly
+
+ * Found another bug that was causing IMU readings to stop and fixed it
+
+DONE 2014-03-24
+
+ * Fixed the worst of the UKF problems, but pykalman seems to be not very
+   numerically robust in general... will probably write one from the book in
+   the end
+
+ * Got the servos to be stable by turning down the D term of their internal PID
+
+ * Made USB not block on transmit
+
+DONE 2014-03-23
+
+ * Integrated gyros into attitude with a 1s bias sampling period at the start,
+   works OK, but drift is too large after a minute or so of operation, will
+   need ongoing corrections or longer bias sampling period
+
+ * Switched joystick to be accumulative with deadband, and made the d-pad
+   adjust in the smallest steps the servo can represent
+
+ * Started work on KF for attitude... having problems that I haven't
+   successfully debugged yet
+
+DONE 2014-03-22
+
+ * Traced AVR watchdogs to USB slowness, looks like current USB implementation
+   can block for >15ms at a time.  With watchdog set much larger, everything
+   works fine.  Will re-work usb_serial.c to not block.
+
+DONE 2014-03-21
+ * Wired up servos to AVR and battery through power distribution board
+ * Updated AVR to get basic serial communication working
+
+ * Something appears to be resetting the AVR firmware occasionally when
+   communicating serially with the servos, need to debug
+
+DONE 2014-03-20
+
+ * Worked towards having AVR communicate serially to servos instead of using
+   donbgu RS232 adapter
+
+DONE 2014-03-19
+ * Constructed prototype power distribution board
+
+DONE 2014-03-18
+ * assembled complete turret
+
+DONE 2014-03-16
+ * Fixed muzzle velocity issue (gearbox wasn't mating to barrel properly)
+ * Ordered parts for perfboard power distribution, including Castle BEC
+
+ * Partially re-assembled turret, awaiting additional M2 screw sizes before
+   completing
+
+ * Wired up MiniIMU v2 to AVR and prepared for mounting in turret
+
+DONE 2014-03-15
+ * Ordered M2x10 and M2x6 screws for AEG and chassis assembly
+ * Made video of operation
+ * Discovered barrel velocity is terrible
+ * Started drafting chassis layout
+
+DONE 2014-03-14
+
+ * Wrote simple application to control turret, laser, agitator, and AEG from
+   joystick
+
+ * Tested at 10ft with the 3'' target... it is plenty feasible to center the
+   laser pointer on the target at that distance using nothing but the 1080p
+   video feed.  I haven't tested to see how much recoil is caused by the AEG
+   mechanism yet (too loud to test much while Cyrus is sleeping)
+
+DONE 2014-03-13
+ * installed camera using aluminum jaws
+ * wired up laser all the way to AVR on breadboard, tested control in firmware
+ * installed EC3 connectors on battery, charger, and motor driver
+ * odroid + C920 work fine
+
+DONE 2014-03-12
+
+ * Assembled AEG turret minus camera, tested servo drivers... seems there is
+   plenty of power for this mass AEG
+
+DONE 2014-03-11
+
+ * mounted prototype turret base to 2x4 and polycarb for testing (still
+   waiting on hardware to assemble full prototype)
+
+DONE 2014-03-10
+ * source up on gitlab.com
+
+DONE 2014-03-09
+ * sent off plates to emachineshop
+
+ * ordered smaller battery, 30mm spacers, charger, and some screws from
+   hobbyking
+
+ * came up with draft approach for mounting turret without chassis
+ * some polycarbonate I have left over + some 2x4s plus a hand drill
+ * ordered from amazon
+ * spacers for around the AEG
+ * M2 plastic washers
+
+DONE 2014-03-06
+ * Iterate on AEG mounting plates
+ * move plates to be 30mm apart
+ * make sure there is a nice place for the scoring LED board on top if needed
+ * verify final mounting clearance with paper version
+
+DONE 2014-03-05
+ * fix camera geometry, both top and bottom surfaces are sloped somewhat
+
+ * make sure all drill holes are large enough to account for +- .25mm
+   tolerance of emachineshop
+
+ * get servo holes to be fixed distance away from plate
+ * switch plates to aluminum thickness
+ * make corners rounded
+ * put holes for spacer supports
+ * determine if there is room for M2 washers between plate and servo bracket
+ * look to reduce mass maybe reduce shroud around barrel
+ * see if anything looks nice which shrouds the agitator motor
+ * ensure adequate mounting location for IMU
+ * re-draw camera jaw, include spacer support holes
+
+DONE 2014-03-04
+ * Re-measure where AEG mounting holes are
+ * ensure that AEG mounting holes line up
+
 
 DONE 2014-03-02
  * First rough draft of turret freecad model
