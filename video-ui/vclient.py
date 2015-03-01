@@ -583,6 +583,7 @@ class ControlInterface(object):
         '1': FCMD.inpos1,
         '2': FCMD.inpos2,
         '3': FCMD.inpos3,
+        '5': FCMD.inpos5,
         '9': FCMD.cont,
         '0': FCMD.off
         }
@@ -713,7 +714,7 @@ class ControlInterface(object):
           S-( S-)  - change fire duration
           S-*      - show fire duration
           ESC      - clear logs from OSD; then toggle servo status
-          1/2/3/9/0 - right-button autofire: 1/2/3 shots, continuous, off
+          1/2/3/5/9/0 - right-button autofire: 1/2/3 shots, continuous, off
           Numpad +/-  - change OSD font size
         """
         for line in textwrap.dedent(helpmsg).strip().splitlines():
@@ -769,11 +770,17 @@ class ControlInterface(object):
         server_time = (self.server_state['srv_time']
                        - self.server_state['cli_time'] + time.time())
         self.fire_cmd_seq += 1
+        timeout = 0.5
+        if FCMD._is_inpos(command):
+            # Give extra time for servoes to settle
+            # TODO mafanasyev: this should not be required once 'cont' support
+            # is implemented
+            timeout += 0.5
         self.control_dict.update(
             fire_duration = self.ui_state['fire_duration'],
             fire_cmd = [command, self.fire_cmd_seq],
             # Ignore command if it is delayed by >0.5 sec
-            fire_cmd_deadline = server_time + 0.5)
+            fire_cmd_deadline = server_time + timeout)
         self.logger.info('Sent fire command %d', command)
 
     @wrap_event

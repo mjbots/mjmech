@@ -20,6 +20,7 @@ class FCMD(object):
     inpos1 = 1      # Fire 1 shot when inposition
     inpos2 = 2      # Fire 2 shots when inposition
     inpos3 = 3      # Fire 3 shots when inposition
+    inpos5 = 5      # Fire 5 shots when inposition
     now1   = 11     # Fire 1 shot immediately
     cont   = 20     # Keep firing for some time
 
@@ -33,7 +34,13 @@ class FCMD(object):
             return 2
         elif x == cls.inpos3:
             return 3
+        elif x == cls.inpos5:
+            return 5
         assert False, 'Unknown FCMD input: %r' % (x, )
+
+    @classmethod
+    def _is_inpos(cls, x):
+        return x in [cls.inpos1, cls.inpos2, cls.inpos3, cls.inpos5]
 
 def wrap_event(callback):
     """Wrap event callback so the app exit if it crashes"""

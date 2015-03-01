@@ -84,9 +84,12 @@ class ControlInterface(object):
         #  net_packet is None)
         self.servo_packet = None
 
-        # Per-servo status (address->string)
+        # Per-servo status (address->tuple of strings)
         self.last_servo_status = dict()
         self.turret_servoes_ready = False
+
+        # Last processed fire command
+        self.last_fire_cmd = None
 
         # Iterator which returns next servo to poll
         if SERVO_IDS_TO_POLL:
@@ -289,10 +292,10 @@ class ControlInterface(object):
         status_list = yield From(
             self.mech_driver.servo.get_clear_status(servo_id))
         status_str = ','.join(status_list) or 'idle'
-        if status_str != self.last_servo_status.get(servo_id):
+        if tuple(status_list) != self.last_servo_status.get(servo_id):
             #self.logger.debug('Servo status for %r: %s'
             #                  % (servo_id, status_str))
-            self.last_servo_status[servo_id] = status_str
+            self.last_servo_status[servo_id] = tuple(status_list)
         self.status_packet['servo_status'][servo_id] = status_str
         raise Return(status_str)
 
@@ -307,30 +310,6 @@ class ControlInterface(object):
 
         if olddata is None:
             olddata = dict()   # so one can use 'get'
-
-        fire_cmd = data['fire_cmd']
-        if fire_cmd is None and olddata.get('fire_cmd') is not None:
-            # Stop firing motor
-            yield From(servo.mjmech_fire(fire_time=0, fire_pwm=0))
-        elif fire_cmd is None or fire_cmd == olddata.get('fire_cmd'):
-            # No new command
-            pass
-        elif data['fire_cmd_deadline'] < time.time():
-            dt = time.time() - data['fire_cmd_deadline']
-            self.logger.warn('Ignoring old fire_cmd %r: %.3f sec old',
-                             fire_cmd, dt)
-        else:
-            # Firetime!
-            # We can do few shots at once, but no more than 25.5 sec.
-            command = fire_cmd[0]
-            if command == FCMD.cont:
-                duration = 0.5  # bigger than poll interval
-            else:
-                duration = data['fire_duration'] * FCMD._numshots(command)
-            # TODO mafanasyev: add support for 'inpos' part
-            self.logger.debug('Bang bang %.2f sec!!', duration)
-            yield From(servo.mjmech_fire(
-                    fire_time=duration, fire_pwm=data['fire_motor_pwm']))
 
         # re-sent magic servo command. Unlike real servo,
         # it will timeout and turn off all LEDs if there were no
@@ -350,7 +329,7 @@ class ControlInterface(object):
             self.servo_poll_count += 1
             special_step = 0
             if (servo_id != 99) and \
-                    self.last_servo_status.get(servo_id) != 'offline':
+                    'offline' not in self.last_servo_status.get(servo_id, []):
                 # Note that mod-factor should be relatively prime to number
                 # of servoes
                 special_step = (self.servo_poll_count % 103)
@@ -385,6 +364,48 @@ class ControlInterface(object):
             yield From(servo.set_pose({TURRET_SERVO_X: send_x,
                                        TURRET_SERVO_Y: send_y}))
 
+        fire_cmd = data['fire_cmd']
+        if fire_cmd is None and self.last_fire_cmd is not None:
+            self.last_fire_cmd = None
+            # Stop firing motor
+            yield From(servo.mjmech_fire(fire_time=0, fire_pwm=0))
+        elif fire_cmd == self.last_fire_cmd:
+            # No new command -- current one is processed
+            pass
+        elif data['fire_cmd_deadline'] < time.time():
+            # Command expired
+            self.last_fire_cmd = fire_cmd
+            dt = time.time() - data['fire_cmd_deadline']
+            self.logger.warn('Ignoring old fire_cmd %r: %.3f sec old',
+                             fire_cmd, dt)
+        else:
+            command = fire_cmd[0]
+            suppress = []
+            if FCMD._is_inpos(command):
+                # Need to check if turret servoes are inposition
+                # For that, immediately poll them
+                for sid in (TURRET_SERVO_X, TURRET_SERVO_Y):
+                    status = yield From(self._poll_servo_status(sid))
+                    if 'inposition' not in status:
+                        suppress.append(sid)
+
+            if suppress:
+                self.logger.debug('Waiting for firing servoes to settle (%r)',
+                                  suppress)
+                # Do not touch last_fire_cmd so we keep retrying the test
+            else:
+                # Firetime!
+                # We can do few shots at once, but no more than 25.5 sec.
+                self.last_fire_cmd = fire_cmd
+                command = fire_cmd[0]
+                if command == FCMD.cont:
+                    duration = 0.5  # bigger than poll interval
+                else:
+                    duration = data['fire_duration'] * FCMD._numshots(command)
+                self.logger.debug('Bang bang %.2f sec!!', duration)
+                yield From(servo.mjmech_fire(
+                        fire_time=duration, fire_pwm=data['fire_motor_pwm']))
+                
         if data.get('gait'):
             # We got a gait command. Start the mech driver.
             if self.mech_driver and not self.mech_driver_started:

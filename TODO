@@ -1,11 +1,6 @@
 High priority (have to finish before competition)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * UI: One-click shooting -- should shoot once both servoes report INPOSITION
-  - Option: on/off mode, then shoot on left button click
-  - Option: shoot on right button click
-  - Option: shoot on left button click with shift held
-
  * UI: Inactivity timer -- shows contigious time spent not moving
 
  * UI: Show bullet count (approx.)
@@ -19,6 +14,10 @@ High priority (have to finish before competition)
 
 Medium priority:
 ~~~~~~~~~~~~~~~
+ * Add high-PWM mode for agitator (probably only momentary) -- it got stuck once
+
+ * One-click shooting: 'cont' mode (shoot while mouse button is held)
+
  * Tune turret servoes for better performance
 
  * Shoot qualification video and post it.
@@ -114,6 +113,11 @@ ___ Improve legtool ____
 
 History
 ~~~~~~~
+
+DONE 2015-03-01:
+ * UI: One-click shooting -- should shoot once both servoes report INPOSITION
+  - shoots on right button click once it is enabled
+ 
 
 DONE 2015-02-24:
  * UI: Post-click motion
