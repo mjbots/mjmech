@@ -29,7 +29,7 @@ import gbulb
 import legtool
 import legtool.servo.selector as selector
 
-from vui_helpers import wrap_event
+from vui_helpers import wrap_event, FCMD
 import vui_helpers
 
 # How often to poll servo status, in absense of other commands
@@ -308,24 +308,29 @@ class ControlInterface(object):
         if olddata is None:
             olddata = dict()   # so one can use 'get'
 
-        if 'fire_cmd_count' in olddata:
-            fire_diff = data['fire_cmd_count'] - olddata['fire_cmd_count']
+        fire_cmd = data['fire_cmd']
+        if fire_cmd is None and olddata.get('fire_cmd') is not None:
+            # Stop firing motor
+            yield From(servo.mjmech_fire(fire_time=0, fire_pwm=0))
+        elif fire_cmd is None or fire_cmd == olddata.get('fire_cmd'):
+            # No new command
+            pass
+        elif data['fire_cmd_deadline'] < time.time():
+            dt = time.time() - data['fire_cmd_deadline']
+            self.logger.warn('Ignoring old fire_cmd %r: %.3f sec old',
+                             fire_cmd, dt)
         else:
-            fire_diff = 0
-
-        if (fire_diff < 0) or (fire_diff > 3):
-            self.logger.warn('fire_cmd_count jump too big, ignored: %r->%r' % (
-                    olddata['fire_cmd_count'], data['fire_cmd_count']))
-        elif fire_diff == 0:
-            pass  # Do nothing
-        else:
-            self.logger.info('bang bang (%dx)' % fire_diff)
-            # TODO mafanasyev: take care of fire_diff > 1
-            # (wait for previous fire command to finish and start again)
-            # (or multiply fire duration, but take care to keep it <2.55 sec)
+            # Firetime!
+            # We can do few shots at once, but no more than 25.5 sec.
+            command = fire_cmd[0]
+            if command == FCMD.cont:
+                duration = 0.5  # bigger than poll interval
+            else:
+                duration = data['fire_duration'] * FCMD._numshots(command)
+            # TODO mafanasyev: add support for 'inpos' part
+            self.logger.debug('Bang bang %.2f sec!!', duration)
             yield From(servo.mjmech_fire(
-                    fire_time=data['fire_duration'],
-                    fire_pwm=data['fire_motor_pwm']))
+                    fire_time=duration, fire_pwm=data['fire_motor_pwm']))
 
         # re-sent magic servo command. Unlike real servo,
         # it will timeout and turn off all LEDs if there were no

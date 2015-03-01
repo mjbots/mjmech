@@ -14,6 +14,27 @@ import gbulb
 # common helpers for vclient.py and vserver.py
 g_quit_handlers = list()
 
+class FCMD(object):
+    """Fire_cmd constants"""
+    off = 0         # Motor disabled
+    inpos1 = 1      # Fire 1 shot when inposition
+    inpos2 = 2      # Fire 2 shots when inposition
+    inpos3 = 3      # Fire 3 shots when inposition
+    now1   = 11     # Fire 1 shot immediately
+    cont   = 20     # Keep firing for some time
+
+    @classmethod
+    def _numshots(cls, x):
+        if x in [cls.off, cls.cont]:
+            return 0
+        elif x in [cls.inpos1, cls.now1]:
+            return 1
+        elif x == cls.inpos2:
+            return 2
+        elif x == cls.inpos3:
+            return 3
+        assert False, 'Unknown FCMD input: %r' % (x, )
+
 def wrap_event(callback):
     """Wrap event callback so the app exit if it crashes"""
     def wrapped(*args, **kwargs):

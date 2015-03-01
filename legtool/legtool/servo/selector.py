@@ -193,7 +193,7 @@ class HerkuleXController(object):
     @asyncio.coroutine
     def mjmech_fire(self, fire_time, fire_pwm):
         fire_time_ticks = int(fire_time / 0.10)
-        assert 1 <= fire_time_ticks <= 255, (
+        assert 0 <= fire_time_ticks <= 255, (
             'Invalid fire_time value: %r sec (%d ticks)' % (
                 fire_time, fire_time_ticks))
 

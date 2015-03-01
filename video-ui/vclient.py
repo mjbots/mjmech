@@ -18,7 +18,7 @@ from trollius import Task, From
 
 from vui_helpers import (
     wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler,
-    add_pair)
+    add_pair, FCMD)
 from video_window import VideoWindow, video_window_init, video_window_main
 import osd
 
@@ -183,6 +183,9 @@ class ControlInterface(object):
         msg_font_size=20,
         # fire command duration (seconds)
         fire_duration = 0.5,
+        # Autofire mode. This is initialized in the constructor, and saved value
+        # is always ignored.
+        autofire_mode = 0,
     )
 
     _INITIAL_CONTROL_DICT = dict(
@@ -213,8 +216,20 @@ class ControlInterface(object):
         # (as records in this struct are not saved)
         fire_duration = None,
 
-        # fire a shot every time this changes; should only ever increase
-        fire_cmd_count = 0,
+        # fire control.
+        # The fire control must be:
+        # (1) idempotent -- we can send control packet for any reason
+        # (2) resilent to packet losses
+        # (3) time limited -- network delays should not cause delayed fire.
+
+        # Firing command deadline. If this is zero or less than server's current
+        # time, all new firing is inhibited (current shot is not interrupted)
+        fire_cmd_deadline = 0,
+
+        # Fire command. This is a tuple (command, seq). A new command starts
+        # every time a tuple changes. Mode is one of FCMD constants from
+        # vui_helpers.
+        fire_cmd = None,
         )
 
 
@@ -273,6 +288,7 @@ class ControlInterface(object):
 
         # Most recent server state
         self.server_state = dict()
+        self.fire_cmd_seq = 0
 
         restore_from = opts.restore_state
 
@@ -288,6 +304,9 @@ class ControlInterface(object):
             with open(restore_from, 'r') as fh:
                 restored = json.load(fh)
             self.ui_state.update(restored)
+
+        # Always start with autofire disabled.
+        self.ui_state['autofire_mode'] = 0
 
         self.video = None
 
@@ -305,6 +324,7 @@ class ControlInterface(object):
             self.video = VideoWindow(host, self.VIDEO_PORT, video_log=video_log)
             self.video.on_video_mouse_click = self._handle_video_mouse_click
             self.video.on_video_mouse_move = self._handle_video_mouse_move
+            self.video.on_video_mouse_release = self._handle_video_mouse_release
             self.video.on_key_press = self._handle_key_press
             self.video.on_key_release = self._handle_key_release
             self.video.on_got_video = functools.partial(
@@ -501,7 +521,11 @@ class ControlInterface(object):
              )
 
         self._mouse_click_info = None
-        if button != 1:
+        fire_cmd = None
+        if (button == 3) and self.ui_state['autofire_mode']:
+            # autofire mode
+            fire_cmd = self.ui_state['autofire_mode']
+        elif button != 1:
             self.logger.info('Click with B%d at (w2d %.3f,%.3f, move by '
                              '%.1f,%.1f deg)' % ((button, ) + w2d + w2ang))
             return
@@ -525,7 +549,19 @@ class ControlInterface(object):
         # Remember turret position
         self._mouse_click_info = (pos, self.control_dict['turret'])
 
+        if not fire_cmd:
+            pass
+        elif fire_cmd in [FCMD.inpos1, FCMD.inpos2, FCMD.inpos3]:
+            self._prepare_fire_command(fire_cmd)
+        else:
+            # TODO mafanasyev: implement FCMD.cont
+            self.logger.error('Fire command %d not implemented', fire_cmd)
+
         self._send_control()
+
+    def _handle_video_mouse_release(self, button):
+        """User has release mouse button in a video window"""
+        pass
 
     _GAIT_KEYS = {  #  key->(dx,dy,dr)
         'w': (0, 1, 0),
@@ -542,6 +578,14 @@ class ControlInterface(object):
         'Up': (0, -1),
         'Down': (0, 1)
     }
+
+    _FIRE_COMMANDS = {
+        '1': FCMD.inpos1,
+        '2': FCMD.inpos2,
+        '3': FCMD.inpos3,
+        '9': FCMD.cont,
+        '0': FCMD.off
+        }
 
     def _handle_key_press(self, base_name, modifiers):
         arrows = self._ARROW_KEYS.get(base_name)
@@ -574,9 +618,7 @@ class ControlInterface(object):
             self.logger.info('Green LED set to %d',
                              self.control_dict['green_led_on'])
         elif name in ['Return']:
-            self.control_dict['fire_duration'] = self.ui_state['fire_duration']
-            self.control_dict['fire_cmd_count'] += 1
-            self.logger.info('Sent fire command')
+            self._prepare_fire_command(FCMD.now1)
         elif name == 'c':
             self.control_dict['turret'] = (0.0, 0.0)
             self.logger.info('Centered turret')
@@ -627,6 +669,12 @@ class ControlInterface(object):
                 self.ui_state['status_on'] ^= True
                 self.logger.debug('Set status_on=%r',
                                   self.ui_state['status_on'])
+        elif name in self._FIRE_COMMANDS:
+            self.ui_state['autofire_mode'] = newval = self._FIRE_COMMANDS[name]
+            self.logger.info('Right-button autofire mode %d', newval)
+            if newval == FCMD.off:
+                # Halt firing immediately when autofire is disabled
+                self.control_dict['fire_cmd'] = None
         elif base_name in ['Shift_R', 'Shift_L',
                            'Control_R', 'Control_L',
                            'Alt_R', 'Alt_L']:
@@ -665,6 +713,7 @@ class ControlInterface(object):
           S-( S-)  - change fire duration
           S-*      - show fire duration
           ESC      - clear logs from OSD; then toggle servo status
+          1/2/3/9/0 - right-button autofire: 1/2/3 shots, continuous, off
           Numpad +/-  - change OSD font size
         """
         for line in textwrap.dedent(helpmsg).strip().splitlines():
@@ -708,6 +757,24 @@ class ControlInterface(object):
             return
         self._update_video_overlay_pending = True
         self.asyncio_loop.call_soon_threadsafe(self._update_video_overlay_now)
+
+    def _prepare_fire_command(self, command):
+        """Prepare fire command. You still need to send_control for it to take
+        an effect
+        """
+        if self.server_state.get('srv_time') is None:
+            self.logger.error('Cannot fire -- no server time')
+            return
+
+        server_time = (self.server_state['srv_time']
+                       - self.server_state['cli_time'] + time.time())
+        self.fire_cmd_seq += 1
+        self.control_dict.update(
+            fire_duration = self.ui_state['fire_duration'],
+            fire_cmd = [command, self.fire_cmd_seq],
+            # Ignore command if it is delayed by >0.5 sec
+            fire_cmd_deadline = server_time + 0.5)
+        self.logger.info('Sent fire command %d', command)
 
     @wrap_event
     def _update_video_overlay_now(self):

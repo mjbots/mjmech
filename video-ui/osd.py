@@ -123,6 +123,10 @@ class OnScreenDisplay(object):
             if not got_any:
                 status_lines.append('No servo status available')
 
+        # Always show autofire, even when status is off
+        if ui_state.get('autofire_mode'):
+            status_lines.append('RCLICK AUTOFIRE %r' % ui_state['autofire_mode'])
+
         # We output each text twice: first text outline in black, then text
         # itself in bright color. This ensures good visibility over both black
         # and green background.

@@ -228,6 +228,7 @@ class VideoWindow(object):
         # Callback functions
         self.on_video_mouse_click = None
         self.on_video_mouse_move = None
+        self.on_video_mouse_release = None
         self.on_key_press = None
         self.on_key_release = None
         self.on_got_video = None
@@ -506,6 +507,8 @@ class VideoWindow(object):
     def _on_da_mouse_release(self, src, evt):
         assert src == self.drawingarea, src
         self._mouse_down_info = None
+        if self.on_video_mouse_release:
+            self.on_video_mouse_release(evt.button)
         return True
 
     @wrap_event
