@@ -1,3 +1,34 @@
+High priority (have to finish before competition)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ * UI: One-click shooting -- should shoot once both servoes report INPOSITION
+  - Option: on/off mode, then shoot on left button click
+  - Option: shoot on right button click
+  - Option: shoot on left button click with shift held
+
+ * UI: Inactivity timer -- shows contigious time spent not moving
+
+ * UI: Show bullet count (approx.)
+
+ * Make turret servoes stronger: replace horn
+
+ * UI: fix reticle #1 to use proper display mapping, calibration.
+
+ * Add a way to reset all servoes (for example, after power fault). This should
+   also re-initialize turret servoes.
+
+Medium priority:
+~~~~~~~~~~~~~~~
+ * Tune turret servoes for better performance
+
+ * Shoot qualification video and post it.
+   2013 rules say: 5 minutes of motion, 4 plastic cups 8-12'' from the ground.
+ 
+ * Make video more error-resistant. Decrease I-frame interval? (this might
+   require getting uvch264src to work)
+
+ * power-off all servoes when client goes away
+
  * Model turret
   - Center of coordinates is camera center
   - Laser has offset (cm, Y only, X=0), and roll/pitch errors
@@ -9,29 +40,6 @@
      then gun marker shows where bullets would hit
    - Add vision-based distance to detect laser spot
 
- * UI: One-click shooting -- should shoot once both servoes report INPOSITION
-  - Option: on/off mode, then shoot on left button click
-  - Option: shoot on right button click
-  - Option: shoot on left button click with shift held
-
- * UI: Inactivity timer -- shows contigious time spent not moving
-
- * UI: Show bullet count (approx.)
-
- * Make video more error-resistant. Decrease I-frame interval? (this might
-   require getting uvch264src to work)
-
- * Make turret servoes stronger: replace horn
-
- * Tune turret servoes for better performance
-
- * UI: fix reticle #1 to use proper display mapping, calibration.
-
- * power-off all servoes when client goes away
-
- * Shoot qualification video and post it.
-   2013 rules say: 5 minutes of motion, 4 plastic cups 8-12'' from the ground.
-
  * Add accelerometer support to detect shots. Maybe run it as standalone C
    helper?
   - MVP: Detect # of shots fired
@@ -41,10 +49,13 @@ Lower priority:
 ~~~~~~~~~~~~~~
 
  * UI: do not always restart vserver on vclient start
+
  * Consider: record OSD into final video (as subtitles or re-code video
    properly)
+
  * Fix bug where the playback speed of record mkv's is too high (only present
    in old mlplayer???)
+
  * Make turret servoes stronger: add extra bearings
 
 Software and gait TODOs
