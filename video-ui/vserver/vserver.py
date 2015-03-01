@@ -405,17 +405,23 @@ class ControlInterface(object):
                 self.logger.debug('Bang bang %.2f sec!!', duration)
                 yield From(servo.mjmech_fire(
                         fire_time=duration, fire_pwm=data['fire_motor_pwm']))
-                
+
         if data.get('gait'):
             # We got a gait command. Start the mech driver.
             if self.mech_driver and not self.mech_driver_started:
                 self.mech_driver_started = True
+                # Gait engine started, but no motion
+                self.status_packet["last_motion_time"] = None
                 Task(self.mech_driver.run())
 
             gait = data['gait']
             if gait['type'] == 'idle':
+                # TODO mafanasyev: update last_motion_time with the time
+                # motion actually ends.
                 self.mech_driver.set_idle()
             elif gait['type'] == 'ripple':
+                self.status_packet["last_motion_time"] = time.time()
+
                 command = self.mech_driver.create_default_command()
 
                 # Now apply any values we received from the client.

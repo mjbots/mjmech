@@ -123,9 +123,27 @@ class OnScreenDisplay(object):
             if not got_any:
                 status_lines.append('No servo status available')
 
+            # TODO mafanasyev: when long time has expired since last motion,
+            # make this output more distinct
+            if "last_motion_time" not in server_state:
+                status_lines.append('Gait unready')
+            elif not server_state["last_motion_time"]:
+                status_lines.append('Gait ready')
+            else:
+                dt = (server_state["srv_time"] -
+                      server_state["last_motion_time"])
+                msg = ('NO-MOVE %.1f sec' % dt)
+                if (dt > 30.0) and (int(dt * 2.0) % 2):
+                    # Flash exclamation sign if spent too long without motion
+                    msg = "!!!!! " + msg
+                status_lines.append(msg)
+
+
         # Always show autofire, even when status is off
         if ui_state.get('autofire_mode'):
-            status_lines.append('RCLICK AUTOFIRE %r' % ui_state['autofire_mode'])
+            status_lines.append('[RCLICK AUTOFIRE %r]'
+                                % ui_state['autofire_mode'])
+
 
         # We output each text twice: first text outline in black, then text
         # itself in bright color. This ensures good visibility over both black

@@ -1,8 +1,6 @@
 High priority (have to finish before competition)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * UI: Inactivity timer -- shows contigious time spent not moving
-
  * UI: Show bullet count (approx.)
 
  * Make turret servoes stronger: replace horn
@@ -121,6 +119,7 @@ History
 DONE 2015-03-01:
  * UI: One-click shooting -- should shoot once both servoes report INPOSITION
   - shoots on right button click once it is enabled
+ * UI: Inactivity timer -- shows contigious time spent not moving
 
 
 DONE 2015-02-24:
