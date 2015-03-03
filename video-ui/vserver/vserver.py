@@ -85,6 +85,7 @@ class ControlInterface(object):
         self.servo_packet = None
 
         # Per-servo status (address->tuple of strings)
+        # (this excludes some volatile status bits)
         self.last_servo_status = dict()
         self.turret_servoes_ready = False
 
@@ -262,10 +263,10 @@ class ControlInterface(object):
                 and self.mech_driver
                 and self.mech_driver.servo):
                 servo_started_up = True
-                # Disable all power on startup
-                self.logger.warn('Disabling servo power on startup')
-                yield From(
-                    self.mech_driver.servo.enable_power(selector.POWER_FREE))
+                # Reset all servos on startup, as they may have had an pending
+                # error due to power glitch or something similar.
+                self.logger.warn('Rebooting servos on startup')
+                yield From(self.mech_driver.servo.reboot())
 
             if not self.servo_send_now.is_set():
                 # Make sure we wake up periodically
@@ -291,13 +292,20 @@ class ControlInterface(object):
         """
         status_list = yield From(
             self.mech_driver.servo.get_clear_status(servo_id))
+
+        status_list_clean = tuple(
+            x for x in status_list if x not in ['moving', 'inposition'])
+        if status_list_clean \
+                != self.last_servo_status.get(servo_id, ('motor_off', )):
+            self.logger.debug(
+                'Servo status for %r: %s' % (
+                    servo_id, ','.join(status_list_clean) or 'ready'))
+        self.last_servo_status[servo_id] = status_list_clean
+
         status_str = ','.join(status_list) or 'idle'
-        if tuple(status_list) != self.last_servo_status.get(servo_id):
-            #self.logger.debug('Servo status for %r: %s'
-            #                  % (servo_id, status_str))
-            self.last_servo_status[servo_id] = tuple(status_list)
         self.status_packet['servo_status'][servo_id] = status_str
-        raise Return(status_str)
+
+        raise Return(status_list)
 
     @asyncio.coroutine
     def _send_servo_commands_once(self, data, olddata):

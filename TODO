@@ -5,9 +5,6 @@ High priority (have to finish before competition)
 
  * Make turret servoes stronger: replace horn
 
- * Add a way to reset all servoes (for example, after power fault). This should
-   also re-initialize turret servoes.
-
  * Add clear plastic cover above odroid
 
  * Figure out how to detect/prevent agitator jams
@@ -49,6 +46,8 @@ Medium priority:
   - MVP: Detect # of shots fired
   - Also detect mis-shots: known we are out of ammo, auto-retry on misshots
 
+ * UI: Hide debug-priority messegs from OSD (leave on stdout)
+
 Lower priority:
 ~~~~~~~~~~~~~~
 
@@ -63,6 +62,9 @@ Lower priority:
    in old mlplayer???)
 
  * Make turret servoes stronger: add extra bearings
+
+ * Add a way to reset all servoes without restarting app (for example,
+   after power fault). This should also re-initialize turret servoes.
 
 Software and gait TODOs
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -123,6 +125,8 @@ History
 
 DONE 2015-03-02:
  * UI: fix reticle #1 to use proper display mapping, calibration.
+ * Restart servoes when server restarts (instead of just powering down)
+ * Log server statuses, including errors
 
 DONE 2015-03-01:
  * UI: One-click shooting -- should shoot once both servoes report INPOSITION
