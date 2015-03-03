@@ -3,7 +3,7 @@ def: test .compiled run
 REMOTE=odroid@odroid
 #SRC=linux-i2c-test.c
 SRC=test1.c
-CCFLAGS=-Wall -Werror
+CCFLAGS=-Wall -Werror -g
 
 test:
 	gcc ${CCFLAGS} -o /tmp/ignore ${SRC}
