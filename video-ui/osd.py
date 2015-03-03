@@ -14,38 +14,36 @@ class OnScreenDisplay(object):
         print >>out, '<svg width="{image_size[0]}" height="{image_size[1]}">'\
             .format(**ui_state)
 
+        # Create a list of calibration lines, each entry may be either:
+        #  - string -- this defines properties for subsequent lines
+        #  - list points, each is a pair of angles in degrees
+        lines_deg = []
+
         rmode = ui_state['reticle_mode']
         if rmode == 1:
             # Shooting reticle
-            reticle_center_rel = add_pair((0.5, 0.5),
-                                          ui_state['reticle_offset'])
-            reticle_center = (
-                ui_state['image_size'][0] * reticle_center_rel[0],
-                ui_state['image_size'][1] * reticle_center_rel[1])
 
-            print >>out, '''
-<g transform='rotate({0[reticle_rotate]}) translate({1[0]} {1[1]})'
-   stroke="rgb(255,128,0)">
-  <line x1="500"  x2="100"  y1="0" y2="0" stroke-width="4" />
-  <line x1="-500" x2="-100" y1="0" y2="0" stroke-width="4" />
-  <line x1="-100" x2="100"  y1="0" y2="0" />
-  <line y1="500"  y2="100"  x1="0" x2="0" stroke-width="4" />
-  <line y1="-500" y2="-100" x1="0" x2="0" stroke-width="4" />
-  <line y1="-100" y2="100"  x1="0" x2="0" />
+            co = 15    # Size of thick outer cross
+            ci = 5     # Size of thin inner cross
+            pls = 1.0  # Parallel line step
+            lines_deg += [
+                # Thick outer cross
+                'stroke-width="4"',
+                [(-co, 0), (-ci, 0)], [(ci, 0), (co, 0)],
+                [(0, -co), (0, -ci)], [(0, ci), (0, co)],
+                # Smaller inner cross
+                '',
+                [(-ci, 0), (ci, 0)], [(0, -ci), (0, ci)],
+                # Top ranging line
+                [(-0.5 * ci, -pls), (0.5 * ci, -pls)],
+                ]
+            for num in xrange(1, 6):
+                width = ci * (10 - num) / 10.0
+                lines_deg.append([(-width, pls * num), (width, pls * num)])
 
-  <line x1="-80" x2="80"  y1="-20" y2="-20" />
-  <line x1="-80" x2="80"  y1="20" y2="20" />
-  <line x1="-60" x2="60"  y1="40" y2="40" />
-  <line x1="-40" x2="40"  y1="60" y2="60" />
-  <line x1="-20" x2="20"  y1="80" y2="80" />
-</g>
-'''.format(ui_state, reticle_center)
         elif rmode == 2:
             # Calibration reticle
 
-            # Create a list of calibration lines, each line is a list of points
-            # in degrees.
-            lines_deg = []
             # Start with a cross in the middle. Add many points, as lines are
             # not straight
             lines_deg.append([(x, 0) for x in xrange(-30, 31, 5)])
@@ -55,6 +53,8 @@ class OnScreenDisplay(object):
                 lines_deg.append([(-s, s), (0, s), (s, s), (s, 0), (s, -s),
                                   (0, -s), (-s, -s), (-s, 0), (-s, s)])
 
+
+        if lines_deg:
             # Re-use reticle_offset to allow reticle movement
             offs_x, offs_y = ui_state['reticle_offset']
 
@@ -62,7 +62,11 @@ class OnScreenDisplay(object):
             # Convert degrees to pixels. It may be faster to do all in one go,
             # but I do not care about it for now.
             lines_pix = []
+            line_flags = ""
             for one_line in lines_deg:
+                if isinstance(one_line, str):
+                    line_flags = one_line
+                    continue
                 pix = self.calibration.from_world2d(
                     ((math.tan(math.radians(pt[0] + offs_x)),
                       math.tan(math.radians(pt[1] + offs_y)))
@@ -70,8 +74,8 @@ class OnScreenDisplay(object):
                     image_size=ui_state['image_size'])
                 for p1, p2 in zip(pix, pix[1:]):
                     print >>out, (
-                        '<line x1="%.2f" x2="%.2f" y1="%.2f" y2="%.2f"/>'
-                        % (p1[0], p2[0], p1[1], p2[1]))
+                        '<line x1="%.2f" x2="%.2f" y1="%.2f" y2="%.2f" %s/>'
+                        % (p1[0], p2[0], p1[1], p2[1], line_flags))
             print >>out, '</g>'
 
         status_lines = list()

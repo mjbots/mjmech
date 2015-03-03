@@ -5,8 +5,6 @@ High priority (have to finish before competition)
 
  * Make turret servoes stronger: replace horn
 
- * UI: fix reticle #1 to use proper display mapping, calibration.
-
  * Add a way to reset all servoes (for example, after power fault). This should
    also re-initialize turret servoes.
 
@@ -17,7 +15,7 @@ High priority (have to finish before competition)
 Medium priority:
 ~~~~~~~~~~~~~~~
 
- * Add a zoom option to miplify long-distance (10ft) shooting
+ * Add a zoom option to simplify long-distance (10ft) shooting
 
  * Add a plug for BB container so they do not roll out when robot stands up
 
@@ -53,6 +51,8 @@ Medium priority:
 
 Lower priority:
 ~~~~~~~~~~~~~~
+
+ * UI: add mechanism to update OSD when video frames are not coming in
 
  * UI: do not always restart vserver on vclient start
 
@@ -120,6 +120,9 @@ ___ Improve legtool ____
 
 History
 ~~~~~~~
+
+DONE 2015-03-02:
+ * UI: fix reticle #1 to use proper display mapping, calibration.
 
 DONE 2015-03-01:
  * UI: One-click shooting -- should shoot once both servoes report INPOSITION
