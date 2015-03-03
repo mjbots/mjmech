@@ -12,8 +12,13 @@ High priority (have to finish before competition)
 
  * Add clear plastic cover above odroid
 
+ * Figure out how to detect/prevent agitator jams
+
 Medium priority:
 ~~~~~~~~~~~~~~~
+
+ * Add a zoom option to miplify long-distance (10ft) shooting
+
  * Add a plug for BB container so they do not roll out when robot stands up
 
  * Add high-PWM mode for agitator (probably only momentary) -- it got stuck once
