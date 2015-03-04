@@ -58,7 +58,7 @@ class UdpAnnounceReceiver(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                                   socket.IPPROTO_UDP)
         self.sock.setblocking(0)
-        self.logger.info('Binding to port %d' % self.PORT)
+        self.logger.debug('Binding to port %d' % self.PORT)
         self.sock.bind(('', self.PORT))
 
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -66,7 +66,8 @@ class UdpAnnounceReceiver(object):
                           GLib.PRIORITY_DEFAULT,
                           GLib.IO_IN | GLib.IO_ERR | GLib.IO_HUP,
                           self._on_readable)
-        self.logger.info('Waiting for address broadcast')
+        self.logger.info('Waiting for address broadcast on port %d' %
+                         self.PORT)
         self.last_ann_info = None
         self.last_run_info = None
         self.control = None
@@ -288,6 +289,7 @@ class ControlInterface(object):
 
         # Most recent server state
         self.server_state = dict()
+        self.server_time_offset = None
         self.fire_cmd_seq = 0
 
         restore_from = opts.restore_state
@@ -458,6 +460,12 @@ class ControlInterface(object):
         # Prepare to log
         pkt.update(cli_time=time.time(),
                    _type='srv-state')
+
+        server_time_offset = pkt['srv_time'] - pkt['cli_time']
+        if (self.server_time_offset is None) or \
+                abs(self.server_time_offset - server_time_offset) > 1.0:
+            self.logger.debug('Server time offset %.3f sec', server_time_offset)
+            self.server_time_offset = server_time_offset
 
         # Parse out messages -- no need to log them twice
         logs = pkt.pop('logs_data', None) or []
@@ -781,7 +789,7 @@ class ControlInterface(object):
             fire_cmd = [command, self.fire_cmd_seq],
             # Ignore command if it is delayed by >0.5 sec
             fire_cmd_deadline = server_time + timeout)
-        self.logger.info('Sent fire command %d', command)
+        self.logger.debug('Sent fire command %d', command)
 
     @wrap_event
     def _update_video_overlay_now(self):
@@ -807,6 +815,8 @@ def main(opts):
 
     logging_init(verbose=True)
     logsaver = MemoryLoggingHandler(install=True, max_records=30)
+    # Debug messages do not go to OSD, only to console and file.
+    logsaver.setLevel(logging.INFO)
 
     root = logging.getLogger()
 

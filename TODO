@@ -44,8 +44,6 @@ Medium priority:
   - MVP: Detect # of shots fired
   - Also detect mis-shots: known we are out of ammo, auto-retry on misshots
 
- * UI: Hide debug-priority messegs from OSD (leave on stdout)
-
 Lower priority:
 ~~~~~~~~~~~~~~
 
@@ -123,6 +121,8 @@ History
 
 DONE 2015-03-03:
  * Add clear plastic cover above odroid
+ * UI: Hide debug-priority messegs from OSD (leave on stdout), demote some
+   messages to stdout
 
 DONE 2015-03-02:
  * UI: fix reticle #1 to use proper display mapping, calibration.

@@ -272,21 +272,21 @@ class VideoWindow(object):
     @wrap_event
     def _on_new_rtpbin_pad(self, source, pad):
         name = pad.get_name()
-        self.logger.info('Got new rtpbin pad: %r', name)
+        self.logger.debug('Got new rtpbin pad: %r', name)
         if name.startswith('recv_rtp_src'):
             if self.rtpbin_last_pad is not None:
                 #ok = self.rtpbin.unlink(
                 #    self.rtpbin_last_pad, self.play_elements[0], None)
                 # Since we do not know dest pad, unlink all.
                 ok = self.rtpbin.unlink(self.play_elements[0])
-                self.logger.info('Unlinking old pad: %r', ok)
+                self.logger.debug('Unlinking old pad: %r', ok)
             self.rtpbin_last_pad = name
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
 
     @wrap_event
     def _on_removed_rtpbin_pad(self, source, pad):
         name = pad.get_name()
-        self.logger.info('Rtpbin pad got removed: %r', name)
+        self.logger.debug('Rtpbin pad got removed: %r', name)
 
     @wrap_event
     def _on_sync_message(self, bus, msg):

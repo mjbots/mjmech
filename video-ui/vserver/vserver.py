@@ -64,7 +64,7 @@ class ControlInterface(object):
         self.sock = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
-        self.logger.info('Binding to port %d' % self.PORT)
+        self.logger.debug('Binding to port %d' % self.PORT)
         # Bind to port early (before opening serial device).
         # This ensures only once instance is active.
         self.sock.bind(('', self.PORT))
@@ -103,7 +103,6 @@ class ControlInterface(object):
         # re-sending the data.
         self.servo_send_now = asyncio.Event()
         self.servo_send_task = Task(self._send_servo_commands())
-
 
         # We send status every time this event is set (but in a rate-limited
         # way)
@@ -182,7 +181,11 @@ class ControlInterface(object):
         return True
 
     def _set_src_addr(self, addr):
-        self.logger.info('Remote peer address is now %r' % (addr, ))
+        if self.src_addr is not None:
+            self.logger.info('Remote peer address changed: %r->%r' %
+                             (self.src_addr, addr))
+        else:
+            self.logger.debug('Remote peer address is now %r' % (addr, ))
         self.src_addr = addr
         if addr is None:
             self.net_packet = None
@@ -192,7 +195,6 @@ class ControlInterface(object):
     def _handle_packet(self, pkt_bin):
         self.recent_packets += 1
         pkt = json.loads(pkt_bin)
-
 
         if self.net_packet is None:
             pass
@@ -265,7 +267,7 @@ class ControlInterface(object):
                 servo_started_up = True
                 # Reset all servos on startup, as they may have had an pending
                 # error due to power glitch or something similar.
-                self.logger.warn('Rebooting servos on startup')
+                self.logger.info('Rebooting servos on startup')
                 yield From(self.mech_driver.servo.reboot())
 
             if not self.servo_send_now.is_set():
@@ -313,7 +315,7 @@ class ControlInterface(object):
             return
         servo = self.mech_driver.servo
         if servo is None:
-            self.logger.warn('Not sending commands -- no servo yet')
+            self.logger.debug('Not sending commands -- no servo yet')
             raise Return()
 
         if olddata is None:
@@ -462,7 +464,7 @@ class ControlInterface(object):
             ['./send-video.sh', str(addr[0]), str(addr[1])],
             flags=gobject.SPAWN_DO_NOT_REAP_CHILD)
         self.video_proc = pid
-        self.logger.info('Started video process, PID %r' % pid)
+        self.logger.debug('Started video process, PID %r' % pid)
         gobject.child_watch_add(pid, self._process_died)
 
     def _process_died(self, pid, condition):
@@ -489,7 +491,7 @@ def main(opts):
     os.system("killall -v gst-launch-1.0")
 
     cif = ControlInterface(opts, logsaver=logsaver)
-    logging.info('Running')
+    logging.debug('Running')
 
     asyncio.get_event_loop().run_forever()
 
