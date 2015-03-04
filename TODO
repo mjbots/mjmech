@@ -39,10 +39,14 @@ Medium priority:
      then gun marker shows where bullets would hit
    - Add vision-based distance to detect laser spot
 
- * Add accelerometer support to detect shots. Maybe run it as standalone C
-   helper?
-  - MVP: Detect # of shots fired
-  - Also detect mis-shots: known we are out of ammo, auto-retry on misshots
+ * Add accelerometer support to detect shots.
+  - Run it as standalone C helper, as it takes 100% of CPU's one core
+  - Detect # of shots fired
+  - Try to detect mis-shots: known we are out of ammo, auto-retry on misshots
+  - Try to determine if agitator is running or not
+
+ * Change .svg file generation to make entries more readable (blur the
+   background?)
 
 Lower priority:
 ~~~~~~~~~~~~~~
@@ -121,8 +125,9 @@ History
 
 DONE 2015-03-03:
  * Add clear plastic cover above odroid
- * UI: Hide debug-priority messegs from OSD (leave on stdout), demote some
+ * UI: Hide debug-priority messages from OSD (leave on stdout), demote some
    messages to stdout
+ * Added skeleton for i2c poller (for accelerometer support)
 
 DONE 2015-03-02:
  * UI: fix reticle #1 to use proper display mapping, calibration.
