@@ -15,3 +15,8 @@ test:
 
 run: .compiled
 	ssh ${REMOTE} -t cd /tmp '&&' time ./code.exe
+
+runget: run get
+
+get:
+	rsync -v ${REMOTE}:/tmp/acc-log-*.txt acc-log-`date +'%F-%H%M%S'`/
