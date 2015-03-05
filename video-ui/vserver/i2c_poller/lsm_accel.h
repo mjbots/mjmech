@@ -37,9 +37,9 @@ int accel_init(int atype);
 typedef struct accel_data {
   // Non-zero value means buffer overrun
   int16_t errors;
-  int16_t x;
-  int16_t y;
-  int16_t z;
+  float x;
+  float y;
+  float z;
 } accel_data_t;
 
 // Poll an accelerometer

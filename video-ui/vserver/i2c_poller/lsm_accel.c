@@ -43,6 +43,9 @@ addr_LSM303D_L = 0x1e;
  */
 static uint8_t init_LSM303D[] = { 0xA0, 0x67, 0xC8, 0, 0, 0, 0, 0, 0 };
 
+// Full scale is 4G in both cases
+#define FULL_SCALE  (4.0 / 32767)
+
 int accel_init(int atype) {
   int rv = -1;
   switch (atype) {
@@ -92,8 +95,8 @@ int accel_poll(int atype, accel_data_t* data) {
     perror("read acc data");
     return -1;
   }
-  data->x = acc_out[0] | (acc_out[1] << 8);
-  data->y = acc_out[2] | (acc_out[3] << 8);
-  data->z = acc_out[4] | (acc_out[5] << 8);
+  data->x = ((int16_t)(acc_out[0] | (acc_out[1] << 8))) * FULL_SCALE;
+  data->y = ((int16_t)(acc_out[2] | (acc_out[3] << 8))) * FULL_SCALE;
+  data->z = ((int16_t)(acc_out[4] | (acc_out[5] << 8))) * FULL_SCALE;
   return 1;
 }
