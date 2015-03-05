@@ -152,7 +152,9 @@ class OnScreenDisplay(object):
         # We output each text twice: first text outline in black, then text
         # itself in bright color. This ensures good visibility over both black
         # and green background.
-        for tp in ['stroke="black" fill="black"', 'fill="COLOR"']:
+        for tp in [('stroke="black" fill="black" '+
+                    'stroke-width="5" stroke-linecap="round"'),
+                   'fill="COLOR"']:
             print >>out, '''
 <text transform="translate(10 {0})" {1}
    font-family="Helvetica,sans-serif"
@@ -164,7 +166,7 @@ class OnScreenDisplay(object):
             for line_num, mtuple in enumerate(reversed(logs)):
                 line = MemoryLoggingHandler.to_string(mtuple)
                 print >>out, '<tspan x="0" y="%d"><![CDATA[%s]]></tspan>' % (
-                    (-1 - line_num) * ui_state['msg_font_size'], line)
+                    (-1 - line_num) * (ui_state['msg_font_size'] + 2), line)
             print >>out, '</text>'
 
             print >>out, '''

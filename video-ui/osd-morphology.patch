@@ -1,0 +1,35 @@
+# This patch makes osd much more readable, but takes so much CPU time the framerate
+# drops to less than 1 fps
+diff --git a/video-ui/osd.py b/video-ui/osd.py
+index a0605a0..9125f58 100644
+--- a/video-ui/osd.py
++++ b/video-ui/osd.py
+@@ -11,8 +11,15 @@ class OnScreenDisplay(object):
+         """Render SVG for a given state. Should not access anything other
+         than parameters, as this function may be called during replay.
+         """
+-        print >>out, '<svg width="{image_size[0]}" height="{image_size[1]}">'\
+-            .format(**ui_state)
++        print >>out, '''
++<svg width="{image_size[0]}" height="{image_size[1]}">
++<defs>
++   <filter id="textbkgr" x="-5" y="-5" height="40" width="40">
++       <!--feGaussianBlur in="SourceGraphic" stdDeviation="3"/-->
++      <feMorphology in="SourceGraphic" operator="dilate" radius="2"/>
++   </filter>
++ </defs>
++'''.format(**ui_state)
+ 
+         # Create a list of calibration lines, each entry may be either:
+         #  - string -- this defines properties for subsequent lines
+@@ -152,7 +159,9 @@ class OnScreenDisplay(object):
+         # We output each text twice: first text outline in black, then text
+         # itself in bright color. This ensures good visibility over both black
+         # and green background.
+-        for tp in ['stroke="black" fill="black"', 'fill="COLOR"']:
++        for tp in [
++            'stroke="black" fill="black" style="filter: url(#textbkgr)"',
++            'fill="COLOR"']:
+             print >>out, '''
+ <text transform="translate(10 {0})" {1}
+    font-family="Helvetica,sans-serif"
