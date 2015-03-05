@@ -40,6 +40,9 @@ SERVO_SEND_INTERVAL = 0.5
 TURRET_RANGE_X = (-90, 90)
 TURRET_RANGE_Y = (-90, 90)
 
+# How fast should turret servoes move into position
+TURRET_POSE_TIME = 0.25
+
 # Servo IDs of turret servoes
 TURRET_SERVO_X = 12
 TURRET_SERVO_Y = 13
@@ -88,6 +91,7 @@ class ControlInterface(object):
         # (this excludes some volatile status bits)
         self.last_servo_status = dict()
         self.turret_servoes_ready = False
+        self.gait_commanded_nonidle = False
 
         # Last processed fire command
         self.last_fire_cmd = None
@@ -372,7 +376,8 @@ class ControlInterface(object):
             send_y = min(TURRET_RANGE_Y[1],
                          max(TURRET_RANGE_Y[0], servo_y))
             yield From(servo.set_pose({TURRET_SERVO_X: send_x,
-                                       TURRET_SERVO_Y: send_y}))
+                                       TURRET_SERVO_Y: send_y},
+                                      pose_time=TURRET_POSE_TIME))
 
         fire_cmd = data['fire_cmd']
         if fire_cmd is None and self.last_fire_cmd is not None:
@@ -422,6 +427,7 @@ class ControlInterface(object):
                 self.mech_driver_started = True
                 # Gait engine started, but no motion
                 self.status_packet["last_motion_time"] = None
+                self.logger.debug('Gait engine started')
                 Task(self.mech_driver.run())
 
             gait = data['gait']
@@ -429,6 +435,9 @@ class ControlInterface(object):
                 # TODO mafanasyev: update last_motion_time with the time
                 # motion actually ends.
                 self.mech_driver.set_idle()
+                if self.gait_commanded_nonidle:
+                    self.logger.debug('No longer commanding gait')
+                    self.gait_commanded_nonidle = False
             elif gait['type'] == 'ripple':
                 self.status_packet["last_motion_time"] = time.time()
 
@@ -439,6 +448,9 @@ class ControlInterface(object):
                     if key != 'type':
                         setattr(command, key, value)
 
+                if not self.gait_commanded_nonidle:
+                    self.logger.debug('Commanding nonidle gait %r' % gait)
+                    self.gait_commanded_nonidle = True
                 self.mech_driver.set_command(command)
             else:
                 assert False, 'Invalid gait type %r' % gait['type']

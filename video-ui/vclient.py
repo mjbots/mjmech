@@ -647,8 +647,11 @@ class ControlInterface(object):
             if self.control_dict.get('turret') is None:
                 self.logger.warn('Cannot move turret -- center it first')
             else:
-                self.control_dict['turret'] = add_pair(
+                self.control_dict['turret'] = new = add_pair(
                     self.control_dict['turret'], arrows, step)
+                self.logger.debug('Moving turret to (%+.1f, %+.1f) deg '
+                                  'in response to keys',
+                                  new[0], new[1])
         elif name == 'r':
             newmode = (self.ui_state['reticle_mode'] + 1) % 3
             self.ui_state['reticle_mode'] = newmode
