@@ -7,6 +7,8 @@ High priority (have to finish before competition)
 
  * Figure out how to detect/prevent agitator jams
 
+ * Better logging: log client-side messages
+
 Medium priority:
 ~~~~~~~~~~~~~~~
 
