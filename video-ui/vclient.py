@@ -786,7 +786,7 @@ class ControlInterface(object):
             # Give extra time for servoes to settle
             # TODO mafanasyev: this should not be required once 'cont' support
             # is implemented
-            timeout += 0.5
+            timeout += 1.5
         self.control_dict.update(
             fire_duration = self.ui_state['fire_duration'],
             fire_cmd = [command, self.fire_cmd_seq],

@@ -365,9 +365,18 @@ class ControlInterface(object):
                 sid_list = [TURRET_SERVO_X, TURRET_SERVO_Y]
                 # Enable power
                 yield From(servo.enable_power(selector.POWER_ENABLE, sid_list))
-                # Configure deadband
+                # Configure servo
+                # default P/I/D is 254/0/6500
+                # TODO mafanasyev: add overload controls to detect gun hitting
+                #                  limit
+                # TODO mafanasyev: shall we use 'stopped' instead of
+                #                  'inposition' for more reliability?
                 yield From(servo.configure_servo(
-                        {'dead_zone': 1},
+                        {'dead_zone': 0,     # when to shut off the motor
+                         'inpos_margin': 1,  # 'inposition' sensetivity
+                         # 'acc_ratio': 50,  # triangular drive profile
+                          'pos_kp': 200, 'pos_ki': 1000, 'pos_kd': 1000,
+                         },
                         sid_list))
 
             servo_x, servo_y = data['turret']
