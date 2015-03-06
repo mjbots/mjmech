@@ -101,7 +101,7 @@ class HerkuleXController(object):
     def configure_servo(self, settings, idents):
         """Configure servoes using a dict of settings"""
         for ident in idents:
-            yield From(self.port.configure_servo(ident, setting))
+            yield From(self.port.configure_servo(ident, settings))
 
 
     @asyncio.coroutine

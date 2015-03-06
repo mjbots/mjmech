@@ -492,7 +492,7 @@ class HerkuleX(object):
                 assert 0 <= value <= 65534  # 0xffff is invalid
                 data = [ value & 0xff, (value >> 8) & 0xff ]
                 assert size == 2
-            yield From(self.port.ram_write(ident, addr, data))
+            yield From(self.ram_write(ident, addr, data))
 
     @asyncio.coroutine
     def read_servo_config(self, ident):
