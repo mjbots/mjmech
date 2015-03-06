@@ -131,8 +131,31 @@ class HerkuleX(object):
     LED_RED = 0x04
 
     EEP_ID = 6
-    REG_DEAD_ZONE = 10
     REG_TORQUE_CONTROL = 52
+
+    # Configuration registers, access via configure_servo
+    # Value is tuple (ram-address, size-bytes)
+    CONFIG_REGS = {
+        'acc_ratio': (8, 1),
+        'acc_max_time': (9, 1),
+        'dead_zone': (10, 1),  # when force is not applied
+        'sat_offset': (11, 1),
+        'sat_slope': (12, 2),
+        'pwm_offset': (14, 1),  # manual 'I' term
+        'pwm_min': (15, 1),  # overcome friction
+        'pwm_max': (16, 2),  # save battery
+        'overload_pwm': (18, 2),  # overload error setup
+        'overload_time': (42, 1),
+        'pos_kp': (24, 2), # PID controller
+        'pos_kd': (26, 2),
+        'pos_ki': (28, 2),
+        'pos_ff_kd': (30, 2),
+        'pos_ff_kdd': (32, 2),
+        'stop_thresh': (43, 1),  # 'moving' flag setup
+        'stop_time': (41, 1),
+        'inpos_margin': (44, 1),  # when inposition is reported
+        'cal_diff': (53, 1),  # zero angle offset
+        }
 
     def __init__(self, serial_port):
         self.baud_rate = 115200
@@ -257,8 +280,10 @@ class HerkuleX(object):
                 (servo, received.servo))
         assert received.cmd == (0x40 | cmd)
         assert len(received.data) == length + 4
-
-        raise Return(MemReadResponse([ord(x) for x in received.data]))
+        result = MemReadResponse([ord(x) for x in received.data])
+        assert result.register_start == reg
+        assert result.length == length
+        raise Return(result)
 
     @asyncio.coroutine
     def mem_write(self, cmd, servo, reg, data):
@@ -357,7 +382,8 @@ class HerkuleX(object):
         assert ((received.servo == servo or servo == self.BROADCAST) and
                 (received.cmd == (0x40 | self.CMD_STAT)) and
                 (len(received.data) == 2)), (
-            "Received wrong STATUS response from servo %d: %s" % (servo, received))
+            "Received wrong STATUS response from servo %d: %s" % (
+                        servo, received))
 
         reg48 = ord(received.data[0])
         reg49 = ord(received.data[1])
@@ -402,16 +428,21 @@ class HerkuleX(object):
             raise Return(None)
 
     @asyncio.coroutine
-    def position(self, servo):
+    def position(self, servo, return_status=False):
+        fail = (None, None) if return_status else None
         try:
             # NOTE: The datasheet appears to be off here.
             data = yield From(self.ram_read(servo, 60, 2))
             value = data.data
             if value is None:
-                raise Return(None)
-            raise Return(value[1] << 8 | value[0])
+                raise Return(fail)
+            int_val = value[1] << 8 | value[0]
+            if return_status:
+                raise Return(int_val, data.status)
+            else:
+                raise Return(int_val)
         except asyncio.TimeoutError:
-            raise Return(None)
+            raise Return(fail)
 
     @asyncio.coroutine
     def pwm(self, servo):
@@ -445,3 +476,37 @@ class HerkuleX(object):
     def set_position_ki(self, servo, value):
         yield From(
             self.ram_write(servo, 28, [ value & 0xff, (value >> 8) & 0xff ]))
+
+    @asyncio.coroutine
+    def configure_servo(self, ident, settings):
+        """Configure servoes using a dict of settings"""
+        for key, val in sorted(settings.items()):
+            if key not in self.CONFIG_REGS:
+                raise Exception('Unknown configuration key %r' % key)
+            addr, size = self.CONFIG_REGS[key]
+            value = int(val)
+            if size == 1:
+                assert 0 <= value <= 254
+                data = [value]
+            else:
+                assert 0 <= value <= 65534  # 0xffff is invalid
+                data = [ value & 0xff, (value >> 8) & 0xff ]
+                assert size == 2
+            yield From(self.port.ram_write(ident, addr, data))
+
+    @asyncio.coroutine
+    def read_servo_config(self, ident):
+        """Read all settings, return as a dictionary"""
+        result = {}
+        for key, (addr, size) in sorted(self.CONFIG_REGS.items()):
+            data = yield From(self.ram_read(ident, addr, size))
+            value = data.data
+            if value is None:
+                result[key] = None
+                continue
+            if size == 1:
+                result[key] = value[0]
+            else:
+                assert size == 2
+                result[key] = value[1] << 8 | value[0]
+        raise Return(result)

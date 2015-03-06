@@ -100,16 +100,8 @@ class HerkuleXController(object):
     @asyncio.coroutine
     def configure_servo(self, settings, idents):
         """Configure servoes using a dict of settings"""
-        for key, val in sorted(settings.items()):
-            if key == 'dead_zone':
-                addr = self.port.REG_DEAD_ZONE
-                data = [int(val)]
-                assert 0 <= data[0] <= 254
-            else:
-                raise Exception('Unknown configuration key %r' % key)
-
-            for ident in idents:
-                yield From(self.port.ram_write(ident, addr, data))
+        for ident in idents:
+            yield From(self.port.configure_servo(ident, setting))
 
 
     @asyncio.coroutine

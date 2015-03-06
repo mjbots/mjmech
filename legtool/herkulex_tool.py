@@ -50,10 +50,12 @@ def do_reboot(servo, options):
 @asyncio.coroutine
 def do_status(servo, options, do_print=True):
     addr = get_address(options)
-    status = yield From(servo.status(addr))
-    result = 'Servo %d: (0x%02x, 0x%02x) %s' % (
+    #status = yield From(servo.status(addr))
+    position, status = yield From(servo.position(addr, return_status=True))
+    result = 'Servo %d: (0x%02x, 0x%02x) %s | pos %d' % (
         addr, status.reg48, status.reg49,
-        ','.join(status.active_flags()) or 'none')
+        ','.join(status.active_flags()) or 'none',
+        position or -1)
     if do_print:
         print result
     else:
@@ -97,6 +99,12 @@ def do_blink_led(servo, options):
         yield From(servo.set_leds(addr, 0))
         print >>sys.stderr, '0'
 
+@asyncio.coroutine
+def do_read_config(servo, options):
+    result = yield From(servo.read_servo_config(get_address(options)))
+    for k, v in sorted(result.items()):
+        print " %-14s: %r" % (k, v)
+
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-a', '--address', default=None,
@@ -124,6 +132,8 @@ def main():
                       metavar='ADDR:D0:[D1..]',
                       help="Execute 'write ram' command. May be specified "
                       "multiple times")
+    parser.add_option('-c', '--read-config', action='store_true', default=None,
+                      help='Read and display servo config')
 
     (options, args) = parser.parse_args()
 
@@ -139,6 +149,7 @@ def main():
         'voltage': do_voltage,
         'temperature': do_temperature,
         'blink_led': do_blink_led,
+        'read_config': do_read_config,
         }
 
 
@@ -151,6 +162,8 @@ def main():
 
     @asyncio.coroutine
     def run_actions():
+        yield From(servo.start())
+
         ran_any = False
         for cmd in write_commands:
             yield From(do_write_ram(servo, options, cmd[0], cmd[1:]))
