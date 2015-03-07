@@ -61,11 +61,14 @@ class DataSet(object):
                 if line.get('fire_cmd') and \
                    line['fire_cmd_deadline'] > ts:
                     fire_cmd = line['fire_cmd'][0]
-
+                turret_cmd = line.get('turret', (None, None))
                 cd_data.append((
-                    ts, line['agitator_on'],
+                    ts, line.get('agitator_on',
+                                 line.get('agitator_mode', 0) == 2),
                     int(fire_cmd == FCMD.inpos3),
-                    int(fire_cmd not in [0, FCMD.inpos3])))
+                    int(fire_cmd not in [0, FCMD.inpos3]),
+                    turret_cmd[0], turret_cmd[1]
+                    ))
                 last_cd = line
             elif line['_type'] == 'srv-state':
                 ts = line['srv_time']
@@ -74,11 +77,14 @@ class DataSet(object):
                 turret_moving = 0
                 status_x = servo_status.get("12", "")
                 status_y = servo_status.get("13", "")
+                turret_pos = line.get('turret_position', (None, None))
                 ss_data.append((ts, firing,
+                                line.get('agitator_on', 0),
                                 int('moving' in status_x),
                                 int('moving' in status_y),
                                 int('inposition' not in status_x),
                                 int('inposition' not in status_y),
+                                turret_pos[0], turret_pos[1],
                             ))
             elif line['_type'] == 'srv-log':
                 ts = line['srv_time']
@@ -95,12 +101,14 @@ class DataSet(object):
         self._append_data(
             'control', cd_data, [
                 ('ts', 'f8'), ('agitator_on', 'u1'),
-                ('firing_ip3', 'u1'), ('firing_other', 'u1')])
+                ('firing_ip3', 'u1'), ('firing_other', 'u1'),
+                ('turret_x', 'f4'), ('turret_y', 'f4')])
         self._append_data(
             'server', ss_data, [
-                ('ts', 'f8'), ('firing', 'i1'),
+                ('ts', 'f8'), ('firing', 'i1'), ('agitator_on', 'i1'),
                 ('moving_x', 'i1'), ('moving_y', 'i1'),
                 ('ninpos_x', 'i1'), ('ninpos_y', 'i1'),
+                ('turret_x', 'f4'), ('turret_y', 'f4')
                 ])
         for key, val in events.items():
             self._append_data(key, val, [('ts', 'f8')])
@@ -155,7 +163,7 @@ def main():
     ax = None
     subplot_max = 0
     if 'acc0' in ds.data: subplot_max += 1
-    if 'control' in ds.data: subplot_max += 1
+    if 'control' in ds.data: subplot_max += 2
     if 'acc1' in ds.data: subplot_max += 1
     subplot_num = 0
 
@@ -174,17 +182,19 @@ def main():
         y_offsets = list()
         y_names = list()
         y_offs = 0
-        for spec in ('control.agitator_on',
-                     'control.firing_ip3', '+!fire_cmd',
-                     'control.firing_other', '+!fire_cmd',
-                     'server.firing', '+!fire_sent',
-                     '!firing_failed',
-                     'server.ninpos_x', '+!turret_cmd',
-                     'server.moving_x',
-                     'server.ninpos_y', '+!turret_cmd',
-                     'server.moving_y',
-                     '!udp_loss',
-                 ):
+        for spec in (
+            #'control.agitator_on', # old
+            'server.agitator_on', # new
+            'control.firing_ip3', '+!fire_cmd',
+            'control.firing_other', '+!fire_cmd',
+            'server.firing', '+!fire_sent',
+            '!firing_failed',
+            'server.ninpos_x', '+!turret_cmd',
+            'server.moving_x',
+            'server.ninpos_y', '+!turret_cmd',
+            'server.moving_y',
+            '!udp_loss',
+            ):
             merge = spec.startswith('+')
             if merge:
                 spec = spec[1:]
@@ -212,6 +222,16 @@ def main():
         ds.plot_xy_data(ax, 'acc1.x', '.-')
         ds.plot_xy_data(ax, 'acc1.y', '.-')
         ds.plot_xy_data(ax, 'acc1.z', '.-')
+        pyplot.grid(True)
+        pyplot.legend()
+
+    if 'control' in ds.data:
+        subplot_num += 1
+        ax = fig.add_subplot(subplot_max, 1, subplot_num, sharex=ax)
+        ds.plot_xy_data(ax, 'server.turret_x', '.-')
+        ds.plot_xy_data(ax, 'server.turret_y', '.-')
+        ds.plot_xy_data(ax, 'control.turret_x', '.-')
+        ds.plot_xy_data(ax, 'control.turret_y', '.-')
         pyplot.grid(True)
         pyplot.legend()
 
