@@ -51,9 +51,9 @@ IDLE_COMMAND = {
 class UdpAnnounceReceiver(object):
     PORT = 13355
 
-    def __init__(self, opts, logsaver=None):
+    def __init__(self, opts, ci_kwargs={}):
         self.opts = opts
-        self.logsaver = logsaver
+        self.ci_kwargs = ci_kwargs
         self.logger = logging.getLogger('announce-receiver')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                                   socket.IPPROTO_UDP)
@@ -129,7 +129,7 @@ class UdpAnnounceReceiver(object):
         # Start UI now
         self.control = ControlInterface(
             self.opts, data['addr'], data.get('cport', None),
-            logsaver=self.logsaver)
+            **self.ci_kwargs)
 
     @asyncio.coroutine
     @wrap_event
@@ -236,10 +236,12 @@ class ControlInterface(object):
         )
 
 
-    def __init__(self, opts, host, port=None, logsaver=None):
+    def __init__(self, opts, host, port=None,
+                 osd_logsaver=None, json_logsaver=None):
         self.opts = opts
         self.logger = logging.getLogger('control')
-        self.logsaver = logsaver
+        self.osd_logsaver = osd_logsaver
+        self.json_logsaver = json_logsaver
         self.asyncio_loop = asyncio.get_event_loop()
         self.addr = (host, port or self.DEFAULT_PORT)
         self.sock = socket.socket(
@@ -277,6 +279,14 @@ class ControlInterface(object):
             self.state_savefile_name = os.path.join(
                 os.path.dirname(opts.log_prefix + 'test'),
                 self.UI_STATE_SAVEFILE)
+
+        # Log startup events
+        self._emit_json_logsaver_data()
+
+        # Install handler to log future events (from the right thread)
+        self.json_logsaver.on_record.append(
+            lambda: self.asyncio_loop.call_soon_threadsafe(
+                self._emit_json_logsaver_data))
 
         self.osd = osd.OnScreenDisplay(self.c_cal)
 
@@ -359,8 +369,8 @@ class ControlInterface(object):
                           self._on_readable)
 
         # Refresh overlay when new logs are arriving
-        if self.logsaver:
-            self.logsaver.on_record.append(
+        if self.osd_logsaver:
+            self.osd_logsaver.on_record.append(
                 lambda *_: self.update_video_overlay())
 
 
@@ -680,12 +690,12 @@ class ControlInterface(object):
             self.logger.info('Fire duration set to %.2f sec', newval)
 
         elif name == 'Escape':
-            if self.logsaver and self.logsaver.data:
+            if self.osd_logsaver and self.osd_logsaver.data:
+                numlines = len(self.osd_logsaver.data)
                 self.logger.info('Cleared on-screen display (%d lines)',
-                                 len(self.logsaver.data))
-                # TODO mafanasyev: when we will log logs properly, we should
-                # also log 'clear' events, so we can reconstruct OSD properly
-                del self.logsaver.data[:]
+                                 numlines)
+                self._log_event('cli-log-osd-cleared', numlines=numlines)
+                del self.osd_logsaver.data[:]
             else:
                 self.ui_state['status_on'] ^= True
                 self.logger.debug('Set status_on=%r',
@@ -752,6 +762,20 @@ class ControlInterface(object):
 
         return sertext
 
+    def _log_event(self, name, **kwargs):
+        rec = { "_type": "event", "cli_time": time.time(),
+                "name": name }
+        rec.update(kwargs)
+        self._log_struct(rec)
+
+    def _emit_json_logsaver_data(self):
+        while self.json_logsaver.data:
+            entry = self.json_logsaver.data.pop(0)
+            log_dict = MemoryLoggingHandler.to_dict(
+                entry, time_field='cli_time')
+            log_dict.update(_type='cli-log')
+            self._log_struct(log_dict)
+
     def _state_updated(self, force=False):
         sertext = json.dumps(self.ui_state, sort_keys=True)
         if (sertext == self._logged_state) and not force:
@@ -807,8 +831,8 @@ class ControlInterface(object):
     def _update_video_overlay_now(self):
         self._update_video_overlay_pending = False
 
-        if self.logsaver:
-            logs = self.logsaver.data
+        if self.osd_logsaver:
+            logs = self.osd_logsaver.data
         else:
             logs = []
         stream = StringIO.StringIO()
@@ -826,9 +850,11 @@ def main(opts):
     asyncio_misc_init()
 
     logging_init(verbose=True)
-    logsaver = MemoryLoggingHandler(install=True, max_records=30)
+    osd_logsaver = MemoryLoggingHandler(install=True, max_records=30)
     # Debug messages do not go to OSD, only to console and file.
-    logsaver.setLevel(logging.INFO)
+    osd_logsaver.setLevel(logging.INFO)
+
+    json_logsaver = MemoryLoggingHandler(install=True, max_records=1000)
 
     root = logging.getLogger()
 
@@ -866,10 +892,11 @@ def main(opts):
 
     video_window_init()
 
+    ci_kwargs = dict(osd_logsaver=osd_logsaver, json_logsaver=json_logsaver)
     if opts.addr is None:
-        ann = UdpAnnounceReceiver(opts, logsaver=logsaver)
+        ann = UdpAnnounceReceiver(opts, ci_kwargs=ci_kwargs)
     else:
-        cif = ControlInterface(opts, opts.addr, logsaver=logsaver)
+        cif = ControlInterface(opts, opts.addr, **ci_kwargs)
 
     logging.info('Running')
     video_window_main()

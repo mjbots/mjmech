@@ -1,8 +1,6 @@
 High priority (have to finish before competition)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * Better logging: log client-side messages
-
 Medium priority:
 ~~~~~~~~~~~~~~~
 
@@ -144,6 +142,7 @@ DONE 2015-03-06:
  * Make 'auto-agitator' mode which runs it only for some interval
    after the shots.
  * UI: Show bullet count (approx.)
+ * Better logging: log client-side messages
 
 DONE 2015-03-04:
  * Tried to change .svg file generation to make entries more readable. Have
