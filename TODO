@@ -1,20 +1,16 @@
 High priority (have to finish before competition)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * UI: Show bullet count (approx.)
-
- * Make 'auto-agitator' mode which runs it only after the shots.
-
  * Better logging: log client-side messages
-
- * Poll fire motor status more often when shooting
-
- * Poll (and send) turret servo actual positions
 
 Medium priority:
 ~~~~~~~~~~~~~~~
 
+ * Poll fire motor status more often when shooting
+
  * Tune turret servoes more for better performance
+
+ * Log stdout/stderr of external processes of vserver
 
  * Make turret servoes stronger: replace horn
 
@@ -30,6 +26,8 @@ Medium priority:
  * Add high-PWM mode for agitator (probably only momentary) -- it got stuck once
 
  * One-click shooting: 'cont' mode (shoot while mouse button is held)
+
+ * Properly estimate number of shots when commands overlap (for 'cont' mode)
 
  * Shoot qualification video and post it.
    2013 rules say: 5 minutes of motion, 4 plastic cups 8-12'' from the ground.
@@ -142,6 +140,10 @@ DONE 2015-03-06:
  * Log analysis tool which plots accelerometer data, events from ~/.mjmech log
  * Legtool servo settings support
  * Initial turret servo tuning
+ * Poll (and send) turret servo actual positions
+ * Make 'auto-agitator' mode which runs it only for some interval
+   after the shots.
+ * UI: Show bullet count (approx.)
 
 DONE 2015-03-04:
  * Tried to change .svg file generation to make entries more readable. Have

@@ -207,8 +207,10 @@ class ControlInterface(object):
 
         # 0 = off; 1 = on
         laser_on = 0,
-        agitator_on = 0,
         green_led_on = 0,
+
+        # 0 = off, 1 = auto, 2 = force on
+        agitator_mode = 1,
 
         # pwm values in 0..1 range
         agitator_pwm = 0.5,
@@ -559,7 +561,7 @@ class ControlInterface(object):
 
         if not fire_cmd:
             pass
-        elif fire_cmd in [FCMD.inpos1, FCMD.inpos2, FCMD.inpos3]:
+        elif fire_cmd != FCMD.cont:
             self._prepare_fire_command(fire_cmd)
         else:
             # TODO mafanasyev: implement FCMD.cont
@@ -617,10 +619,17 @@ class ControlInterface(object):
             self.control_dict['laser_on'] ^= 1
             self.logger.info('Laser set to %d',
                              self.control_dict['laser_on'])
-        elif name == 'm':
-            self.control_dict['agitator_on'] ^= 1
-            self.logger.info('Agitator set to %d (pwm %.3f)',
-                             self.control_dict['agitator_on'],
+        elif name in ['m', 'M']:
+            val = self.control_dict['agitator_mode']
+            if name == 'm' and val != 1:
+                val, val_str = 1, 'auto'
+            elif name == 'M' and val != 2:
+                val, val_str = 2, 'force-on'
+            else:
+                val, val_str = 0, 'off'
+            self.control_dict['agitator_mode'] = val
+            self.logger.info('Agitator mode to %s(%d) (pwm %.3f)',
+                             val_str, val,
                              self.control_dict['agitator_pwm'])
         elif name == 'S-G':
             self.control_dict['green_led_on'] ^= 1

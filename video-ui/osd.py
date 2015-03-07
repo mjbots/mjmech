@@ -93,12 +93,17 @@ class OnScreenDisplay(object):
             tags = list()
             if control_dict['laser_on']:
                 tags.append('LAS')
-            if control_dict['agitator_on']:
-                tags.append('AGT')
             if control_dict['green_led_on']:
                 tags.append('GRN')
-            if not tags:
-                tags.append('(all off)')
+            if control_dict['agitator_mode'] == 2:
+                tags.append('AGT-FORCE-ON')
+            elif control_dict['agitator_mode'] == 0:
+                tags.append('AGT-FORCE-OFF')
+            elif server_state.get('agitator_on'):
+                tags.append('AGT-ON')  # Auto mode, on
+            else:
+                tags.append('AGT-AUTO')  # Auto mode
+
             status_lines.append(','.join(tags))
 
             # Add servo status
@@ -141,6 +146,10 @@ class OnScreenDisplay(object):
                     # Flash exclamation sign if spent too long without motion
                     msg = "!!!!! " + msg
                 status_lines.append(msg)
+
+            if server_state.get("shots_fired"):
+                status_lines.append("Shots fired: %d" %
+                                    server_state["shots_fired"])
 
 
         # Always show autofire, even when status is off

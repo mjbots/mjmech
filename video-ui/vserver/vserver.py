@@ -47,6 +47,9 @@ TURRET_POSE_TIME = 0.25
 TURRET_SERVO_X = 12
 TURRET_SERVO_Y = 13
 
+# How long to run agitator for after each shot
+AUTO_AGITATOR_TIME = 2.0
+
 # Which servo IDs to poll for status
 # (set to false value to disable mechanism)
 SERVO_IDS_TO_POLL = [1, 3, 5, 7, TURRET_SERVO_X, TURRET_SERVO_Y, 99]
@@ -90,8 +93,10 @@ class ControlInterface(object):
         # Per-servo status (address->tuple of strings)
         # (this excludes some volatile status bits)
         self.last_servo_status = dict()
+
         self.turret_servoes_ready = False
         self.gait_commanded_nonidle = False
+        self.auto_agitator_expires = 0
 
         # Last processed fire command
         self.last_fire_cmd = None
@@ -121,6 +126,7 @@ class ControlInterface(object):
             "servo_temp": dict(),
             "agitator_on": 0,
             "turret_position": [None, None],
+            "shots_fired": 0,
             }
 
         self.status_send_task = Task(self._send_status_packets())
@@ -337,7 +343,11 @@ class ControlInterface(object):
         if olddata is None:
             olddata = dict()   # so one can use 'get'
 
-        agitator_on = data['agitator_on']
+        now = time.time()
+        agitator_on = (data['agitator_mode'] == 2)
+        if data['agitator_mode'] == 1 and (self.auto_agitator_expires > now):
+            agitator_on = 1
+
         self.status_packet['agitator_on'] = agitator_on
         # re-sent magic servo command. Unlike real servo,
         # it will timeout and turn off all LEDs if there were no
@@ -410,15 +420,18 @@ class ControlInterface(object):
         elif fire_cmd == self.last_fire_cmd:
             # No new command -- current one is processed
             pass
-        elif data['fire_cmd_deadline'] < time.time():
+        elif data['fire_cmd_deadline'] < now:
             # Command expired
             self.last_fire_cmd = fire_cmd
-            dt = time.time() - data['fire_cmd_deadline']
+            dt = now - data['fire_cmd_deadline']
             self.logger.warn('Ignoring old fire_cmd %r: %.3f sec old',
                              fire_cmd, dt)
         else:
             command = fire_cmd[0]
             suppress = []
+            # Start agitator early
+            self.auto_agitator_expires = now + AUTO_AGITATOR_TIME
+
             if FCMD._is_inpos(command):
                 # Need to check if turret servoes are inposition
                 # For that, immediately poll them
@@ -442,9 +455,17 @@ class ControlInterface(object):
                 command = fire_cmd[0]
                 if command == FCMD.cont:
                     duration = 0.5  # bigger than poll interval
+                    # TODO mafanasyev: implement
+                    numshots = 1
                 else:
-                    duration = data['fire_duration'] * FCMD._numshots(command)
+                    numshots = FCMD._numshots(command)
+                    duration = data['fire_duration'] * numshots
                 self.logger.debug('Bang bang %.2f sec!!', duration)
+
+                # TODO mafanasyev: do not add it if previous shot is not
+                # yet complete.
+                self.status_packet["shots_fired"] += numshots
+
                 yield From(servo.mjmech_fire(
                         fire_time=duration, fire_pwm=data['fire_motor_pwm']))
 
