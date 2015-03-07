@@ -427,10 +427,13 @@ class ControlInterface(object):
             self.logger.warn('Ignoring old fire_cmd %r: %.3f sec old',
                              fire_cmd, dt)
         else:
-            command = fire_cmd[0]
+            command, seq = fire_cmd
             suppress = []
-            # Start agitator early
-            self.auto_agitator_expires = now + AUTO_AGITATOR_TIME
+            # Start agitator early, but only for every Nth shot
+            # (The reason for that is if there is a BB stuck in the agitator,
+            # you need to fire with agitator DISABLED in order to dislodge it)
+            if (seq % 2) == 0:
+                self.auto_agitator_expires = now + AUTO_AGITATOR_TIME
 
             if FCMD._is_inpos(command):
                 # Need to check if turret servoes are inposition

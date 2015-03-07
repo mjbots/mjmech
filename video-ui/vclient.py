@@ -241,8 +241,9 @@ class ControlInterface(object):
         fire_cmd_deadline = 0,
 
         # Fire command. This is a tuple (command, seq). A new command starts
-        # every time a tuple changes. Mode is one of FCMD constants from
-        # vui_helpers.
+        # every time a tuple changes. 'command' is one of the FCMD constants from
+        # vui_helpers. 'seq' must be an interger which increases by one every time
+        # new command appears.
         fire_cmd = None,
         )
 
@@ -640,11 +641,11 @@ class ControlInterface(object):
             self.control_dict['laser_on'] ^= 1
             self.logger.info('Laser set to %d',
                              self.control_dict['laser_on'])
-        elif name in ['m', 'M']:
+        elif name in ['m', 'S-M']:
             val = self.control_dict['agitator_mode']
             if name == 'm' and val != 1:
                 val, val_str = 1, 'auto'
-            elif name == 'M' and val != 2:
+            elif name == 'S-M' and val != 2:
                 val, val_str = 2, 'force-on'
             else:
                 val, val_str = 0, 'off'
