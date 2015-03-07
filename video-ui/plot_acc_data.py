@@ -153,18 +153,20 @@ def main():
     fig = pyplot.figure()
     fig.subplots_adjust(top=0.95, bottom=0.01, left=0.1, right=0.99)
     ax = None
-    subplot_max = 2
-    if 'control' in ds.data:
-        subplot_max += 1
+    subplot_max = 0
+    if 'acc0' in ds.data: subplot_max += 1
+    if 'control' in ds.data: subplot_max += 1
+    if 'acc1' in ds.data: subplot_max += 1
     subplot_num = 0
 
-    subplot_num += 1
-    ax = fig.add_subplot(subplot_max, 1, subplot_num, sharex=ax)
-    ds.plot_xy_data(ax, 'acc0.x', '.-')
-    ds.plot_xy_data(ax, 'acc0.y', '.-')
-    ds.plot_xy_data(ax, 'acc0.z', '.-')
-    pyplot.legend()
-    pyplot.grid(True)
+    if 'acc0' in ds.data:
+        subplot_num += 1
+        ax = fig.add_subplot(subplot_max, 1, subplot_num, sharex=ax)
+        ds.plot_xy_data(ax, 'acc0.x', '.-')
+        ds.plot_xy_data(ax, 'acc0.y', '.-')
+        ds.plot_xy_data(ax, 'acc0.z', '.-')
+        pyplot.legend()
+        pyplot.grid(True)
 
     if 'control' in ds.data:
         subplot_num += 1
@@ -204,13 +206,14 @@ def main():
         pyplot.yticks(y_offsets, y_names)
         pyplot.grid(True)
 
-    subplot_num += 1
-    ax = fig.add_subplot(subplot_max, 1, subplot_num, sharex=ax)
-    ds.plot_xy_data(ax, 'acc1.x', '.-')
-    ds.plot_xy_data(ax, 'acc1.y', '.-')
-    ds.plot_xy_data(ax, 'acc1.z', '.-')
-    pyplot.grid(True)
-    pyplot.legend()
+    if 'acc1' in ds.data:
+        subplot_num += 1
+        ax = fig.add_subplot(subplot_max, 1, subplot_num, sharex=ax)
+        ds.plot_xy_data(ax, 'acc1.x', '.-')
+        ds.plot_xy_data(ax, 'acc1.y', '.-')
+        ds.plot_xy_data(ax, 'acc1.z', '.-')
+        pyplot.grid(True)
+        pyplot.legend()
 
     assert subplot_max == subplot_num, (subplot_num, subplot_max)
 
