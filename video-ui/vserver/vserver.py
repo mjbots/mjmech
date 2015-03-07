@@ -47,6 +47,26 @@ TURRET_POSE_TIME = 0.25
 TURRET_SERVO_X = 12
 TURRET_SERVO_Y = 13
 
+# TODO mafanasyev: add overload controls to detect gun hitting
+#                  limit
+TURRET_SERVO_CONFIG = {
+    'dead_zone': 0,     # when to shut off the motor
+    # We set larger 'inpos_margin' and rely on stop_thresh
+    # to fire when we are alsmot at a target and no progress is being made
+    'inpos_margin': 2,  # 'inposition' sensitivity
+    'stop_thresh': 1,   # 'moving' sensitivity
+    'stop_time': 100,   # 'moving' timeout, in 11mS units
+    # 'acc_ratio': 50,  # triangular drive profile
+
+    # default P/I/D is 254/0/6500
+    # stable but slow: 200/1000/1000
+    'pos_kp': 200, 'pos_ki': 2000, 'pos_kd': 1000,
+    }
+# Modifications for 'Y' servo
+TURRET_SERVO_CONFIG_Y = {
+    'pos_kp': 300, 'pos_ki': 5000, 'pos_kd': 1000,
+}
+
 # How long to run agitator for after each shot
 AUTO_AGITATOR_TIME = 2.0
 
@@ -325,7 +345,7 @@ class ControlInterface(object):
         self.status_packet['servo_status'][servo_id] = status_str
 
         if (servo_id == TURRET_SERVO_X) and (position is not None):
-            self.status_packet['turret_position'][0] = position
+            self.status_packet['turret_position'][0] = -position
         elif (servo_id == TURRET_SERVO_Y) and (position is not None):
             self.status_packet['turret_position'][1] = position
 
@@ -390,18 +410,10 @@ class ControlInterface(object):
                 # Enable power
                 yield From(servo.enable_power(selector.POWER_ENABLE, sid_list))
                 # Configure servo
-                # default P/I/D is 254/0/6500
-                # TODO mafanasyev: add overload controls to detect gun hitting
-                #                  limit
-                yield From(servo.configure_servo(
-                        {'dead_zone': 0,     # when to shut off the motor
-                         'inpos_margin': 1,  # 'inposition' sensitivity
-                         'stop_thresh': 1,   # 'moving' sensitivity
-                         'stop_time': 10,    # 'moving' timeout, in 11mS units
-                         # 'acc_ratio': 50,  # triangular drive profile
-                          'pos_kp': 200, 'pos_ki': 1000, 'pos_kd': 1000,
-                         },
-                        sid_list))
+                config = dict(TURRET_SERVO_CONFIG)
+                yield From(servo.configure_servo(config, [TURRET_SERVO_X]))
+                config.update(TURRET_SERVO_CONFIG_Y)
+                yield From(servo.configure_servo(config, [TURRET_SERVO_Y]))
 
             servo_x, servo_y = data['turret']
             send_x = min(TURRET_RANGE_X[1],

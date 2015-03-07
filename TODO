@@ -1,18 +1,20 @@
 High priority (have to finish before competition)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+ * Log turret position even when not in 'inpos firing' mode
+
+ * Better logging while waiting for firing servoes to settle
+
+ * On UI, show desired/actual turret position difference
+
 Medium priority:
 ~~~~~~~~~~~~~~~
 
  * Poll fire motor status more often when shooting
 
- * Tune turret servoes more for better performance
-
  * Log stdout/stderr of external processes of vserver
 
  * Make turret servoes stronger: replace horn
-
- * On UI, show desired/actual turret position difference
 
  * Better logging: send server status packets more often when times are
    interesting (moving, shooting)
@@ -20,8 +22,6 @@ Medium priority:
  * Add a zoom option to simplify long-distance (10ft) shooting
 
  * Add a plug for BB container so they do not roll out when robot stands up
-
- * Add high-PWM mode for agitator (probably only momentary) -- it got stuck once
 
  * One-click shooting: 'cont' mode (shoot while mouse button is held)
 
@@ -75,6 +75,8 @@ Lower priority:
    after power fault). This should also re-initialize turret servoes.
 
  * Use accelerometer to determine if agitator is running or not
+
+ * Add high-PWM mode for agitator (probably only momentary) -- it got stuck once
 
 Software and gait TODOs
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -132,6 +134,9 @@ ___ Improve legtool ____
 
 History
 ~~~~~~~
+
+DONE 2015-03-07:
+ * Tune turret servoes more for better performance
 
 DONE 2015-03-06:
  * Accelerometer data logger which runs on odroid

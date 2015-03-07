@@ -57,7 +57,7 @@ NORMAL_FIRE_TIMEOUT = 0.5
 # as gun may fire unexpectedly.
 # TODO mafanasyev: this should not be required once 'cont' support
 # is implemented
-INPOS_EXTRA_FIRE_TIMEOUT = 2.0
+INPOS_EXTRA_FIRE_TIMEOUT = 5.0
 
 class UdpAnnounceReceiver(object):
     PORT = 13355
