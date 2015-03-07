@@ -119,6 +119,8 @@ class ControlInterface(object):
             "servo_status": dict(),
             "servo_voltage": dict(),
             "servo_temp": dict(),
+            "agitator_on": 0,
+            "turret_position": [None, None],
             }
 
         self.status_send_task = Task(self._send_status_packets())
@@ -258,7 +260,7 @@ class ControlInterface(object):
                 self.sock.sendto(payload, self.src_addr)
 
             # ratelimit
-            yield From(asyncio.sleep(0.1))
+            yield From(asyncio.sleep(0.05))
 
     @asyncio.coroutine
     def _send_servo_commands(self):
@@ -296,8 +298,13 @@ class ControlInterface(object):
         """Poll servo's status. Convert result to string, update
         state vars, return new result.
         """
-        status_list = yield From(
-            self.mech_driver.servo.get_clear_status(servo_id))
+        if servo_id in [TURRET_SERVO_X, TURRET_SERVO_Y]:
+            status_list, position = yield From(
+                self.mech_driver.servo.get_clear_status(
+                    servo_id, return_pos=True))
+        else:
+            status_list = yield From(
+                self.mech_driver.servo.get_clear_status(servo_id))
 
         status_list_clean = tuple(
             x for x in status_list if x not in ['moving', 'inposition'])
@@ -310,6 +317,11 @@ class ControlInterface(object):
 
         status_str = ','.join(status_list) or 'idle'
         self.status_packet['servo_status'][servo_id] = status_str
+
+        if (servo_id == TURRET_SERVO_X) and (position is not None):
+            self.status_packet['turret_position'][0] = position
+        elif (servo_id == TURRET_SERVO_Y) and (position is not None):
+            self.status_packet['turret_position'][1] = position
 
         raise Return(status_list)
 
@@ -325,6 +337,8 @@ class ControlInterface(object):
         if olddata is None:
             olddata = dict()   # so one can use 'get'
 
+        agitator_on = data['agitator_on']
+        self.status_packet['agitator_on'] = agitator_on
         # re-sent magic servo command. Unlike real servo,
         # it will timeout and turn off all LEDs if there were no
         # commands for a while.
@@ -334,7 +348,7 @@ class ControlInterface(object):
                 # LED_BLUE is an actual blue LED on the board. Flash it
                 # as we receive the packets.
                 blue=(self.recent_packets % 2),
-                agitator=(data['agitator_pwm'] if data['agitator_on'] else 0)
+                agitator=(data['agitator_pwm'] if agitator_on else 0)
                 ))
 
         # poll servos (one at a time)

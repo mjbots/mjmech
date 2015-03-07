@@ -155,22 +155,40 @@ class HerkuleXController(object):
         raise Return(result)
 
     @asyncio.coroutine
-    def get_clear_status(self, ident):
+    def get_clear_status(self, ident, return_pos=False):
         """Get a list of pending servo errors, and clear these errors,
         if any.
         @returns list of strings -- status flags
+        @returns tuple(flags, position) if @p return_pos is True
+        position may be None on error
         """
+        counts = None
         try:
-            status = yield From(self.port.status(ident))
+            if return_pos:
+                counts, status = yield From(
+                    self.port.position(ident, return_status=True))
+            else:
+                status = yield From(self.port.status(ident))
         except asyncio.TimeoutError:
             status = None
 
         if status is None:
-            raise Return(['offline'])
+            if return_pos:
+                raise Return((['offline'], None))
+            else:
+                raise Return(['offline'])
 
         if status.has_errors():
             yield From(self.port.clear_errors(ident))
-        raise Return(status.active_flags())
+
+        if return_pos:
+            if counts is None:
+                position = None
+            else:
+                position = self._counts_to_angle(counts)
+            raise Return((status.active_flags(), position))
+        else:
+            raise Return(status.active_flags())
 
     @asyncio.coroutine
     def set_leds(self, ident, red=False, green=False, blue=False):
@@ -342,8 +360,11 @@ class GazeboController(object):
         pass
 
     @asyncio.coroutine
-    def get_clear_status(self, ident):
-        raise Return([])
+    def get_clear_status(self, ident, return_pos=False):
+        if return_pos:
+            raise Return(([], None))
+        else:
+            raise Return([])
 
 @asyncio.coroutine
 def select_servo(servo_type, **kwargs):
