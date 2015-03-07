@@ -3,14 +3,25 @@ High priority (have to finish before competition)
 
  * UI: Show bullet count (approx.)
 
- * Make turret servoes stronger: replace horn
-
- * Figure out how to detect/prevent agitator jams
+ * Make 'auto-agitator' mode which runs it only after the shots.
 
  * Better logging: log client-side messages
 
+ * Poll fire motor status more often when shooting
+
+ * Poll (and send) turret servo actual positions
+
 Medium priority:
 ~~~~~~~~~~~~~~~
+
+ * Tune turret servoes more for better performance
+
+ * Make turret servoes stronger: replace horn
+
+ * On UI, show desired/actual turret position difference
+
+ * Better logging: send server status packets more often when times are
+   interesting (moving, shooting)
 
  * Add a zoom option to simplify long-distance (10ft) shooting
 
@@ -20,15 +31,13 @@ Medium priority:
 
  * One-click shooting: 'cont' mode (shoot while mouse button is held)
 
- * Tune turret servoes for better performance
-
  * Shoot qualification video and post it.
    2013 rules say: 5 minutes of motion, 4 plastic cups 8-12'' from the ground.
 
  * Make video more error-resistant. Decrease I-frame interval? (this might
    require getting uvch264src to work)
 
- * power-off all servoes when client goes away
+ * power-off/reboot all servoes when client goes away
 
  * Model turret
   - Center of coordinates is camera center
@@ -41,14 +50,15 @@ Medium priority:
      then gun marker shows where bullets would hit
    - Add vision-based distance to detect laser spot
 
- * Add accelerometer support to detect shots.
-  - Run it as standalone C helper, as it takes 100% of CPU's one core
-  - Detect # of shots fired
-  - Try to detect mis-shots: known we are out of ammo, auto-retry on misshots
-  - Try to determine if agitator is running or not
+ * Add accelerometer support.
+  - It run it as standalone C helper, as it takes 100% of CPU's one core
+  - Need to start/stop it as needed (only when user connects)
+  - Need to parse its stdout in a meaningful way.
 
- * Change .svg file generation to make entries more readable (blur the
-   background?)
+ * Use accelerometer to detect # of shots fired.
+
+ * Use accelerometer to try detect mis-shots: known we are out of ammo,
+   auto-retry on misshots
 
 Lower priority:
 ~~~~~~~~~~~~~~
@@ -67,6 +77,8 @@ Lower priority:
 
  * Add a way to reset all servoes without restarting app (for example,
    after power fault). This should also re-initialize turret servoes.
+
+ * Use accelerometer to determine if agitator is running or not
 
 Software and gait TODOs
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -124,6 +136,17 @@ ___ Improve legtool ____
 
 History
 ~~~~~~~
+
+DONE 2015-03-06:
+ * Accelerometer data logger which runs on odroid
+ * Log analysis tool which plots accelerometer data, events from ~/.mjmech log
+ * Legtool servo settings support
+ * Initial turret servo tuning
+
+DONE 2015-03-04:
+ * Tried to change .svg file generation to make entries more readable. Have
+   a patch which blurs the background -- great effect, but too high of a CPU
+   usage
 
 DONE 2015-03-03:
  * Add clear plastic cover above odroid
