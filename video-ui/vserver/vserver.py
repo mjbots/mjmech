@@ -383,11 +383,11 @@ class ControlInterface(object):
                 # default P/I/D is 254/0/6500
                 # TODO mafanasyev: add overload controls to detect gun hitting
                 #                  limit
-                # TODO mafanasyev: shall we use 'stopped' instead of
-                #                  'inposition' for more reliability?
                 yield From(servo.configure_servo(
                         {'dead_zone': 0,     # when to shut off the motor
-                         'inpos_margin': 1,  # 'inposition' sensetivity
+                         'inpos_margin': 1,  # 'inposition' sensitivity
+                         'stop_thresh': 1,   # 'moving' sensitivity
+                         'stop_time': 10,    # 'moving' timeout, in 11mS units
                          # 'acc_ratio': 50,  # triangular drive profile
                           'pos_kp': 200, 'pos_ki': 1000, 'pos_kd': 1000,
                          },
@@ -422,14 +422,18 @@ class ControlInterface(object):
             if FCMD._is_inpos(command):
                 # Need to check if turret servoes are inposition
                 # For that, immediately poll them
-                for sid in (TURRET_SERVO_X, TURRET_SERVO_Y):
+                for axis, sid in (('x', TURRET_SERVO_X),
+                                  ('y', TURRET_SERVO_Y)):
                     status = yield From(self._poll_servo_status(sid))
                     if 'inposition' not in status:
-                        suppress.append(sid)
-
+                        suppress.append(axis + '.ninpos')
+                    if 'moving' in status:
+                        suppress.append(axis + '.moving')
+                # TODO mafanasyev: also add requirement to be in steady state
+                # for X samples?
             if suppress:
-                self.logger.debug('Waiting for firing servoes to settle (%r)',
-                                  suppress)
+                self.logger.debug('Waiting for firing servoes to settle: %s',
+                                  ', '.join(suppress))
                 # Do not touch last_fire_cmd so we keep retrying the test
             else:
                 # Firetime!
