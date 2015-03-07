@@ -48,6 +48,17 @@ IDLE_COMMAND = {
     'type': 'idle'
 }
 
+# Maximum network latency for fire command
+# Must be always more that inter-control-packet interval
+NORMAL_FIRE_TIMEOUT = 0.5
+
+# Maximum time for servo to settle
+# Too short times will cause failed autofires, too long times are dangerous
+# as gun may fire unexpectedly.
+# TODO mafanasyev: this should not be required once 'cont' support
+# is implemented
+INPOS_EXTRA_FIRE_TIMEOUT = 2.0
+
 class UdpAnnounceReceiver(object):
     PORT = 13355
 
@@ -814,12 +825,11 @@ class ControlInterface(object):
         server_time = (self.server_state['srv_time']
                        - self.server_state['cli_time'] + time.time())
         self.fire_cmd_seq += 1
-        timeout = 0.5
+
+        timeout = NORMAL_FIRE_TIMEOUT
         if FCMD._is_inpos(command):
             # Give extra time for servoes to settle
-            # TODO mafanasyev: this should not be required once 'cont' support
-            # is implemented
-            timeout += 1.5
+            timeout += INPOS_EXTRA_FIRE_TIMEOUT
         self.control_dict.update(
             fire_duration = self.ui_state['fire_duration'],
             fire_cmd = [command, self.fire_cmd_seq],
