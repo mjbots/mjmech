@@ -54,6 +54,30 @@ class OnScreenDisplay(object):
                                   (0, -s), (-s, -s), (-s, 0), (-s, s)])
 
 
+        turret_actual = server_state.get("turret_position", (None, None))
+        if rmode and (turret_actual[0] is not None) and (
+            turret_actual[1] is not None) and control_dict.get('turret'):
+            # Draw 'actual position' mark
+            actual_x = control_dict['turret'][0] - turret_actual[0]
+            actual_y = control_dict['turret'][1] - turret_actual[1]
+            lines_deg.append("stroke='yellow'")
+
+            # Show 45 deg square with diagonal of 3 counts
+            sz = 0.325 * 3 / 2
+            lines_deg.append([(actual_x - sz, actual_y),
+                              (actual_x, actual_y + sz),
+                              (actual_x + sz, actual_y),
+                              (actual_x, actual_y - sz),
+                              (actual_x - sz, actual_y)])
+
+            # When we are moving, draw a bigger cross around it
+            if server_state.get('turret_inmotion'):
+                sz2 = 10.0
+                lines_deg.append([(actual_x - sz2, actual_y),
+                                  (actual_x + sz2, actual_y)])
+                lines_deg.append([(actual_x, actual_y - sz2),
+                                  (actual_x, actual_y + sz2)])
+
         if lines_deg:
             # Re-use reticle_offset to allow reticle movement
             offs_x, offs_y = ui_state['reticle_offset']
