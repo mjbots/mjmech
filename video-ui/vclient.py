@@ -785,6 +785,9 @@ class ControlInterface(object):
             entry = self.json_logsaver.data.pop(0)
             log_dict = MemoryLoggingHandler.to_dict(
                 entry, time_field='cli_time')
+            if log_dict["name"].startswith("srv."):
+                # Do not double-save server messages
+                return
             log_dict.update(_type='cli-log')
             self._log_struct(log_dict)
 
