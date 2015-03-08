@@ -47,6 +47,10 @@ TURRET_POSE_TIME = 0.25
 TURRET_SERVO_X = 12
 TURRET_SERVO_Y = 13
 
+# How long to fastpoll turret for after it stopped moving
+# (turret is always fastpolled while it is moving)
+TURRET_FASTPOLL_TIME = 1.0
+
 # TODO mafanasyev: add overload controls to detect gun hitting
 #                  limit
 TURRET_SERVO_CONFIG = {
@@ -70,8 +74,7 @@ TURRET_SERVO_CONFIG_Y = {
 # How long to run agitator for after each shot
 AUTO_AGITATOR_TIME = 2.0
 
-# Which servo IDs to poll for status
-# (set to false value to disable mechanism)
+# Which servo IDs to poll for status (must be non-empty)
 SERVO_IDS_TO_POLL = [1, 3, 5, 7, TURRET_SERVO_X, TURRET_SERVO_Y, 99]
 
 _start_time = time.time()
@@ -115,17 +118,22 @@ class ControlInterface(object):
         self.last_servo_status = dict()
 
         self.turret_servoes_ready = False
+        # When >now, turret servoes will be polled at a higher rate
+        self.turret_fastpoll_until = 0
+        # Last commanded turret position.
+        self.turret_last_command = None
+        # Time when last_command changed
+        self.turret_last_command_time = 0
+
         self.gait_commanded_nonidle = False
+        # When >now, agitator will be enabled when in auto mode
         self.auto_agitator_expires = 0
 
         # Last processed fire command
         self.last_fire_cmd = None
 
         # Iterator which returns next servo to poll
-        if SERVO_IDS_TO_POLL:
-            self.next_servo_to_poll = itertools.cycle(SERVO_IDS_TO_POLL)
-        else:
-            self.next_servo_to_poll = None
+        self.next_servo_to_poll = itertools.cycle(SERVO_IDS_TO_POLL)
         self.servo_poll_count = 0
 
         # Normally we refresh state periodically. Set this flag to force
@@ -145,7 +153,9 @@ class ControlInterface(object):
             "servo_voltage": dict(),
             "servo_temp": dict(),
             "agitator_on": 0,
-            "turret_position": [None, None],
+            "turret_position": [None, None],  # actual turret position
+            # Empty string if motion is done, else reason
+            "turret_inmotion": None,
             "shots_fired": 0,
             }
 
@@ -381,29 +391,20 @@ class ControlInterface(object):
                 agitator=(data['agitator_pwm'] if agitator_on else 0)
                 ))
 
-        # poll servos (one at a time)
-        if self.next_servo_to_poll is not None:
-            servo_id = self.next_servo_to_poll.next()
-            self.servo_poll_count += 1
-            special_step = 0
-            if (servo_id != 99) and \
-                    'offline' not in self.last_servo_status.get(servo_id, []):
-                # Note that mod-factor should be relatively prime to number
-                # of servoes
-                special_step = (self.servo_poll_count % 103)
+        poll_servo_id = self.next_servo_to_poll.next()
+        now = time.time()   # update now -- we sent a command
 
-            if special_step == 10:
-                voltage_dict = yield From(servo.get_voltage([servo_id]))
-                self.status_packet['servo_voltage'][servo_id] = \
-                    voltage_dict.get(servo_id, None)
-            elif special_step == 18:
-                temp_dict = yield From(servo.get_temperature([servo_id]))
-                self.status_packet['servo_temp'][servo_id] = \
-                    temp_dict.get(servo_id, None)
-            else:
-                yield From(self._poll_servo_status(servo_id))
+        turret_inmotion = []
+        # check for new turret command
+        if data.get('turret') != self.turret_last_command:
+            self.turret_last_command = data['turret']
+            self.turret_last_command_time = now
+            self.turret_fastpoll_until = now + TURRET_FASTPOLL_TIME
+            turret_inmotion.append('cmd')
 
-        if data.get('turret'):
+        # Send command if needed -- when changed or periodically
+        if (('cmd' in turret_inmotion) or (self.servo_poll_count % 113 == 0)
+            ) and data.get('turret'):
             if not self.turret_servoes_ready:
                 self.turret_servoes_ready = True
                 sid_list = [TURRET_SERVO_X, TURRET_SERVO_Y]
@@ -424,6 +425,59 @@ class ControlInterface(object):
                                        TURRET_SERVO_Y: send_y},
                                       pose_time=TURRET_POSE_TIME))
 
+        # Poll servoes if we are in fastpoll mode
+        if self.turret_fastpoll_until > now:
+            for axis, sid in (('x', TURRET_SERVO_X),
+                              ('y', TURRET_SERVO_Y)):
+                status = yield From(self._poll_servo_status(sid))
+                if 'moving' in status:
+                    turret_inmotion.append(axis + '.moving')
+                if 'inposition' not in status:
+                    turret_inmotion.append(axis + '.ninpos')
+                if sid == poll_servo_id:
+                    # Do not poll for turret servos again
+                    poll_servo_id = self.next_servo_to_poll.next()
+
+            # TODO mafanasyev: suppress 'ninpos' when 'moving' is true?
+            # TODO mafanasyev: also add requirement to be in steady state
+            # for X samples?
+
+        # Update new inmpotion flags
+        inmotion_str = ','.join(turret_inmotion)
+        if self.status_packet['turret_inmotion'] != inmotion_str:
+            self.status_packet['turret_inmotion'] = inmotion_str
+            dt = self.turret_last_command_time - now
+            if inmotion_str:
+                self.logger.debug(
+                    'Turret in motion: %s (dt %.3f)', inmotion_str, dt)
+            else:
+                self.logger.debug(
+                    'Turret no longer in motion (dt %.3f)', dt)
+
+        if turret_inmotion:
+            # Keep fastpolling while we are moving, and then some
+            self.turret_fastpoll_until = now + TURRET_FASTPOLL_TIME
+
+        # poll other servos (one at a time)
+        self.servo_poll_count += 1
+        special_step = 0
+        if (poll_servo_id != 99) and (
+            'offline' not in self.last_servo_status.get(poll_servo_id, [])):
+            # Note that mod-factor should be relatively prime to number
+            # of servoes
+            special_step = (self.servo_poll_count % 103)
+        if special_step == 10:
+            voltage_dict = yield From(servo.get_voltage([poll_servo_id]))
+            self.status_packet['servo_voltage'][poll_servo_id] = \
+                voltage_dict.get(poll_servo_id, None)
+        elif special_step == 18:
+            temp_dict = yield From(servo.get_temperature([poll_servo_id]))
+            self.status_packet['servo_temp'][poll_servo_id] = \
+                temp_dict.get(poll_servo_id, None)
+        else:
+            yield From(self._poll_servo_status(poll_servo_id))
+
+        # Process firing
         fire_cmd = data['fire_cmd']
         if fire_cmd is None and self.last_fire_cmd is not None:
             self.last_fire_cmd = None
@@ -447,19 +501,8 @@ class ControlInterface(object):
             if (seq % 2) == 0:
                 self.auto_agitator_expires = now + AUTO_AGITATOR_TIME
 
-            if FCMD._is_inpos(command):
-                # Need to check if turret servoes are inposition
-                # For that, immediately poll them
-                for axis, sid in (('x', TURRET_SERVO_X),
-                                  ('y', TURRET_SERVO_Y)):
-                    status = yield From(self._poll_servo_status(sid))
-                    if 'inposition' not in status:
-                        suppress.append(axis + '.ninpos')
-                    if 'moving' in status:
-                        suppress.append(axis + '.moving')
-                # TODO mafanasyev: also add requirement to be in steady state
-                # for X samples?
-            if suppress:
+            if FCMD._is_inpos(command) and turret_inmotion:
+                # We are not in position yet. Do not fire.
                 self.logger.debug('Waiting for firing servoes to settle: %s',
                                   ', '.join(suppress))
                 # Do not touch last_fire_cmd so we keep retrying the test
