@@ -18,7 +18,7 @@ from trollius import Task, From
 
 from vui_helpers import (
     wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler,
-    add_pair, FCMD)
+    add_pair, FCMD, g_quit_handlers)
 from video_window import VideoWindow, video_window_init, video_window_main
 import osd
 
@@ -175,7 +175,6 @@ class UdpAnnounceReceiver(object):
         retcode = yield From(proc.wait())
         logger.warning('Process exited, code %r', retcode)
 
-
 class ControlInterface(object):
     SEND_INTERVAL = 0.25
     DEFAULT_PORT = 13356
@@ -249,7 +248,8 @@ class ControlInterface(object):
 
 
     def __init__(self, opts, host, port=None,
-                 osd_logsaver=None, json_logsaver=None):
+                 osd_logsaver=None, json_logsaver=None,
+                 test_sim_keys=None):
         self.opts = opts
         self.logger = logging.getLogger('control')
         self.osd_logsaver = osd_logsaver
@@ -265,7 +265,6 @@ class ControlInterface(object):
         self.sock.setblocking(0)
         self.logger.info('Connecting to %s:%d' % self.addr)
         self.sock.connect(self.addr)
-
 
         # Wallclock and pipeline time
         self.last_video_wall_time = None
@@ -385,6 +384,9 @@ class ControlInterface(object):
             self.osd_logsaver.on_record.append(
                 lambda *_: self.update_video_overlay())
 
+        if test_sim_keys is not None:
+            # We do not care about errors here
+            Task(self._replay_test_data(test_sim_keys))
 
     def select_axes(self):
         complete = self.joystick.get_features(linux_input.EV.ABS)
@@ -742,25 +744,52 @@ class ControlInterface(object):
           w/s, a/d - move
           q/e      - rotate
           l        - laser on/off
-          m        - agitator on/off
+          m/M      - toggle agitator auto/forced
           G        - green LED on/off
           c        - enable && center turret
-          click    - point turret to this location (must center first)
+          left click - point turret to this location (must center first)
+          right click - print location coordinates, or autofire
           ENTER    - fire
           arrows   - move turret
           S+arrows - move turret (move faster)
           C+arrows - set reticle center (use shift for more precision)
-          C+S+arrows - set reticle center (move faster)
+          C+S+arrows - set reticle center (move slowerr)
           C+r      - zero out reticle offset
           r        - toggle reticle
           S-( S-)  - change fire duration
           S-*      - show fire duration
-          ESC      - clear logs from OSD; then toggle servo status
-          1/2/3/5/9/0 - right-button autofire: 1/2/3 shots, continuous, off
+          ESC      - clear logs from OSD; then toggle status visibility
+          1/2/3/5/9/0 - right-button autofire: 1-5 shots, continuous, off
           Numpad +/-  - change OSD font size
         """
         for line in textwrap.dedent(helpmsg).strip().splitlines():
             self.logger.info('| ' + line)
+
+    @asyncio.coroutine
+    def _replay_test_data(self, data):
+        self.logger.info('Simulating keypresses based on a command line')
+        for word in data.split(' '):
+            if word.startswith('@'):
+                # Sleep
+                interval = float(word[1:])
+                yield From(asyncio.sleep(interval))
+            else:
+                # Keypress
+                if '-' in word:
+                    modifiers, base_name = word.rsplit('-', 1)
+                    modifiers += '-'
+                else:
+                    modifiers, base_name = '', word
+                self.logger.info('Simulating key: (%r, %r)',
+                                 modifiers, base_name)
+                self._handle_key_press(base_name, modifiers)
+                # Maintain spacing
+                yield From(asyncio.sleep(0.5))
+
+        # Exit program
+        self.logger.info('Replay complete, exiting')
+        for cb in g_quit_handlers:
+            cb()
 
     def _log_struct(self, rec):
         """Log @p rec (which must be a json-serialized dict) to logfile.
@@ -906,7 +935,9 @@ def main(opts):
 
     video_window_init()
 
-    ci_kwargs = dict(osd_logsaver=osd_logsaver, json_logsaver=json_logsaver)
+    ci_kwargs = dict(osd_logsaver=osd_logsaver,
+                     json_logsaver=json_logsaver,
+                     test_sim_keys=opts.test_sim_keys)
     if opts.addr is None:
         ann = UdpAnnounceReceiver(opts, ci_kwargs=ci_kwargs)
     else:
@@ -936,6 +967,9 @@ if __name__ == '__main__':
     parser.add_option('-R', '--restore-state', default=None,
                       help='Restore UI state on startup. Default LOGDIR/' +
                       ControlInterface.UI_STATE_SAVEFILE)
+    parser.add_option('-T', '--test-sim-keys', default=None,
+                      help='Simulate keypresses. Arg is space-separates '
+                      'string.')
 
     opts, args = parser.parse_args()
     if len(args) and opts.addr is None:

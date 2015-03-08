@@ -56,6 +56,9 @@ Medium priority:
  * Use accelerometer to try detect mis-shots: known we are out of ammo,
    auto-retry on misshots
 
+ * Fix problem of SSH KEX failing: either add reboot option to
+   vserver_launcher, or install ethersafe.
+
 Lower priority:
 ~~~~~~~~~~~~~~
 
