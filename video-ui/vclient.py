@@ -685,6 +685,10 @@ class ControlInterface(object):
                 self.logger.debug('Moving turret to (%+.1f, %+.1f) deg '
                                   'in response to keys',
                                   new[0], new[1])
+        elif name == 'C-S-M-Arrows':
+            # Method will do its own logging
+            step = 0.25
+            self.c_cal.tweak_fixups(arrows[0] * step, arrows[1] * step)
         elif name == 'r':
             newmode = (self.ui_state['reticle_mode'] + 1) % 3
             self.ui_state['reticle_mode'] = newmode
@@ -755,6 +759,7 @@ class ControlInterface(object):
           C+arrows - set reticle center (use shift for more precision)
           C+S+arrows - set reticle center (move slowerr)
           C+r      - zero out reticle offset
+          C+S+M+arrows - temporarily tweak camera calibration
           r        - toggle reticle
           S-( S-)  - change fire duration
           S-*      - show fire duration

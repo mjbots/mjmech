@@ -4,8 +4,6 @@ High priority (have to finish before competition)
 Medium priority:
 ~~~~~~~~~~~~~~~
 
- * Add an option to manually tweak camera calibration
-
  * Poll fire motor status more often when shooting
 
  * Log stdout/stderr of external processes of vserver
@@ -64,6 +62,12 @@ Lower priority:
 
  * Consider: record OSD into final video (as subtitles or re-code video
    properly)
+   - vlc supports "vobsub" format -- external subtitles with text index
+     and RLE-compressed images in underdocumented format.
+   - vobsub may be embedded into mkv:
+     http://matroska.org/technical/specs/subtitles/images.html
+   - 'sub2vobsub.c' is the minimal vobsub creator
+     http://forum.doom9.org/showthread.php?t=111664 (describes .c bugs)
 
  * Fix bug where the playback speed of record mkv's is too high (only present
    in old mlplayer???)
@@ -139,6 +143,7 @@ DONE 2015-03-07:
  * Log turret position even when not in 'inpos firing' mode
  * Better logging while waiting for firing servoes to settle
  * On UI, show desired/actual turret position difference
+ * Add an option to manually tweak camera calibration
 
 DONE 2015-03-06:
  * Accelerometer data logger which runs on odroid
