@@ -37,8 +37,8 @@ import vui_helpers
 SERVO_SEND_INTERVAL = 0.5
 
 # Turret ranges: (min, max) pairs in degrees
-TURRET_RANGE_X = (-90, 90)
-TURRET_RANGE_Y = (-90, 90)
+TURRET_RANGE_X = (-120, 120)
+TURRET_RANGE_Y = (-35, 30)
 
 # How fast should turret servoes move into position
 TURRET_POSE_TIME = 0.25
@@ -64,7 +64,7 @@ TURRET_SERVO_CONFIG = {
 
     # default P/I/D is 254/0/6500
     # stable but slow: 200/1000/1000
-    'pos_kp': 200, 'pos_ki': 2000, 'pos_kd': 1000,
+    'pos_kp': 200, 'pos_ki': 5000, 'pos_kd': 1000,
     }
 # Modifications for 'Y' servo
 TURRET_SERVO_CONFIG_Y = {
