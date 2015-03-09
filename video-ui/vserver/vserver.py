@@ -395,15 +395,16 @@ class ControlInterface(object):
         now = time.time()   # update now -- we sent a command
 
         turret_inmotion = []
+        new_command = False
         # check for new turret command
         if data.get('turret') != self.turret_last_command:
             self.turret_last_command = data['turret']
             self.turret_last_command_time = now
             self.turret_fastpoll_until = now + TURRET_FASTPOLL_TIME
-            turret_inmotion.append('cmd')
+            new_command = True
 
         # Send command if needed -- when changed or periodically
-        if (('cmd' in turret_inmotion) or (self.servo_poll_count % 113 == 0)
+        if (new_command or (self.servo_poll_count % 113 == 0)
             ) and data.get('turret'):
             if not self.turret_servoes_ready:
                 self.turret_servoes_ready = True
@@ -432,21 +433,24 @@ class ControlInterface(object):
                 status = yield From(self._poll_servo_status(sid))
                 if 'moving' in status:
                     turret_inmotion.append(axis + '.moving')
-                if 'inposition' not in status:
+                elif 'inposition' not in status:
+                    # 'inposition' seems to be always false when moving is true
                     turret_inmotion.append(axis + '.ninpos')
                 if sid == poll_servo_id:
                     # Do not poll for turret servos again
                     poll_servo_id = self.next_servo_to_poll.next()
 
-            # TODO mafanasyev: suppress 'ninpos' when 'moving' is true?
             # TODO mafanasyev: also add requirement to be in steady state
             # for X samples?
+
+        if new_command and not turret_inmotion:
+            turret_inmotion.append('cmd')
 
         # Update new inmpotion flags
         inmotion_str = ','.join(turret_inmotion)
         if self.status_packet['turret_inmotion'] != inmotion_str:
             self.status_packet['turret_inmotion'] = inmotion_str
-            dt = self.turret_last_command_time - now
+            dt = now - self.turret_last_command_time
             if inmotion_str:
                 self.logger.debug(
                     'Turret in motion: %s (dt %.3f)', inmotion_str, dt)
@@ -494,7 +498,6 @@ class ControlInterface(object):
                              fire_cmd, dt)
         else:
             command, seq = fire_cmd
-            suppress = []
             # Start agitator early, but only for every Nth shot
             # (The reason for that is if there is a BB stuck in the agitator,
             # you need to fire with agitator DISABLED in order to dislodge it)
@@ -503,8 +506,7 @@ class ControlInterface(object):
 
             if FCMD._is_inpos(command) and turret_inmotion:
                 # We are not in position yet. Do not fire.
-                self.logger.debug('Waiting for firing servoes to settle: %s',
-                                  ', '.join(suppress))
+                pass
                 # Do not touch last_fire_cmd so we keep retrying the test
             else:
                 # Firetime!
