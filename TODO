@@ -4,6 +4,9 @@ High priority (have to finish before competition)
 Medium priority:
 ~~~~~~~~~~~~~~~
 
+ * Add 'look around' mode -- one key turret movement in large increments
+   (every 30 degrees on 'x' axis) -- so one can spot enemies easier
+
  * Poll fire motor status more often when shooting
 
  * Log stdout/stderr of external processes of vserver
@@ -55,6 +58,12 @@ Medium priority:
 
 Lower priority:
 ~~~~~~~~~~~~~~
+
+ * UI: Synchronize server status OSD with video
+  - server should include current video ts in the stream
+   - this required something other then gst-launch that we currently use
+  - client's OSD display should delay status frames until video timestamp
+    is received.
 
  * UI: add mechanism to update OSD when video frames are not coming in
 
