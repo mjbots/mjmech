@@ -184,7 +184,7 @@ class _UnixReadPipeTransport(transports.ReadTransport):
     max_size = 256 * 1024  # max bytes we read in one eventloop iteration
 
     def __init__(self, loop, pipe, protocol, waiter=None, extra=None):
-        super().__init__(extra)
+        super(_UnixReadPipeTransport, self).__init__(extra)
         self._extra['pipe'] = pipe
         self._loop = loop
         self._pipe = pipe
@@ -253,7 +253,7 @@ class _UnixWritePipeTransport(selector_events._FlowControlMixin,
                               transports.WriteTransport):
 
     def __init__(self, loop, pipe, protocol, waiter=None, extra=None):
-        super().__init__(extra)
+        super(_UnixWritePipeTransport, self).__init__(extra)
         self._extra['pipe'] = pipe
         self._loop = loop
         self._pipe = pipe

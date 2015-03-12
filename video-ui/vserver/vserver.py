@@ -568,19 +568,27 @@ class ControlInterface(object):
         if addr is None:
             return
         self.logger.info('Sending video to %r' % (addr, ))
-        pid, _1, _2, _3 = gobject.spawn_async(
+        plogger = logging.getLogger('vsender')
+        pid, _1, fd_out, fd_err = gobject.spawn_async(
             ['./send-video.sh', str(addr[0]), str(addr[1])],
-            flags=gobject.SPAWN_DO_NOT_REAP_CHILD)
+            flags=gobject.SPAWN_DO_NOT_REAP_CHILD,
+            standard_output=True, standard_error=True)
         self.video_proc = pid
-        self.logger.debug('Started video process, PID %r' % pid)
-        gobject.child_watch_add(pid, self._process_died)
+        plogger.debug('Started video process, PID %r' % pid)
+        CriticalTask(vui_helpers.dump_lines_from_fd(
+                fd_out, plogger.debug), exit_ok=True)
+        CriticalTask(vui_helpers.dump_lines_from_fd(
+                fd_err, plogger.getChild('stderr').debug),
+                     exit_ok=True)
+        gobject.child_watch_add(pid, self._video_process_died)
 
-    def _process_died(self, pid, condition):
+    def _video_process_died(self, pid, condition):
         if pid == self.video_proc:
             self.logger.info('Video process %d died: %r' % (pid, condition))
             self.video_proc = None
         else:
-            self.logger.info('Unknown process %d died: %r' % (pid, condition))
+            self.logger.error('Unknown video process %d died: %r' %
+                              (pid, condition))
 
         # TODO mafanasyev: how to close PID properly?
         #gobject.g_spawn_close_pid(pid)

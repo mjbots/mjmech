@@ -1,6 +1,7 @@
 import functools
 import logging
 import os
+import re
 import signal
 import sys
 import time
@@ -107,6 +108,37 @@ def _critical_task_done(task, exit_ok=False):
     # Terminate program
     for cb in g_quit_handlers:
         cb()
+
+_INVALID_CHARACTER_RE = re.compile('[^\x20-\x7E]')
+def sanitize_stdout(line):
+    """Strip newline from end of line, call repr if any nonprintables
+    left ater that.
+    """
+    if line.endswith('\n'):
+        line = line[:-1]
+    if _INVALID_CHARACTER_RE.search(line):
+        return repr(line)
+    return line
+
+
+@asyncio.coroutine
+def dump_lines_from_fd(fd, print_func):
+    """Given a file descriptor (integer), asyncronously read lines from it.
+    Sanitize each line and pass as a sole argument to @p print_func.
+    """
+    fdobj = os.fdopen(fd, 'r')
+    loop = asyncio.get_event_loop()
+    reader = asyncio.streams.StreamReader(loop=loop)
+    transport, _ = yield asyncio.From(loop.connect_read_pipe(
+            lambda: asyncio.streams.StreamReaderProtocol(reader),
+            fdobj))
+
+    while True:
+        line = yield asyncio.From(reader.readline())
+        if line == '': # EOF
+            break
+        print_func(sanitize_stdout(line))
+    transport.close()
 
 def asyncio_misc_init():
     asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())

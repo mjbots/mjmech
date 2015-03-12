@@ -9,8 +9,6 @@ Medium priority:
 
  * Poll fire motor status more often when shooting
 
- * Log stdout/stderr of external processes of vserver
-
  * Make turret servoes stronger: replace horn
 
  * Better logging: send server status packets more often when times are
@@ -146,6 +144,9 @@ ___ Improve legtool ____
 
 History
 ~~~~~~~
+DONE 2015-03-11:
+ * Log stdout/stderr of external processes of vserver
+
 
 DONE 2015-03-07:
  * Tune turret servoes more for better performance

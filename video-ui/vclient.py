@@ -7,6 +7,7 @@ import logging
 import math
 import optparse
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -19,6 +20,7 @@ from trollius import From
 from vui_helpers import (
     wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler,
     add_pair, FCMD, g_quit_handlers, CriticalTask)
+import vui_helpers
 from video_window import VideoWindow, video_window_init, video_window_main
 import osd
 
@@ -162,18 +164,38 @@ class UdpAnnounceReceiver(object):
                 deploy_cmd,
                 close_fds=True,
                 #stdin=open('/dev/stdin', 'r'),
-                #stdout=asyncio.subprocess.PIPE,
-                #stderr=asyncio.subprocess.STDOUT
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT
                 ))
 
-        #while True:
-        #    line = yield From(proc.stdout.readline())
-        #    logger.info(repr(line))
-        #    if line == '':
-        #        break
+        recent = list()
+        _LOG_RE = re.compile(
+            r'^[0-9][0-9]:[0-9][0-9]:[0-9][0-9][.][0-9]{3} '
+            r'\[[A-Z]\] ')
+        started = False
+        while True:
+            line = yield From(proc.stdout.readline())
+            if line == '':
+                break
+            line = vui_helpers.sanitize_stdout(line)
+            if not (started and _LOG_RE.match(line)):
+                # To avoid double-display of logs, suppress what looks like
+                # log messages, and only show them if deply fails.
+                logger.info(line)
+            else:
+                recent.append(line)
+                while len(recent) > 100: recent.pop(0)
+            if '*** Live logs ***' in line:
+                started = True
 
         retcode = yield From(proc.wait())
+        if retcode != 0:
+            logger.warning('Replaying suppressed lines')
+            for line in recent:
+                logger.info('| ' + line)
         logger.warning('Process exited, code %r', retcode)
+        assert retcode == 0, 'Deploy returned failing error code'
+        assert started, 'Server process never got started'
 
 class ControlInterface(object):
     SEND_INTERVAL = 0.25
