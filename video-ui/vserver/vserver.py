@@ -1,17 +1,18 @@
 #!/usr/bin/python
-import sys
-import os
-import traceback
-import logging
-import socket
-import optparse
-import json
 import errno
-import time
-import signal
-import serial
 import fcntl
 import itertools
+import json
+import logging
+import optparse
+import os
+import serial
+import signal
+import socket
+import subprocess
+import sys
+import time
+import traceback
 
 import trollius as asyncio
 from trollius import Task, From, Return
@@ -608,7 +609,14 @@ def main(opts):
         logging.info('Check passed')
         return
     # cleanup hack
-    os.system("killall -v gst-launch-1.0")
+    proc = subprocess.Popen(
+        "killall -v gst-launch-1.0",
+        shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);
+    outmsg, _ = proc.communicate()
+    for line in outmsg.split('\n'):
+        line = line.strip()
+        if line != '': logging.debug('Cleanup says: ' + line)
+    logging.debug('Cleanup complete, result %r' % proc.returncode)
 
     cif = ControlInterface(opts, logsaver=logsaver)
     logging.debug('Running')
