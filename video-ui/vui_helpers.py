@@ -1,9 +1,10 @@
+import functools
 import logging
+import os
 import signal
 import sys
-import os
-import traceback
 import time
+import traceback
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../legtool/'))
@@ -42,16 +43,18 @@ class FCMD(object):
     def _is_inpos(cls, x):
         return x in [cls.inpos1, cls.inpos2, cls.inpos3, cls.inpos5]
 
+_error_logger = logging.getLogger('fatal-error')
+
 def wrap_event(callback):
     """Wrap event callback so the app exit if it crashes"""
     def wrapped(*args, **kwargs):
         try:
             return callback(*args, **kwargs)
         except BaseException as e:
-            logging.error("Callback %r crashed:", callback)
-            logging.error(" %s %s" % (e.__class__.__name__, e))
+            _error_logger.error("Callback %r crashed:", callback)
+            _error_logger.error(" %s %s" % (e.__class__.__name__, e))
             for line in traceback.format_exc().split('\n'):
-                logging.error('| %s', line)
+                _error_logger.error('| %s', line)
             for cb in g_quit_handlers:
                 cb()
             raise
@@ -66,6 +69,44 @@ def _sigint_handler():
 def _sigterm_handler():
     # wrap_event decorator will make sure the exception stops event loop.
     raise Exception('Got SIGTERM')
+
+def CriticalTask(coro, exit_ok=False):
+    """Just like asyncio.Task, but if it ever competes, the program exits.
+    (unless @p exit_ok is True, in which case non-exception exit is ok)
+    """
+    task = asyncio.Task(coro)
+    task.add_done_callback(
+        functools.partial(_critical_task_done, exit_ok=exit_ok))
+    return task
+
+@wrap_event
+def _critical_task_done(task, exit_ok=False):
+    if exit_ok and task.done() and (task.exception() is None):
+        # No errors
+        return
+
+    # Reach inside task's privates to get exception traceback
+    # (if this fails for some reason, wrap_event will terminate us anyway)
+    logger = logging.getLogger('fatal-error')
+    if task._tb_logger:
+        tb_text = task._tb_logger.tb
+        if task._tb_logger.source_traceback:
+            # Do not care
+            tb_text.append('Task creation information not shown')
+    else:
+        tb_text = ['No traceback info']
+    _error_logger.error("Critical task (%r) exited:", task._coro)
+    e = task.exception()
+    if e is None:
+        _error_logger.error('Successful (but unexpected) exit')
+    else:
+        _error_logger.error(" %s %s" % (e.__class__.__name__, e))
+    for line in ''.join(tb_text).split('\n'):
+        _error_logger.error('| %s', line.rstrip())
+
+    # Terminate program
+    for cb in g_quit_handlers:
+        cb()
 
 def asyncio_misc_init():
     asyncio.set_event_loop_policy(gbulb.GLibEventLoopPolicy())

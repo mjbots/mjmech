@@ -14,11 +14,11 @@ import textwrap
 import time
 
 import trollius as asyncio
-from trollius import Task, From
+from trollius import From
 
 from vui_helpers import (
     wrap_event, asyncio_misc_init, logging_init, MemoryLoggingHandler,
-    add_pair, FCMD, g_quit_handlers)
+    add_pair, FCMD, g_quit_handlers, CriticalTask)
 from video_window import VideoWindow, video_window_init, video_window_main
 import osd
 
@@ -131,7 +131,8 @@ class UdpAnnounceReceiver(object):
                 # while old vserver is running
                 self.old_running_since = data['running_since']
                 self.deploying = True
-                asyncio.Task(self._run_deploy_process(data['addr']))
+                CriticalTask(self._run_deploy_process(data['addr']),
+                             exit_ok=True)
 
             # Return if program is not running yet
             if data['running_since'] in [None, self.old_running_since]:
@@ -143,7 +144,6 @@ class UdpAnnounceReceiver(object):
             **self.ci_kwargs)
 
     @asyncio.coroutine
-    @wrap_event
     def _run_deploy_process(self, addr):
         # subprocess_exec is broken in gbulb/base_events.py, so use shell
 
@@ -366,10 +366,9 @@ class ControlInterface(object):
         joysticks = enumerator.joysticks()
         if len(joysticks):
             self.joystick = joysticks[0]
-            self.joystick_task = Task(self._read_joystick())
+            CriticalTask(self._read_joystick())
         else:
             self.joystick = None
-            self.joystick_task = None
             self.logger.info("No joysticks found!")
 
         GLib.timeout_add(int(self.SEND_INTERVAL * 1000),
@@ -385,8 +384,8 @@ class ControlInterface(object):
                 lambda *_: self.update_video_overlay())
 
         if test_sim_keys is not None:
-            # We do not care about errors here
-            Task(self._replay_test_data(test_sim_keys))
+            # Exit once replay completes
+            CriticalTask(self._replay_test_data(test_sim_keys))
 
     def select_axes(self):
         complete = self.joystick.get_features(linux_input.EV.ABS)
@@ -433,11 +432,6 @@ class ControlInterface(object):
 
     @wrap_event
     def _on_send_timer(self):
-        # Raise exception if any of tasks terminate
-        if self.joystick_task and self.joystick_task.done():
-            #self.joystick_task.result()
-            self.joystick_task = None
-
         self._send_control()
 
         if self.video:
@@ -793,8 +787,7 @@ class ControlInterface(object):
 
         # Exit program
         self.logger.info('Replay complete, exiting')
-        for cb in g_quit_handlers:
-            cb()
+        # We will exit on return since this is a CriticalTask
 
     def _log_struct(self, rec):
         """Log @p rec (which must be a json-serialized dict) to logfile.

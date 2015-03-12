@@ -15,7 +15,7 @@ import time
 import traceback
 
 import trollius as asyncio
-from trollius import Task, From, Return
+from trollius import From, Return
 
 from gi.repository import GObject
 gobject = GObject
@@ -30,7 +30,7 @@ import gbulb
 import legtool
 import legtool.servo.selector as selector
 
-from vui_helpers import wrap_event, FCMD
+from vui_helpers import wrap_event, FCMD, CriticalTask
 import vui_helpers
 
 # How often to poll servo status, in absense of other commands
@@ -140,7 +140,7 @@ class ControlInterface(object):
         # Normally we refresh state periodically. Set this flag to force
         # re-sending the data.
         self.servo_send_now = asyncio.Event()
-        self.servo_send_task = Task(self._send_servo_commands())
+        CriticalTask(self._send_servo_commands())
 
         # We send status every time this event is set (but in a rate-limited
         # way)
@@ -160,7 +160,7 @@ class ControlInterface(object):
             "shots_fired": 0,
             }
 
-        self.status_send_task = Task(self._send_status_packets())
+        CriticalTask(self._send_status_packets())
         self.status_send_now = asyncio.Event()
 
         self.mech_driver_started = False
@@ -168,7 +168,8 @@ class ControlInterface(object):
             self.mech_driver = None
         else:
             self.mech_driver = gait_driver.MechDriver(opts)
-            Task(self.mech_driver.connect_servo())
+            CriticalTask(self.mech_driver.connect_servo(),
+                         exit_ok=True)
 
         self.video_addr = None
         self.video_proc = None
@@ -179,20 +180,6 @@ class ControlInterface(object):
                              wrap_event(self._on_readable))
 
     def _on_timeout(self):
-        if self.servo_send_task and self.servo_send_task.done():
-            # super ugly hack to get real exception: lose the object
-            # (if we call result(), then stack trace is lost; otherwise
-            # default exception handler is activated which prints proper
-            # traceback)
-            self.servo_send_task = None
-            raise Exception("Servo send task exited")
-
-        if self.status_send_task and self.status_send_task.done():
-            # ditto
-            self.status_send_task = None
-            raise Exception("Status send task exited")
-
-
         if self.recent_packets:
             #self.logger.debug('Remote peer %r sent %d packet(s)' % (
             #        self.src_addr, self.recent_packets))
@@ -537,7 +524,7 @@ class ControlInterface(object):
                 # Gait engine started, but no motion
                 self.status_packet["last_motion_time"] = None
                 self.logger.debug('Gait engine started')
-                Task(self.mech_driver.run())
+                CriticalTask(self.mech_driver.run())
 
             gait = data['gait']
             if gait['type'] == 'idle':
