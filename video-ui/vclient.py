@@ -503,6 +503,14 @@ class ControlInterface(object):
         pkt.update(cli_time=time.time(),
                    _type='srv-state')
 
+        if self.video:
+            # Add locally derived values
+            pkt['cli_pts'] = self.video.get_video_pts()
+
+        if pkt['est_cli_time']:
+            # Control link latency
+            pkt['ctrl_latency'] = pkt['cli_time'] - pkt['est_cli_time']
+
         server_time_offset = pkt['srv_time'] - pkt['cli_time']
         if (self.server_time_offset is None) or \
                 abs(self.server_time_offset - server_time_offset) > 1.0:
@@ -846,8 +854,6 @@ class ControlInterface(object):
             return
 
         self.ui_state['cli_time'] = time.time()
-        if self.video:
-            self.ui_state['video_pts'] = self.video.get_video_pts()
         sertext = self._log_struct(self.ui_state)
 
         self._logged_text = sertext

@@ -114,6 +114,9 @@ class ControlInterface(object):
         #  net_packet is None)
         self.servo_packet = None
 
+        # Estimated client time offset
+        self.client_time_offset = None
+
         # Per-servo status (address->tuple of strings)
         # (this excludes some volatile status bits)
         self.last_servo_status = dict()
@@ -245,6 +248,8 @@ class ControlInterface(object):
             self.logger.info('Seq number jump: %r->%r',
                              self.net_packet['seq'], pkt['seq'])
 
+        self.client_time_offset = pkt['cli_time'] - time.time()
+
         vport = pkt.get('video_port', 0)
         if not vport:
             self._set_video_dest(None)
@@ -264,6 +269,11 @@ class ControlInterface(object):
 
             self.status_packet["seq"] += 1
             self.status_packet["srv_time"] = time.time()
+            if self.client_time_offset is not None:
+                # Estimate client time -- for link latency calculation
+                self.status_packet['est_cli_time'] = \
+                    time.time() + self.client_time_offset
+
             if self.src_addr:
                 # Add most recent log messages if requested
                 if self.net_packet and self.net_packet.get('logs_from'):
