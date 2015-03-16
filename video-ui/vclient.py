@@ -291,6 +291,7 @@ class ControlInterface(object):
         # Wallclock and pipeline time
         self.last_video_wall_time = None
         self.last_video_pp_time = None
+        self.video_extra_stats = dict()
 
         self.control_dict = dict(self._INITIAL_CONTROL_DICT)
 
@@ -376,6 +377,7 @@ class ControlInterface(object):
             self.video.on_key_release = self._handle_key_release
             self.video.on_got_video = functools.partial(
                 self._state_updated, force=True)
+            self.video.on_get_extra_stats = self._get_video_extra_stats
 
         def metric(device):
             abs_axis = device.get_features(linux_input.EV.ABS)
@@ -506,10 +508,26 @@ class ControlInterface(object):
         if self.video:
             # Add locally derived values
             pkt['cli_pts'] = self.video.get_video_pts()
+            if 'srv_pts' in pkt:
+                # Video latency
+                latency = pkt['srv_pts'] - pkt['cli_pts']
+                pkt['latency_video'] = latency
+                # Store min and max control latency for stats output
+                self.video_extra_stats['lat_video'] = max(
+                    self.video_extra_stats.get('lat_video', -1),
+                    latency)
+                self.video_extra_stats['lat_video_min'] = min(
+                    self.video_extra_stats.get('lat_video_min', 1e12),
+                    latency)
 
         if pkt['est_cli_time']:
             # Control link latency
-            pkt['ctrl_latency'] = pkt['cli_time'] - pkt['est_cli_time']
+            latency = pkt['cli_time'] - pkt['est_cli_time']
+            pkt['latency_ctrl'] = latency
+            # Store max control latency for stats output
+            self.video_extra_stats['lat_ctrl'] = max(
+                self.video_extra_stats.get('lat_ctrl', -1),
+                latency)
 
         server_time_offset = pkt['srv_time'] - pkt['cli_time']
         if (self.server_time_offset is None) or \
@@ -766,6 +784,15 @@ class ControlInterface(object):
                 self.control_dict['gait'] = IDLE_COMMAND
             self._send_control()
 
+    def _get_video_extra_stats(self):
+        # Return extra lines to print in periodic video stats line
+        rv = dict()
+        for key, val in self.video_extra_stats.items():
+            if val != 0:
+                rv[key] = '%.1fmS' % (val * 1000.0)
+        self.video_extra_stats = dict()
+        return rv
+
     def _print_help(self):
         helpmsg = """
         Help on Keys:
@@ -781,7 +808,7 @@ class ControlInterface(object):
           arrows   - move turret
           S+arrows - move turret (move faster)
           C+arrows - set reticle center (use shift for more precision)
-          C+S+arrows - set reticle center (move slowerr)
+          C+S+arrows - set reticle center (move slower)
           C+r      - zero out reticle offset
           C+S+M+arrows - temporarily tweak camera calibration
           r        - toggle reticle

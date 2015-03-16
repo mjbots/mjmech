@@ -6,6 +6,7 @@ import json
 import logging
 import optparse
 import os
+import re
 import serial
 import signal
 import socket
@@ -116,6 +117,8 @@ class ControlInterface(object):
 
         # Estimated client time offset
         self.client_time_offset = None
+        # Estimated time offset to video PTS
+        self.video_pts_offset = None
 
         # Per-servo status (address->tuple of strings)
         # (this excludes some volatile status bits)
@@ -176,6 +179,7 @@ class ControlInterface(object):
 
         self.video_addr = None
         self.video_proc = None
+        self.video_logger = None
         gobject.timeout_add(int(self.TIMEOUT * 1000),
                             wrap_event(self._on_timeout))
         gobject.io_add_watch(self.sock.fileno(),
@@ -268,11 +272,16 @@ class ControlInterface(object):
             self.status_send_now.clear()
 
             self.status_packet["seq"] += 1
-            self.status_packet["srv_time"] = time.time()
+            now = time.time()
+            self.status_packet["srv_time"] = now
+
+            if self.video_pts_offset is not None:
+                self.status_packet["srv_pts"] =  now + self.video_pts_offset
+
             if self.client_time_offset is not None:
                 # Estimate client time -- for link latency calculation
                 self.status_packet['est_cli_time'] = \
-                    time.time() + self.client_time_offset
+                    now + self.client_time_offset
 
             if self.src_addr:
                 # Add most recent log messages if requested
@@ -578,24 +587,45 @@ class ControlInterface(object):
         if addr is None:
             return
         self.logger.info('Sending video to %r' % (addr, ))
-        plogger = logging.getLogger('vsender')
+
+        # TODO mafanasyev: stop using gtk methods here -- use asyncore ones
         pid, _1, fd_out, fd_err = gobject.spawn_async(
             ['./send-video.sh', str(addr[0]), str(addr[1])],
             flags=gobject.SPAWN_DO_NOT_REAP_CHILD,
             standard_output=True, standard_error=True)
         self.video_proc = pid
-        plogger.debug('Started video process, PID %r' % pid)
+        self.video_logger = logging.getLogger('vsender')
+        self.video_logger.debug('Started video process, PID %r' % pid)
         CriticalTask(vui_helpers.dump_lines_from_fd(
-                fd_out, plogger.debug), exit_ok=True)
+                fd_out, self._handle_vsender_stdout), exit_ok=True)
         CriticalTask(vui_helpers.dump_lines_from_fd(
-                fd_err, plogger.getChild('stderr').debug),
+                fd_err, self.video_logger.getChild('stderr').debug),
                      exit_ok=True)
         gobject.child_watch_add(pid, self._video_process_died)
+
+    _VSENDER_TSTAMP_RE = re.compile(
+        '^/GstPipeline:pipeline0/GstIdentity:camera-data: .* '
+        'pts:([0-9]+):([0-9]{2}):([0-9]{2}.[0-9]*),')
+    _IGNORE_MSG_RE = re.compile('^/GstPipeline:pipeline0/')
+
+    def _handle_vsender_stdout(self, line):
+        mm = self._VSENDER_TSTAMP_RE.match(line)
+        if mm:
+            # Got packet timestamp. Record.
+            hrs_s, min_s, sec_s = mm.groups()
+            pts_val = (3600 * int(hrs_s) + 60 * int(min_s) + float(sec_s))
+            self.video_pts_offset = pts_val - time.time()
+        elif self._IGNORE_MSG_RE.match(line):
+            # Ignore boaring lines
+            pass
+        else:
+            self.video_logger.debug(line)
 
     def _video_process_died(self, pid, condition):
         if pid == self.video_proc:
             self.logger.info('Video process %d died: %r' % (pid, condition))
             self.video_proc = None
+            self.video_pts_offset = None
         else:
             self.logger.error('Unknown video process %d died: %r' %
                               (pid, condition))

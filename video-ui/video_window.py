@@ -261,6 +261,7 @@ class VideoWindow(object):
         self.on_key_press = None
         self.on_key_release = None
         self.on_got_video = None
+        self.on_get_extra_stats = None
 
     def make_element(self, etype, name=None, **kwargs):
         elt = Gst.ElementFactory.make(etype, name)
@@ -744,6 +745,9 @@ class VideoWindow(object):
             self.extra_stats['no-jtb'] = 1
 
         decoded_frames = self.detector_stats['decoded'].count
+
+        if self.on_get_extra_stats:
+            self.extra_stats.update(**self.on_get_extra_stats())
 
         # print out statistics from detectors
         det_tags = list()
