@@ -208,10 +208,6 @@ class VideoWindow(object):
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
         self.rtpbin.connect("pad-removed", self._on_removed_rtpbin_pad)
         self.rtpbin.connect("on-ssrc-active", self._on_rtpbin_ssrc_active)
-        # TODO mafanasyev: figure out why this breaks video, then set various
-        # properties in a handler
-        #self.rtpbin.connect("new-jitterbuffer",
-        #                    self._on_new_rtpbin_jitterbuffer)
 
         if False:
             # Connect something to the old queue, so pipeline can start.
@@ -304,7 +300,10 @@ class VideoWindow(object):
         corresponds to timestamp in .mkv file and may be used for matching
         osd to video.
         """
-        return self.decoded_stats.last_pts
+        statrec = self.decoded_stats
+        if statrec.last_pts is None:
+            return None
+        return statrec.last_pts + time.time() - statrec.last_pts_changed
 
     @wrap_event
     def _on_new_rtpbin_pad(self, source, pad):
@@ -333,9 +332,8 @@ class VideoWindow(object):
 
         name = event.get_structure().get_name()
         if name == 'GstRTPPacketLost':
-            # Packet lost, retries (if any) failed
-            if self.DUMP_EXTRA_STATS:
-                self.extra_stats['loss-final'] += 1
+            # Packet lost, all retransmission (if any) failed
+            self.extra_stats['lost-final'] += 1
             if self.DUMP_EXTRA_EVENTS:
                 self.logger.debug('Rtpbin downstream packet loss')
         else:
@@ -389,7 +387,7 @@ class VideoWindow(object):
         packets_lost = stats.get_int('sent-rb-packetslost')[1]
         dp = packets_lost - prev.get('packets_lost', 0)
         if dp > 0:
-            self.extra_stats['loss-rtcp'] += dp
+            self.extra_stats['lost-rtcp'] += dp
         elif dp < 0:
             # Duplicate packet. Unfortunately, there is no way to get both
             # dups and losses separately
@@ -401,16 +399,6 @@ class VideoWindow(object):
             self.logger.debug('SSRC active: sess=%r, ssrc=%r, %r',
                           session_id, ssrc, stats.to_string())
 
-
-    @wrap_event
-    def _on_new_rtpbin_jitterbuffer(self, source, jbuffer, session, ssrc):
-        # TODO mafanasyev: this is currently disabled now
-        self.logger.debug('Rtpbin made jitterbuffer %r for session %r ssrc %r',
-                          jbuffer, session, ssrc)
-        # TODO mafanasyev: configure jitterbuffer:
-        #  set 'rtx-delay' to ask for retransmittions earlier
-        #  set 'rtx-delay-reorder' to handle reordering faster
-        #  set 'rtx-retry-timeout' to retry more
 
     @wrap_event
     def _on_sync_message(self, bus, msg):
@@ -471,6 +459,7 @@ class VideoWindow(object):
             if owner.get_name() == 'rtpjitterbuffer0':
                 self.last_jitterbuffer = owner
                 self.last_jitterbuffer_stats = dict()
+                self._configure_jitterbufer(owner)
 
         elif msg.type == Gst.MessageType.STREAM_START:
             has_group, group_id = msg.parse_group_id()
@@ -528,6 +517,28 @@ class VideoWindow(object):
                     msg.src.get_name(),  msg.type.value_names))
 
         return True
+
+    def _configure_jitterbufer(self, jbuffer):
+        # The recommended way to configure jitterbuffer is "new-jitterbuffer"
+        # signal on rtpbin, but connecting to this signal breaks video.
+        # So we will do it in a hacky way here.
+
+        # How long after packet deadline passed to ask for rtx (retransmission),
+        # ms. Default 2*jitter if known, or 20mS
+        jbuffer.set_property('rtx-delay', 10)
+
+        # When rtx failed, how long to wait until asking for another rtx, ms.
+        # Default 2*jitter + rtt if known, else 40mS
+        jbuffer.set_property('rtx-retry-timeout', 10)
+
+        # Total time spent retrying, mS. If this much time has passed, consider
+        # packet lost. Default is latency - rtx-retry-timeout.
+        #jbuffer.set_property('rtx-retry-period', 1000)
+
+        # Maximum number of reordered packets. If packet N arrives, all packets
+        # except last 'rtx-delay-reorder' are considered late immediately.
+        # Default 3.
+        jbuffer.set_property('rtx-delay-reorder', 0)
 
     def get_video_window_size(self):
         """Get visible size of video window. Returns (width, height) tuple"""
@@ -658,7 +669,9 @@ class VideoWindow(object):
             self.clear()
             # Last pts/dts values are never cleared
             self.last_dts = 0
-            self.last_pts = 0
+            self.last_pts = None
+            # Time when pts value changed
+            self.last_pts_changed = None
 
         def clear(self):
             self.count = 0
@@ -685,7 +698,10 @@ class VideoWindow(object):
         if gbuffer.dts != Gst.CLOCK_TIME_NONE:
             statrec.last_dts = gbuffer.dts / 1.e9
         if gbuffer.pts != Gst.CLOCK_TIME_NONE:
-            statrec.last_pts = gbuffer.pts / 1.e9
+            pts = gbuffer.pts / 1.e9
+            if statrec.last_pts != pts:
+                statrec.last_pts_changed = time.time()
+            statrec.last_pts = pts
         if gbuffer.duration != Gst.CLOCK_TIME_NONE:
             statrec.duration += gbuffer.duration / 1.e9
 
@@ -737,9 +753,10 @@ class VideoWindow(object):
                 # Successfully retransmitted
                 self.extra_stats['rtx-ok'] = diff_stats['rtx_success_count']
 
-            if diff_stats['rtx_count'] != diff_stats['rtx_success_count']:
-                self.extra_stats['loss-rtx'] = (
-                    diff_stats['rtx_count'] - diff_stats['rtx_success_count'])
+            # Number of lost packets. Including cases when request for
+            # retransmittion was lost.
+            if diff_stats['rtx_count']:
+                self.extra_stats['lost-rtx'] = diff_stats['rtx_count']
         else:
             # Should not happen when video is playing normally
             self.extra_stats['no-jtb'] = 1

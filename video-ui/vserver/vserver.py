@@ -119,6 +119,8 @@ class ControlInterface(object):
         self.client_time_offset = None
         # Estimated time offset to video PTS
         self.video_pts_offset = None
+        # Last pts value
+        self.video_last_pts_val = None
 
         # Per-servo status (address->tuple of strings)
         # (this excludes some volatile status bits)
@@ -614,7 +616,11 @@ class ControlInterface(object):
             # Got packet timestamp. Record.
             hrs_s, min_s, sec_s = mm.groups()
             pts_val = (3600 * int(hrs_s) + 60 * int(min_s) + float(sec_s))
-            self.video_pts_offset = pts_val - time.time()
+            if self.video_last_pts_val != pts_val:
+                # Each original packet may be split into multiple fragments.
+                # For consistent timings, only look at first pts.
+                self.video_pts_offset = pts_val - time.time()
+            self.video_last_pts_val = pts_val
         elif self._IGNORE_MSG_RE.match(line):
             # Ignore boaring lines
             pass

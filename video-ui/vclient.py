@@ -508,17 +508,18 @@ class ControlInterface(object):
         if self.video:
             # Add locally derived values
             pkt['cli_pts'] = self.video.get_video_pts()
-            if 'srv_pts' in pkt:
-                # Video latency
-                latency = pkt['srv_pts'] - pkt['cli_pts']
-                pkt['latency_video'] = latency
+
+        if 'srv_pts' in pkt and (pkt.get('cli_pts') is not None):
+            # Video latency
+            latency = pkt['srv_pts'] - pkt['cli_pts']
+            pkt['latency_video'] = latency
                 # Store min and max control latency for stats output
-                self.video_extra_stats['lat_video'] = max(
-                    self.video_extra_stats.get('lat_video', -1),
-                    latency)
-                self.video_extra_stats['lat_video_min'] = min(
-                    self.video_extra_stats.get('lat_video_min', 1e12),
-                    latency)
+            self.video_extra_stats['lat_video'] = max(
+                self.video_extra_stats.get('lat_video', -1),
+                latency)
+            self.video_extra_stats['lat_video_min'] = min(
+                self.video_extra_stats.get('lat_video_min', 1e12),
+                latency)
 
         if pkt['est_cli_time']:
             # Control link latency
