@@ -85,9 +85,10 @@ class VideoWindow(object):
         # Create 'identity' elements which will notify us of all passing buffers
         self.detector_decoded = self.make_element(
             "identity", name="detector_decoded", silent=False)
+        self.decoded_stats = self.detector_stats.setdefault(
+            "decoded", self._DetectorStats())
         self.detector_decoded.connect(
-            "handoff", self._on_detector_handoff,
-            self.detector_stats.setdefault("decoded", self._DetectorStats()))
+            "handoff", self._on_detector_handoff, self.decoded_stats)
 
         self.detector_raw = self.make_element(
             "identity", name="detector_raw", silent=False)
@@ -268,6 +269,13 @@ class VideoWindow(object):
         clock = self.pipeline.get_clock()
         tm = clock.get_internal_time()
         return tm / 1.e9
+
+    def get_video_pts(self):
+        """Return video PTS (presentation time stamp) in seconds. This
+        corresponds to timestamp in .mkv file and may be used for matching
+        osd to video.
+        """
+        return self.decoded_stats.last_pts
 
     @wrap_event
     def _on_new_rtpbin_pad(self, source, pad):
@@ -530,13 +538,14 @@ class VideoWindow(object):
         """Detector stats object, filled by detectors' handoff signal."""
         def __init__(self):
             self.clear()
+            # Last pts/dts values are never cleared
+            self.last_dts = 0
+            self.last_pts = 0
 
         def clear(self):
             self.count = 0
             self.duration = 0.0
             self.size = 0
-            self.last_dts = 0
-            self.last_pts = 0
 
         def to_str_dt(self, dt, level=0):
             tags = ['%.2f FPS' % (self.count / dt)]

@@ -845,8 +845,9 @@ class ControlInterface(object):
         if (sertext == self._logged_state) and not force:
             return
 
-        # TODO mafanasyev: add video timestamp
         self.ui_state['cli_time'] = time.time()
+        if self.video:
+            self.ui_state['video_pts'] = self.video.get_video_pts()
         sertext = self._log_struct(self.ui_state)
 
         self._logged_text = sertext
