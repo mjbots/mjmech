@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-import sys
-import os
+import collections
 import logging
+import os
+import sys
+import time
 
 # IMPORT NOTE:
 #  this file may be later re-written in C, if we need more performance
@@ -18,6 +20,8 @@ from vui_helpers import wrap_event, asyncio_misc_init, g_quit_handlers
 # http://bazaar.launchpad.net/~jderose/+junk/gst-examples/view/head:/video-player-1.0
 # docs:
 # http://pygstdocs.berlios.de/pygst-reference/gst-class-reference.html
+# another example:
+# https://github.com/RichardWithnell/evaluation_tools/blob/fb50facfc585f174f8ece01db85118b22b2b77e8/applications.py
 
 class VideoWindow(object):
     # How often to print framerate info
@@ -31,6 +35,12 @@ class VideoWindow(object):
 
     # Is camera upside down?
     CAMERA_ROTATE = False
+
+    # Dump extra events info
+    DUMP_EXTRA_EVENTS = False
+
+    # Dump extra stats
+    DUMP_EXTRA_STATS = False
 
     # UDP sources will generate a warning when that many seconds without
     # packets pass
@@ -86,7 +96,7 @@ class VideoWindow(object):
         self.detector_decoded = self.make_element(
             "identity", name="detector_decoded", silent=False)
         self.decoded_stats = self.detector_stats.setdefault(
-            "decoded", self._DetectorStats())
+            "decoded", self._DetectorStats(show_size=False))
         self.detector_decoded.connect(
             "handoff", self._on_detector_handoff, self.decoded_stats)
 
@@ -94,13 +104,20 @@ class VideoWindow(object):
             "identity", name="detector_raw", silent=False)
         self.detector_raw.connect(
             "handoff", self._on_detector_handoff,
-            self.detector_stats.setdefault("raw", self._DetectorStats()))
+            self.detector_stats.setdefault(
+                "raw", self._DetectorStats(show_size=False)))
 
         self.detector_udp_rtp = self.make_element(
             "identity", name="detector_udp_rtp", silent=False)
         self.detector_udp_rtp.connect(
             "handoff", self._on_detector_handoff,
             self.detector_stats.setdefault("udp_rtp", self._DetectorStats()))
+
+        # Info for other callbacks
+        self.extra_stats = collections.defaultdict(int)
+
+        self.last_jitterbuffer = None
+        self.last_jitterbuffer_stats = dict()
 
         self.rtpbin = self.make_element(
             "rtpbin",
@@ -109,11 +126,17 @@ class VideoWindow(object):
             do_lost=True,
             # remove pad when client disappears
             autoremove=True,
+            # Maximum latency, ms (default 200)
+            latency=200,
+
             # TODO mafanasyev: try settings below, maybe they will help
             #use_pipeline_clock=True,
             #buffer_mode=2,   # RTP_JITTER_BUFFER_MODE_BUFFER
             )
         self.rtpbin_last_pad = None
+
+        if self.DUMP_EXTRA_STATS:
+            self.rtpbin_last_rtpstats = dict(key=None)
 
         caps = Gst.Caps.from_string(
             "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
@@ -184,6 +207,11 @@ class VideoWindow(object):
         self.play_elements = play_elements
         self.rtpbin.connect("pad-added", self._on_new_rtpbin_pad)
         self.rtpbin.connect("pad-removed", self._on_removed_rtpbin_pad)
+        self.rtpbin.connect("on-ssrc-active", self._on_rtpbin_ssrc_active)
+        # TODO mafanasyev: figure out why this breaks video, then set various
+        # properties in a handler
+        #self.rtpbin.connect("new-jitterbuffer",
+        #                    self._on_new_rtpbin_jitterbuffer)
 
         if False:
             # Connect something to the old queue, so pipeline can start.
@@ -290,18 +318,106 @@ class VideoWindow(object):
                 self.logger.debug('Unlinking old pad: %r', ok)
             self.rtpbin_last_pad = name
             self.link_pads(self.rtpbin, name, self.play_elements[0], None)
+            pad.add_probe(Gst.PadProbeType.EVENT_DOWNSTREAM,
+                          self._on_rtpbin_downstream_event)
+
+    @wrap_event
+    def _on_rtpbin_downstream_event(self, pad, info):
+        event = info.get_event()
+        if event.type != Gst.EventType.CUSTOM_DOWNSTREAM:
+            if self.DUMP_EXTRA_EVENTS:
+                name = event.type.value_name
+                self.logger.debug('Rtpbin downstream basic event: %s', name)
+            return Gst.PadProbeReturn.PASS
+
+        name = event.get_structure().get_name()
+        if name == 'GstRTPPacketLost':
+            # Packet lost, retries (if any) failed
+            if self.DUMP_EXTRA_STATS:
+                self.extra_stats['loss-final'] += 1
+            if self.DUMP_EXTRA_EVENTS:
+                self.logger.debug('Rtpbin downstream packet loss')
+        else:
+            self.logger.debug('Rtpbin downstream custom event: %s', name)
+
+        return Gst.PadProbeReturn.PASS
 
     @wrap_event
     def _on_removed_rtpbin_pad(self, source, pad):
         name = pad.get_name()
         self.logger.debug('Rtpbin pad got removed: %r', name)
+        # Release jitterbiffer value just in case
+        self.last_jitterbuffer = None
+
+    @wrap_event
+    def _on_rtpbin_ssrc_active(self, rtpbin, session_id, ssrc):
+        # This is invoked every time RTCP is sent
+        assert rtpbin == self.rtpbin
+
+        if not self.DUMP_EXTRA_STATS:
+            return
+
+        # Get RtpSession object
+        session = rtpbin.emit("get-internal-session", session_id)
+        if session is None:
+            self.logger.warn("Could not get internal session for SSRC")
+            return
+        # Get RTPSource object (see rtpsource.c)
+        source = session.emit("get-source-by-ssrc", ssrc)
+        if session is None:
+            self.logger.warn("Could not get internal source for SSRC")
+            return
+        # Get RTPSource::stats object (see rtpsource.c)
+        stats = source.get_property('stats')
+        if stats is None:
+            self.logger.warn("Could not get internal stats for SSRC")
+            return
+
+        # Check if we have previous stats object
+        if self.rtpbin_last_rtpstats['key'] != (session_id, ssrc):
+            self.logger.debug('Selecting SSRC %r', (session_id, ssrc))
+            # Wipe previous stats
+            self.rtpbin_last_rtpstats = dict(key = (session_id, ssrc))
+        prev = self.rtpbin_last_rtpstats
+
+        # Unfortunately, 'rb-round-trip' is always zero.. it would be nice
+        # to log this value.
+
+        # Get RTCP packet loss metric.. it is somewhat useless as it includes
+        # duplicates and losses in a single number.
+        packets_lost = stats.get_int('sent-rb-packetslost')[1]
+        dp = packets_lost - prev.get('packets_lost', 0)
+        if dp > 0:
+            self.extra_stats['loss-rtcp'] += dp
+        elif dp < 0:
+            # Duplicate packet. Unfortunately, there is no way to get both
+            # dups and losses separately
+            self.extra_stats['dupe-rtcp'] += -dp
+
+        prev.update(packets_lost=packets_lost)
+
+        if self.DUMP_EXTRA_EVENTS:
+            self.logger.debug('SSRC active: sess=%r, ssrc=%r, %r',
+                          session_id, ssrc, stats.to_string())
+
+
+    @wrap_event
+    def _on_new_rtpbin_jitterbuffer(self, source, jbuffer, session, ssrc):
+        # TODO mafanasyev: this is currently disabled now
+        self.logger.debug('Rtpbin made jitterbuffer %r for session %r ssrc %r',
+                          jbuffer, session, ssrc)
+        # TODO mafanasyev: configure jitterbuffer:
+        #  set 'rtx-delay' to ask for retransmittions earlier
+        #  set 'rtx-delay-reorder' to handle reordering faster
+        #  set 'rtx-retry-timeout' to retry more
 
     @wrap_event
     def _on_sync_message(self, bus, msg):
         # This is run in internal thread. Try to do as little as possible there.
         struct_name = msg.get_structure().get_name()
         if struct_name == 'prepare-window-handle':
-            self.logger.debug('Embedding video window')
+            if self.DUMP_EXTRA_EVENTS:
+                self.logger.debug('Embedding video window')
             msg.src.set_window_handle(self.xid)
         return True
 
@@ -310,7 +426,7 @@ class VideoWindow(object):
         if msg.type == Gst.MessageType.STATE_CHANGED:
             old, new, pending = msg.parse_state_changed()
             # Only log this for some elements
-            if msg.src == self.play_elements[-1]:
+            if msg.src == self.play_elements[-1] and self.DUMP_EXTRA_EVENTS:
                 # enum has value_name='GST_STATE_PAUSED', value_nick='playing'
                 msg_text = '%s->%s' % (old.value_nick, new.value_nick)
                 if pending != Gst.State.VOID_PENDING:
@@ -345,15 +461,15 @@ class VideoWindow(object):
 
         elif msg.type == Gst.MessageType.STREAM_STATUS:
             status, owner = msg.parse_stream_status()
-            if False:
+            if self.DUMP_EXTRA_EVENTS:
                 # Boring.
                 self.logger.debug(
                     "Stream status changed for %r: %s for owner %r",
                     msg.src.get_name(),
                     status.value_name, owner.get_name())
-            # TODO mafanasyev: wait for 'rtpjitterbuffer0' element, then
-            # record it's pointer so one can query 'stats' with usefull stuff
-            # like udp packet loss/duplication.
+            if owner.get_name() == 'rtpjitterbuffer0':
+                self.last_jitterbuffer = owner
+                self.last_jitterbuffer_stats = dict()
 
         elif msg.type == Gst.MessageType.STREAM_START:
             has_group, group_id = msg.parse_group_id()
@@ -536,7 +652,8 @@ class VideoWindow(object):
 
     class _DetectorStats(object):
         """Detector stats object, filled by detectors' handoff signal."""
-        def __init__(self):
+        def __init__(self, show_size=True):
+            self._show_size = show_size
             self.clear()
             # Last pts/dts values are never cleared
             self.last_dts = 0
@@ -551,7 +668,7 @@ class VideoWindow(object):
             tags = ['%.2f FPS' % (self.count / dt)]
             if level >= 2:
                 tags.append('%.1f%% miss' % ((dt - self.duration) / dt))
-            if level >= 1:
+            if level >= 1 and self._show_size:
                 if self.size > (1024 * 1024 * 50):
                     tags.append('%.1fMB/s' % (self.size / 1024.0 / 1024.0 / dt))
                 else:
@@ -593,21 +710,53 @@ class VideoWindow(object):
         for name, (count, duration) in sorted(self.qos_dropped_info.items()):
             drop_tags.append('%s: %d (%.3fs)' % (name, count, duration))
         if drop_tags:
-            self.stats_logger.info('Frames dropped: %s', '; '.join(drop_tags))
+            self.stats_logger.warn('Frames dropped: %s', '; '.join(drop_tags))
         self.qos_dropped_info.clear()
 
+        # Merge in information from jitterbuffer
+        if self.last_jitterbuffer is not None:
+            jstats = self.last_jitterbuffer.get_property('stats')
+
+            # Units guessed
+            self.extra_stats['rtt'] = '%.1fms' % (
+                jstats.get_uint64('rtx-rtt')[1] / 1.e6)
+
+            if self.DUMP_EXTRA_EVENTS:
+                self.extra_stats['rtx-pp'] = '%.1f' % (
+                    jstats.get_double('rtx-per-packet')[1])
+
+            old_jstats = self.last_jitterbuffer_stats
+            new_stats = dict(
+                rtx_count=jstats.get_uint64('rtx-count')[1],
+                rtx_success_count=jstats.get_uint64('rtx-success-count')[1])
+            self.last_jitterbuffer_stats = new_stats
+            diff_stats = { name: val - old_jstats.get(name, 0)
+                           for name, val in new_stats.items() }
+            if diff_stats['rtx_success_count']:
+                # Successfully retransmitted
+                self.extra_stats['rtx-ok'] = diff_stats['rtx_success_count']
+
+            if diff_stats['rtx_count'] != diff_stats['rtx_success_count']:
+                self.extra_stats['loss-rtx'] = (
+                    diff_stats['rtx_count'] - diff_stats['rtx_success_count'])
+        else:
+            # Should not happen when video is playing normally
+            self.extra_stats['no-jtb'] = 1
 
         decoded_frames = self.detector_stats['decoded'].count
 
-        # print out statistics from QoS messages
+        # print out statistics from detectors
         det_tags = list()
         for name, value in sorted(self.detector_stats.items()):
             det_tags.append(
                 '%s: %s' % (name, value.to_str_dt(dt, level=1)))
             value.clear()
+        for name, value in sorted(self.extra_stats.items()):
+            det_tags.append('%s: %s' % (name, value))
+        self.extra_stats.clear()
 
         self.stats_logger.info(
-            'Video stats: %s', '; '.join(det_tags) or 'No frames detected')
+            '; '.join(det_tags) or 'No frames detected')
 
         if not decoded_frames and self.CRASH_ON_VIDEO_STOP:
             self._dump_pad_info()
