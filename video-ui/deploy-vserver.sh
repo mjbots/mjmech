@@ -19,6 +19,7 @@ Commands:
    exec legtool/legtool.py
    exec legtool/herkulex_tool.py -d /dev/ttyACM99 -b -a 2
    exec ./install-startup-scripts.sh -g
+   exec ./send-video.sh --test
 EOF
     exit 1
 fi
