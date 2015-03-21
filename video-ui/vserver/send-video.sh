@@ -27,9 +27,10 @@ PORT2=$(expr $PORT + 2)
 # rtcp_sink has timeout property so we would get warnings if rtcp messages are
 # not being received
 
-# settings below may be customize when running on desktop
+# settings below may be customized when running on desktop
 : ${VMODE:=v}
 : ${VDEVICE:=/dev/video0}
+: ${GST_BIN:=/opt/gstreamer-1.4.5/bin/}
 
 if [[ "${VMODE}" == "u" ]]; then
     # Use 'uvch264src' which lets us customize stream properties
@@ -57,12 +58,12 @@ if [[ "$HOST" == "--test" ]]; then
     set -x
     # Test mode -- capture and print stats for 300 buffers
     #export GST_DEBUG=4
-    exec gst-launch-1.0 -v -e $GSS ! h264parse ! \
+    exec ${GST_BIN}gst-launch-1.0 -v -e $GSS ! h264parse ! \
         identity error-after=300 ! fakesink name=h264data silent=false sync=false
 fi
 
 set -x
-exec gst-launch-1.0 -v -e rtpbin name=rtpbin \
+exec ${GST_BIN}gst-launch-1.0 -v -e rtpbin name=rtpbin \
     $GSS ! h264parse ! rtph264pay ! \
     identity name=camera-data silent=false ! \
     rtprtxqueue max-size-packets=1000 ! rtpbin.send_rtp_sink_0 \
