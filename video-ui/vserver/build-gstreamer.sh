@@ -39,8 +39,8 @@ set -e
 
 echo Building gstreamer $VER in $BUILD_DIR, will install to $GST_PREFIX
 
-COMPONENTS="gstreamer libav "
-COMPONENTS+="plugins-base plugins-good plugins-bad plugins-ugly rtsp-server"
+COMPONENTS="gstreamer plugins-base "
+COMPONENTS+="plugins-good plugins-bad plugins-ugly rtsp-server libav"
 
 do_deps=0
 do_download=0
