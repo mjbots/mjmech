@@ -37,12 +37,11 @@ if [[ "${VMODE}" == "u" ]]; then
     # (see http://www.oz9aec.net/index.php/gstreamer/487-using-the-logitech-c920-webcam-with-gstreamer-12)
     GSS="uvch264src device=${VDEVICE} name=src auto-start=true"
     #GSS+=" mode=mode-video post-previews=false "
-    #GSS+=" iframe-period=3000"
+    #GSS+=" iframe-period=1000"
     # Discard viewfinder image.
     GSS+=" src.vfsrc ! queue "
-    #GSS+=" ! video/x-raw,format=(string)YUY2,width=320,height=240,framerate=10/1"
-    GSS+=" ! image/jpeg,width=320,height=240,framerate=10/1"
-    GSS+=" ! fakesink name=vfsrc-sink silent=false"
+    GSS+=" ! video/x-raw,format=(string)YUY2,width=320,height=240,framerate=5/1"
+    GSS+=" ! fakesink name=vfsrc-sink silent=true"
     # Send compressed video via queue
     GSS+=" src.vidsrc ! queue"
 else

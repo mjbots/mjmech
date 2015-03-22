@@ -11,6 +11,8 @@ Medium priority:
 
  * Make turret servoes stronger: replace horn
 
+ * Eventually expire messages from on-screen log display
+
  * Better logging: send server status packets more often when times are
    interesting (moving, shooting)
 
