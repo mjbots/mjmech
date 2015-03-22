@@ -32,7 +32,7 @@ export RSYNC_RSH="ssh -o BatchMode=yes -o CheckHostIP=no -o HashKnownHosts=no"
 # Store hostkey under a fixed name even if IP address is used, use local k_h
 RSYNC_RSH="$RSYNC_RSH -o HostKeyAlias=odroid -o UserKnownHostsFile=known_hosts"
 
-: ${RHOST:=odroid@odroid}
+: ${RHOST:=odroid@mjmech-odroid}
 
 if [[ "$1" == "stop" ]]; then
     $RSYNC_RSH $RHOST -t killall -v vserver.py
