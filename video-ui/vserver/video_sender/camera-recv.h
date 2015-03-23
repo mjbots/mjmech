@@ -4,15 +4,24 @@
 #include <gst/gst.h>
 #include <glib.h>
 
+struct RtspServer;
+
 typedef struct CameraReceiver {
+  // Main pipeline element.
   GstElement* pipeline;
-  // Statistics
+  // Statistics to print.
   GHashTable* stats;
+
+  // Pointer to RtspServer object. Should only be modified
+  // before 'start'. May be left at NULL.
+  struct RtspServer* rtsp_server;
+
+  gboolean rtsp_server_caps_set;
 } CameraReceiver;
 
 CameraReceiver* camera_receiver_make();
 
-// Increment given value in stats by that much 
+// Increment given value in stats by that much
 void camera_receiver_add_stat(CameraReceiver*, const char* name, int inc);
 
 void camera_receiver_start(CameraReceiver*);

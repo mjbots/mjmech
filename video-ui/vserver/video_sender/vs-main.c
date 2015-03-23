@@ -32,23 +32,20 @@ int main (int argc, char *argv[])
   // Exit on critical messages
   g_log_set_fatal_mask("", G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
+  GMainLoop* loop = g_main_loop_new(NULL, FALSE);
 
   CameraReceiver* receiver = camera_receiver_make();
-  camera_receiver_start(receiver);
+  assert(receiver != NULL);
 
   // Create and register RTSP server
-  //RtspServer* server = make_rtsp_server();
-  //assert(server != NULL);
+  RtspServer* server = rtsp_server_make();
+  assert(server != NULL);
 
-  /*
-  GstBus* bus = gst_element_get_bus(pipeline);
-  g_message("doing bus poll");
-  GstMessage* msg = gst_bus_poll(bus, GST_MESSAGE_EOS | GST_MESSAGE_ERROR, -1);
-  g_message("bus poll done");
-  gst_message_unref(msg);
-  */
+  receiver->rtsp_server = server;
 
-  GMainLoop* loop = g_main_loop_new(NULL, FALSE);
+  camera_receiver_start(receiver);
+  rtsp_server_start(server);
+
   g_main_loop_run(loop);
   return 0;
 }
