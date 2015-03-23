@@ -15,8 +15,6 @@ typedef struct CameraReceiver {
   // Pointer to RtspServer object. Should only be modified
   // before 'start'. May be left at NULL.
   struct RtspServer* rtsp_server;
-
-  gboolean rtsp_server_caps_set;
 } CameraReceiver;
 
 CameraReceiver* camera_receiver_make();

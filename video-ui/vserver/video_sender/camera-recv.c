@@ -19,9 +19,9 @@ const char LAUNCH_CMD_1[] = " "
 
 const char LAUNCH_CMD[] = " "
   "uvch264src device=/dev/video0 name=src auto-start=true "
+  "   iframe-period=1000 "
   "src.vfsrc ! queue "
   " ! video/x-raw,format=(string)YUY2,width=640,height=480,framerate=30/1"
-  //" ! xvimagesink sync=false "
   " ! appsink name=raw-sink max-buffers=1 drop=true "
   "src.vidsrc ! video/x-h264, width=1920, height=1080, framerate=30/1 "
   " ! h264parse ! queue ! appsink name=h264-sink max-buffers=120 drop=false "
@@ -112,43 +112,9 @@ static GstFlowReturn h264_sink_new_sample(GstElement* sink,
     return GST_FLOW_OK;
   }
 
-  RtspServer* rtsp_server = this->rtsp_server;
-
-  if (rtsp_server && !this->rtsp_server_caps_set) {
-    GstCaps* caps = gst_sample_get_caps(sample);
-    // Should only have one struct at this stage.
-    assert(GST_CAPS_IS_SIMPLE(caps));
-    char* caps_str = gst_caps_to_string(caps);
-    g_message("Passing H264 caps to RTSP server: %s", caps_str);
-    g_free(caps_str);
-
-    this->rtsp_server_caps_set = TRUE;
-    g_mutex_lock(&rtsp_server->appsrc_mutex);
-    // get_caps will addref, so it all works out properly
-    assert(rtsp_server->appsrc_h264_caps == NULL);
-    rtsp_server->appsrc_h264_caps = caps;
-    g_mutex_unlock(&rtsp_server->appsrc_mutex);
-  }
-
-  gboolean sample_sent = FALSE;
-  if (rtsp_server) {
-    g_mutex_lock(&rtsp_server->appsrc_mutex);
-    if (rtsp_server->appsrc_h264) {
-      GstBuffer* buf = gst_sample_get_buffer(sample);
-      assert(buf != NULL);
-      // push_buffer takes ownership, so we need to add_ref here
-      gst_buffer_ref(buf);
-      GstFlowReturn ret =
-        gst_app_src_push_buffer(rtsp_server->appsrc_h264, buf);
-      if (ret != GST_FLOW_OK) {
-        g_warning("Failed to push buffer to rtsp h264: %d", ret);
-      }
-      sample_sent = TRUE;
+  if (rtsp_server_push_h264_sample(this->rtsp_server, sample)) {
     camera_receiver_add_stat(this, "h264-buff-sent", 1);
-    }
-    g_mutex_unlock(&rtsp_server->appsrc_mutex);
-  }
-  if (!sample_sent) {
+  } else {
     camera_receiver_add_stat(this, "h264-buff-ignored", 1);
   }
   gst_sample_unref(sample);

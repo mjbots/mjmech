@@ -86,7 +86,7 @@ static void media_unprepared(GstRTSPMedia *gstrtspmedia,
 
 static void media_new_state(GstRTSPMedia *gstrtspmedia, gint state,
                             gpointer      user_data) {
-  // TODO: if media did not go to PLYAING state after a while, raise an error.
+  // TODO: if media did not go to PLAYING state after a while, raise an error.
   g_message("Video source in state %d", state);
 }
 
@@ -104,11 +104,22 @@ static void appsrc_enough_data(GstAppSrc *src, RtspServer *this) {
   }
 }
 
+static void appsrc_seek_data(GstAppSrc *src, guint64 pos, RtspServer *this) {
+  char* name = gst_element_get_name(src);
+  g_message("RTSP appsource '%s' says: seek me to %" GST_TIME_FORMAT
+            ". This is not suppored, trouble ahead.", name, GST_TIME_ARGS(pos));
+  g_free(name);
+}
+
 static void media_configure(GstRTSPMediaFactory *sender,
                             GstRTSPMedia        *media,
                             RtspServer          *this) {
   g_message("Starting up video source");
   this->error_count = 0;
+  this->appsrc_needs_iframe = TRUE;    // Hide data until we get an i-frame
+  this->appsrc_offset_valid = FALSE;   // Invalidate all offsets.
+  this->appsrc_h264_buffers = 0;
+
   g_signal_connect(media, "unprepared", (GCallback)media_unprepared, this);
   g_signal_connect(media, "new-state", G_CALLBACK(media_new_state), this);
 
@@ -134,6 +145,8 @@ static void media_configure(GstRTSPMediaFactory *sender,
     }
     g_signal_connect(this->appsrc_h264, "enough-data",
                      G_CALLBACK(appsrc_enough_data), this);
+    g_signal_connect(this->appsrc_h264, "seek-data",
+                     G_CALLBACK(appsrc_seek_data), this);
   } else {
     g_warning("Could not find H264 appsource in RTSP pipeline");
   }
@@ -142,6 +155,105 @@ static void media_configure(GstRTSPMediaFactory *sender,
   gst_object_unref(main_bin);
 }
 
+
+gboolean rtsp_server_push_h264_sample(RtspServer* this, GstSample* sample) {
+  if (!this) {
+    // No server -> cannot push.
+    return FALSE;
+  }
+
+  g_mutex_lock(&this->appsrc_mutex);
+  // Set caps if we need to.
+  if (!this->appsrc_h264_caps) {
+    GstCaps* caps = gst_sample_get_caps(sample);
+    // Should only have one struct at this stage.
+    assert(GST_CAPS_IS_SIMPLE(caps));
+    char* caps_str = gst_caps_to_string(caps);
+    g_message("Setting H264 caps to RTSP server: %s", caps_str);
+    g_free(caps_str);
+
+    // get_caps will addref, so it all works out properly
+    assert(this->appsrc_h264_caps == NULL);
+    this->appsrc_h264_caps = caps;
+  }
+
+  if (!this->appsrc_h264) {
+    // No active session. Exit.
+    g_mutex_unlock(&this->appsrc_mutex);
+    return FALSE;
+  }
+
+  gboolean sample_sent = FALSE;
+  GstBuffer* buf = gst_sample_get_buffer(sample);
+  assert(buf != NULL);
+
+  if (0) {
+    g_message("RTSP buffer: flags=0x%x pts=%" GST_TIME_FORMAT
+              " dts=%" GST_TIME_FORMAT
+              " duration=%" GST_TIME_FORMAT
+              " offset=%" G_GUINT64_FORMAT,
+              GST_BUFFER_FLAGS(buf),
+              GST_TIME_ARGS(buf->pts), GST_TIME_ARGS(buf->dts),
+              GST_TIME_ARGS(buf->duration), buf->offset);
+    gpointer state = NULL;
+    GstMeta* meta;
+    while (NULL != (meta = gst_buffer_iterate_meta(buf, &state))) {
+      g_message(" + meta api=%s type=%s",
+                g_type_name(meta->info->api), g_type_name(meta->info->type));
+    }
+  }
+
+  if (this->appsrc_needs_iframe &&
+      GST_BUFFER_FLAG_IS_SET(buf, GST_BUFFER_FLAG_DELTA_UNIT)) {
+    g_mutex_unlock(&this->appsrc_mutex);
+    return sample_sent;
+  }
+  if (this->appsrc_needs_iframe) {
+    g_message("Got IFRAME in stream, now sending data");
+    this->appsrc_needs_iframe = FALSE;
+  }
+
+  if (!this->appsrc_offset_valid) {
+    // Record offsets from first sample.
+    this->appsrc_offset_valid = TRUE;
+    this->appsrc_offset_dts = buf->dts;
+    this->appsrc_offset_pts = buf->pts;
+  }
+  this->appsrc_h264_buffers++;
+
+  // push_buffer takes ownership, so we need to add_ref here
+  buf = gst_buffer_ref(buf);
+
+  // Make buffer writeable and apply pts/dts offsets
+  buf = gst_buffer_make_writable(buf);
+  if (GST_CLOCK_TIME_IS_VALID(this->appsrc_offset_pts)) {
+    assert(GST_CLOCK_TIME_IS_VALID(buf->pts));
+    buf->pts -= this->appsrc_offset_pts;
+  } else {
+    assert(!GST_CLOCK_TIME_IS_VALID(buf->pts));
+  }
+
+  if (GST_CLOCK_TIME_IS_VALID(this->appsrc_offset_dts)) {
+    assert(GST_CLOCK_TIME_IS_VALID(buf->dts));
+    buf->dts -= this->appsrc_offset_dts;
+  } else {
+    assert(!GST_CLOCK_TIME_IS_VALID(buf->dts));
+  }
+
+  // TODO: fill pts?
+  // TODO: offset seems to be in bytes, but gst_rtsp_* seems to expect it in
+  // seconds?
+
+  GstFlowReturn ret = gst_app_src_push_buffer(this->appsrc_h264, buf);
+  if (ret != GST_FLOW_OK) {
+    g_message("Failed to push buffer to rtsp h264: %d", ret);
+  } else {
+    sample_sent = TRUE;
+  }
+
+  g_mutex_unlock(&this->appsrc_mutex);
+  return sample_sent;
+}
 
 RtspServer* rtsp_server_make() {
   RtspServer* this = calloc(1, sizeof(RtspServer));
