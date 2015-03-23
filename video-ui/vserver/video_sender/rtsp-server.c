@@ -5,14 +5,11 @@
 
 #include <gst/app/gstappsink.h>
 
-const char LAUNCH_CMD_1[] = "( "
-    "videotestsrc is-live=1 "
-    " ! x264enc ! rtph264pay name=pay0 pt=96 "
-    "videotestsrc is-live=1 "
-    " ! appsink name=raw-sink max-buffers=1 drop=true "
+static const char LAUNCH_CMD[] = "( "
+    "appsrc name=video-input | x264enc ! rtph264pay name=pay0 pt=96 "
     ")";
 
-const char LAUNCH_CMD[] = "( "
+static const char LAUNCH_CMD_2[] = "( "
     "uvch264src device=/dev/video0 name=src auto-start=true "
     //"src.vfsrc ! queue "
     //" ! video/x-raw,format=(string)YUY2,width=320,height=240,framerate=5/1"
@@ -22,7 +19,7 @@ const char LAUNCH_CMD[] = "( "
     " ! queue ! rtph264pay name=pay0 pt=96 "
     ")";
 
-const char LAUNCH_CMD_3[] = "( "
+static const char LAUNCH_CMD_3[] = "( "
     "v4l2src device=/dev/video0 "
     " ! video/x-h264, width=1920, height=1080, framerate=30/1 "
     " ! queue ! rtph264pay name=pay0 pt=96 "
@@ -56,61 +53,22 @@ static void media_new_state(GstRTSPMedia *gstrtspmedia, gint state,
 }
 
 
-GstFlowReturn raw_sink_new_sample(GstElement* sink) {
-  GstSample* sample = NULL;
-  g_signal_emit_by_name(sink, "pull-sample", &sample);
-  if (!sample) {
-    g_warning("raw sink is out of samples");
-    return GST_FLOW_OK;
-  }
-
-  //GstCaps* caps = gst_sample_get_caps(sample);
-  //GstBuffer* buf = gst_sample_get_buffer(sample);
-
-  g_message("raw sink got sample");
-  gst_sample_unref(sample);
-  return GST_FLOW_OK;
-}
-
-void media_configure(GstRTSPMediaFactory *sender,
+static void media_configure(GstRTSPMediaFactory *sender,
                      GstRTSPMedia        *media,
                      gpointer             user_data) {
   g_message("Starting up video source");
   g_signal_connect(media, "unprepared", (GCallback)media_unprepared,
                    user_data);
   g_signal_connect(media, "new-state", G_CALLBACK(media_new_state), user_data);
+  /*
   // Find out appsink and hook to it
   GstElement* main_bin = gst_rtsp_media_get_element(media);
-
-  GstAppSink* raw_sink = GST_APP_SINK(
-      gst_bin_get_by_name_recurse_up(GST_BIN(main_bin), "raw-sink"));
-  if (raw_sink == NULL) {
-    g_warning("Could not find raw-sink");
-    // assert(false);
-  } else {
-    assert(raw_sink != NULL);
-    // TODO mafanasyev: call gst_app_sink_set_caps(raw_sink, ...)
-    // or add 'caps' property to raw_sink
-
-    // We emit a signal every time we have a frame; if the buffer
-    // is not pulled by the next frame, we discard it.
-    // Note that the alternative is to have a separate thread which
-    // just pulls all the time (pull function will block if there
-    // is no data)
-    gst_app_sink_set_emit_signals(raw_sink, TRUE);
-    gst_app_sink_set_max_buffers(raw_sink, 1);
-    gst_app_sink_set_drop(raw_sink, TRUE);
-    g_signal_connect(raw_sink, "new-sample",
-                     G_CALLBACK(raw_sink_new_sample), NULL);
-
-    //g_util_set_object_arg(G_OBJECT(raw_sink),
-    gst_object_unref(raw_sink);
-  }
-
+  raw_sink_configure(main_bin, user_data);
   gst_object_unref(main_bin);
+  */
 }
 
-gboolean start_media_factory(void* user) {
+static gboolean start_media_factory(void* user) {
   g_message("Starting media factory");
   /*
   RtspServer* this = (RtspServer*)user;

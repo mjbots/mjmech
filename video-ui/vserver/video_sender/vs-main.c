@@ -19,7 +19,11 @@
 
 #include "assert.h"
 
+#include <gst/gst.h>
+
+#include "camera-recv.h"
 #include "rtsp-server.h"
+
 
 int main (int argc, char *argv[])
 {
@@ -28,8 +32,22 @@ int main (int argc, char *argv[])
   // Exit on critical messages
   g_log_set_fatal_mask("", G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
-  RtspServer* server = make_rtsp_server();
-  assert(server != NULL);
+
+  CameraReceiver* receiver = camera_receiver_make();
+  camera_receiver_start(receiver);
+
+  // Create and register RTSP server
+  //RtspServer* server = make_rtsp_server();
+  //assert(server != NULL);
+
+  /*
+  GstBus* bus = gst_element_get_bus(pipeline);
+  g_message("doing bus poll");
+  GstMessage* msg = gst_bus_poll(bus, GST_MESSAGE_EOS | GST_MESSAGE_ERROR, -1);
+  g_message("bus poll done");
+  gst_message_unref(msg);
+  */
+
   GMainLoop* loop = g_main_loop_new(NULL, FALSE);
   g_main_loop_run(loop);
   return 0;
