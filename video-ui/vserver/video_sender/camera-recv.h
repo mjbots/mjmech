@@ -15,9 +15,19 @@ typedef struct CameraReceiver {
   // Pointer to RtspServer object. Should only be modified
   // before 'start'. May be left at NULL.
   struct RtspServer* rtsp_server;
+
+  // Options. Should only be modified before 'start'.
+  gchar* opt_device;
+  gchar* opt_save_h264;
+  gboolean opt_dumb_camera;
+
 } CameraReceiver;
 
+// Allocate object. Does not do any gst calls.
 CameraReceiver* camera_receiver_make();
+
+// Add command-line for this object.
+void camera_receiver_add_options(CameraReceiver*, GOptionGroup*);
 
 // Increment given value in stats by that much
 void camera_receiver_add_stat(CameraReceiver*, const char* name, int inc);

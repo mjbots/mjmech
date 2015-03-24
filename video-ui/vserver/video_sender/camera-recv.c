@@ -8,25 +8,101 @@
 
 #include "rtsp-server.h"
 
-const char LAUNCH_CMD_1[] = " "
-    "videotestsrc is-live=1 "
-    " ! video/x-raw,format=(string)YUY2,width=320,height=240,framerate=5/1 "
-    " ! appsink name=raw-sink max-buffers=1 drop=true "
-    "videotestsrc is-live=1 ! x264enc "
-    " ! video/x-h264, width=1920, height=1080, framerate=30/1 "
-    " ! appsink name=h264-sink max-buffers=120 drop=false "
-    "";
+// TODO: find right camera by glob
+//const char UVC_CAMERA_GLOB[] =
+//    "/dev/v4l/by-id/usb-046d_HD_Pro_Webcam_C920_*-video-index0";
 
-const char LAUNCH_CMD[] = " "
-  "uvch264src device=/dev/video0 name=src auto-start=true "
-  "   iframe-period=1000 "
-  "src.vfsrc ! queue "
-  " ! video/x-raw,format=(string)YUY2,width=640,height=480,framerate=30/1"
-  " ! appsink name=raw-sink max-buffers=1 drop=true "
-  "src.vidsrc ! video/x-h264, width=1920, height=1080, framerate=30/1 "
-  " ! h264parse ! queue ! appsink name=h264-sink max-buffers=120 drop=false "
-  "";
+const char DEFAULT_DEVICE[] = "/dev/video0";
 
+// Caps for locally decoded image
+// (this is what is requested from uvch264src.vfsrc, and there are
+// limits on minimal framerate and resolution)
+const char DECODED_IMAGE_CAPS[] =
+    "video/x-raw,format=YUY2,width=640,height=480,framerate=30/1";
+// H264 caps when useing on-camera encoder
+const char HW_H264_CAPS[] =
+    "video/x-h264,width=1920,height=1080,framerate=30/1";
+// H264 caps when using local encoder. Framerate/size is all derived.
+const char SW_H264_CAPS[] =
+    "video/x-h264";
+
+
+static char* make_launch_cmd(CameraReceiver* this) {
+  GString* result = g_string_new(NULL);
+  const char* dev = this->opt_device ? this->opt_device : DEFAULT_DEVICE;
+  gboolean is_test = (strcmp(dev, "TEST") == 0);
+  gboolean is_dumb = is_test || this->opt_dumb_camera;
+
+  // TODO: the pipeline is not very optimal when is_dumb is True -- too many
+  // videocoverts. Whatever, it is for development anyway.
+
+  // TODO: the pipeline probably has too many 'queue' elements -- each one is
+  // a thread. However, the pipeline will silently fail to start if there are
+  // too few.
+
+  // make unencoded image endpoint
+  if (is_test) {
+    g_string_append(result, "videotestsrc is-live=1 pattern=ball ");
+  } else if (is_dumb) {
+    g_string_append_printf(
+        result, "v4l2src name=src device=%s ! videoconvert ",
+        dev);
+  } else {
+    g_string_append_printf(
+        result, "uvch264src device=%s name=src auto-start=true "
+        "   iframe-period=1000 "
+        "src.vfsrc ", dev);
+  }
+  g_string_append_printf(result, " ! %s ", DECODED_IMAGE_CAPS);
+  if (is_dumb) {
+    g_string_append(result, " ! tee name=dec-tee ");
+  }
+
+  // consume unencoded image data
+  g_string_append(result,
+                  " ! queue ! appsink name=raw-sink max-buffers=1 drop=true ");
+
+  // make h264 image endpoint
+  if (is_dumb) {
+    g_string_append_printf(
+        result, " dec-tee. ! videoconvert ! queue "
+        " ! x264enc tune=zerolatency ! %s ",
+        SW_H264_CAPS);
+  } else {
+    g_string_append_printf(
+        result, " src.vidsrc ! %s ! h264parse ",
+        HW_H264_CAPS);
+  }
+
+  // consume h264 data
+  if (this->opt_save_h264 && *this->opt_save_h264) {
+    char* muxer = NULL;
+    g_message("Will save H264 to file %s", this->opt_save_h264);
+    if (g_str_has_suffix(this->opt_save_h264, ".mkv")) {
+      // MKV has useful metadata (like stream start time), but buffers
+      // in large chunks.
+      muxer = "matroskamux streamable=true";
+    } else if (g_str_has_suffix(this->opt_save_h264, ".mp4")) {
+      // mp4 does not buffer much.
+      muxer = "mp4mux";
+    } else if (g_str_has_suffix(this->opt_save_h264, ".avi")) {
+      muxer = "avimux";
+    } else {
+      g_warning("Unknown h264 savefile extension, assuming MP4 format");
+      muxer = "mp4mux";
+    }
+    g_string_append_printf(
+        result, " ! tee name=h264-tee ! queue"
+        " ! %s ! filesink name=h264writer location=%s "
+        " h264-tee.", muxer, this->opt_save_h264);
+  }
+  g_string_append(
+      result,
+      "! queue ! appsink name=h264-sink max-buffers=120 drop=false ");
+
+
+  return g_string_free(result, FALSE); // Free the struct, return the contents.
+}
 
 void camera_receiver_add_stat(CameraReceiver* this, const char* name, int inc) {
   int* val = g_hash_table_lookup(this->stats, name);
@@ -145,13 +221,11 @@ static void bus_message(GstBus     *bus,
     gchar *dbg = NULL;
     gst_message_parse_error(message, &err, &dbg);
     if (err) {
-      g_error("Pipeline ERROR: %s", err->message);
+      g_error("Pipeline ERROR: %s\nDebug details: %s",
+              err->message, dbg ? dbg : "(NONE)" );
       g_error_free(err);
     }
-    if (dbg) {
-      g_message("Debug details: %s", dbg);
-      g_free(dbg);
-    }
+    if (dbg) { g_free(dbg); }
     break;
   }
   case GST_MESSAGE_STATE_CHANGED:
@@ -176,16 +250,37 @@ static void bus_message(GstBus     *bus,
 }
 
 CameraReceiver* camera_receiver_make() {
-  CameraReceiver* this = calloc(1, sizeof(CameraReceiver));
+  CameraReceiver* this = g_malloc0(sizeof(CameraReceiver));
 
   this->stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+  return this;
+}
 
-  g_message("Creating pipeline: gst-launch-1.0 %s", LAUNCH_CMD);
+void camera_receiver_add_options(CameraReceiver* this, GOptionGroup* group) {
+  GOptionEntry entries[] = {
+    { "device", 'd', 0, G_OPTION_ARG_FILENAME, &this->opt_device,
+      "Video device file to use, 'TEST' for test source", DEFAULT_DEVICE },
+    { "save-h264", 's', 0, G_OPTION_ARG_FILENAME, &this->opt_save_h264,
+      "Record received H264 stream to this file", "file.MKV|MP4|AVI" },
+    { "dumb-camera", 0, 0, G_OPTION_ARG_NONE, &this->opt_dumb_camera,
+      "Assume camera does not do H264 stream, encode on CPU" },
+    { NULL },
+  };
+
+  g_option_group_add_entries(group, entries);
+}
+
+
+void camera_receiver_start(CameraReceiver* this) {
+
+  char* launch_cmd = make_launch_cmd(this);
+  g_message("Creating pipeline: gst-launch-1.0 %s", launch_cmd);
   // Start the main pipeline which reads the video
   GError* error = NULL;
-  this->pipeline = gst_parse_launch(LAUNCH_CMD, &error);
-  if (!this->pipeline) {
-    g_message("LAUNCH_CMD parse error: %s", error->message);
+  this->pipeline = gst_parse_launch(launch_cmd, &error);
+  g_free(launch_cmd);
+  if (!this->pipeline || error) {
+    g_message("LAUNCH_CMD error %d: %s", error->code, error->message);
     exit(1);
   }
   assert(error == NULL);
@@ -200,10 +295,6 @@ CameraReceiver* camera_receiver_make() {
 
   camera_receiver_add_stat(this, "started", 1);
 
-  return this;
-}
-
-void camera_receiver_start(CameraReceiver* this) {
   // start the pipeline
   gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
   // start stats timer

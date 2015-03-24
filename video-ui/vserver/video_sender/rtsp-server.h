@@ -14,8 +14,8 @@ typedef struct RtspServer {
   // is alive even if there are no clients.
   GstRTSPMedia* factory_media;
 
-  // Mutex for all appsrc_ variables, as they may be changed from various threads.
-  // (via push_h264_sample function)
+  // Mutex for all appsrc_ variables, as they may be changed from various
+  // threads (via push_h264_sample function).
   GMutex appsrc_mutex;
 
   // Current H264 appsource, or NULL if no active connection.
@@ -34,9 +34,18 @@ typedef struct RtspServer {
 
   // Number of printed errors. Reset when no connection is active.
   int error_count;
+
+  // Options. Should only be modified before 'start'.
+  int opt_port;
+  // TODO: options for auth
+  // TODO: options to bind to interface
+
 } RtspServer;
 
+// Allocate object. Does not do any gst calls.
 RtspServer* rtsp_server_make();
+
+void rtsp_server_add_options(RtspServer*, GOptionGroup*);
 
 // Push a foreign sample to h264 appsource.
 // Returns TRUE if sample was pushed, FALSE if push failed.

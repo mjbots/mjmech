@@ -255,11 +255,37 @@ gboolean rtsp_server_push_h264_sample(RtspServer* this, GstSample* sample) {
   return sample_sent;
 }
 
-RtspServer* rtsp_server_make() {
-  RtspServer* this = calloc(1, sizeof(RtspServer));
+void rtsp_server_add_options(RtspServer* this, GOptionGroup* group) {
+  GOptionEntry entries[] = {
+    { "rtsp-port", 'p', 0, G_OPTION_ARG_INT, &this->opt_port,
+      "RTSP TCP port. 0 to assign random, -1 to disable RTSP",
+      "PORT" },
+    { NULL },
+  };
 
+  g_option_group_add_entries(group, entries);
+
+}
+
+const int SYSTEM_DEFAULT_RTSP_PORT = -9999;
+
+RtspServer* rtsp_server_make(int port) {
+  RtspServer* this = g_malloc0(sizeof(RtspServer));
+  this->opt_port = SYSTEM_DEFAULT_RTSP_PORT;
   g_mutex_init(&this->appsrc_mutex);
+  return this;
+}
+
+void rtsp_server_start(RtspServer* this) {
   this->server = gst_rtsp_server_new();
+
+  if (this->opt_port > 0) {
+    // Who needs string service names? numeric ports
+    // are always good enough.
+    char* service = g_strdup_printf("%d", this->opt_port);
+    gst_rtsp_server_set_service(this->server, service);
+    g_free(service);
+  }
 
   GstRTSPMountPoints* mounts = gst_rtsp_server_get_mount_points(this->server);
 
@@ -279,11 +305,12 @@ RtspServer* rtsp_server_make() {
 
   g_signal_connect(this->server, "client-connected",
                    (GCallback)client_connected, this);
-  return this;
-}
 
-void rtsp_server_start(RtspServer* this) {
-  gst_rtsp_server_attach(this->server, NULL);
-  g_message("stream ready at rtsp://127.0.0.1:%d/video",
-            gst_rtsp_server_get_bound_port(this->server));
+  if (this->opt_port >= 0 || this->opt_port == SYSTEM_DEFAULT_RTSP_PORT) {
+    gst_rtsp_server_attach(this->server, NULL);
+    g_message("RTSP server ready at rtsp://127.0.0.1:%d/video",
+              gst_rtsp_server_get_bound_port(this->server));
+  } else {
+    g_message("RTSP server disabled");
+  }
 }
