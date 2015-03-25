@@ -5,16 +5,18 @@
 #include <glib.h>
 
 struct RtspServer;
+struct MainAppSL;
 
 typedef struct CameraReceiver {
   // Main pipeline element.
   GstElement* pipeline;
-  // Statistics to print.
-  GHashTable* stats;
 
   // Pointer to RtspServer object. Should only be modified
   // before 'start'. May be left at NULL.
   struct RtspServer* rtsp_server;
+
+  // Pointer to MainAppSL object which will collect statistics.
+  struct MainAppSL* main_app_sl;
 
   // Options. Should only be modified before 'start'.
   gchar* opt_device;
@@ -29,9 +31,7 @@ CameraReceiver* camera_receiver_make();
 // Add command-line for this object.
 void camera_receiver_add_options(CameraReceiver*, GOptionGroup*);
 
-// Increment given value in stats by that much
-void camera_receiver_add_stat(CameraReceiver*, const char* name, int inc);
-
 void camera_receiver_start(CameraReceiver*);
+void camera_receiver_stop(CameraReceiver*);
 
 #endif

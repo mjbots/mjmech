@@ -17,7 +17,7 @@ FLAGS=$(pkg-config --cflags --libs \
 (cd $mydir &&
     set -x &&
     gcc -Wall -Werror -g -o /tmp/video_sender.exe \
-        vs-main.c rtsp-server.c camera-recv.c $FLAGS
+        vs-main.c main-app-sl.c rtsp-server.c camera-recv.c $FLAGS
 )
 
 if [[ "$1" == "--test" ]]; then

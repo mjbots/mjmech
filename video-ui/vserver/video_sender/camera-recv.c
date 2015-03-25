@@ -1,12 +1,13 @@
 #include "camera-recv.h"
 
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <gst/app/gstappsink.h>
 
 #include "rtsp-server.h"
+#include "main-app-sl.h"
 
 // TODO: find right camera by glob
 //const char UVC_CAMERA_GLOB[] =
@@ -50,7 +51,7 @@ static char* make_launch_cmd(CameraReceiver* this) {
   } else {
     g_string_append_printf(
         result, "uvch264src device=%s name=src auto-start=true "
-        "   iframe-period=1000 "
+        "   message-forward=true iframe-period=1000 "
         "src.vfsrc ", dev);
   }
   g_string_append_printf(result, " ! %s ", DECODED_IMAGE_CAPS);
@@ -104,34 +105,6 @@ static char* make_launch_cmd(CameraReceiver* this) {
   return g_string_free(result, FALSE); // Free the struct, return the contents.
 }
 
-void camera_receiver_add_stat(CameraReceiver* this, const char* name, int inc) {
-  int* val = g_hash_table_lookup(this->stats, name);
-  if (!val) {
-    val = g_malloc0(sizeof(int));
-    g_hash_table_insert(this->stats, g_strdup(name), val);
-  }
-  *val += inc;
-}
-
-static gboolean print_stats(void* user_arg) {
-  CameraReceiver* this = (CameraReceiver*)user_arg;
-  GList* keys = g_hash_table_get_keys(this->stats);
-  keys = g_list_sort(keys, (GCompareFunc)strcmp);
-
-  GString* message = g_string_new("");
-
-  GList* key;
-  for (key=keys; key; key=key->next) {
-    int* val = (int*)g_hash_table_lookup(this->stats, key->data);
-    g_string_append_printf(message, "%s=%d; ", (char*)key->data, *val);
-  }
-  g_list_free(keys);
-  g_hash_table_remove_all(this->stats);
-
-  g_message("Stats: %s", message->str);
-  g_string_free(message, TRUE);
-  return TRUE;
-}
 
 static GstFlowReturn raw_sink_new_sample(GstElement* sink,
                                          CameraReceiver* this) {
@@ -146,7 +119,7 @@ static GstFlowReturn raw_sink_new_sample(GstElement* sink,
   //GstBuffer* buf = gst_sample_get_buffer(sample);
 
   //g_message("raw sink got sample");
-  camera_receiver_add_stat(this, "raw-sample", 1);
+  main_app_sl_add_stat(this->main_app_sl, "raw-sample", 1);
   gst_sample_unref(sample);
   return GST_FLOW_OK;
 }
@@ -189,9 +162,9 @@ static GstFlowReturn h264_sink_new_sample(GstElement* sink,
   }
 
   if (rtsp_server_push_h264_sample(this->rtsp_server, sample)) {
-    camera_receiver_add_stat(this, "h264-buff-sent", 1);
+    main_app_sl_add_stat(this->main_app_sl, "h264-buff-sent", 1);
   } else {
-    camera_receiver_add_stat(this, "h264-buff-ignored", 1);
+    main_app_sl_add_stat(this->main_app_sl, "h264-buff-ignored", 1);
   }
   gst_sample_unref(sample);
   return GST_FLOW_OK;
@@ -207,52 +180,90 @@ static void h264_sink_configure(GstElement* parent_bin, gpointer user_data) {
   gst_object_unref(h264_sink);
 }
 
-static void bus_message(GstBus     *bus,
+static gboolean bus_message(GstBus     *bus,
                         GstMessage *message,
                         gpointer    user_data) {
+  gboolean print_message = TRUE;
   switch (GST_MESSAGE_TYPE (message)) {
-  case GST_MESSAGE_EOS: {
-    g_message("EOS on pipeline");
-    exit(1);
-    break;
-  }
-  case GST_MESSAGE_ERROR: {
-    GError *err = NULL;
-    gchar *dbg = NULL;
-    gst_message_parse_error(message, &err, &dbg);
-    if (err) {
-      g_error("Pipeline ERROR: %s\nDebug details: %s",
-              err->message, dbg ? dbg : "(NONE)" );
-      g_error_free(err);
+    case GST_MESSAGE_EOS: {
+      g_message("EOS on pipeline");
+      exit(1);
+      break;
     }
-    if (dbg) { g_free(dbg); }
-    break;
+    case GST_MESSAGE_ERROR: {
+      GError *err = NULL;
+      gchar *dbg = NULL;
+      gst_message_parse_error(message, &err, &dbg);
+      if (err) {
+        g_error("Pipeline ERROR: %s\nDebug details: %s",
+                err->message, dbg ? dbg : "(NONE)" );
+        g_error_free(err);
+      }
+      if (dbg) { g_free(dbg); }
+      break;
+    }
+    case GST_MESSAGE_STATE_CHANGED:
+    case GST_MESSAGE_STREAM_STATUS:
+    case GST_MESSAGE_TAG:
+    case GST_MESSAGE_NEW_CLOCK: {
+      // Ignore
+      print_message = FALSE;
+      break;
+    }
+    default: { break; };
   }
-  case GST_MESSAGE_STATE_CHANGED:
-  case GST_MESSAGE_STREAM_STATUS:
-  case GST_MESSAGE_TAG:
-  case GST_MESSAGE_NEW_CLOCK: {
-    // Ignore
-    break;
-  }
-  default: {
+  if (print_message) {
     const GstStructure* mstruct = gst_message_get_structure(message);
     char* struct_info =
-      mstruct ? gst_structure_to_string(mstruct) : g_strdup("no-struct");
-    g_message("Message '%s' from '%s': %s",
+        mstruct ? gst_structure_to_string(mstruct) : g_strdup("no-struct");
+    g_message("camera-recv message '%s' from '%s': %s",
               GST_MESSAGE_TYPE_NAME(message),
               GST_MESSAGE_SRC_NAME(message),
               struct_info);
     g_free(struct_info);
-    break;
   }
+  return TRUE;
+}
+
+static gboolean deep_notify_message(GstObject  *gstobject,
+                                    GstObject  *prop_object,
+                                    GParamSpec *prop,
+                                    gpointer    user_data) {
+  // Code from implementation of gst_object_default_deep_notify
+  // This is what happens in gst-launch with -v option
+  if (! (prop->flags & G_PARAM_READABLE)) {
+    // Unreadable parameter -- ignore
+    return TRUE;
   }
+  if (strcmp(prop->name, "caps") == 0) {
+    // caps are just too verbose...
+    return TRUE;
+  }
+
+  if (strcmp(prop->name, "device-fd") != 0) {
+    return TRUE;
+  }
+
+  // TODO: record device-fd for uvch264 source, print message only when verbose
+  // is set.
+
+  GValue value = { 0, };
+  g_value_init(&value, prop->value_type);
+  g_object_get_property(G_OBJECT(prop_object), prop->name, &value);
+  // Can also do g_value_dup_string(&value) when G_VALUE_HOLDS_STRING (&value)
+  gchar* str = gst_value_serialize (&value);
+  char* obj_name = gst_object_get_path_string(prop_object);
+  g_message("camera-recv deep notify %s: %s = %s", obj_name, prop->name, str);
+  g_free (obj_name);
+  g_free (str);
+  g_value_unset (&value);
+
+  return TRUE;
 }
 
 CameraReceiver* camera_receiver_make() {
   CameraReceiver* this = g_malloc0(sizeof(CameraReceiver));
 
-  this->stats = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
   return this;
 }
 
@@ -286,17 +297,22 @@ void camera_receiver_start(CameraReceiver* this) {
   assert(error == NULL);
 
   GstBus* bus = gst_element_get_bus(this->pipeline);
-  g_signal_connect(bus, "message", G_CALLBACK(bus_message), this);
-  gst_bus_add_signal_watch(bus);
-  gst_object_unref(GST_OBJECT(bus));
+  gst_bus_add_watch(bus, bus_message, this);
+  gst_object_unref(bus);
+
+  g_signal_connect(this->pipeline, "deep-notify",
+                   G_CALLBACK(deep_notify_message), this);
 
   raw_sink_configure(this->pipeline, this);
   h264_sink_configure(this->pipeline, this);
 
-  camera_receiver_add_stat(this, "started", 1);
+  main_app_sl_add_stat(this->main_app_sl, "started", 1);
 
   // start the pipeline
   gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
-  // start stats timer
-  g_timeout_add(5000, print_stats, this);
+}
+
+void camera_receiver_stop(CameraReceiver* this) {
+  // TODO mafanasyev: send EOS here?
+  gst_element_set_state(this->pipeline, GST_STATE_NULL);
 }
