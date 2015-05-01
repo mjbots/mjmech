@@ -124,11 +124,14 @@
 <wire x1="31.73" y1="14.91" x2="0" y2="14.91" width="0" layer="20"/>
 <wire x1="0" y1="14.91" x2="0" y2="0" width="0" layer="20"/>
 <text x="1.778" y="3.81" size="1.27" layer="21" rot="R90">mjpanel</text>
-<text x="5.588" y="0.254" size="1.27" layer="21">(c) 2015</text>
+<text x="5.588" y="0.254" size="1.27" layer="21">v1 (c) 2015</text>
 <hole x="2.032" y="12.7" drill="2.2"/>
 <hole x="2.032" y="2.032" drill="2.2"/>
 <hole x="29.718" y="2.032" drill="2.2"/>
 <hole x="29.718" y="12.7" drill="2.2"/>
+<text x="5.588" y="10.668" size="1.016" layer="21" rot="R270">G</text>
+<text x="5.588" y="8.128" size="1.016" layer="21" rot="R270">V</text>
+<text x="5.588" y="5.334" size="1.016" layer="21" rot="R270">S</text>
 </plain>
 <libraries>
 <library name="Atmel_By_element14_Batch_1-00">
@@ -1631,7 +1634,6 @@ design rules under a new name.</description>
 </element>
 <element name="J1" library="target" package="CON6P2R" value="AVRISP6_COMPACT" x="28.194" y="7.366" smashed="yes" rot="R90"/>
 <element name="JP1" library="pinhead" package="1X03" value="" x="3.81" y="7.366" smashed="yes" rot="R90">
-<attribute name="NAME" x="7.0612" y="6.0198" size="1.016" layer="25" rot="R90"/>
 <attribute name="VALUE" x="6.985" y="3.556" size="1.27" layer="27" rot="R90"/>
 </element>
 <element name="JP2" library="pinhead" package="1X02" value="" x="21.844" y="2.032" smashed="yes">
@@ -1676,12 +1678,12 @@ design rules under a new name.</description>
 <wire x1="12.192" y1="4.699" x2="13.208" y2="5.715" width="0.254" layer="1"/>
 <wire x1="10.2616" y1="4.699" x2="12.192" y2="4.699" width="0.254" layer="1"/>
 <wire x1="13.589" y1="11.049" x2="13.655" y2="11.049" width="0.254" layer="1"/>
-<wire x1="6.604" y1="7.366" x2="3.81" y2="7.366" width="0.254" layer="16"/>
-<wire x1="8.382" y1="7.366" x2="6.604" y2="7.366" width="0.254" layer="1"/>
+<wire x1="7.874" y1="7.366" x2="3.81" y2="7.366" width="0.254" layer="16"/>
+<wire x1="8.382" y1="7.366" x2="7.874" y2="7.366" width="0.254" layer="1"/>
 <wire x1="25.4" y1="6.35" x2="26.924" y2="4.826" width="0.254" layer="16"/>
 <wire x1="15.621" y1="6.35" x2="25.4" y2="6.35" width="0.254" layer="16"/>
 <wire x1="13.208" y1="6.35" x2="15.621" y2="6.35" width="0.254" layer="1"/>
-<via x="6.604" y="7.366" extent="1-16" drill="0.6096"/>
+<via x="7.874" y="7.366" extent="1-16" drill="0.6096"/>
 <via x="15.621" y="6.35" extent="1-16" drill="0.6096"/>
 </signal>
 <signal name="GND">
