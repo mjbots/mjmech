@@ -7953,43 +7953,61 @@ Source: www.kingbright.com</description>
 <parts>
 <part name="U1" library="Atmel_By_element14_Batch_1-00" deviceset="ATTINY85-20SU" device="">
 <attribute name="DPN" value="ATTINY85-20SU-ND"/>
+<attribute name="PRICE10" value="1.386"/>
 </part>
 <part name="P+1" library="supply1" deviceset="VCC" device=""/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="C1" library="rcl" deviceset="C-US" device="C0805" value=".1uF">
 <attribute name="DPN" value="399-1168-1-ND"/>
+<attribute name="PRICE10" value="0.05"/>
 </part>
 <part name="PWR" library="led" deviceset="LED" device="SML0805">
 <attribute name="DPN" value="160-1469-1-ND"/>
+<attribute name="PRICE10" value="0.267"/>
 </part>
 <part name="HIT" library="led" deviceset="LED" device="SML0805">
 <attribute name="DPN" value="160-1414-1-ND"/>
+<attribute name="PRICE10" value="0.288"/>
 </part>
 <part name="R1" library="rcl" deviceset="R-US_" device="R0805" value="680">
 <attribute name="DPN" value="P680ACT-ND"/>
+<attribute name="PRICE10" value="0.0196"/>
 </part>
 <part name="R2" library="rcl" deviceset="R-US_" device="R0805" value="680">
 <attribute name="DPN" value="P680ACT-ND"/>
+<attribute name="PRICE10" value="0.0196"/>
 </part>
 <part name="R3" library="rcl" deviceset="R-US_" device="R0805" value="10k">
 <attribute name="DPN" value="P10KACT-ND"/>
+<attribute name="PRICE10" value="0.0196"/>
 </part>
 <part name="R4" library="rcl" deviceset="R-US_" device="R0805" value="10k">
 <attribute name="DPN" value="P10KACT-ND"/>
+<attribute name="PRICE10" value="0.0196"/>
 </part>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="P+2" library="supply1" deviceset="VCC" device=""/>
 <part name="P+3" library="supply1" deviceset="VCC" device=""/>
-<part name="J1" library="target" deviceset="AVRISP6" device="_COMPACT" value="AVRISP6_COMPACT"/>
+<part name="J1" library="target" deviceset="AVRISP6" device="_COMPACT" value="AVRISP6_COMPACT">
+<attribute name="DPN" value="OR1108-ND"/>
+<attribute name="PRICE10" value="0.399"/>
+</part>
 <part name="P+4" library="supply1" deviceset="VCC" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
-<part name="JP1" library="pinhead" deviceset="PINHD-1X3" device=""/>
+<part name="JP1" library="pinhead" deviceset="PINHD-1X3" device="">
+<attribute name="DPN" value="952-2245-ND"/>
+<attribute name="PRICE10" value="0.155"/>
+</part>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" deviceset="VCC" device=""/>
-<part name="JP2" library="pinhead" deviceset="PINHD-1X2" device=""/>
+<part name="JP2" library="pinhead" deviceset="PINHD-1X2" device="">
+<attribute name="DPN" value="102-1170-ND"/>
+<attribute name="PRICE10" value="1.833"/>
+</part>
 <part name="R5" library="rcl" deviceset="R-US_" device="R0805" value="DNP"/>
 <part name="R6" library="rcl" deviceset="R-US_" device="R0805" value="100">
-<attribute name="P100ACT-ND" value=""/>
+<attribute name="DPN" value="P100ACT-ND"/>
+<attribute name="PRICE10" value="0.0196"/>
 </part>
 </parts>
 <sheets>
@@ -7999,43 +8017,61 @@ Source: www.kingbright.com</description>
 <instances>
 <instance part="U1" gate="A" x="33.02" y="43.18">
 <attribute name="DPN" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="P+1" gate="VCC" x="10.16" y="53.34"/>
 <instance part="GND1" gate="1" x="10.16" y="20.32"/>
 <instance part="C1" gate="G$1" x="-2.54" y="40.64">
 <attribute name="DPN" x="-2.54" y="40.64" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="-2.54" y="40.64" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="PWR" gate="G$1" x="-22.86" y="27.94">
 <attribute name="DPN" x="-22.86" y="27.94" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="-22.86" y="27.94" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="HIT" gate="G$1" x="88.9" y="50.8">
 <attribute name="DPN" x="88.9" y="50.8" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="88.9" y="50.8" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="R1" gate="G$1" x="-22.86" y="40.64" rot="R90">
 <attribute name="DPN" x="-22.86" y="40.64" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="PRICE10" x="-22.86" y="40.64" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R2" gate="G$1" x="88.9" y="60.96" rot="R90">
 <attribute name="DPN" x="88.9" y="60.96" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="PRICE10" x="88.9" y="60.96" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R3" gate="G$1" x="76.2" y="30.48" rot="R90">
 <attribute name="DPN" x="76.2" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="PRICE10" x="76.2" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R4" gate="G$1" x="83.82" y="30.48" rot="R90">
 <attribute name="DPN" x="83.82" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="PRICE10" x="83.82" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="GND2" gate="1" x="76.2" y="20.32"/>
 <instance part="P+2" gate="VCC" x="96.52" y="25.4"/>
 <instance part="P+3" gate="VCC" x="88.9" y="71.12"/>
-<instance part="J1" gate="A" x="33.02" y="71.12"/>
+<instance part="J1" gate="A" x="33.02" y="71.12">
+<attribute name="DPN" x="33.02" y="71.12" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="33.02" y="71.12" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="P+4" gate="VCC" x="12.7" y="86.36"/>
 <instance part="GND3" gate="1" x="12.7" y="71.12"/>
-<instance part="JP1" gate="A" x="114.3" y="53.34"/>
+<instance part="JP1" gate="A" x="114.3" y="53.34">
+<attribute name="DPN" x="114.3" y="53.34" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="114.3" y="53.34" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="GND4" gate="1" x="104.14" y="45.72"/>
 <instance part="P+5" gate="VCC" x="104.14" y="63.5"/>
-<instance part="JP2" gate="G$1" x="121.92" y="35.56"/>
+<instance part="JP2" gate="G$1" x="121.92" y="35.56">
+<attribute name="DPN" x="121.92" y="35.56" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="121.92" y="35.56" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="R5" gate="G$1" x="106.68" y="35.56" rot="R90"/>
 <instance part="R6" gate="G$1" x="99.06" y="35.56" rot="R90">
-<attribute name="P100ACT-ND" x="99.06" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="DPN" x="99.06" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="PRICE10" x="99.06" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 </instances>
 <busses>
