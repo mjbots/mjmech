@@ -8,6 +8,7 @@
 #include <glib-unix.h>
 
 static void exit_app(MainAppSL* this, char* reason) {
+  this->exit_code = 1;
   g_message("Exiting: %s", reason);
   g_main_loop_quit(this->loop);
 }
@@ -160,5 +161,13 @@ void main_app_sl_start(MainAppSL* this, int argc, char *argv[]) {
 
 // Run the loop until quit
 void main_app_sl_loop(MainAppSL* this) {
+  if (this->exit_code != 0) {
+    g_warning("Not staring main loop -- init failed");
+    return;
+  }
   g_main_loop_run(this->loop);
+}
+
+void main_app_sl_exit(MainAppSL* this) {
+  exit_app(this, "Application error");
 }

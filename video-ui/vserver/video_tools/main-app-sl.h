@@ -37,9 +37,12 @@ void main_app_sl_start(MainAppSL*, int argc, char *argv[]);
 // Run the loop until interruped
 void main_app_sl_loop(MainAppSL*);
 
-
 // Increment given value in stats by that much
 // First pointer may be NULL, in which case it is no-op.
 void main_app_sl_add_stat(MainAppSL*, const char* name, int inc);
+
+// Stop the main loop, then exit the program with specified exitcode
+// may be ran before the loop is started
+void main_app_sl_exit(MainAppSL*);
 
 #endif
