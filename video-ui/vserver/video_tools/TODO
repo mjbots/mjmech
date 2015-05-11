@@ -1,0 +1,17 @@
+both:
+ - more unified output format
+ - log parsing for python apps
+ - latency tracker via packet checksums
+
+sender:
+ - run from vserver (in parallel to send_video.sh -- client should be able to choose)
+ - command line option to change image resolution (and probably framerate?)
+ - opencv adapter, simple image parsing
+
+client:
+ - useful statistics
+ - get mouse / keyboard events, log them
+ - OSD display (existing)
+ - OSD display improved -- text backgrounds
+ - python replacement to VideoWindow which runs process in the background
+ - read from file (playback old) -- think about sync
