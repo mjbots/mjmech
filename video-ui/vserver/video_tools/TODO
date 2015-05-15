@@ -9,6 +9,10 @@ sender:
  - opencv adapter, simple image parsing
 
 client:
+ - figure out how to set default window size (raw XResizeWindow sometime?)
+ - send GST_TAG_TITLE to set more interesting window title
+ - maybe use 'videomixer' to mix subtitles & video? this should have less CPU
+   usage and may help with slow network connections
  - useful statistics
  - get mouse / keyboard events, log them
  - OSD display (existing)

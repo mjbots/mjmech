@@ -14,6 +14,7 @@ typedef struct VideoClient {
   struct MainAppSL* main_app_sl;
 
   gchar* opt_input;
+  gchar* opt_save_stream;
 } VideoClient;
 
 VideoClient* video_client_make();
