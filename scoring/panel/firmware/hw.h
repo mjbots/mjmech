@@ -34,13 +34,17 @@ serial format:
 
 // Threshold value -- when the hit is detected (0..255)
 // 12 is good.
-#define V_THRESH   6
+#define V_THRESH   12
 
 // size of data buffer, mostly limited by RAM
 #define ADC_DATA_COUNT   400
 
 // Serial line divisor. Defines baudrate.
 #define  SSERIAL_DIVISOR   138 // 69 = 115200, 138 = 57600
+
+// When defined, will register trigger every (256 * V_DATA_COUNT) ADC samples
+// even if not above the treshold.
+//#define RETURN_DATA_WHEN_IDLE
 
 
 #endif

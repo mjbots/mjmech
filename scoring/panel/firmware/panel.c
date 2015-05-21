@@ -35,8 +35,8 @@ static void wait_for_hit(void) {
   ADMUX = (1<<REFS1) | (1<<ADLAR) | (1<<MUX2);
 
   // Set up in auto mode (conversion per 13.5 cycles), no interrupt.
-  // ADPS value to sample rate mapping: 2+1->9.2KHz, 2+0->37KHz, 1+1->74KHz
-  ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1);
+  // ADPS value to sample rate mapping: 2+1->9.2KHz, 2+0->37KHz, 1+0->74KHz
+  ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADPS0)|(1<<ADPS1);
   ADCSRB = (1<<BIN); // bipolar, free-running mode
   ADCSRA |= (1<<ADSC); // start conversion
 
@@ -75,8 +75,10 @@ static void wait_for_hit(void) {
       if (++led_counter <= 3) {
         //PORTB ^= (1<<P_LED);
       }
+#ifdef RETURN_DATA_WHEN_IDLE
       // Testing: force trigger once in a while.
       if (led_counter == 0) { return; }
+#endif
     }
     adc_data[adc_last] = val;
 
