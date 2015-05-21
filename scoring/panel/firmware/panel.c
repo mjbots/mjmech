@@ -18,8 +18,17 @@ uint8_t adc_data[ADC_DATA_COUNT];
 // Last index written to.
 uint16_t adc_last = 0;
 
-// ADC offset
+// ADC offset (self-calibrating).
 int8_t adc_offset = 0;
+
+// if zero, adc offset is not known, so all hits are ignored.
+int8_t adc_offset_known = 0;
+
+// History of average ADC over 256 sample window, used to 
+// calculate adc_offset.
+int8_t adc_offset_h1 = 0;
+int8_t adc_offset_h2 = 0;
+int8_t adc_offset_h3 = 0;
 
 static void wait_for_hit(void) {
   // Was hit detected?
@@ -29,10 +38,9 @@ static void wait_for_hit(void) {
   // detected and dump data to serial port.
   uint16_t adc_dump_pos = 0;
 
-  // Setup ADC in differential mode with both (+) and (-) at PB4 for offset
-  // calibration.
+  // Setup ADC in differential mode: (+)PB4, (-)PB3
   // If REFS2 is present, use 2.56v ref, else uses 1.1v ref
-  ADMUX = (1<<REFS1) | (1<<ADLAR) | (1<<MUX2);
+  ADMUX = (1<<REFS1) | (1<<ADLAR) | (1<<MUX2) | (1<<MUX1);
 
   // Set up in auto mode (conversion per 13.5 cycles), no interrupt.
   // ADPS value to sample rate mapping: 2+1->9.2KHz, 2+0->37KHz, 1+0->74KHz
@@ -43,21 +51,14 @@ static void wait_for_hit(void) {
 #define WAIT_ADC_SAMPLE() do { \
     while ((ADCSRA & (1<<ADIF)) == 0) {};  ADCSRA |= (1<<ADIF); } while (0);
 
-  int16_t offset_sum = 0;
-  // Read 256 samples for calibration
-  WAIT_ADC_SAMPLE();
-  for (uint16_t count=0; count<0x100; count++) {
-    offset_sum += ADCH;
-    WAIT_ADC_SAMPLE();
-  }
-  adc_offset = offset_sum >> 8;
+  uint8_t adc_data_rotated = 0;
 
-  // Setup ADC in differential mode: (+)PB4, (-)PB3
-  ADMUX = (1<<REFS1) | (1<<ADLAR) | (1<<MUX2) | (1<<MUX1);
-  uint8_t led_counter = 0;
-  // Give ADC time to switch.
-  WAIT_ADC_SAMPLE();
-  WAIT_ADC_SAMPLE();
+  uint8_t counter_lsb = 0;
+  uint8_t counter_msb = 0;
+
+  int16_t raw_val_sum = 0;
+  int8_t prev_raw_avg_val = 0;
+
 
   while (1) {
     // Below is a very tight loop. At a maximum ADC speed, we only have
@@ -66,20 +67,46 @@ static void wait_for_hit(void) {
     WAIT_ADC_SAMPLE();
 
     // read the value. We only care about upper 8 bits.
-    int8_t val = ADCH - adc_offset;
+    int8_t val = ADCH;
+
+    raw_val_sum += val;
+    // Handle sample counter
+    if (++counter_lsb == 0) {
+      // Got 256 samples.
+      if (++counter_msb > 4) {
+        // We have been running for a while. Use average ADC value over last
+        // 256 samples for calibration. Note that since it is possible that we 
+        // are going to have a hit very soon, we use previous average value.
+        // No danger of overflow here, as types should be auto-promoted to int.
+        adc_offset = (adc_offset_h1 + adc_offset_h2 + 
+                      adc_offset_h3 + prev_raw_avg_val) / 4;
+        adc_offset_h1 = adc_offset_h2;
+        adc_offset_h2 = adc_offset_h3;
+        adc_offset_h3 = prev_raw_avg_val;
+      }
+
+      if (counter_msb == 10) {
+        // Enable sensing
+        adc_offset_known = 1;
+      }
+
+      // Update previous average, reset the sum.
+      prev_raw_avg_val = raw_val_sum >> 8;
+      raw_val_sum = 0;
+    }
+
+    if (!adc_offset_known) { continue; }
 
     // advance position, store value
     if (++adc_last >= ADC_DATA_COUNT) {
       adc_last = 0;
-      // blink LED for a short time every time led_counter overflows.
-      if (++led_counter <= 3) {
-        //PORTB ^= (1<<P_LED);
-      }
+      adc_data_rotated++;
 #ifdef RETURN_DATA_WHEN_IDLE
       // Testing: force trigger once in a while.
-      if (led_counter == 0) { return; }
+      if (adc_data_rotated == 0) { return; }
 #endif
     }
+    val -=  adc_offset;
     adc_data[adc_last] = val;
 
     if (hit_detected) {
