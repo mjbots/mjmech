@@ -80,7 +80,9 @@ class SerialReader(object):
             'BBbB', raw[5:9])
         if (vrate & 0xF8) == 0:
             # Extract data
-            data = struct.unpack('%db' % (len(raw) - 10), raw[9:-1])
+            data = tuple(
+                x - adc_offset
+                for x in struct.unpack('%db' % (len(raw) - 10), raw[9:-1]))
 
             divisor = 1 << max(2, vrate & 7)
             result.update(
@@ -125,7 +127,9 @@ class GnuPlotter(object):
 
     def _generate_plot_commands(self, packet, fh):
         meta = dict(packet)
-        if max(packet['data']) >= packet['threshold']:
+        # TODO: figure out how to tell triggered packets from untriggered ones
+        # probably a bit in header?
+        if True:
             meta['title'] = 'Trigger'
         else:
             meta['title'] = 'Idle'
@@ -134,22 +138,26 @@ class GnuPlotter(object):
 xtime(x)=(x - %(trigger_sample)d) / %(point_freq)f * 1000.0
 
 set grid xtics ytics
-set xlabel 'Time, milliseconds'
+set xlabel 'Time, milliseconds (freq %(point_freq).1fHz)'
 set xrange [xtime(0):xtime(%(data_len)d + 1)]
 
 yvolt(y) = y * %(v_scale)f
 
 set yrange [-128:128]
-set ylabel 'Input, ADC ticks'
+set ylabel 'Input, ADC ticks (offset %(adc_offset)d)'
 
 set y2range [yvolt(-128):yvolt(128)]
 set y2label 'Input, Volts'
+set y2tics
 
 set title '%(title)s on %(time_str)s'
 #unset label
 #set label '%(time_str)s#(num)s' at graph 1, 0.03 right front
 
-set arrow 1 from xtime(0),%(threshold)d to xtime(%(data_len)d + 1),%(threshold)d nohead
+set arrow 1 from xtime(0),%(threshold)d \
+            to xtime(%(data_len)d + 1),%(threshold)d nohead
+set arrow 2 from xtime(0),-%(threshold)d \
+            to xtime(%(data_len)d + 1),-%(threshold)d nohead
 
 plot "-" using (xtime($1)):($2) with linespoints title '' pt 12
 """ % meta

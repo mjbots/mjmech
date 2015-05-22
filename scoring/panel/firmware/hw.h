@@ -15,7 +15,7 @@ signal out is a multi-purpose pin:
  - then if enabled, we transmit detailed hit data in serial format.
 
 serial format:
-  header: 0xFF 0x36 0xB0 0xD4 LL VV TT ZZ 00 <binary-data> CC
+  header: 0xFF 0x36 0xB0 0xD4 LL VV TT ZZ 00 DATA CC
   Where:
     LL - 1 byte, (data length / 4)
       data length includes all following bytes except checksum
@@ -23,9 +23,11 @@ serial format:
       bits 7..6: version, set to 0
       bits 5..3: reserved
       bits 2..0: sample rate -- lower 3 bits of ADCSRA
-    TT - 1 byte, current threshold
+    TT - 1 byte, current threshold trigger is 'abs(data) > TT'
     ZZ - 1 byte, ADC offset
     00 - 1 byte, reserved, always zero
+    DATA - (rest of bytes) binary samples -- signed 8-bit integers
+           the data does NOT have ADC offset subtracted.
     CC - 1 byte, simple sum of all bytes
 */
 

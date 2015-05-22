@@ -21,8 +21,10 @@ uint16_t adc_last = 0;
 // ADC offset (self-calibrating).
 int8_t adc_offset = 0;
 
-// if zero, adc offset is not known, so all hits are ignored.
-int8_t adc_offset_known = 0;
+// Upper and lower trigger limits.
+// These are calculated from adc_offset value.
+int8_t adc_trigger_high = 0x7F;
+int8_t adc_trigger_low = -0x7F;
 
 // History of average ADC over 256 sample window, used to
 // calculate adc_offset.
@@ -85,17 +87,16 @@ static void wait_for_hit(void) {
         adc_offset_h3 = prev_raw_avg_val;
       }
 
-      if (counter_msb == 10) {
-        // Enable sensing
-        adc_offset_known = 1;
+      if (counter_msb > 12) {
+        // Update adc_trigger value. This enables triggering.
+        adc_trigger_high = adc_offset + V_THRESH;
+        adc_trigger_low = adc_offset - V_THRESH;
       }
 
       // Update previous average, reset the sum.
       prev_raw_avg_val = raw_val_sum >> 8;
       raw_val_sum = 0;
     }
-
-    if (!adc_offset_known) { continue; }
 
     // advance position, store value
     if (++adc_last >= ADC_DATA_COUNT) {
@@ -106,7 +107,7 @@ static void wait_for_hit(void) {
       if (adc_data_rotated == 0) { return; }
 #endif
     }
-    val -=  adc_offset;
+
     adc_data[adc_last] = val;
 
     if (hit_detected) {
@@ -114,7 +115,7 @@ static void wait_for_hit(void) {
       if (adc_dump_pos == adc_last) {
         return;
       }
-    } else if (val > V_THRESH) {
+    } else if ((val > adc_trigger_high) || (val < adc_trigger_low)) {
       // Just detected a hit!
       hit_detected = 1;
       // Set the dump time. We tune it such that 25% of buffer
