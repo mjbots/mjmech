@@ -24,7 +24,7 @@ int8_t adc_offset = 0;
 // if zero, adc offset is not known, so all hits are ignored.
 int8_t adc_offset_known = 0;
 
-// History of average ADC over 256 sample window, used to 
+// History of average ADC over 256 sample window, used to
 // calculate adc_offset.
 int8_t adc_offset_h1 = 0;
 int8_t adc_offset_h2 = 0;
@@ -75,10 +75,10 @@ static void wait_for_hit(void) {
       // Got 256 samples.
       if (++counter_msb > 4) {
         // We have been running for a while. Use average ADC value over last
-        // 256 samples for calibration. Note that since it is possible that we 
+        // 256 samples for calibration. Note that since it is possible that we
         // are going to have a hit very soon, we use previous average value.
         // No danger of overflow here, as types should be auto-promoted to int.
-        adc_offset = (adc_offset_h1 + adc_offset_h2 + 
+        adc_offset = (adc_offset_h1 + adc_offset_h2 +
                       adc_offset_h3 + prev_raw_avg_val) / 4;
         adc_offset_h1 = adc_offset_h2;
         adc_offset_h2 = adc_offset_h3;
@@ -145,7 +145,7 @@ void do_beep() {
   PORTB &=~ ((1<<3)|(1<<4));
   DDRB &=~ ((1<<3)|(1<<4));
   // ADC was running, so it may be sampling something stupid now.
-  // Also, the piezo may have residual mechanical energey from beep.
+  // Also, the piezo may have residual mechanical energy from beep.
   // Sleep for a while to let it settle.
   _delay_ms(10);
 }
