@@ -78,19 +78,20 @@ class SerialReader(object):
         # Parse header
         vrate, thresh, adc_offset, reserved = struct.unpack(
             'BBbB', raw[5:9])
-        if (vrate & 0xF8) == 0:
+        if (vrate & 0xD8) == 0:
             # Extract data
             data = tuple(
                 x - adc_offset
                 for x in struct.unpack('%db' % (len(raw) - 10), raw[9:-1]))
 
+            triggerred = (vrate & (1<<5)) == 0
             divisor = 1 << max(2, vrate & 7)
             result.update(
                 version=0,
                 threshold=thresh,
                 adc_offset=adc_offset,
                 reserved=reserved,
-                trigger_sample=len(data) / 4,
+                trigger_sample=(len(data) / 4) if triggerred else None,
                 v_scale=1.1 / 128.0,   # reference voltage is 1.1 volts
                 point_freq=8e6 / 13.5 / divisor,
                 data=data,
@@ -127,12 +128,11 @@ class GnuPlotter(object):
 
     def _generate_plot_commands(self, packet, fh):
         meta = dict(packet)
-        # TODO: figure out how to tell triggered packets from untriggered ones
-        # probably a bit in header?
-        if True:
+        if meta['trigger_sample'] is not None:
             meta['title'] = 'Trigger'
         else:
             meta['title'] = 'Idle'
+            meta['trigger_sample'] = 0
 
         print >>fh, """
 xtime(x)=(x - %(trigger_sample)d) / %(point_freq)f * 1000.0
@@ -202,12 +202,15 @@ def main():
             printable = dict(pkt)
             printable['data'] = '%d points (%d..%d)' % (
                 len(pkt['data']), min(pkt['data']), max(pkt['data']))
+            if pkt['trigger_sample'] is not None:
+                printable['data_t'] = pkt['data'][pkt['trigger_sample'] - 2:
+                                                      pkt['trigger_sample'] + 2]
             ts = printable.pop('time_num')
             if t0 is None:
                 t0 = ts
 
             print '%.3f:' % (ts - t0), (
-                ' '.join('%s=%s' % kv for kv in sorted(printable.iteritems())))
+                ', '.join('%s=%s' % kv for kv in sorted(printable.iteritems())))
 
             if plotter: plotter.plot(pkt)
     finally:

@@ -26,16 +26,18 @@ int8_t adc_offset = 0;
 int8_t adc_trigger_high = 0x7F;
 int8_t adc_trigger_low = -0x7F;
 
+// Was hit detected?
+uint8_t hit_detected = 0;
+
 // History of average ADC over 256 sample window, used to
 // calculate adc_offset.
 int8_t adc_offset_h1 = 0;
 int8_t adc_offset_h2 = 0;
 int8_t adc_offset_h3 = 0;
 
-static void wait_for_hit(void) {
-  // Was hit detected?
-  uint8_t hit_detected = 0;
+int8_t trigger_threshold = V_THRESH;
 
+static void wait_for_hit(void) {
   // when adc_last is equal to value below, we report hit as
   // detected and dump data to serial port.
   uint16_t adc_dump_pos = 0;
@@ -61,6 +63,7 @@ static void wait_for_hit(void) {
   int16_t raw_val_sum = 0;
   int8_t prev_raw_avg_val = 0;
 
+  hit_detected = 0;
 
   while (1) {
     // Below is a very tight loop. At a maximum ADC speed, we only have
@@ -75,22 +78,27 @@ static void wait_for_hit(void) {
     // Handle sample counter
     if (++counter_lsb == 0) {
       // Got 256 samples.
-      if (++counter_msb > 4) {
+      ++counter_msb;
+      if (counter_msb > 4 && !hit_detected) {
         // We have been running for a while. Use average ADC value over last
         // 256 samples for calibration. Note that since it is possible that we
         // are going to have a hit very soon, we use previous average value.
         // No danger of overflow here, as types should be auto-promoted to int.
-        adc_offset = (adc_offset_h1 + adc_offset_h2 +
-                      adc_offset_h3 + prev_raw_avg_val) / 4;
+        // We do not update calibration once we are triggered, as we want to
+        // preserve original adc_offset value.
+        int8_t new_adc_offset = (adc_offset_h1 + adc_offset_h2 +
+                                 adc_offset_h3 + prev_raw_avg_val) / 4;
         adc_offset_h1 = adc_offset_h2;
         adc_offset_h2 = adc_offset_h3;
         adc_offset_h3 = prev_raw_avg_val;
-      }
 
-      if (counter_msb > 12) {
-        // Update adc_trigger value. This enables triggering.
-        adc_trigger_high = adc_offset + V_THRESH;
-        adc_trigger_low = adc_offset - V_THRESH;
+        if (counter_msb > 12) {
+          // We have enough averages. Update adc_offset.
+          adc_offset = new_adc_offset;
+          // Update adc_trigger value. This enables triggering.
+          adc_trigger_high = adc_offset + trigger_threshold;
+          adc_trigger_low = adc_offset - trigger_threshold;
+        }
       }
 
       // Update previous average, reset the sum.
@@ -209,8 +217,12 @@ void send_info() {
   data_send(0xB0);
   data_send(0xD4);
   data_send((ADC_DATA_COUNT + 4)/ 4);
-  data_send(0x00 | (ADCSRA & 7));
-  data_send(V_THRESH);
+  uint8_t VV = 0x00 | (ADCSRA & 7);
+  if (!hit_detected) {
+    VV |= (1<<5);
+  }
+  data_send(VV);
+  data_send(trigger_threshold);
   data_send(adc_offset);
   data_send(0x00);
   uint16_t pos = adc_last;

@@ -21,7 +21,8 @@ serial format:
       data length includes all following bytes except checksum
     VV - 1 byte, packet version + sample rate.
       bits 7..6: version, set to 0
-      bits 5..3: reserved
+      bit  5   : set to 1 if this is no-trigger return.
+      bits 4..3: reserved
       bits 2..0: sample rate -- lower 3 bits of ADCSRA
     TT - 1 byte, current threshold trigger is 'abs(data) > TT'
     ZZ - 1 byte, ADC offset

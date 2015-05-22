@@ -16,17 +16,17 @@ clean :
 
 
 $(PROG).srec : $(PROG).out
-	avr-objcopy -j .text -O srec $(PROG).out $(PROG).srec
-	avr-objcopy -j .text -O ihex $(PROG).out $(PROG).hex
+	avr-size --mcu=$(AVR_PART) --format=avr $(PROG).out | paste - - -
+	avr-objcopy -j .text -j .data -O ihex $(PROG).out $(PROG).hex
 
 $(PROG).out : $(PROG).o $(OBJS)
 	avr-gcc $(CFLAGS) $(PROG).o $(OBJS) -o $(PROG).out
 
-%.o : %.c
+%.o : %.c *.h
 	avr-gcc -c $(CFLAGS) $< -o $@
 
 load : $(PROG).srec
-	avrdude -p $(AVR_PART) -c avrispmkII -U flash:w:$(PROG).srec
+	avrdude -p $(AVR_PART) -c avrispmkII -U flash:w:$(PROG).hex
 
 depend:
 	makedepend -I../avr_include $(PROG).c $(OBJS:%.o=%.c)
