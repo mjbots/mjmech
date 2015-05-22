@@ -180,10 +180,6 @@ void softserial_send(char c) {
 #define TX_SPACE()   PORTB &=~ (1<<P_SIGNAL)
   // The block below is always ran without interrupts
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    // Set pin to output
-    TX_MARK();
-    DDRB |= (1<<P_SIGNAL);
-
     WAIT_BIT(); WAIT_BIT();
     TX_SPACE(); WAIT_BIT(); // START bit
     for (uint8_t bc=0; bc<8; bc++) {
@@ -194,9 +190,6 @@ void softserial_send(char c) {
     };
     TX_MARK(); WAIT_BIT(); // STOP bit
     WAIT_BIT(); // another STOP
-
-    // Release the pin
-    DDRB &= ~(1<<P_SIGNAL);
   }
 #undef WAIT_BIT
 #undef TX_MARK
@@ -250,14 +243,29 @@ int main() {
   while (1) {
     wait_for_hit();
 
-    // Set LED for a while
+    // Set LED ON while we are reporting a hit.
     PORTB &=~ (1<<P_LED);
+
+    // Enable SIGNAL output
+    DDRB |= (1<<P_SIGNAL);
+    if (hit_detected) {
+      // Send a signal that a hit is detected.
+      // The scoring CPU will likely trigger on serial data, but we want to
+      // send nice long pulse ust in case.
+      PORTB &= ~(1<<P_SIGNAL);
+      _delay_ms(20);
+      PORTB |= (1<<P_SIGNAL);
+      _delay_ms(2);
+    }
+
+    // More advance notification
     //do_beep();
     send_info();
-    for (uint16_t i=0; i<400; i++) {
-      _delay_ms(1);
-    }
-    PORTB |= (1<<P_LED);
+    _delay_ms(100);
+
+    // Tristate signal output, turn off LED
+    DDRB &= ~(1<<P_SIGNAL);
+    PORTB |= (1<<P_LED)|(1<<P_SIGNAL);;
   }
 
 }

@@ -42,7 +42,10 @@ class SerialReader(object):
     def raw_read(self):
         """Read a packet, return a bytestring, or None on timeout."""
         while len(self._buff) > 4 and self._buff[:4] != self._HEADER:
-            print >>sys.stderr, 'Discarding junk: %r' % self._buff[:-4]
+            if self._buff[:-4] == '\x00':
+                print >>sys.stderr, 'Saw 0x00 char -- probably hit marker'
+            else:
+                print >>sys.stderr, 'Discarding junk: %r' % self._buff[:-4]
             self._buff = self._buff[-4:]
 
         if len(self._buff) < 5:
