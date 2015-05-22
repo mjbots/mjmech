@@ -57,11 +57,18 @@ static void wait_for_hit(void) {
 
   uint8_t adc_data_rotated = 0;
 
+  // ADC sample counter
   uint8_t counter_lsb = 0;
   uint8_t counter_msb = 0;
 
+  // Variables for averaging ADC values to get adc_offset
   int16_t raw_val_sum = 0;
   int8_t prev_raw_avg_val = 0;
+
+  // current readings above treshold
+  uint8_t high_readings = 0;
+  // Value of 'high_readings' in previous cycle
+  uint8_t high_readings_prev = 0;
 
   hit_detected = 0;
 
@@ -123,14 +130,28 @@ static void wait_for_hit(void) {
       if (adc_dump_pos == adc_last) {
         return;
       }
-    } else if ((val > adc_trigger_high) || (val < adc_trigger_low)) {
-      // Just detected a hit!
-      hit_detected = 1;
-      // Set the dump time. We tune it such that 25% of buffer
-      // is before the trigger, and the resit is after the trigger.
-      adc_dump_pos = adc_last + ADC_DATA_COUNT - (ADC_DATA_COUNT / 4);
-      while (adc_dump_pos >= ADC_DATA_COUNT) {
-        adc_dump_pos -= ADC_DATA_COUNT;
+    } else {
+      if ((val > adc_trigger_high) || (val < adc_trigger_low)) {
+        // This sample has enough energy, increase counter
+        high_readings++;
+      };
+
+      if (high_readings >= V_HIGH_COUNT)  {
+        // Just detected a hit!
+        hit_detected = 1;
+        // Set the dump time. We tune it such that 25% of buffer
+        // is before the trigger, and the resit is after the trigger.
+        adc_dump_pos = adc_last + ADC_DATA_COUNT - (ADC_DATA_COUNT / 4);
+        while (adc_dump_pos >= ADC_DATA_COUNT) {
+          adc_dump_pos -= ADC_DATA_COUNT;
+        }
+      }
+
+      if ((counter_lsb & 0xF) == 0) {
+        // 16 samples passed, decrease high_readings.
+        // To ensure we do not do it mid-hit, delay updates
+        high_readings -= high_readings_prev;
+        high_readings_prev = high_readings;
       }
     }
   }

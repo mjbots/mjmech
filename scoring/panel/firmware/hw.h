@@ -39,6 +39,9 @@ serial format:
 // 12 is good.
 #define V_THRESH   12
 
+// Threshold count -- how many samples must exceed the threshold
+#define V_HIGH_COUNT  2
+
 // size of data buffer, mostly limited by RAM
 #define ADC_DATA_COUNT   400
 

@@ -105,7 +105,7 @@ class SerialReader(object):
                 threshold=thresh,
                 adc_offset=adc_offset,
                 reserved=reserved,
-                trigger_sample=(len(data) / 4) if triggerred else None,
+                trigger_sample=(len(data) / 4 - 1) if triggerred else None,
                 v_scale=1.1 / 128.0,   # reference voltage is 1.1 volts
                 point_freq=8e6 / 13.5 / divisor,
                 data=data,
