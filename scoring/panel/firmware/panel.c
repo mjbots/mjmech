@@ -48,7 +48,7 @@ static void wait_for_hit(void) {
 
   // Set up in auto mode (conversion per 13.5 cycles), no interrupt.
   // ADPS value to sample rate mapping: 2+1->9.2KHz, 2+0->37KHz, 1+0->74KHz
-  ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADPS0)|(1<<ADPS1);
+  ADCSRA = (1<<ADEN)|(1<<ADATE)|(ADC_PRESCALER);
   ADCSRB = (1<<BIN); // bipolar, free-running mode
   ADCSRA |= (1<<ADSC); // start conversion
 

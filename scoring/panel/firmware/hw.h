@@ -43,7 +43,12 @@ serial format:
 #define ADC_DATA_COUNT   400
 
 // Serial line divisor. Defines baudrate.
-#define  SSERIAL_DIVISOR   138 // 69 = 115200, 138 = 57600
+#define SSERIAL_DIVISOR   138 // 69 = 115200, 138 = 57600
+
+// ADC prescaler
+// Number from 1 to 7, ADC will sample at (8e6 / 13.5 / 2**X) Hz
+// 5 = 18KHz (max quality), 3 = 74KHz (max recommended by ATMEL), 2=148KHz
+#define ADC_PRESCALER     2
 
 // When defined, will register trigger every (256 * V_DATA_COUNT) ADC samples
 // even if not above the treshold.
