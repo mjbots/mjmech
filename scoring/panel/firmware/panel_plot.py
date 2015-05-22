@@ -1,21 +1,32 @@
 #!/usr/bin/env python
 
-import sys
-import os
+import json
 import optparse
+import os
 import serial
 import struct
 import subprocess
+import sys
 import time
 
 class SerialReader(object):
     _HEADER = '\xFF\x36\xB0\xD4'
 
-    def __init__(self, port):
+    def __init__(self, port, save_logs):
         self._dev = serial.serial_for_url(
             port, baudrate=57600, timeout=0.1)
         print >>sys.stderr, 'Opened port', port
         self._buff = ''
+
+        self._logsave = None
+        if save_logs:
+            realname = time.strftime(save_logs, time.localtime())
+            print >>sys.stderr, 'Saving logs to %r' % realname
+            try:
+                os.makedirs(os.path.dirname(realname))
+            except OSError:
+                pass
+            self._logsave = open(realname, 'w')
 
     def _read_to_buff(self, min_len):
         """Read data until _buff contains at least _min_len bytes.
@@ -100,7 +111,24 @@ class SerialReader(object):
         else:
             assert False, 'Invalid firmware version %r' % vrate
 
+        if self._logsave:
+            stringified = json.dumps(result, sort_keys=True)
+            print >>self._logsave, stringified
+            self._logsave.flush()
         return result
+
+class LogReader(object):
+    def __init__(self, fn):
+        if fn == '-':
+            self._file = sys.stdin
+        else:
+            self._file = open(fn, 'r')
+
+    def read(self):
+        line = self._file.readline()
+        if line == '':
+            return None
+        return json.loads(line)
 
 class GnuPlotter(object):
     """Plot graphs using background gnuplot invocation.
@@ -108,8 +136,12 @@ class GnuPlotter(object):
     in a background
     """
 
-    def __init__(self):
-        self._proc = subprocess.Popen(['gnuplot'],
+    def __init__(self, persist=False):
+        arg = []
+        if persist:
+            arg += ['-persist']
+        self._persist = persist
+        self._proc = subprocess.Popen(['gnuplot'] + arg,
                                       stdin=subprocess.PIPE)
         self._plots = 0
         print >>self._proc.stdin, 'set term wxt noraise title "panel_plot"'
@@ -167,27 +199,39 @@ plot "-" using (xtime($1)):($2) with linespoints title '' pt 12
         fh.flush()
 
     def close(self):
-        self._proc.terminate()
+        if not self._persist:
+            self._proc.terminate()
 
 def main():
     parser = optparse.OptionParser(
         '%prog [options]')
     parser.add_option('-s', '--serial', metavar='/dev/tty...',
                       help='Read data from this serial port')
+    parser.add_option('-r', '--read-log', metavar='FN',
+                      help='Read data from this file')
     parser.add_option('-p', '--plot', action='store_true',
                       help='Plot graphs')
+    parser.add_option('-w', '--save-logs', metavar='FN',
+                      default='panel-logs/panel-%F-%H%M%S.json',
+                      help='With -s, write logs to a specified file '
+                      "(default '%default', empty string to disable)")
     opts, args = parser.parse_args()
     if args:
         parser.error('No positional arguments accepted')
+    if opts.serial and opts.read_log:
+        parser.error('Cannot read from serial and log simultaneously')
 
     reader = None
     if opts.serial:
-        reader = SerialReader(opts.serial)
+        reader = SerialReader(opts.serial,
+                              save_logs=opts.save_logs)
+    elif opts.read_log:
+        reader = LogReader(opts.read_log)
     else:
         parser.error('No data source')
 
     if opts.plot:
-        plotter = GnuPlotter()
+        plotter = GnuPlotter(persist=(not opts.serial))
     else:
         plotter = None
 
@@ -197,7 +241,12 @@ def main():
             if plotter: plotter.poll()
             pkt = reader.read()
             if pkt is None:
-                continue
+                if not opts.read_log:
+                    # Idle on serial port
+                    continue
+                print 'File finished, exiting'
+                time.sleep(1.0)
+                break
 
             printable = dict(pkt)
             printable['data'] = '%d points (%d..%d)' % (
