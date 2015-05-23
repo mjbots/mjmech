@@ -7957,9 +7957,9 @@ Source: www.kingbright.com</description>
 </part>
 <part name="P+1" library="supply1" deviceset="VCC" device=""/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
-<part name="C1" library="rcl" deviceset="C-US" device="C0805" value=".1uF">
-<attribute name="DPN" value="399-1168-1-ND"/>
-<attribute name="PRICE10" value="0.05"/>
+<part name="C1" library="rcl" deviceset="C-US" device="C0805" value="1uF">
+<attribute name="DPN" value="399-8004-1-ND"/>
+<attribute name="PRICE10" value="0.13"/>
 </part>
 <part name="PWR" library="led" deviceset="LED" device="SML0805">
 <attribute name="DPN" value="160-1469-1-ND"/>
