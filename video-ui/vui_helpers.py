@@ -72,8 +72,9 @@ def _sigterm_handler():
     raise Exception('Got SIGTERM')
 
 def CriticalTask(coro, exit_ok=False):
-    """Just like asyncio.Task, but if it ever competes, the program exits.
-    (unless @p exit_ok is True, in which case non-exception exit is ok)
+    """Just like asyncio.Task, but if it ever completes, the program
+    exits.  (unless @p exit_ok is True, in which case non-exception
+    exit is ok)
     """
     task = asyncio.Task(coro)
     task.add_done_callback(
