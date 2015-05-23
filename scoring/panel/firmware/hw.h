@@ -35,9 +35,8 @@ serial format:
 #define P_SIGNAL   1
 #define P_LED      2
 
-// Threshold value -- when the hit is detected (0..255)
-// 12 is good.
-#define V_THRESH   12
+// Threshold value -- when the hit is detected (0..255).
+#define V_THRESH   30
 
 // Threshold count -- how many samples must exceed the threshold
 #define V_HIGH_COUNT  2
