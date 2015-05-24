@@ -846,6 +846,9 @@ class ControlInterface(object):
         Help on Keys:
           w/s, a/d - move
           q/e      - rotate
+          r/f      - move up/down
+          g        - toggle between lowest and highest position
+          z/x      - go slower/speed up
           l        - laser on/off
           m/M      - toggle agitator auto/forced
           G        - green LED on/off
@@ -859,7 +862,7 @@ class ControlInterface(object):
           C+S+arrows - set reticle center (move slower)
           C+r      - zero out reticle offset
           C+S+M+arrows - temporarily tweak camera calibration
-          r        - toggle reticle
+          t        - toggle reticle
           S-( S-)  - change fire duration
           S-*      - show fire duration
           ESC      - clear logs from OSD; then toggle status visibility
