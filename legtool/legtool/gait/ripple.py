@@ -586,14 +586,15 @@ class RippleGait(object):
                 leg.point = current
 
                 lift_fraction = 0.01 * self.config.lift_percent
+                height_mm = (self.config.lift_height_mm *
+                             self.command.lift_height_percent / 100.0)
                 if leg_phase < lift_fraction:
-                    leg.point.z = ((leg_phase / lift_fraction) *
-                                   self.config.lift_height_mm)
+                    leg.point.z = ((leg_phase / lift_fraction) * height_mm)
                 elif leg_phase < (1.0 - lift_fraction):
-                    leg.point.z = self.config.lift_height_mm
+                    leg.point.z = height_mm
                 else:
                     leg.point.z = (((1.0 - leg_phase) / lift_fraction) *
-                                   self.config.lift_height_mm)
+                                   height_mm)
 
         if self.config.accurate_cog:
             self.state.update_cog(self.config.mechanical,

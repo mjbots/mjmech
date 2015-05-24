@@ -44,10 +44,16 @@ RIPPLE_COMMAND = {
     'translate_x_mm_s': 0,
     'translate_y_mm_s': 0,
     'rotate_deg_s': 0,
+    'body_z_mm': 0.0,
     }
 
 IDLE_COMMAND = {
-    'type': 'idle'
+    'type': 'idle',
+    'translate_x_mm_s': 0,
+    'translate_y_mm_s': 0,
+    'rotate_deg_s': 0,
+    'body_z_mm': 0.0,
+    'lift_height_percent': 0.0,
 }
 
 # Maximum network latency for fire command
@@ -219,6 +225,7 @@ class ControlInterface(object):
         # Autofire mode. This is initialized in the constructor, and saved value
         # is always ignored.
         autofire_mode = 0,
+        speed = 150,
     )
 
     _INITIAL_CONTROL_DICT = dict(
@@ -449,9 +456,10 @@ class ControlInterface(object):
                     dx = 0.0
 
                 gait = RIPPLE_COMMAND.copy()
-                gait['translate_x_mm_s'] = dx * 40
-                gait['translate_y_mm_s'] = -dy * 100
-                gait['rotate_deg_s'] = dr * 50
+                speed = self.ui_state['speed']
+                gait['translate_x_mm_s'] = dx * 0.7 * speed
+                gait['translate_y_mm_s'] = -dy * 1.0 * speed
+                gait['rotate_deg_s'] = dr * 0.5 * speed
                 self.control_dict['gait'] = gait
 
     @wrap_event
@@ -649,6 +657,22 @@ class ControlInterface(object):
         'e': (0, 0, 1)
     }
 
+    _Z_KEYS = {  # key->dz
+        'f': -10,
+        'r': 10,
+    }
+
+    _MIN_Z_VALUE = -25
+    _MAX_Z_VALUE = 20
+
+    _SPEED_KEYS = { # key->dspeed
+        'z': -10,
+        'x': 10,
+    }
+
+    _MIN_SPEED_VALUE = 10
+    _MAX_SPEED_VALUE = 220
+
     _ARROW_KEYS = { # key->(dx, dy)
         'Left': (-1, 0),
         'Right': (1, 0),
@@ -672,14 +696,30 @@ class ControlInterface(object):
 
         name = modifiers + base_name
 
+        speed = self.ui_state['speed']
         if name in self._GAIT_KEYS:
             dx, dy, dr = self._GAIT_KEYS[name]
             gait = RIPPLE_COMMAND.copy()
-            gait['translate_x_mm_s'] = dx * 50
-            gait['translate_y_mm_s'] = dy * 100
-            gait['rotate_deg_s'] = dr * 30
+            gait['translate_x_mm_s'] = dx * 0.7 * speed
+            gait['translate_y_mm_s'] = dy * 1.0 * speed
+            gait['rotate_deg_s'] = dr * 0.3 * speed
             self.control_dict['gait'] = gait
             self.key_gait_active = True
+        elif name in self._Z_KEYS:
+            dz = self._Z_KEYS[name]
+            self._add_z(dz)
+        elif name in ['g']:
+            change = self._MAX_Z_VALUE - self._MIN_Z_VALUE
+            if RIPPLE_COMMAND['body_z_mm'] == self._MIN_Z_VALUE:
+                self._add_z(change)
+            else:
+                self._add_z(-change)
+        elif name in self._SPEED_KEYS:
+            dspeed = self._SPEED_KEYS[name]
+            self.ui_state['speed'] += dspeed
+            self.ui_state['speed'] = max(
+                self._MIN_SPEED_VALUE,
+                min(self._MAX_SPEED_VALUE, self.ui_state['speed']))
         elif name in ['h', 'S-question']:
             self._print_help()
         elif name == 'l':
@@ -732,7 +772,7 @@ class ControlInterface(object):
             # Method will do its own logging
             step = 0.25
             self.c_cal.tweak_fixups(arrows[0] * step, arrows[1] * step)
-        elif name == 'r':
+        elif name == 't':
             newmode = (self.ui_state['reticle_mode'] + 1) % 3
             self.ui_state['reticle_mode'] = newmode
             self.logger.info('Set reticle_mode=%r', newmode)
@@ -784,6 +824,13 @@ class ControlInterface(object):
             if self.control_dict['gait'] is not None:
                 self.control_dict['gait'] = IDLE_COMMAND
             self._send_control()
+
+    def _add_z(self, dz):
+        for command in [RIPPLE_COMMAND, IDLE_COMMAND]:
+            command['body_z_mm'] += dz
+            command['body_z_mm'] = max(
+                self._MIN_Z_VALUE,
+                min(self._MAX_Z_VALUE, command['body_z_mm']))
 
     def _get_video_extra_stats(self):
         # Return extra lines to print in periodic video stats line

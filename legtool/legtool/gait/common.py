@@ -171,6 +171,7 @@ class Command(object):
     body_pitch_deg = 0.0
     body_roll_deg = 0.0
     body_yaw_deg = 0.0
+    lift_height_percent = 100.0
 
     def copy(self):
         return copy.copy(self)

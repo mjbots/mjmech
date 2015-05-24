@@ -113,6 +113,14 @@ class OnScreenDisplay(object):
                 status_lines.append('Turret: ({:+5.1f}, {:+5.1f})'
                                     .format(*control_dict['turret']))
 
+            # Add Z position
+            if (control_dict.get('gait') and
+                control_dict['gait'].get('body_z_mm') is not None):
+                status_lines.append(
+                    'Z: %d' % control_dict['gait']['body_z_mm'])
+
+            status_lines.append('speed: %d' % ui_state['speed'])
+
             # Add GPIO status
             tags = list()
             if control_dict['laser_on']:

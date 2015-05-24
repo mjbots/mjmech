@@ -209,6 +209,14 @@ class ConfigRippleGait(object):
 
     @asyncio.coroutine
     def transition_to_idle(self, early_exit, run):
+        # TODO jpieper: Higher levels have switched to getting "idle"
+        # behavior by just commanding a zero lift_height_percent, and
+        # thus this routine doesn't accomplish anything.
+        #
+        # Eventually, the "idle" concept should just be removed from
+        # the GaitDriver entirely.
+        raise Return(True)
+
         # Command 0 speed, wait for the command to be active, then
         # wait for at least 1 phase, then wait for all legs to be in
         # stance.

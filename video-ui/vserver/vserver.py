@@ -58,7 +58,7 @@ TURRET_FASTPOLL_TIME = 1.0
 TURRET_SERVO_CONFIG = {
     'dead_zone': 0,     # when to shut off the motor
     # We set larger 'inpos_margin' and rely on stop_thresh
-    # to fire when we are alsmot at a target and no progress is being made
+    # to fire when we are almost at a target and no progress is being made
     'inpos_margin': 2,  # 'inposition' sensitivity
     'stop_thresh': 1,   # 'moving' sensitivity
     'stop_time': 100,   # 'moving' timeout, in 11mS units
@@ -551,10 +551,20 @@ class ControlInterface(object):
             if gait['type'] == 'idle':
                 # TODO mafanasyev: update last_motion_time with the time
                 # motion actually ends.
-                self.mech_driver.set_idle()
+                command = self.mech_driver.create_default_command()
+
+                # Apply anything that isn't a movement command.
+                for key, value in gait.iteritems():
+                    if key != 'type' and not key.endswith('_s'):
+                        setattr(command, key, value)
+
+                command.lift_percent = 0.0
+
+                self.mech_driver.set_command(command)
                 if self.gait_commanded_nonidle:
                     self.logger.debug('No longer commanding gait')
                     self.gait_commanded_nonidle = False
+
             elif gait['type'] == 'ripple':
                 self.status_packet["last_motion_time"] = time.time()
 
