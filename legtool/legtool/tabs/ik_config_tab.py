@@ -445,7 +445,8 @@ class IkConfigTab(object):
             set_combo(self.ui.maximumCombo, 'maximum_pose')
 
             for spin, name in self.get_float_configs():
-                spin.setValue(config.getfloat('ikconfig', name))
+                if config.has_option('ikconfig', name):
+                    spin.setValue(config.getfloat('ikconfig', name))
 
         if config.has_option('ikconfig', 'plane'):
             self.ui.planeCombo.setCurrentIndex(
