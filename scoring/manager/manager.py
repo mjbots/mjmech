@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+# TODO:
+#  * Implement kiosk window.
+#  * Give a useful error if the serial port disappears or has an error.
+#  * Save and restore state.
+
 import itertools
 import logging
 import optparse
@@ -139,7 +144,6 @@ class ManagerMainWindow(QtGui.QMainWindow):
                     continue
 
                 self._transponder_hit(ident, panel)
-
 
     def _transponder_hit(self, ident, panel):
         mech = self.state.find(ident)
