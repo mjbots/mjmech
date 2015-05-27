@@ -193,7 +193,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QPushButton" name="openKioskAction">
+         <widget class="QPushButton" name="openKioskButton">
           <property name="text">
            <string>Open Kiosk Window</string>
           </property>

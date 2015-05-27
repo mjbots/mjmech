@@ -27,7 +27,7 @@ from legtool.async import asyncio_qt
 from legtool.async import asyncio_serial
 
 import ui_manager_main_window
-
+import ui_kiosk_window
 
 def _critical_task_done(task):
     if task.exception() is None:
@@ -84,6 +84,69 @@ class State(object):
         return
 
 
+class Panel(object):
+    parent = None
+    layout = None
+    header = None
+    history = None
+
+
+class KioskWindow(QtGui.QDialog):
+    def __init__(self, state, parent=None):
+        super(KioskWindow, self).__init__(parent)
+
+        self.state = state
+
+        self.ui = ui_kiosk_window.Ui_KioskWindow()
+        self.ui.setupUi(self)
+
+        self.layout = QtGui.QHBoxLayout(self.ui.widget)
+
+        palette = QtGui.QPalette(self.palette())
+        palette.setColor(QtGui.QPalette.Background, QtCore.Qt.white)
+        self.ui.widget.setAutoFillBackground(True)
+        self.ui.widget.setPalette(palette)
+
+        self.panels = []
+
+    def update(self):
+        while len(self.panels) > len(self.state.mechs):
+            self.layout.removeWidget(self.panels[-1].parent)
+            del self.panels[-1]
+
+        while self.layout.count() < len(self.state.mechs):
+            panel = Panel()
+            panel.parent = QtGui.QWidget(self.ui.widget)
+            panel.layout = QtGui.QVBoxLayout(panel.parent)
+
+            panel.header = QtGui.QLabel(panel.parent)
+            panel.header.setFont(QtGui.QFont("Helvetica", 40, 3))
+            panel.layout.addWidget(panel.header)
+            panel.history = QtGui.QLabel(panel.parent)
+            panel.layout.addWidget(panel.history)
+
+            self.layout.addWidget(panel.parent)
+            self.panels.append(panel)
+
+        assert len(self.panels) == len(self.state.mechs)
+
+        for panel, mech in zip(self.panels, self.state.mechs):
+            panel.header.setText(
+                '%s (%02X): %d' % (mech.name, mech.ident, mech.hp))
+
+            text = ''
+            for item in itertools.islice(
+                [x for x in reversed(self.state.history)
+                 if x.ident == mech.ident], 10):
+
+                text += '%s: %02X: %s\n' % (
+                    time.asctime(time.localtime(item.stamp)),
+                    item.ident,
+                    item.value)
+
+            panel.history.setText(text)
+
+
 class ManagerMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(ManagerMainWindow, self).__init__(parent)
@@ -113,13 +176,16 @@ class ManagerMainWindow(QtGui.QMainWindow):
         self.ui.propertiesSetHpButton.clicked.connect(
             self.handle_set_hp_button)
 
+        self.ui.openKioskButton.clicked.connect(
+            self.handle_open_kiosk_button)
+
         self.state = State()
+        self.kiosk = KioskWindow(self.state)
 
     def open_serial(self, serial):
         self.serial = asyncio_serial.AsyncioSerial(serial, baudrate=38400)
 
         CriticalTask(self._read_serial())
-
 
     @asyncio.coroutine
     def _read(self):
@@ -160,6 +226,7 @@ class ManagerMainWindow(QtGui.QMainWindow):
         mech.hp = newhp
         mech.update()
         self.handle_mech_current_row()
+        self.kiosk.update()
 
 
     def handle_mech_add_button(self):
@@ -188,6 +255,7 @@ class ManagerMainWindow(QtGui.QMainWindow):
         self.ui.mechListWidget.takeItem(index)
 
         self.handle_mech_current_row()
+        self.kiosk.update()
 
     def handle_mech_current_row(self):
         row = self.ui.mechListWidget.currentRow()
@@ -226,6 +294,7 @@ class ManagerMainWindow(QtGui.QMainWindow):
             self.ui.propertiesHpEdit.setReadOnly(True)
 
         mech.update()
+        self.kiosk.update()
 
     def handle_add_hp_button(self):
         self._change_hp(1)
@@ -248,6 +317,7 @@ class ManagerMainWindow(QtGui.QMainWindow):
         mech.update()
 
         self.handle_mech_current_row()
+        self.kiosk.update()
 
     def handle_set_hp_button(self):
         mech = self._current_mech()
@@ -265,6 +335,9 @@ class ManagerMainWindow(QtGui.QMainWindow):
                 item.value)
 
         self.ui.historyEdit.setPlainText(text)
+
+    def handle_open_kiosk_button(self):
+        self.kiosk.show()
 
 
 def main():

@@ -3,3 +3,5 @@ env = canonenv.Clone()
 
 env.Command('ui_manager_main_window.py', 'manager_main_window.ui',
             'pyside-uic $SOURCE -o $TARGET')
+env.Command('ui_kiosk_window.py', 'kiosk_window.ui',
+            'pyside-uic $SOURCE -o $TARGET')
