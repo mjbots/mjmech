@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # TODO:
-#  * Implement kiosk window.
+#  * sound
 #  * Give a useful error if the serial port disappears or has an error.
 #  * Save and restore state.
 
@@ -88,6 +88,7 @@ class Panel(object):
     parent = None
     layout = None
     header = None
+    line = None
     history = None
 
 
@@ -122,8 +123,15 @@ class KioskWindow(QtGui.QDialog):
             panel.header = QtGui.QLabel(panel.parent)
             panel.header.setFont(QtGui.QFont("Helvetica", 40, 3))
             panel.layout.addWidget(panel.header)
+            panel.line = QtGui.QFrame(panel.parent)
+            panel.line.setFrameShape(QtGui.QFrame.HLine)
+            panel.line.setFrameShadow(QtGui.QFrame.Sunken)
+            panel.layout.addWidget(panel.line)
             panel.history = QtGui.QLabel(panel.parent)
+            panel.history.setAlignment(QtCore.Qt.AlignLeft |
+                                       QtCore.Qt.AlignTop)
             panel.layout.addWidget(panel.history)
+            panel.layout.setStretch(2, 1)
 
             self.layout.addWidget(panel.parent)
             self.panels.append(panel)
