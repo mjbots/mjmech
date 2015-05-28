@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
 # TODO:
-#  * sound
 #  * Give a useful error if the serial port disappears or has an error.
 #  * Save and restore state.
 
 import itertools
 import logging
 import optparse
+import subprocess
 import sys
 import time
 
@@ -56,6 +56,7 @@ class Mech(object):
         self.name = 'unknown'
         self.hp = 0
         self.item = item
+        self.sound = ''
 
     def update(self):
         self.item.setText('%02X: %s: HP %d' % (self.ident, self.name, self.hp))
@@ -183,6 +184,8 @@ class ManagerMainWindow(QtGui.QMainWindow):
             self.handle_remove_hp_button)
         self.ui.propertiesSetHpButton.clicked.connect(
             self.handle_set_hp_button)
+        self.ui.propertiesSoundButton.clicked.connect(
+            self.handle_sound_button)
 
         self.ui.openKioskButton.clicked.connect(
             self.handle_open_kiosk_button)
@@ -232,6 +235,13 @@ class ManagerMainWindow(QtGui.QMainWindow):
                 '(%s) panel %d HP %d -> %d' % (
                     mech.name, panel, mech.hp, newhp)))
         mech.hp = newhp
+
+        if mech.sound != '':
+            subprocess.check_call(
+                'mplayer %s </dev/null >/dev/null &' % mech.sound,
+                shell=True)
+            QtGui.QSound.play(mech.sound)
+
         mech.update()
         self.handle_mech_current_row()
         self.kiosk.update()
@@ -273,6 +283,7 @@ class ManagerMainWindow(QtGui.QMainWindow):
         self.ui.propertiesIdEdit.setText('%02X' % mech.ident)
         self.ui.propertiesNameEdit.setText(mech.name)
         self.ui.propertiesHpEdit.setText('%d' % mech.hp)
+        self.ui.propertiesSoundEdit.setText(mech.sound)
 
     def _current_mech(self):
         row = self.ui.mechListWidget.currentRow()
@@ -333,6 +344,21 @@ class ManagerMainWindow(QtGui.QMainWindow):
             return
 
         self.ui.propertiesHpEdit.setReadOnly(False)
+
+    def handle_sound_button(self):
+        mech = self._current_mech()
+        if mech is None:
+            return
+
+        result = QtGui.QFileDialog.getOpenFileName(
+            self, 'Select sound', '', 'Sounds (*.wav *.mp3 *.ogg)')
+        if result != None:
+            result = result[0]
+        else:
+            return
+        mech.sound = result
+
+        self.handle_mech_current_row()
 
     def update_history(self):
         text = ''
