@@ -421,22 +421,34 @@ class ControlInterface(object):
     def select_axes(self):
         complete = self.joystick.get_features(linux_input.EV.ABS)
 
+        print "Joystick available axes:", complete
+
         # If we have all of X, Y, and RX, RY, then the axes are
         # probably mapped correctly and we can return what we expect.
         if (linux_input.ABS.X in complete and
             linux_input.ABS.Y in complete and
             linux_input.ABS.RX in complete and
             linux_input.ABS.RY in complete):
-            return [linux_input.ABS.X, linux_input.ABS.Y, linux_input.ABS.RX]
+            return [linux_input.ABS.X, linux_input.ABS.Y,
+                    linux_input.ABS.RX, linux_inpu.ABS.RY]
 
-        # Otherwise, just return the first three axes on the hope that
+        # Otherwise, just return the first axes on the hope that
         # this is meaningful.
-        return complete[0:3]
+        return complete[0:4]
 
     @wrap_event
     def _read_joystick(self):
         axes = self.select_axes()
         print "Selected joystick axes:", axes
+
+        _DEADBAND = 0.2
+        def deadband(x):
+            if abs(x) < _DEADBAND:
+                return 0.0
+            if x > 0.0:
+                return (x - _DEADBAND) / (1.0 - _DEADBAND)
+            if x < 0.0:
+                return (x + _DEADBAND) / (1.0 - _DEADBAND)
 
         while True:
             ev = yield From(self.joystick.read())
@@ -444,23 +456,28 @@ class ControlInterface(object):
             if ev.ev_type != linux_input.EV.ABS:
                 continue
 
-            dx = self.joystick.absinfo(axes[0]).scaled()
-            dy = self.joystick.absinfo(axes[1]).scaled()
-            dr = self.joystick.absinfo(axes[2]).scaled()
+            dx, dy, dr, dz = [
+                deadband(self.joystick.absinfo(axes[x]).scaled())
+                for x in range(4)]
 
-            if abs(dx) < 0.2 and abs(dy) < 0.2 and abs(dr) < 0.2:
+            if abs(dx) == 0.0 and abs(dy) == 0.0 and abs(dr) == 0.0:
                 if self.control_dict.get('gait') is not None:
                     self.control_dict['gait'] = IDLE_COMMAND
             else:
-                if abs(dy) > 0.1:
-                    dx = 0.0
-
                 gait = RIPPLE_COMMAND.copy()
                 speed = self.ui_state['speed']
                 gait['translate_x_mm_s'] = dx * 0.7 * speed
                 gait['translate_y_mm_s'] = -dy * 1.0 * speed
                 gait['rotate_deg_s'] = dr * 0.5 * speed
                 self.control_dict['gait'] = gait
+
+            if 'gait' in self.control_dict:
+                z_mapping = 0.0
+                if dz < 0.0:
+                    z_mapping = -dz * self._MAX_Z_VALUE
+                else:
+                    z_mapping = dz * self._MIN_Z_VALUE
+                self.control_dict['gait']['body_z_mm'] = z_mapping
 
     @wrap_event
     def _on_send_timer(self):
