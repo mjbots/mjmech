@@ -1287,6 +1287,7 @@ at 27/07/2012 14:02:49</description>
 <part name="C1" library="MF_Passives" deviceset="CAPACITOR_NP" device="_0603" value="1uF"/>
 <part name="R7" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="2k"/>
 <part name="U$1" library="jst-ph" deviceset="JST-PH3" device=""/>
+<part name="R8" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="47"/>
 </parts>
 <sheets>
 <sheet>
@@ -1342,8 +1343,9 @@ at 27/07/2012 14:02:49</description>
 <instance part="PWR" gate="G$1" x="-22.86" y="27.94" rot="R270"/>
 <instance part="HIT" gate="G$1" x="88.9" y="50.8" rot="R270"/>
 <instance part="C1" gate="G$1" x="-2.54" y="40.64"/>
-<instance part="R7" gate="G$1" x="73.66" y="50.8" rot="R90"/>
+<instance part="R7" gate="G$1" x="78.74" y="50.8" rot="R90"/>
 <instance part="U$1" gate="A" x="109.22" y="73.66"/>
+<instance part="R8" gate="G$1" x="68.58" y="43.18"/>
 </instances>
 <busses>
 </busses>
@@ -1373,8 +1375,8 @@ at 27/07/2012 14:02:49</description>
 <pinref part="R2" gate="G$1" pin="P$2"/>
 <wire x1="88.9" y1="76.2" x2="88.9" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="R7" gate="G$1" pin="P$2"/>
-<wire x1="73.66" y1="55.88" x2="73.66" y2="73.66" width="0.1524" layer="91"/>
-<wire x1="73.66" y1="73.66" x2="88.9" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="55.88" x2="78.74" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="73.66" x2="88.9" y2="73.66" width="0.1524" layer="91"/>
 <junction x="88.9" y="73.66"/>
 </segment>
 <segment>
@@ -1473,12 +1475,6 @@ at 27/07/2012 14:02:49</description>
 <pinref part="HIT" gate="G$1" pin="CATHODE"/>
 </segment>
 </net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="R2" gate="G$1" pin="P$1"/>
-<wire x1="88.9" y1="63.5" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$2" class="0">
 <segment>
 <pinref part="J1" gate="A" pin="!RESET"/>
@@ -1499,25 +1495,20 @@ at 27/07/2012 14:02:49</description>
 </net>
 <net name="N$8" class="0">
 <segment>
-<pinref part="J1" gate="A" pin="MISO"/>
-<wire x1="48.26" y1="71.12" x2="53.34" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="71.12" x2="53.34" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="U1" gate="A" pin="PB1"/>
-<wire x1="53.34" y1="43.18" x2="50.8" y2="43.18" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="43.18" x2="73.66" y2="43.18" width="0.1524" layer="91"/>
-<wire x1="73.66" y1="43.18" x2="99.06" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="43.18" x2="99.06" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="43.18" x2="99.06" y2="55.88" width="0.1524" layer="91"/>
-<junction x="53.34" y="43.18"/>
 <pinref part="JP1" gate="A" pin="1"/>
 <wire x1="99.06" y1="55.88" x2="124.46" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="R7" gate="G$1" pin="P$1"/>
 <wire x1="124.46" y1="55.88" x2="137.16" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="73.66" y1="45.72" x2="73.66" y2="43.18" width="0.1524" layer="91"/>
-<junction x="73.66" y="43.18"/>
+<wire x1="78.74" y1="45.72" x2="78.74" y2="43.18" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="A" pin="1"/>
 <wire x1="119.38" y1="76.2" x2="124.46" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="124.46" y1="76.2" x2="124.46" y2="55.88" width="0.1524" layer="91"/>
 <junction x="124.46" y="55.88"/>
+<pinref part="R8" gate="G$1" pin="P$2"/>
+<wire x1="73.66" y1="43.18" x2="78.74" y2="43.18" width="0.1524" layer="91"/>
+<junction x="78.74" y="43.18"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -1537,9 +1528,36 @@ at 27/07/2012 14:02:49</description>
 <wire x1="111.76" y1="38.1" x2="119.38" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 </net>
+<net name="N$9" class="0">
+<segment>
+<pinref part="U1" gate="A" pin="PB1"/>
+<pinref part="J1" gate="A" pin="MISO"/>
+<wire x1="48.26" y1="71.12" x2="53.34" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="71.12" x2="53.34" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="43.18" x2="50.8" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="R8" gate="G$1" pin="P$1"/>
+<wire x1="53.34" y1="43.18" x2="63.5" y2="43.18" width="0.1524" layer="91"/>
+<junction x="53.34" y="43.18"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="HIT" gate="G$1" pin="ANODE"/>
+<pinref part="R2" gate="G$1" pin="P$1"/>
+<wire x1="88.9" y1="55.88" x2="88.9" y2="63.5" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="104,1,-22.86,33.02,PWR,ANODE,N$1,,,"/>
+<approved hash="104,1,-22.86,22.86,PWR,CATHODE,GND,,,"/>
+<approved hash="104,1,88.9,55.88,HIT,ANODE,N$5,,,"/>
+<approved hash="104,1,88.9,45.72,HIT,CATHODE,N$4,,,"/>
+<approved hash="113,1,137.397,54.7412,JP1,,,,,"/>
+<approved hash="113,1,119.617,38.2312,JP2,,,,,"/>
+</errors>
 </schematic>
 </drawing>
 </eagle>
