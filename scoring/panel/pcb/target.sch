@@ -1243,20 +1243,20 @@ at 27/07/2012 14:02:49</description>
 <part name="P+1" library="supply1" deviceset="VCC" device=""/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="R1" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="560">
-<attribute name="DPN" value="P680ACT-ND"/>
-<attribute name="PRICE10" value="0.0196"/>
+<attribute name="DPN" value="P560GDKR-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
 </part>
 <part name="R2" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="560">
-<attribute name="DPN" value="P680ACT-ND"/>
-<attribute name="PRICE10" value="0.0196"/>
+<attribute name="DPN" value="P560GDKR-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
 </part>
 <part name="R3" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="10k">
-<attribute name="DPN" value="P10KACT-ND"/>
-<attribute name="PRICE10" value="0.0196"/>
+<attribute name="DPN" value="P10KGCT-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
 </part>
 <part name="R4" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="10k">
-<attribute name="DPN" value="P10KACT-ND"/>
-<attribute name="PRICE10" value="0.0196"/>
+<attribute name="DPN" value="P10KGCT-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
 </part>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="P+2" library="supply1" deviceset="VCC" device=""/>
@@ -1274,20 +1274,38 @@ at 27/07/2012 14:02:49</description>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" deviceset="VCC" device=""/>
 <part name="JP2" library="pinhead" deviceset="PINHD-1X2" device="">
-<attribute name="DPN" value="102-1170-ND"/>
-<attribute name="PRICE10" value="1.833"/>
+<attribute name="DPN" value="490-7800-ND"/>
+<attribute name="PRICE10" value="0.794"/>
 </part>
 <part name="R5" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="DNP"/>
 <part name="R6" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="100">
-<attribute name="DPN" value="P100ACT-ND"/>
-<attribute name="PRICE10" value="0.0196"/>
+<attribute name="DPN" value="P100GCT-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
 </part>
-<part name="PWR" library="MF_LEDs" deviceset="LED_SINGLE" device="_0603" value="RED"/>
-<part name="HIT" library="MF_LEDs" deviceset="LED_SINGLE" device="_0603" value="GRN"/>
-<part name="C1" library="MF_Passives" deviceset="CAPACITOR_NP" device="_0603" value="1uF"/>
-<part name="R7" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="2k"/>
-<part name="U$1" library="jst-ph" deviceset="JST-PH3" device=""/>
-<part name="R8" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="47"/>
+<part name="PWR" library="MF_LEDs" deviceset="LED_SINGLE" device="_0603" value="RED">
+<attribute name="DPN" value="160-1436-1-ND"/>
+<attribute name="PRICE10" value="0.218"/>
+</part>
+<part name="HIT" library="MF_LEDs" deviceset="LED_SINGLE" device="_0603" value="GRN">
+<attribute name="DPN" value="160-1446-1-ND"/>
+<attribute name="PRICE10" value="0.238"/>
+</part>
+<part name="C1" library="MF_Passives" deviceset="CAPACITOR_NP" device="_0603" value="1uF">
+<attribute name="DPN" value="490-3897-1-ND"/>
+<attribute name="PRICE10" value="0.0440"/>
+</part>
+<part name="R7" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="2k">
+<attribute name="DPN" value="2.0KGCT-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
+</part>
+<part name="U$1" library="jst-ph" deviceset="JST-PH3" device="">
+<attribute name="DPN" value="455-1705-ND"/>
+<attribute name="PRICE10" value="0.173"/>
+</part>
+<part name="R8" library="MF_Passives" deviceset="RESISTOR" device="_0603" value="47">
+<attribute name="DPN" value="P47GCT-ND"/>
+<attribute name="PRICE10" value="0.00960"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -1340,12 +1358,30 @@ at 27/07/2012 14:02:49</description>
 <attribute name="DPN" x="99.06" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="PRICE10" x="99.06" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
-<instance part="PWR" gate="G$1" x="-22.86" y="27.94" rot="R270"/>
-<instance part="HIT" gate="G$1" x="88.9" y="50.8" rot="R270"/>
-<instance part="C1" gate="G$1" x="-2.54" y="40.64"/>
-<instance part="R7" gate="G$1" x="78.74" y="50.8" rot="R90"/>
-<instance part="U$1" gate="A" x="109.22" y="73.66"/>
-<instance part="R8" gate="G$1" x="68.58" y="43.18"/>
+<instance part="PWR" gate="G$1" x="-22.86" y="27.94" rot="R270">
+<attribute name="DPN" x="-22.86" y="27.94" size="1.778" layer="96" rot="R270" display="off"/>
+<attribute name="PRICE10" x="-22.86" y="27.94" size="1.778" layer="96" rot="R270" display="off"/>
+</instance>
+<instance part="HIT" gate="G$1" x="88.9" y="50.8" rot="R270">
+<attribute name="DPN" x="88.9" y="50.8" size="1.778" layer="96" rot="R270" display="off"/>
+<attribute name="PRICE10" x="88.9" y="50.8" size="1.778" layer="96" rot="R270" display="off"/>
+</instance>
+<instance part="C1" gate="G$1" x="-2.54" y="40.64">
+<attribute name="DPN" x="-2.54" y="40.64" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="-2.54" y="40.64" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="R7" gate="G$1" x="78.74" y="50.8" rot="R90">
+<attribute name="DPN" x="78.74" y="50.8" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="PRICE10" x="78.74" y="50.8" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="U$1" gate="A" x="109.22" y="73.66">
+<attribute name="DPN" x="109.22" y="73.66" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="109.22" y="73.66" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="R8" gate="G$1" x="68.58" y="43.18">
+<attribute name="DPN" x="68.58" y="43.18" size="1.778" layer="96" display="off"/>
+<attribute name="PRICE10" x="68.58" y="43.18" size="1.778" layer="96" display="off"/>
+</instance>
 </instances>
 <busses>
 </busses>
