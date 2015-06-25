@@ -50,7 +50,17 @@ def do_reboot(servo, options):
 @asyncio.coroutine
 def do_status(servo, options, do_print=True):
     addr = get_address(options)
-    #status = yield From(servo.status(addr))
+    status = yield From(servo.status(addr))
+    result = 'Servo %d: (0x%02x, 0x%02x)' % (
+        addr, status.reg48, status.reg49)
+    if do_print:
+        print result
+    else:
+        raise Return(result)
+
+@asyncio.coroutine
+def do_position(servo, options, do_print=True):
+    addr = get_address(options)
     position, status = yield From(servo.position(addr, return_status=True))
     result = 'Servo %d: (0x%02x, 0x%02x) %s | pos %d' % (
         addr, status.reg48, status.reg49,
@@ -62,12 +72,12 @@ def do_status(servo, options, do_print=True):
         raise Return(result)
 
 @asyncio.coroutine
-def do_status_loop(servo, options):
+def do_position_loop(servo, options):
     t0 = time.time()
     last_status = None
     while True:
         dt = time.time() - t0
-        status = yield From(do_status(servo, options, do_print=False))
+        status = yield From(do_position(servo, options, do_print=False))
         if status != last_status:
             print '[%6.2f]' % dt, status
             last_status = status
@@ -119,7 +129,9 @@ def main():
                       help='reboot servos')
     parser.add_option('-s', '--status', action='store_true', default=None,
                       help='query status of servo')
-    parser.add_option('-S', '--status-loop', action='store_true', default=None,
+    parser.add_option('--position', action='store_true', default=None,
+                      help='query position of servo')
+    parser.add_option('--position-loop', action='store_true', default=None,
                       help='continuously query status of servo and print '
                       'any changes')
     parser.add_option('-v', '--voltage', action='store_true', default=None,
@@ -145,7 +157,8 @@ def main():
         'set_address': do_set_address,
         'reboot': do_reboot,
         'status': do_status,
-        'status_loop': do_status_loop,
+        'position': do_position,
+        'position_loop': do_position_loop,
         'voltage': do_voltage,
         'temperature': do_temperature,
         'blink_led': do_blink_led,
