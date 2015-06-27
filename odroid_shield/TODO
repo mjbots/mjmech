@@ -1,0 +1,54 @@
+ * Parts
+   * crystal for AVR
+   * Switch servo connectors to something SMT so that it doesn't eat
+     up so much of both sides of the board
+     * I guess JST XH
+   * 12V boost for gimbal controller
+     * MIC2253 DPN: 576-3643-6-ND
+   * IMU - MAX21000 + MMA8451Q
+   * brushless gimbal controller?
+
+   * line up all connectors
+   * route power
+   * route 5V buck
+   * route 12V boost
+   * autoroute
+
+
+
+ * odroid shield for mech
+   * accessible from top
+     * 2x4 0.1" header for aeg/agitator/laser
+     * USB for camera
+     * master power switch
+     * weapon power switch
+     * blinking weapon power light
+     * 5V power light
+     * shore power connector
+     * 12V power for gimbal
+     * data for gimbal
+     * I2C connector
+   * power distribution
+     * input connector/pins for battery
+     * high current fuse
+     * shore power connector for odroid
+       * DPN: CP-034A-ND
+   * 5V buck regulator for odroid
+     * ST1S10  DPN: 497-6904-1-ND
+   * 12V boost for gimbal controller
+     * MIC2253 DPN: 576-3643-6-ND
+   * servo power/data connectors for legs
+   * AEG motor driver - MC33926
+   * agitator motor driver - MC33926
+   * laser control - FET
+   * I2C level shift
+   * Serial level shift
+   * AVR - on I2C bus (or probably serial like we have now)
+   * switches
+      * CKN5001-ND
+      * power
+      * weapon
+   * power light
+   * weapon light
+   * some connection for scoring transponder data... maybe just
+     another herkulex bus connector?
