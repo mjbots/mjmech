@@ -15126,8 +15126,8 @@ http://www.zetex.com&lt;p&gt;
 <part name="U$3" library="odroid_shield" deviceset="M3_HEX_MOUNT" device=""/>
 <part name="U$4" library="odroid_shield" deviceset="M3_HEX_MOUNT" device=""/>
 <part name="J4" library="odroid_shield" deviceset="ODROID_J4" device=""/>
-<part name="X1" library="odroid_shield" deviceset="USB" device="2MM"/>
-<part name="P1" library="odroid_shield" deviceset="JST-PH4" device=""/>
+<part name="J2" library="odroid_shield" deviceset="USB" device="2MM"/>
+<part name="JUSB" library="odroid_shield" deviceset="JST-PH4" device=""/>
 <part name="U1" library="odroid_shield" deviceset="SINGLE-BIT_BUS_TRANSCEIVER" device="">
 <attribute name="DPN" value="296-16843-1-ND"/>
 </part>
@@ -15225,19 +15225,19 @@ http://www.zetex.com&lt;p&gt;
 </part>
 <part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="500"/>
 <part name="R4" library="rcl" deviceset="R-US_" device="R0603" value="500"/>
-<part name="U$5" library="odroid_shield" deviceset="MP33926" device=""/>
+<part name="U7" library="odroid_shield" deviceset="MP33926" device=""/>
 <part name="C6" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
 <part name="R5" library="rcl" deviceset="R-US_" device="R0603" value="100k"/>
 <part name="P+5" library="supply1" deviceset="+5V" device=""/>
 <part name="R6" library="rcl" deviceset="R-US_" device="R0603" value="200"/>
-<part name="IC1" library="v-reg" deviceset="TS5205" device=""/>
+<part name="U5" library="v-reg" deviceset="TS5205" device=""/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
 <part name="C9" library="rcl" deviceset="C-US" device="C0603" value="1uF"/>
 <part name="C10" library="rcl" deviceset="C-US" device="C0603" value="1uF"/>
 <part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
-<part name="T1" library="zetex" deviceset="NMOSSOT23" device=""/>
-<part name="U$6" library="odroid_shield" deviceset="TCA9517" device="MSOP8"/>
+<part name="Q1" library="zetex" deviceset="NMOSSOT23" device=""/>
+<part name="U6" library="odroid_shield" deviceset="TCA9517" device="MSOP8"/>
 <part name="R7" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
 <part name="R8" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
 <part name="R9" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
@@ -15255,7 +15255,7 @@ http://www.zetex.com&lt;p&gt;
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
 <part name="P+9" library="supply1" deviceset="+5V" device=""/>
 <part name="R11" library="rcl" deviceset="R-US_" device="R0603" value="200"/>
-<part name="U$7" library="odroid_shield" deviceset="ABM8G" device="">
+<part name="U10" library="odroid_shield" deviceset="ABM8G" device="">
 <attribute name="DPN" value="535-10267-6-ND"/>
 </part>
 <part name="GND13" library="supply1" deviceset="GND" device=""/>
@@ -15263,12 +15263,12 @@ http://www.zetex.com&lt;p&gt;
 <part name="C12" library="rcl" deviceset="C-US" device="C0603" value="20pF"/>
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="+3V3" library="supply1" deviceset="+3V3" device=""/>
-<part name="U$8" library="odroid_shield" deviceset="MAX21000" device=""/>
+<part name="U8" library="odroid_shield" deviceset="MAX21000" device=""/>
 <part name="GND15" library="supply1" deviceset="GND" device=""/>
 <part name="+3V4" library="supply1" deviceset="+3V3" device=""/>
 <part name="R12" library="rcl" deviceset="R-US_" device="R0603" value="100k"/>
 <part name="C13" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
-<part name="U$9" library="odroid_shield" deviceset="MMA8451Q" device=""/>
+<part name="U9" library="odroid_shield" deviceset="MMA8451Q" device=""/>
 <part name="+3V5" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND16" library="supply1" deviceset="GND" device=""/>
 <part name="C14" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
@@ -15285,8 +15285,8 @@ http://www.zetex.com&lt;p&gt;
 <instance part="U$3" gate="G$1" x="15.24" y="86.36"/>
 <instance part="U$4" gate="G$1" x="15.24" y="81.28"/>
 <instance part="J4" gate="G$1" x="157.48" y="15.24"/>
-<instance part="X1" gate="G$1" x="83.82" y="78.74" rot="R180"/>
-<instance part="P1" gate="G$1" x="124.46" y="76.2" rot="R180"/>
+<instance part="J2" gate="G$1" x="83.82" y="78.74" rot="R180"/>
+<instance part="JUSB" gate="G$1" x="124.46" y="76.2" rot="R180"/>
 <instance part="U1" gate="G$1" x="40.64" y="22.86">
 <attribute name="DPN" x="40.64" y="22.86" size="1.778" layer="96" display="off"/>
 </instance>
@@ -15384,19 +15384,19 @@ http://www.zetex.com&lt;p&gt;
 </instance>
 <instance part="R3" gate="G$1" x="40.64" y="154.94" rot="R90"/>
 <instance part="R4" gate="G$1" x="53.34" y="-76.2" rot="R90"/>
-<instance part="U$5" gate="G$1" x="109.22" y="149.86"/>
+<instance part="U7" gate="G$1" x="109.22" y="149.86"/>
 <instance part="C6" gate="G$1" x="139.7" y="165.1"/>
 <instance part="R5" gate="G$1" x="91.44" y="167.64" rot="R90"/>
 <instance part="P+5" gate="1" x="91.44" y="182.88"/>
 <instance part="R6" gate="G$1" x="88.9" y="116.84" rot="R90"/>
-<instance part="IC1" gate="G$1" x="297.18" y="-81.28"/>
+<instance part="U5" gate="G$1" x="297.18" y="-81.28"/>
 <instance part="GND9" gate="1" x="297.18" y="-104.14"/>
 <instance part="+3V1" gate="G$1" x="322.58" y="-68.58"/>
 <instance part="C9" gate="G$1" x="317.5" y="-81.28"/>
 <instance part="C10" gate="G$1" x="274.32" y="-81.28"/>
 <instance part="+3V2" gate="G$1" x="162.56" y="172.72"/>
-<instance part="T1" gate="A" x="195.58" y="142.24"/>
-<instance part="U$6" gate="G$1" x="233.68" y="15.24" rot="MR0"/>
+<instance part="Q1" gate="A" x="195.58" y="142.24"/>
+<instance part="U6" gate="G$1" x="233.68" y="15.24" rot="MR0"/>
 <instance part="R7" gate="G$1" x="185.42" y="35.56" rot="R90"/>
 <instance part="R8" gate="G$1" x="195.58" y="35.56" rot="R90"/>
 <instance part="R9" gate="G$1" x="261.62" y="22.86" rot="R90"/>
@@ -15414,7 +15414,7 @@ http://www.zetex.com&lt;p&gt;
 <instance part="GND12" gate="1" x="172.72" y="299.72"/>
 <instance part="P+9" gate="1" x="165.1" y="337.82"/>
 <instance part="R11" gate="G$1" x="127" y="276.86" rot="R90"/>
-<instance part="U$7" gate="G$1" x="152.4" y="355.6" rot="R90">
+<instance part="U10" gate="G$1" x="152.4" y="355.6" rot="R90">
 <attribute name="DPN" x="152.4" y="355.6" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="GND13" gate="1" x="170.18" y="345.44"/>
@@ -15422,12 +15422,12 @@ http://www.zetex.com&lt;p&gt;
 <instance part="C12" gate="G$1" x="129.54" y="345.44"/>
 <instance part="GND14" gate="1" x="124.46" y="335.28"/>
 <instance part="+3V3" gate="G$1" x="248.92" y="48.26"/>
-<instance part="U$8" gate="G$1" x="71.12" y="408.94"/>
+<instance part="U8" gate="G$1" x="71.12" y="408.94"/>
 <instance part="GND15" gate="1" x="73.66" y="381"/>
 <instance part="+3V4" gate="G$1" x="48.26" y="447.04"/>
 <instance part="R12" gate="G$1" x="96.52" y="426.72" rot="R90"/>
 <instance part="C13" gate="G$1" x="35.56" y="411.48"/>
-<instance part="U$9" gate="G$1" x="182.88" y="403.86"/>
+<instance part="U9" gate="G$1" x="182.88" y="403.86"/>
 <instance part="+3V5" gate="G$1" x="137.16" y="439.42"/>
 <instance part="GND16" gate="1" x="182.88" y="378.46"/>
 <instance part="C14" gate="G$1" x="142.24" y="393.7"/>
@@ -15456,7 +15456,7 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="185.42" y1="43.18" x2="195.58" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="195.58" y1="43.18" x2="195.58" y2="40.64" width="0.1524" layer="91"/>
 <junction x="185.42" y="43.18"/>
-<pinref part="U$6" gate="G$1" pin="VCCA"/>
+<pinref part="U6" gate="G$1" pin="VCCA"/>
 <wire x1="195.58" y1="43.18" x2="228.6" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="228.6" y1="43.18" x2="228.6" y2="30.48" width="0.1524" layer="91"/>
 <junction x="195.58" y="43.18"/>
@@ -15522,12 +15522,12 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="274.32" y1="-68.58" x2="279.4" y2="-68.58" width="0.1524" layer="91"/>
 <wire x1="279.4" y1="-68.58" x2="279.4" y2="-76.2" width="0.1524" layer="91"/>
 <junction x="259.08" y="-68.58"/>
-<pinref part="IC1" gate="G$1" pin="VIN"/>
+<pinref part="U5" gate="G$1" pin="VIN"/>
 <wire x1="279.4" y1="-76.2" x2="281.94" y2="-76.2" width="0.1524" layer="91"/>
 <wire x1="281.94" y1="-76.2" x2="287.02" y2="-76.2" width="0.1524" layer="91"/>
 <wire x1="281.94" y1="-76.2" x2="281.94" y2="-81.28" width="0.1524" layer="91"/>
 <junction x="281.94" y="-76.2"/>
-<pinref part="IC1" gate="G$1" pin="CE"/>
+<pinref part="U5" gate="G$1" pin="CE"/>
 <wire x1="281.94" y1="-81.28" x2="287.02" y2="-81.28" width="0.1524" layer="91"/>
 <pinref part="C10" gate="G$1" pin="1"/>
 <wire x1="274.32" y1="-68.58" x2="274.32" y2="-78.74" width="0.1524" layer="91"/>
@@ -15537,7 +15537,7 @@ http://www.zetex.com&lt;p&gt;
 <pinref part="P+5" gate="1" pin="+5V"/>
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="91.44" y1="180.34" x2="91.44" y2="177.8" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="SLEW"/>
+<pinref part="U7" gate="G$1" pin="SLEW"/>
 <wire x1="91.44" y1="177.8" x2="91.44" y2="172.72" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="142.24" x2="78.74" y2="142.24" width="0.1524" layer="91"/>
 <wire x1="78.74" y1="142.24" x2="78.74" y2="177.8" width="0.1524" layer="91"/>
@@ -15581,7 +15581,7 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="177.8" y1="7.62" x2="182.88" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="GND1" gate="1" pin="GND"/>
 <wire x1="182.88" y1="7.62" x2="182.88" y2="-7.62" width="0.1524" layer="91"/>
-<pinref part="U$6" gate="G$1" pin="GND"/>
+<pinref part="U6" gate="G$1" pin="GND"/>
 <wire x1="182.88" y1="-7.62" x2="182.88" y2="-15.24" width="0.1524" layer="91"/>
 <wire x1="182.88" y1="-7.62" x2="236.22" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="236.22" y1="-7.62" x2="236.22" y2="-5.08" width="0.1524" layer="91"/>
@@ -15700,15 +15700,15 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="40.64" y1="127" x2="53.34" y2="127" width="0.1524" layer="91"/>
 <junction x="53.34" y="127"/>
 <wire x1="132.08" y1="127" x2="132.08" y2="134.62" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="PAD"/>
+<pinref part="U7" gate="G$1" pin="PAD"/>
 <wire x1="132.08" y1="134.62" x2="124.46" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="134.62" x2="132.08" y2="137.16" width="0.1524" layer="91"/>
 <junction x="132.08" y="134.62"/>
-<pinref part="U$5" gate="G$1" pin="AGND"/>
+<pinref part="U7" gate="G$1" pin="AGND"/>
 <wire x1="132.08" y1="137.16" x2="124.46" y2="137.16" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="137.16" x2="132.08" y2="139.7" width="0.1524" layer="91"/>
 <junction x="132.08" y="137.16"/>
-<pinref part="U$5" gate="G$1" pin="PGND"/>
+<pinref part="U7" gate="G$1" pin="PGND"/>
 <wire x1="132.08" y1="139.7" x2="124.46" y2="139.7" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="1"/>
 <wire x1="88.9" y1="111.76" x2="132.08" y2="111.76" width="0.1524" layer="91"/>
@@ -15723,12 +15723,12 @@ http://www.zetex.com&lt;p&gt;
 <junction x="203.2" y="152.4"/>
 <pinref part="JWEAP" gate="A" pin="2"/>
 <wire x1="203.2" y1="154.94" x2="180.34" y2="154.94" width="0.1524" layer="91"/>
-<pinref part="T1" gate="A" pin="S"/>
+<pinref part="Q1" gate="A" pin="S"/>
 <wire x1="195.58" y1="137.16" x2="203.2" y2="137.16" width="0.1524" layer="91"/>
 <junction x="203.2" y="137.16"/>
 </segment>
 <segment>
-<pinref part="IC1" gate="G$1" pin="GND"/>
+<pinref part="U5" gate="G$1" pin="GND"/>
 <wire x1="287.02" y1="-86.36" x2="287.02" y2="-101.6" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
 <wire x1="287.02" y1="-101.6" x2="297.18" y2="-101.6" width="0.1524" layer="91"/>
@@ -15777,10 +15777,10 @@ http://www.zetex.com&lt;p&gt;
 <pinref part="SER2" gate="A" pin="1"/>
 </segment>
 <segment>
-<pinref part="U$7" gate="G$1" pin="GND@2"/>
+<pinref part="U10" gate="G$1" pin="GND@2"/>
 <pinref part="GND13" gate="1" pin="GND"/>
 <wire x1="170.18" y1="353.06" x2="170.18" y2="347.98" width="0.1524" layer="91"/>
-<pinref part="U$7" gate="G$1" pin="GND@4"/>
+<pinref part="U10" gate="G$1" pin="GND@4"/>
 <wire x1="170.18" y1="358.14" x2="170.18" y2="353.06" width="0.1524" layer="91"/>
 <junction x="170.18" y="353.06"/>
 </segment>
@@ -15798,9 +15798,9 @@ http://www.zetex.com&lt;p&gt;
 <pinref part="GND15" gate="1" pin="GND"/>
 <wire x1="73.66" y1="383.54" x2="55.88" y2="383.54" width="0.1524" layer="91"/>
 <wire x1="55.88" y1="383.54" x2="55.88" y2="401.32" width="0.1524" layer="91"/>
-<pinref part="U$8" gate="G$1" pin="GND"/>
+<pinref part="U8" gate="G$1" pin="GND"/>
 <wire x1="55.88" y1="401.32" x2="58.42" y2="401.32" width="0.1524" layer="91"/>
-<pinref part="U$8" gate="G$1" pin="CS"/>
+<pinref part="U8" gate="G$1" pin="CS"/>
 <wire x1="86.36" y1="406.4" x2="91.44" y2="406.4" width="0.1524" layer="91"/>
 <wire x1="91.44" y1="406.4" x2="91.44" y2="383.54" width="0.1524" layer="91"/>
 <wire x1="91.44" y1="383.54" x2="73.66" y2="383.54" width="0.1524" layer="91"/>
@@ -15811,7 +15811,7 @@ http://www.zetex.com&lt;p&gt;
 <junction x="55.88" y="383.54"/>
 </segment>
 <segment>
-<pinref part="U$9" gate="G$1" pin="GND"/>
+<pinref part="U9" gate="G$1" pin="GND"/>
 <wire x1="167.64" y1="393.7" x2="167.64" y2="381" width="0.1524" layer="91"/>
 <pinref part="GND16" gate="1" pin="GND"/>
 <wire x1="167.64" y1="381" x2="182.88" y2="381" width="0.1524" layer="91"/>
@@ -15918,39 +15918,39 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="N$1" class="0">
 <segment>
-<pinref part="X1" gate="G$1" pin="VBUS"/>
+<pinref part="J2" gate="G$1" pin="VBUS"/>
 <wire x1="86.36" y1="76.2" x2="96.52" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="76.2" x2="96.52" y2="78.74" width="0.1524" layer="91"/>
-<pinref part="P1" gate="G$1" pin="4"/>
+<pinref part="JUSB" gate="G$1" pin="4"/>
 <wire x1="96.52" y1="78.74" x2="116.84" y2="78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
 <segment>
-<pinref part="P1" gate="G$1" pin="3"/>
+<pinref part="JUSB" gate="G$1" pin="3"/>
 <wire x1="116.84" y1="76.2" x2="99.06" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="76.2" x2="99.06" y2="73.66" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="D-"/>
+<pinref part="J2" gate="G$1" pin="D-"/>
 <wire x1="99.06" y1="73.66" x2="86.36" y2="73.66" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$5" class="0">
 <segment>
-<pinref part="X1" gate="G$1" pin="D+"/>
+<pinref part="J2" gate="G$1" pin="D+"/>
 <wire x1="86.36" y1="71.12" x2="101.6" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="101.6" y1="71.12" x2="101.6" y2="73.66" width="0.1524" layer="91"/>
-<pinref part="P1" gate="G$1" pin="2"/>
+<pinref part="JUSB" gate="G$1" pin="2"/>
 <wire x1="101.6" y1="73.66" x2="116.84" y2="73.66" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
 <segment>
-<pinref part="X1" gate="G$1" pin="GND"/>
+<pinref part="J2" gate="G$1" pin="GND"/>
 <wire x1="86.36" y1="78.74" x2="93.98" y2="78.74" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="78.74" x2="93.98" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="68.58" x2="106.68" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="68.58" x2="106.68" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="P1" gate="G$1" pin="1"/>
+<pinref part="JUSB" gate="G$1" pin="1"/>
 <wire x1="106.68" y1="71.12" x2="116.84" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -16074,7 +16074,7 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="JWEAP" gate="A" pin="1"/>
 <wire x1="142.24" y1="154.94" x2="172.72" y2="154.94" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="OUT1"/>
+<pinref part="U7" gate="G$1" pin="OUT1"/>
 <wire x1="124.46" y1="149.86" x2="142.24" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="142.24" y1="149.86" x2="142.24" y2="154.94" width="0.1524" layer="91"/>
 </segment>
@@ -16085,7 +16085,7 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="149.86" y1="147.32" x2="149.86" y2="152.4" width="0.1524" layer="91"/>
 <pinref part="JWEAP" gate="A" pin="3"/>
 <wire x1="149.86" y1="152.4" x2="172.72" y2="152.4" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="OUT2"/>
+<pinref part="U7" gate="G$1" pin="OUT2"/>
 <wire x1="124.46" y1="144.78" x2="132.08" y2="144.78" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="144.78" x2="132.08" y2="147.32" width="0.1524" layer="91"/>
 </segment>
@@ -16110,7 +16110,7 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="86.36" y1="165.1" x2="86.36" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="175.26" x2="132.08" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="175.26" x2="132.08" y2="170.18" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="VPWR"/>
+<pinref part="U7" gate="G$1" pin="VPWR"/>
 <wire x1="132.08" y1="170.18" x2="132.08" y2="160.02" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="160.02" x2="124.46" y2="160.02" width="0.1524" layer="91"/>
 <pinref part="C6" gate="G$1" pin="1"/>
@@ -16135,7 +16135,7 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="N$16" class="0">
 <segment>
-<pinref part="U$5" gate="G$1" pin="CCP"/>
+<pinref part="U7" gate="G$1" pin="CCP"/>
 <pinref part="C6" gate="G$1" pin="2"/>
 <wire x1="124.46" y1="157.48" x2="139.7" y2="157.48" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="157.48" x2="139.7" y2="160.02" width="0.1524" layer="91"/>
@@ -16145,13 +16145,13 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="91.44" y1="162.56" x2="91.44" y2="160.02" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="SF/"/>
+<pinref part="U7" gate="G$1" pin="SF/"/>
 <wire x1="91.44" y1="160.02" x2="93.98" y2="160.02" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="MOTOR_FB" class="0">
 <segment>
-<pinref part="U$5" gate="G$1" pin="FB"/>
+<pinref part="U7" gate="G$1" pin="FB"/>
 <wire x1="93.98" y1="157.48" x2="88.9" y2="157.48" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="88.9" y1="157.48" x2="88.9" y2="121.92" width="0.1524" layer="91"/>
@@ -16165,7 +16165,7 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="+3V3" class="0">
 <segment>
-<pinref part="IC1" gate="G$1" pin="VOUT"/>
+<pinref part="U5" gate="G$1" pin="VOUT"/>
 <pinref part="+3V1" gate="G$1" pin="+3V3"/>
 <wire x1="307.34" y1="-76.2" x2="317.5" y2="-76.2" width="0.1524" layer="91"/>
 <wire x1="317.5" y1="-76.2" x2="322.58" y2="-76.2" width="0.1524" layer="91"/>
@@ -16181,13 +16181,13 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="162.56" y1="149.86" x2="172.72" y2="149.86" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$6" gate="G$1" pin="VCCB"/>
+<pinref part="U6" gate="G$1" pin="VCCB"/>
 <wire x1="238.76" y1="30.48" x2="248.92" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="248.92" y1="30.48" x2="248.92" y2="45.72" width="0.1524" layer="91"/>
 <wire x1="248.92" y1="30.48" x2="254" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="254" y1="30.48" x2="254" y2="5.08" width="0.1524" layer="91"/>
 <junction x="248.92" y="30.48"/>
-<pinref part="U$6" gate="G$1" pin="EN"/>
+<pinref part="U6" gate="G$1" pin="EN"/>
 <wire x1="254" y1="5.08" x2="248.92" y2="5.08" width="0.1524" layer="91"/>
 <wire x1="254" y1="30.48" x2="261.62" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="261.62" y1="30.48" x2="269.24" y2="30.48" width="0.1524" layer="91"/>
@@ -16207,12 +16207,12 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="+3V4" gate="G$1" pin="+3V3"/>
 <wire x1="48.26" y1="444.5" x2="48.26" y2="436.88" width="0.1524" layer="91"/>
-<pinref part="U$8" gate="G$1" pin="VDD"/>
+<pinref part="U8" gate="G$1" pin="VDD"/>
 <wire x1="48.26" y1="436.88" x2="48.26" y2="416.56" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="416.56" x2="58.42" y2="416.56" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="416.56" x2="48.26" y2="411.48" width="0.1524" layer="91"/>
 <junction x="48.26" y="416.56"/>
-<pinref part="U$8" gate="G$1" pin="VDDIO"/>
+<pinref part="U8" gate="G$1" pin="VDDIO"/>
 <wire x1="48.26" y1="411.48" x2="58.42" y2="411.48" width="0.1524" layer="91"/>
 <pinref part="R12" gate="G$1" pin="2"/>
 <wire x1="48.26" y1="436.88" x2="96.52" y2="436.88" width="0.1524" layer="91"/>
@@ -16225,18 +16225,18 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="+3V5" gate="G$1" pin="+3V3"/>
 <wire x1="137.16" y1="436.88" x2="137.16" y2="426.72" width="0.1524" layer="91"/>
-<pinref part="U$9" gate="G$1" pin="VDD"/>
+<pinref part="U9" gate="G$1" pin="VDD"/>
 <wire x1="137.16" y1="426.72" x2="137.16" y2="411.48" width="0.1524" layer="91"/>
 <wire x1="137.16" y1="411.48" x2="142.24" y2="411.48" width="0.1524" layer="91"/>
 <wire x1="142.24" y1="411.48" x2="167.64" y2="411.48" width="0.1524" layer="91"/>
 <wire x1="137.16" y1="411.48" x2="137.16" y2="401.32" width="0.1524" layer="91"/>
 <junction x="137.16" y="411.48"/>
-<pinref part="U$9" gate="G$1" pin="VDDIO"/>
+<pinref part="U9" gate="G$1" pin="VDDIO"/>
 <wire x1="137.16" y1="401.32" x2="167.64" y2="401.32" width="0.1524" layer="91"/>
 <pinref part="C14" gate="G$1" pin="1"/>
 <wire x1="142.24" y1="396.24" x2="142.24" y2="411.48" width="0.1524" layer="91"/>
 <junction x="142.24" y="411.48"/>
-<pinref part="U$9" gate="G$1" pin="SA0"/>
+<pinref part="U9" gate="G$1" pin="SA0"/>
 <wire x1="198.12" y1="403.86" x2="203.2" y2="403.86" width="0.1524" layer="91"/>
 <wire x1="203.2" y1="403.86" x2="203.2" y2="426.72" width="0.1524" layer="91"/>
 <wire x1="203.2" y1="426.72" x2="137.16" y2="426.72" width="0.1524" layer="91"/>
@@ -16247,7 +16247,7 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="JWEAP" gate="A" pin="6"/>
 <wire x1="180.34" y1="149.86" x2="195.58" y2="149.86" width="0.1524" layer="91"/>
-<pinref part="T1" gate="A" pin="D"/>
+<pinref part="Q1" gate="A" pin="D"/>
 <wire x1="195.58" y1="149.86" x2="195.58" y2="147.32" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -16257,7 +16257,7 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="177.8" y1="22.86" x2="185.42" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="185.42" y1="22.86" x2="198.12" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="198.12" y1="22.86" x2="198.12" y2="10.16" width="0.1524" layer="91"/>
-<pinref part="U$6" gate="G$1" pin="SCLA"/>
+<pinref part="U6" gate="G$1" pin="SCLA"/>
 <wire x1="198.12" y1="10.16" x2="218.44" y2="10.16" width="0.1524" layer="91"/>
 <pinref part="R7" gate="G$1" pin="1"/>
 <wire x1="185.42" y1="30.48" x2="185.42" y2="22.86" width="0.1524" layer="91"/>
@@ -16271,7 +16271,7 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="177.8" y1="17.78" x2="195.58" y2="17.78" width="0.1524" layer="91"/>
 <wire x1="195.58" y1="17.78" x2="200.66" y2="17.78" width="0.1524" layer="91"/>
 <wire x1="200.66" y1="17.78" x2="200.66" y2="15.24" width="0.1524" layer="91"/>
-<pinref part="U$6" gate="G$1" pin="SDAA"/>
+<pinref part="U6" gate="G$1" pin="SDAA"/>
 <wire x1="200.66" y1="15.24" x2="218.44" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="R8" gate="G$1" pin="1"/>
 <wire x1="195.58" y1="30.48" x2="195.58" y2="17.78" width="0.1524" layer="91"/>
@@ -16281,7 +16281,7 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="SYS_SCL" class="0">
 <segment>
-<pinref part="U$6" gate="G$1" pin="SCLB"/>
+<pinref part="U6" gate="G$1" pin="SCLB"/>
 <pinref part="JI2C" gate="A" pin="3"/>
 <wire x1="248.92" y1="10.16" x2="269.24" y2="10.16" width="0.1524" layer="91"/>
 <pinref part="R10" gate="G$1" pin="1"/>
@@ -16296,19 +16296,19 @@ http://www.zetex.com&lt;p&gt;
 <label x="139.7" y="302.26" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$8" gate="G$1" pin="SCL"/>
+<pinref part="U8" gate="G$1" pin="SCL"/>
 <wire x1="86.36" y1="416.56" x2="116.84" y2="416.56" width="0.1524" layer="91"/>
 <label x="106.68" y="416.56" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$9" gate="G$1" pin="SCL"/>
+<pinref part="U9" gate="G$1" pin="SCL"/>
 <wire x1="198.12" y1="411.48" x2="228.6" y2="411.48" width="0.1524" layer="91"/>
 <label x="218.44" y="411.48" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SYS_SDA" class="0">
 <segment>
-<pinref part="U$6" gate="G$1" pin="SDAB"/>
+<pinref part="U6" gate="G$1" pin="SDAB"/>
 <wire x1="248.92" y1="15.24" x2="259.08" y2="15.24" width="0.1524" layer="91"/>
 <wire x1="259.08" y1="15.24" x2="259.08" y2="12.7" width="0.1524" layer="91"/>
 <pinref part="JI2C" gate="A" pin="2"/>
@@ -16325,12 +16325,12 @@ http://www.zetex.com&lt;p&gt;
 <label x="139.7" y="299.72" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$8" gate="G$1" pin="SDA"/>
+<pinref part="U8" gate="G$1" pin="SDA"/>
 <wire x1="86.36" y1="414.02" x2="116.84" y2="414.02" width="0.1524" layer="91"/>
 <label x="106.68" y="414.02" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$9" gate="G$1" pin="SDA"/>
+<pinref part="U9" gate="G$1" pin="SDA"/>
 <wire x1="198.12" y1="408.94" x2="228.6" y2="408.94" width="0.1524" layer="91"/>
 <label x="218.44" y="408.94" size="1.778" layer="95"/>
 </segment>
@@ -16378,14 +16378,14 @@ http://www.zetex.com&lt;p&gt;
 <label x="137.16" y="314.96" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$5" gate="G$1" pin="IN1"/>
+<pinref part="U7" gate="G$1" pin="IN1"/>
 <wire x1="93.98" y1="152.4" x2="81.28" y2="152.4" width="0.1524" layer="91"/>
 <label x="81.28" y="152.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="AGITATOR_PWM" class="0">
 <segment>
-<pinref part="U$5" gate="G$1" pin="IN2"/>
+<pinref part="U7" gate="G$1" pin="IN2"/>
 <wire x1="93.98" y1="149.86" x2="81.28" y2="149.86" width="0.1524" layer="91"/>
 <label x="81.28" y="149.86" size="1.778" layer="95"/>
 </segment>
@@ -16402,7 +16402,7 @@ http://www.zetex.com&lt;p&gt;
 <label x="132.08" y="297.18" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$5" gate="G$1" pin="D1"/>
+<pinref part="U7" gate="G$1" pin="D1"/>
 <wire x1="93.98" y1="139.7" x2="71.12" y2="139.7" width="0.1524" layer="91"/>
 <label x="71.12" y="139.7" size="1.778" layer="95"/>
 </segment>
@@ -16414,7 +16414,7 @@ http://www.zetex.com&lt;p&gt;
 <label x="132.08" y="294.64" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$5" gate="G$1" pin="D2/"/>
+<pinref part="U7" gate="G$1" pin="D2/"/>
 <wire x1="93.98" y1="137.16" x2="71.12" y2="137.16" width="0.1524" layer="91"/>
 <label x="71.12" y="137.16" size="1.778" layer="95"/>
 </segment>
@@ -16426,7 +16426,7 @@ http://www.zetex.com&lt;p&gt;
 <label x="132.08" y="292.1" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$5" gate="G$1" pin="EN"/>
+<pinref part="U7" gate="G$1" pin="EN"/>
 <wire x1="93.98" y1="134.62" x2="71.12" y2="134.62" width="0.1524" layer="91"/>
 <label x="71.12" y="134.62" size="1.778" layer="95"/>
 </segment>
@@ -16462,7 +16462,7 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="N$32" class="0">
 <segment>
-<pinref part="U$7" gate="G$1" pin="OSC@1"/>
+<pinref part="U10" gate="G$1" pin="OSC@1"/>
 <wire x1="137.16" y1="353.06" x2="129.54" y2="353.06" width="0.1524" layer="91"/>
 <wire x1="129.54" y1="353.06" x2="111.76" y2="353.06" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="353.06" x2="111.76" y2="330.2" width="0.1524" layer="91"/>
@@ -16475,7 +16475,7 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="N$33" class="0">
 <segment>
-<pinref part="U$7" gate="G$1" pin="OSC@3"/>
+<pinref part="U10" gate="G$1" pin="OSC@3"/>
 <wire x1="137.16" y1="358.14" x2="116.84" y2="358.14" width="0.1524" layer="91"/>
 <wire x1="116.84" y1="358.14" x2="45.72" y2="358.14" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="358.14" x2="45.72" y2="317.5" width="0.1524" layer="91"/>
@@ -16490,7 +16490,7 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="R12" gate="G$1" pin="1"/>
 <wire x1="96.52" y1="421.64" x2="96.52" y2="408.94" width="0.1524" layer="91"/>
-<pinref part="U$8" gate="G$1" pin="SA0"/>
+<pinref part="U8" gate="G$1" pin="SA0"/>
 <wire x1="96.52" y1="408.94" x2="86.36" y2="408.94" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -16498,8 +16498,22 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="C15" gate="G$1" pin="1"/>
 <wire x1="152.4" y1="396.24" x2="152.4" y2="406.4" width="0.1524" layer="91"/>
-<pinref part="U$9" gate="G$1" pin="BYP"/>
+<pinref part="U9" gate="G$1" pin="BYP"/>
 <wire x1="152.4" y1="406.4" x2="167.64" y2="406.4" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="LASER_EN" class="0">
+<segment>
+<pinref part="U4" gate="A" pin="PC6"/>
+<wire x1="104.14" y1="287.02" x2="142.24" y2="287.02" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="287.02" x2="154.94" y2="287.02" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="287.02" x2="142.24" y2="287.02" width="0.1524" layer="91"/>
+<label x="142.24" y="287.02" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="Q1" gate="A" pin="G"/>
+<wire x1="190.5" y1="139.7" x2="160.02" y2="139.7" width="0.1524" layer="91"/>
+<label x="160.02" y="139.7" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

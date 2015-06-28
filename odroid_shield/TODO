@@ -1,6 +1,7 @@
- * Parts
+
+ * bottom chassis plate interferes with bottom USB connector on odroid
+
    * do schematic ERC
-   * give useful names to all ICs
    * line up all connectors
    * try to line up other parts as best I can
    * ensure connectors have sufficient clearance around top plate
@@ -8,7 +9,7 @@
    * decide on other power planes
      * 8V and 5V are the likely candidates
    * route 5V buck
-   * route 12V boost
+   * route weapon drive
    * route power
    * autoroute
    * ensure leadless parts have moderately accessible test points for
@@ -55,6 +56,9 @@
    * weapon light
    * some connection for scoring transponder data... maybe just
      another herkulex bus connector?
+
+DONE 2015-06-28
+ * Gave useful names to all ICs
 
 DONE 2015-06-27
  * AVR crystal
