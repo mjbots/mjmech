@@ -5069,6 +5069,12 @@ PLASTIC QUAT FLATPACK&lt;p&gt;</description>
 <wire x1="-1.2" y1="1.5" x2="-1.5" y2="1.5" width="0.127" layer="21"/>
 <wire x1="-1.5" y1="1.2" x2="-1.2" y2="1.5" width="0.127" layer="21"/>
 <text x="-1.5" y="2" size="1.27" layer="21">&gt;NAME</text>
+<polygon width="0.127" layer="43">
+<vertex x="-0.8" y="0.8"/>
+<vertex x="0.8" y="0.8"/>
+<vertex x="0.8" y="-0.8"/>
+<vertex x="-0.8" y="-0.8"/>
+</polygon>
 </package>
 <package name="QFN16">
 <smd name="15" x="0" y="1.275" dx="0.305" dy="0.813" layer="1"/>
@@ -5095,6 +5101,12 @@ PLASTIC QUAT FLATPACK&lt;p&gt;</description>
 <wire x1="-1.5" y1="1.2" x2="-1.5" y2="1.5" width="0.127" layer="21"/>
 <wire x1="-1.5" y1="1.2" x2="-1.2" y2="1.5" width="0.127" layer="21"/>
 <text x="-1.6" y="2" size="1.27" layer="21">&gt;NAME</text>
+<polygon width="0.127" layer="43">
+<vertex x="-0.7" y="0.7"/>
+<vertex x="0.7" y="0.7"/>
+<vertex x="0.7" y="-0.7"/>
+<vertex x="-0.7" y="-0.7"/>
+</polygon>
 </package>
 </packages>
 <symbols>
