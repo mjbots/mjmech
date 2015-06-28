@@ -1,9 +1,8 @@
 
  * bottom chassis plate interferes with bottom USB connector on odroid
 
-   * thermals to gound and +8V are too small
    * ensure connectors have sufficient clearance around top plate
-   * route weapon drive
+   * route IMU
    * route power
    * autoroute
    * ensure leadless parts have moderately accessible test points for
@@ -60,6 +59,7 @@ DONE 2015-06-28
  * try to line up other parts as best I can
  * decide on other power planes
    * 8V and 5V are the likely candidates
+ * route weapon drive
 
 DONE 2015-06-27
  * AVR crystal
