@@ -2,12 +2,7 @@
  * bottom chassis plate interferes with bottom USB connector on odroid
 
    * thermals to gound and +8V are too small
-   * try to line up other parts as best I can
    * ensure connectors have sufficient clearance around top plate
-   * make ground plane
-   * decide on other power planes
-     * 8V and 5V are the likely candidates
-   * route 5V buck
    * route weapon drive
    * route power
    * autoroute
@@ -60,6 +55,11 @@ DONE 2015-06-28
  * Gave useful names to all ICs
  * do schematic ERC
  * line up all connectors
+ * route 5V buck
+ * make ground plane
+ * try to line up other parts as best I can
+ * decide on other power planes
+   * 8V and 5V are the likely candidates
 
 DONE 2015-06-27
  * AVR crystal

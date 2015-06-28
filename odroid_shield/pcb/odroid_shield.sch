@@ -4919,22 +4919,22 @@ Source: www.bourns.com .. 6000_series.pdf</description>
 <text x="3.9" y="6.6" size="1.27" layer="21">&gt;NAME</text>
 </package>
 <package name="LGA16">
-<smd name="15" x="0" y="1.35" dx="0.35" dy="0.7" layer="1"/>
-<smd name="14" x="0.5" y="1.35" dx="0.35" dy="0.7" layer="1"/>
-<smd name="16" x="-0.5" y="1.35" dx="0.35" dy="0.7" layer="1"/>
-<smd name="6" x="-0.5" y="-1.35" dx="0.35" dy="0.7" layer="1"/>
-<smd name="7" x="0" y="-1.35" dx="0.35" dy="0.7" layer="1"/>
-<smd name="8" x="0.5" y="-1.35" dx="0.35" dy="0.7" layer="1"/>
-<smd name="11" x="1.35" y="0" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="12" x="1.35" y="0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="13" x="1.35" y="1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="10" x="1.35" y="-0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="9" x="1.35" y="-1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="5" x="-1.35" y="-1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="4" x="-1.35" y="-0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="3" x="-1.35" y="0" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="2" x="-1.35" y="0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
-<smd name="1" x="-1.35" y="1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="15" x="0" y="1.35" dx="0.3" dy="0.7" layer="1"/>
+<smd name="14" x="0.5" y="1.35" dx="0.3" dy="0.7" layer="1"/>
+<smd name="16" x="-0.5" y="1.35" dx="0.3" dy="0.7" layer="1"/>
+<smd name="6" x="-0.5" y="-1.35" dx="0.3" dy="0.7" layer="1"/>
+<smd name="7" x="0" y="-1.35" dx="0.3" dy="0.7" layer="1"/>
+<smd name="8" x="0.5" y="-1.35" dx="0.3" dy="0.7" layer="1"/>
+<smd name="11" x="1.35" y="0" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="12" x="1.35" y="0.5" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="13" x="1.35" y="1" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="10" x="1.35" y="-0.5" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="9" x="1.35" y="-1" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="5" x="-1.35" y="-1" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="4" x="-1.35" y="-0.5" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="3" x="-1.35" y="0" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="2" x="-1.35" y="0.5" dx="0.3" dy="0.7" layer="1" rot="R90"/>
+<smd name="1" x="-1.35" y="1" dx="0.3" dy="0.7" layer="1" rot="R90"/>
 <wire x1="-1.5" y1="1.5" x2="-1.5" y2="1.2" width="0.127" layer="21"/>
 <wire x1="-1.5" y1="1.2" x2="-1.5" y2="-1.5" width="0.127" layer="21"/>
 <wire x1="-1.5" y1="-1.5" x2="1.5" y2="-1.5" width="0.127" layer="21"/>
