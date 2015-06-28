@@ -15187,9 +15187,6 @@ http://www.zetex.com&lt;p&gt;
 <part name="C4" library="rcl" deviceset="C-US" device="C1206" value="22uF 16V">
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
-<part name="C5" library="rcl" deviceset="C-US" device="C1206" value="22uF 16V">
-<attribute name="DPN" value="445-3955-1-ND"/>
-</part>
 <part name="L1" library="odroid_shield" deviceset="L-US" device="WURTH_74404042033" value="33uH">
 <attribute name="DPN" value="732-5505-1-ND"/>
 </part>
@@ -15349,9 +15346,6 @@ http://www.zetex.com&lt;p&gt;
 </instance>
 <instance part="C4" gate="G$1" x="220.98" y="-76.2">
 <attribute name="DPN" x="220.98" y="-76.2" size="1.778" layer="96" display="off"/>
-</instance>
-<instance part="C5" gate="G$1" x="243.84" y="-76.2">
-<attribute name="DPN" x="243.84" y="-76.2" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="L1" gate="G$1" x="200.66" y="-68.58" rot="R90">
 <attribute name="DPN" x="200.66" y="-68.58" size="1.778" layer="96" rot="R90" display="off"/>
@@ -15515,17 +15509,13 @@ http://www.zetex.com&lt;p&gt;
 <pinref part="C4" gate="G$1" pin="1"/>
 <wire x1="210.82" y1="-68.58" x2="220.98" y2="-68.58" width="0.1524" layer="91"/>
 <wire x1="220.98" y1="-68.58" x2="220.98" y2="-73.66" width="0.1524" layer="91"/>
-<wire x1="220.98" y1="-68.58" x2="243.84" y2="-68.58" width="0.1524" layer="91"/>
+<wire x1="220.98" y1="-68.58" x2="259.08" y2="-68.58" width="0.1524" layer="91"/>
 <junction x="220.98" y="-68.58"/>
-<pinref part="C5" gate="G$1" pin="1"/>
-<wire x1="243.84" y1="-68.58" x2="243.84" y2="-73.66" width="0.1524" layer="91"/>
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="210.82" y1="-68.58" x2="210.82" y2="-71.12" width="0.1524" layer="91"/>
 <junction x="210.82" y="-68.58"/>
 <pinref part="P+4" gate="1" pin="+5V"/>
-<wire x1="243.84" y1="-68.58" x2="259.08" y2="-68.58" width="0.1524" layer="91"/>
 <wire x1="259.08" y1="-68.58" x2="259.08" y2="-63.5" width="0.1524" layer="91"/>
-<junction x="243.84" y="-68.58"/>
 <wire x1="259.08" y1="-68.58" x2="274.32" y2="-68.58" width="0.1524" layer="91"/>
 <wire x1="274.32" y1="-68.58" x2="279.4" y2="-68.58" width="0.1524" layer="91"/>
 <wire x1="279.4" y1="-68.58" x2="279.4" y2="-76.2" width="0.1524" layer="91"/>
@@ -15664,10 +15654,6 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="210.82" y1="-99.06" x2="220.98" y2="-99.06" width="0.1524" layer="91"/>
 <wire x1="220.98" y1="-99.06" x2="220.98" y2="-81.28" width="0.1524" layer="91"/>
 <junction x="180.34" y="-99.06"/>
-<pinref part="C5" gate="G$1" pin="2"/>
-<wire x1="220.98" y1="-99.06" x2="243.84" y2="-99.06" width="0.1524" layer="91"/>
-<wire x1="243.84" y1="-99.06" x2="243.84" y2="-81.28" width="0.1524" layer="91"/>
-<junction x="220.98" y="-99.06"/>
 <pinref part="R2" gate="G$1" pin="1"/>
 <wire x1="210.82" y1="-96.52" x2="210.82" y2="-99.06" width="0.1524" layer="91"/>
 <junction x="210.82" y="-99.06"/>
