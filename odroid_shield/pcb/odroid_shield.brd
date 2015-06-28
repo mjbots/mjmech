@@ -136,7 +136,7 @@
 <wire x1="80" y1="0" x2="83" y2="3" width="0" layer="20" curve="90"/>
 <wire x1="83" y1="3" x2="83" y2="45" width="0" layer="20"/>
 <text x="1.4" y="15.4" size="1" layer="21" ratio="10">J4</text>
-<text x="52.9" y="20" size="1" layer="21" ratio="10">USB</text>
+<text x="55.1" y="19.9" size="1.27" layer="21" rot="R90">USB</text>
 <wire x1="49" y1="46" x2="49" y2="2" width="0.1" layer="21"/>
 <wire x1="49" y1="2" x2="51" y2="0" width="0.1" layer="21" curve="90"/>
 <wire x1="34" y1="46" x2="34" y2="2" width="0.1" layer="21"/>
@@ -2323,7 +2323,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="25.815" y="38.86" size="1.27" layer="21" rot="R90"/>
 </element>
 <element name="JWEAP" library="pinhead" package="2X04" value="" x="52.3" y="30.6" smashed="yes" rot="R270">
-<attribute name="NAME" x="51.425" y="36.32" size="1.27" layer="25" ratio="10" rot="R90"/>
+<attribute name="NAME" x="51.425" y="36.32" size="1.27" layer="25" rot="R90"/>
 <attribute name="VALUE" x="47.855" y="35.68" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="JD6" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="65.2" y="28.5" smashed="yes" rot="R270">
@@ -2340,16 +2340,17 @@ design rules under a new name.</description>
 <attribute name="DPN" value="67-1499-ND" x="22.6" y="36" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="24.525" y="32.3666" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
-<element name="PWR" library="led" package="CHIPLED_0805" value="GREEN" x="59.2" y="9.2" smashed="yes" rot="R270">
-<attribute name="NAME" x="60.67" y="8.33" size="1" layer="25" ratio="10" rot="R180"/>
+<element name="PWR" library="led" package="CHIPLED_0805" value="GREEN" x="57" y="8.9" smashed="yes" rot="R270">
+<attribute name="NAME" x="58.47" y="8.03" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="SHORE" library="odroid_shield" package="CUI_PJ_015AH_SMT" value="PJ-034ASMT" x="27" y="10.4" smashed="yes" rot="R180">
 <attribute name="DPN" value="CP-015AHPJ-CT-ND" x="27" y="10.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="29.8" y="4" size="1.27" layer="21" rot="R180"/>
 </element>
 <element name="JI2C" library="pinhead" package="1X04" value="" x="18.2" y="7.8" rot="R90"/>
-<element name="F1" library="odroid_shield" package="KEYSTONE_HORIZ_FUSE_CLIP" value="FUSE" x="75.1" y="13.3" rot="R90">
+<element name="F1" library="odroid_shield" package="KEYSTONE_HORIZ_FUSE_CLIP" value="FUSE" x="75.1" y="13.3" smashed="yes" rot="R90">
 <attribute name="DPN" value="36-3569-ND" x="75.1" y="13.3" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="74.3" y="7" size="1" layer="21" ratio="10" rot="R270"/>
 </element>
 <element name="U3" library="odroid_shield" package="POWER_SO8" value="ST1S10" x="42.2" y="13.6" smashed="yes" rot="R270">
 <attribute name="NAME" x="40.295" y="16.267" size="1" layer="25" ratio="10"/>
@@ -2418,8 +2419,8 @@ design rules under a new name.</description>
 <element name="R3" library="rcl" package="R0603" value="500" x="27.6" y="32.9" smashed="yes">
 <attribute name="NAME" x="28.635" y="32.265" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
-<element name="R4" library="rcl" package="R0603" value="500" x="55.7" y="9.2" smashed="yes" rot="R180">
-<attribute name="NAME" x="56.735" y="8.365" size="1" layer="25" ratio="10" rot="R180"/>
+<element name="R4" library="rcl" package="R0603" value="500" x="53" y="8.9" smashed="yes" rot="R180">
+<attribute name="NAME" x="54.035" y="8.065" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="U7" library="odroid_shield" package="PQFN32" value="MP33926" x="41.2" y="33.1" smashed="yes">
 <attribute name="NAME" x="44.6" y="37.8" size="1" layer="21" ratio="10"/>
@@ -2479,7 +2480,7 @@ design rules under a new name.</description>
 </element>
 <element name="JSER2" library="pinhead" package="1X04" value="" x="19.5" y="44.3" smashed="yes" rot="R180">
 <attribute name="DPN" value="S9410-ND" x="19.5" y="44.3" size="1" layer="27" ratio="10" rot="R180" display="off"/>
-<attribute name="NAME" x="17.0438" y="46.2288" size="1.27" layer="25" ratio="10"/>
+<attribute name="NAME" x="17.0438" y="46.2288" size="1.27" layer="25"/>
 <attribute name="VALUE" x="24.58" y="47.475" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R11" library="rcl" package="R0603" value="200" x="13.6" y="24.6" smashed="yes" rot="R90">
@@ -2495,16 +2496,16 @@ design rules under a new name.</description>
 <attribute name="NAME" x="19.065" y="35.965" size="1" layer="26" ratio="10" rot="MR180"/>
 </element>
 <element name="U8" library="odroid_shield" package="LGA16" value="MAX21000" x="16.7" y="17.2" smashed="yes">
-<attribute name="NAME" x="18.1" y="19" size="1" layer="21" ratio="10"/>
+<attribute name="NAME" x="18" y="19.1" size="1" layer="21" ratio="10"/>
 </element>
 <element name="R12" library="rcl" package="R0603" value="100k" x="17.5" y="14.2" smashed="yes">
 <attribute name="NAME" x="19.235" y="15.835" size="1" layer="25" ratio="10" rot="R270"/>
 </element>
 <element name="C13" library="rcl" package="C0603" value=".1uF" x="16.16" y="20" smashed="yes">
-<attribute name="NAME" x="13.825" y="20.635" size="1" layer="25" ratio="10"/>
+<attribute name="NAME" x="13.825" y="20.735" size="1" layer="25" ratio="10"/>
 </element>
 <element name="U9" library="odroid_shield" package="QFN16" value="MMA8451Q" x="10" y="17.2" smashed="yes">
-<attribute name="NAME" x="8" y="18.9" size="1" layer="21" ratio="10"/>
+<attribute name="NAME" x="7.7" y="19.1" size="1" layer="21" ratio="10"/>
 </element>
 <element name="C14" library="rcl" package="C0603" value=".1uF" x="11.34" y="20" smashed="yes">
 <attribute name="NAME" x="9.305" y="20.735" size="1" layer="25" ratio="10"/>
@@ -2822,10 +2823,10 @@ design rules under a new name.</description>
 <wire x1="42.2" y1="13.6" x2="41.6" y2="13.6" width="0" layer="19" extent="1-1"/>
 <wire x1="41.2" y1="33.1" x2="40.6" y2="32.5" width="0" layer="19" extent="1-1"/>
 <wire x1="11.325" y1="17.7" x2="11.325" y2="16.7" width="0" layer="19" extent="1-1"/>
-<wire x1="60.25" y1="9.2" x2="61.75" y2="9.1" width="0" layer="19" extent="1-16"/>
 <wire x1="9.7" y1="24.6" x2="11.3" y2="25.45" width="0" layer="19" extent="1-1"/>
 <wire x1="4.3596" y1="34.7" x2="2.1" y2="34.05" width="0" layer="19" extent="1-1"/>
 <wire x1="10.1" y1="28.9596" x2="11.3" y2="26.6" width="0" layer="19" extent="1-1"/>
+<wire x1="58.05" y1="8.9" x2="61.75" y2="9.1" width="0" layer="19" extent="1-16"/>
 <wire x1="3" y1="24.6" x2="2.1" y2="28.9" width="0" layer="19" extent="1-1"/>
 <wire x1="15.8404" y1="34.7" x2="20.55" y2="36.6" width="0" layer="19" extent="1-16"/>
 <wire x1="9.3126" y1="40.4404" x2="4.3596" y2="34.7" width="0" layer="19" extent="1-1"/>
@@ -3064,7 +3065,7 @@ design rules under a new name.</description>
 <wire x1="45.2" y1="42.2" x2="43.6" y2="42.2" width="1.5" layer="1"/>
 <wire x1="43.6" y1="42.2" x2="43.6" y2="44" width="1.5" layer="1"/>
 <wire x1="45.2" y1="42.2" x2="48.5" y2="42.2" width="1.5" layer="1"/>
-<wire x1="54.25" y1="9.1" x2="54.85" y2="9.2" width="0" layer="19" extent="1-16"/>
+<wire x1="54.2" y1="9.1" x2="52.15" y2="8.9" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="N$9">
 <contactref element="SHORE" pad="1"/>
@@ -3166,7 +3167,7 @@ design rules under a new name.</description>
 <signal name="N$22">
 <contactref element="R4" pad="1"/>
 <contactref element="PWR" pad="A"/>
-<wire x1="58.15" y1="9.2" x2="56.55" y2="9.2" width="0" layer="19" extent="1-1"/>
+<wire x1="53.85" y1="8.9" x2="55.95" y2="8.9" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$16">
 <contactref element="U7" pad="32"/>
