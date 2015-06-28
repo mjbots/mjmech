@@ -15154,7 +15154,7 @@ http://www.zetex.com&lt;p&gt;
 </part>
 <part name="JWEAP" library="pinhead" deviceset="PINHD-2X4" device=""/>
 <part name="JD6" library="odroid_shield" deviceset="JST-XH4" device="VERT">
-<attribute name="DPN" value="S9410-ND"/>
+<attribute name="DPN" value="455-2249-ND"/>
 </part>
 <part name="B+" library="odroid_shield" deviceset="BAT_TERM" device=""/>
 <part name="B-" library="odroid_shield" deviceset="BAT_TERM" device=""/>
@@ -15214,7 +15214,7 @@ http://www.zetex.com&lt;p&gt;
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
 <part name="SUPPLY2" library="supply2" deviceset="+8V" device=""/>
 <part name="JD7" library="odroid_shield" deviceset="JST-XH4" device="VERT">
-<attribute name="DPN" value="S9410-ND"/>
+<attribute name="DPN" value="455-2249-ND"/>
 </part>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="GND8" library="supply1" deviceset="GND" device=""/>
