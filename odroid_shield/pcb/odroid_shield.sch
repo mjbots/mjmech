@@ -1642,12 +1642,12 @@ Wickmann</description>
 <text x="3.937" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
 <rectangle x1="-1" y1="-1" x2="1" y2="1" layer="35"/>
 <smd name="PAD" x="0" y="0" dx="3.5" dy="2.6" layer="1"/>
-<pad name="PAD1" x="-1.1" y="0.6" drill="0.3"/>
-<pad name="PAD2" x="0" y="0.6" drill="0.3"/>
-<pad name="PAD3" x="1.1" y="0.6" drill="0.3"/>
-<pad name="PAD4" x="-1.1" y="-0.6" drill="0.3"/>
-<pad name="PAD5" x="0" y="-0.6" drill="0.3"/>
-<pad name="PAD6" x="1.1" y="-0.6" drill="0.3"/>
+<pad name="PAD1" x="-1.1" y="0.6" drill="0.3048"/>
+<pad name="PAD2" x="0" y="0.6" drill="0.3048"/>
+<pad name="PAD3" x="1.1" y="0.6" drill="0.3048"/>
+<pad name="PAD4" x="-1.1" y="-0.6" drill="0.3048"/>
+<pad name="PAD5" x="0" y="-0.6" drill="0.3048"/>
+<pad name="PAD6" x="1.1" y="-0.6" drill="0.3048"/>
 </package>
 <package name="DO41-10">
 <description>&lt;B&gt;DIODE&lt;/B&gt;&lt;p&gt;
@@ -4368,22 +4368,22 @@ Source: www.bourns.com .. 6000_series.pdf</description>
 <smd name="31" x="-1.6" y="3.5" dx="0.5" dy="1.3" layer="1" roundness="40"/>
 <smd name="32" x="-2.4" y="3.5" dx="0.5" dy="1.3" layer="1" roundness="40"/>
 <smd name="26" x="2.4" y="3.5" dx="0.5" dy="1.3" layer="1" roundness="40"/>
-<pad name="G7" x="0.6" y="0.6" drill="0.3"/>
-<pad name="G6" x="-0.6" y="0.6" drill="0.3"/>
-<pad name="G2" x="-0.6" y="1.8" drill="0.3"/>
-<pad name="G3" x="0.6" y="1.8" drill="0.3"/>
-<pad name="G10" x="-0.6" y="-0.6" drill="0.3"/>
-<pad name="G11" x="0.6" y="-0.6" drill="0.3"/>
-<pad name="G9" x="-1.8" y="-0.6" drill="0.3"/>
-<pad name="G5" x="-1.8" y="0.6" drill="0.3"/>
-<pad name="G1" x="-1.8" y="1.8" drill="0.3"/>
-<pad name="G4" x="1.8" y="1.8" drill="0.3"/>
-<pad name="G8" x="1.8" y="0.6" drill="0.3"/>
-<pad name="G12" x="1.8" y="-0.6" drill="0.3"/>
-<pad name="G13" x="-1.8" y="-1.8" drill="0.3"/>
-<pad name="G14" x="-0.6" y="-1.8" drill="0.3"/>
-<pad name="G15" x="0.6" y="-1.8" drill="0.3"/>
-<pad name="G16" x="1.8" y="-1.8" drill="0.3"/>
+<pad name="G7" x="0.6" y="0.6" drill="0.3048"/>
+<pad name="G6" x="-0.6" y="0.6" drill="0.3048"/>
+<pad name="G2" x="-0.6" y="1.8" drill="0.3048"/>
+<pad name="G3" x="0.6" y="1.8" drill="0.3048"/>
+<pad name="G10" x="-0.6" y="-0.6" drill="0.3048"/>
+<pad name="G11" x="0.6" y="-0.6" drill="0.3048"/>
+<pad name="G9" x="-1.8" y="-0.6" drill="0.3048"/>
+<pad name="G5" x="-1.8" y="0.6" drill="0.3048"/>
+<pad name="G1" x="-1.8" y="1.8" drill="0.3048"/>
+<pad name="G4" x="1.8" y="1.8" drill="0.3048"/>
+<pad name="G8" x="1.8" y="0.6" drill="0.3048"/>
+<pad name="G12" x="1.8" y="-0.6" drill="0.3048"/>
+<pad name="G13" x="-1.8" y="-1.8" drill="0.3048"/>
+<pad name="G14" x="-0.6" y="-1.8" drill="0.3048"/>
+<pad name="G15" x="0.6" y="-1.8" drill="0.3048"/>
+<pad name="G16" x="1.8" y="-1.8" drill="0.3048"/>
 <smd name="1" x="-3.55" y="3.55" dx="1.2" dy="1.2" layer="1" roundness="40"/>
 <smd name="2" x="-3.5" y="2.4" dx="0.5" dy="1.3" layer="1" roundness="40" rot="R90"/>
 <smd name="3" x="-3.5" y="1.6" dx="0.5" dy="1.3" layer="1" roundness="40" rot="R90"/>
