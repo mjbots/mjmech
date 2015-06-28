@@ -1,6 +1,4 @@
  * Parts
-   * IMU - MAX21000 + MMA8451Q
-
    * do schematic ERC
    * give useful names to all ICs
    * line up all connectors
@@ -67,3 +65,4 @@ DONE 2015-06-27
  * Decided not to bother with 12V up converter for now.  If I build a
    custom gimbal board, I can put it on there.
  * Decided not to mess with custom gimbal controller.
+ * IMU - MAX21000 + MMA8451Q
