@@ -15381,7 +15381,7 @@ http://www.zetex.com&lt;p&gt;
 </instance>
 <instance part="GND7" gate="1" x="132.08" y="106.68"/>
 <instance part="GND8" gate="1" x="203.2" y="134.62"/>
-<instance part="SUPPLY3" gate="+8V" x="25.4" y="193.04"/>
+<instance part="SUPPLY3" gate="+8V" x="5.08" y="195.58"/>
 <instance part="C7" gate="G$1" x="68.58" y="157.48"/>
 <instance part="C8" gate="G$1" x="53.34" y="157.48">
 <attribute name="DPN" x="53.34" y="157.48" size="1.778" layer="96" display="off"/>
@@ -16060,8 +16060,10 @@ http://www.zetex.com&lt;p&gt;
 </segment>
 <segment>
 <pinref part="SUPPLY3" gate="+8V" pin="+8V"/>
-<pinref part="WEAP" gate="G$1" pin="O"/>
-<wire x1="25.4" y1="190.5" x2="25.4" y2="187.96" width="0.1524" layer="91"/>
+<wire x1="5.08" y1="193.04" x2="5.08" y2="175.26" width="0.1524" layer="91"/>
+<pinref part="WEAP" gate="G$1" pin="P"/>
+<wire x1="5.08" y1="175.26" x2="27.94" y2="175.26" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="175.26" x2="27.94" y2="177.8" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$9" class="0">
@@ -16113,8 +16115,6 @@ http://www.zetex.com&lt;p&gt;
 </net>
 <net name="N$15" class="0">
 <segment>
-<pinref part="WEAP" gate="G$1" pin="P"/>
-<wire x1="27.94" y1="177.8" x2="27.94" y2="165.1" width="0.1524" layer="91"/>
 <wire x1="27.94" y1="165.1" x2="40.64" y2="165.1" width="0.1524" layer="91"/>
 <pinref part="C8" gate="G$1" pin="1"/>
 <wire x1="40.64" y1="165.1" x2="53.34" y2="165.1" width="0.1524" layer="91"/>
@@ -16138,6 +16138,12 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="132.08" y1="170.18" x2="139.7" y2="170.18" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="170.18" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
 <junction x="132.08" y="170.18"/>
+<wire x1="27.94" y1="165.1" x2="27.94" y2="170.18" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="170.18" x2="35.56" y2="170.18" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="170.18" x2="35.56" y2="190.5" width="0.1524" layer="91"/>
+<pinref part="WEAP" gate="G$1" pin="S"/>
+<wire x1="35.56" y1="190.5" x2="30.48" y2="190.5" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="190.5" x2="30.48" y2="187.96" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$20" class="0">
