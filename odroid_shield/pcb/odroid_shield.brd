@@ -136,7 +136,7 @@
 <wire x1="80" y1="0" x2="83" y2="3" width="0" layer="20" curve="90"/>
 <wire x1="83" y1="3" x2="83" y2="45" width="0" layer="20"/>
 <text x="1.4" y="15.4" size="1" layer="21" ratio="10">J4</text>
-<text x="55.1" y="19.9" size="1.27" layer="21" rot="R90">USB</text>
+<text x="57.5" y="22" size="1.27" layer="21" rot="R180">USB</text>
 <wire x1="49" y1="46" x2="49" y2="2" width="0.1" layer="21"/>
 <wire x1="49" y1="2" x2="51" y2="0" width="0.1" layer="21" curve="90"/>
 <wire x1="34" y1="46" x2="34" y2="2" width="0.1" layer="21"/>
@@ -156,6 +156,22 @@
 <text x="67.7" y="2" size="1" layer="21" ratio="10" rot="R180">mjmech</text>
 <text x="67.7" y="5" size="1" layer="21" ratio="10" rot="R180">jjp@pobox.com</text>
 <text x="67.7" y="3.5" size="1" layer="21" ratio="10" rot="R180">(c) 2015</text>
+<text x="16.7" y="12" size="0.7" layer="21" ratio="10" rot="R180">G</text>
+<text x="16.7" y="6.9" size="0.7" layer="21" ratio="10" rot="R180">SDA</text>
+<text x="16.7" y="9.4" size="0.7" layer="21" ratio="10" rot="R180">SCL</text>
+<text x="16.7" y="4.3" size="0.7" layer="21" ratio="10" rot="R180">3.3V</text>
+<text x="15.3" y="42.6" size="0.7" layer="21" ratio="10" rot="R270">5V</text>
+<text x="17.9" y="42.6" size="0.7" layer="21" ratio="10" rot="R270">TX</text>
+<text x="20.4" y="42.6" size="0.7" layer="21" ratio="10" rot="R270">RX</text>
+<text x="23" y="42.7" size="0.7" layer="21" ratio="10" rot="R270">GND</text>
+<text x="49.7" y="28.5" size="0.7" layer="21" ratio="10" rot="R90">LAS</text>
+<text x="49.7" y="31" size="0.7" layer="21" ratio="10" rot="R90">AEG</text>
+<text x="49.7" y="33.5" size="0.7" layer="21" ratio="10" rot="R90">AGIT</text>
+<text x="53.3" y="25.2" size="0.7" layer="21" ratio="10" rot="R270">GND</text>
+<text x="59" y="35.1" size="0.7" layer="21" ratio="10" rot="R90">-</text>
+<text x="65.2" y="35.2" size="0.7" layer="21" ratio="10" rot="R90">-</text>
+<text x="59.4" y="22" size="0.7" layer="21" ratio="10" rot="R180">+</text>
+<text x="65.6" y="22" size="0.7" layer="21" ratio="10" rot="R180">+</text>
 </plain>
 <libraries>
 <library name="odroid_shield">
@@ -2328,7 +2344,7 @@ design rules under a new name.</description>
 </element>
 <element name="JD6" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="65.2" y="28.5" smashed="yes" rot="R270">
 <attribute name="DPN" value="455-2249-ND" x="65.2" y="28.5" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="65.2" y="35.4" size="1.27" layer="21" rot="R90"/>
+<attribute name="NAME" x="67.6" y="35.3" size="1.27" layer="21" rot="R90"/>
 </element>
 <element name="B+" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="77.9" y="22.2" smashed="yes" rot="MR0">
 <attribute name="NAME" x="81.26" y="23.34" size="1.27" layer="22" rot="MR270"/>
@@ -2347,7 +2363,10 @@ design rules under a new name.</description>
 <attribute name="DPN" value="CP-015AHPJ-CT-ND" x="27" y="10.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="29.8" y="4" size="1.27" layer="21" rot="R180"/>
 </element>
-<element name="JI2C" library="pinhead" package="1X04" value="" x="18.2" y="7.8" rot="R90"/>
+<element name="JI2C" library="pinhead" package="1X04" value="" x="18.2" y="7.8" smashed="yes" rot="R90">
+<attribute name="NAME" x="20.3562" y="2.2712" size="1.27" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="21.375" y="2.72" size="1.27" layer="27" rot="R90"/>
+</element>
 <element name="F1" library="odroid_shield" package="KEYSTONE_HORIZ_FUSE_CLIP" value="FUSE" x="75.1" y="13.3" smashed="yes" rot="R90">
 <attribute name="DPN" value="36-3569-ND" x="75.1" y="13.3" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="74.3" y="7" size="1" layer="21" ratio="10" rot="R270"/>
@@ -2407,7 +2426,7 @@ design rules under a new name.</description>
 </element>
 <element name="JD7" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="59" y="28.5" smashed="yes" rot="R270">
 <attribute name="DPN" value="455-2249-ND" x="59" y="28.5" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="59" y="35.4" size="1.27" layer="21" rot="R90"/>
+<attribute name="NAME" x="61.7" y="35.3" size="1.27" layer="21" rot="R90"/>
 </element>
 <element name="C7" library="rcl" package="C0603" value=".1uF" x="37" y="26.3" smashed="yes" rot="R270">
 <attribute name="NAME" x="36.535" y="26.665" size="1" layer="25" ratio="10" rot="R180"/>

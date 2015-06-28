@@ -7,7 +7,6 @@
      all pins
    * pick part numbers for everything (including macrofab numbers)
    * do design DRC
-   * label individual pins on headers
    * fix up silks
 
 
@@ -61,6 +60,7 @@ DONE 2015-06-28
  * route IMU
  * route power
  * first pass at silk sizing and placement before autoroute
+ * label individual pins on headers
 
 DONE 2015-06-27
  * AVR crystal
