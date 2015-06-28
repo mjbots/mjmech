@@ -2,8 +2,6 @@
  * bottom chassis plate interferes with bottom USB connector on odroid
 
    * ensure connectors have sufficient clearance around top plate
-   * route IMU
-   * route power
    * autoroute
    * ensure leadless parts have moderately accessible test points for
      all pins
@@ -60,6 +58,9 @@ DONE 2015-06-28
  * decide on other power planes
    * 8V and 5V are the likely candidates
  * route weapon drive
+ * route IMU
+ * route power
+ * first pass at silk sizing and placement before autoroute
 
 DONE 2015-06-27
  * AVR crystal

@@ -15258,7 +15258,7 @@ http://www.zetex.com&lt;p&gt;
 <part name="P+8" library="supply1" deviceset="+5V" device=""/>
 <part name="GND11" library="supply1" deviceset="GND" device=""/>
 <part name="IND" library="led" deviceset="LED" device="CHIPLED_0805" value="RED"/>
-<part name="SER2" library="pinhead" deviceset="PINHD-1X4" device="">
+<part name="JSER2" library="pinhead" deviceset="PINHD-1X4" device="">
 <attribute name="DPN" value="S9410-ND"/>
 </part>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
@@ -15424,7 +15424,7 @@ http://www.zetex.com&lt;p&gt;
 <instance part="P+8" gate="1" x="-7.62" y="314.96"/>
 <instance part="GND11" gate="1" x="-7.62" y="284.48"/>
 <instance part="IND" gate="G$1" x="127" y="264.16"/>
-<instance part="SER2" gate="A" x="185.42" y="317.5">
+<instance part="JSER2" gate="A" x="185.42" y="317.5">
 <attribute name="DPN" x="185.42" y="317.5" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND12" gate="1" x="172.72" y="299.72"/>
@@ -15602,7 +15602,7 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="P+9" gate="1" pin="+5V"/>
 <wire x1="165.1" y1="335.28" x2="165.1" y2="314.96" width="0.1524" layer="91"/>
-<pinref part="SER2" gate="A" pin="4"/>
+<pinref part="JSER2" gate="A" pin="4"/>
 <wire x1="165.1" y1="314.96" x2="182.88" y2="314.96" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -15809,7 +15809,7 @@ http://www.zetex.com&lt;p&gt;
 <pinref part="GND12" gate="1" pin="GND"/>
 <wire x1="172.72" y1="302.26" x2="172.72" y2="322.58" width="0.1524" layer="91"/>
 <wire x1="172.72" y1="322.58" x2="182.88" y2="322.58" width="0.1524" layer="91"/>
-<pinref part="SER2" gate="A" pin="1"/>
+<pinref part="JSER2" gate="A" pin="1"/>
 </segment>
 <segment>
 <pinref part="U10" gate="G$1" pin="GND@2"/>
@@ -16474,13 +16474,13 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="U4" gate="A" pin="PD3"/>
 <wire x1="104.14" y1="317.5" x2="182.88" y2="317.5" width="0.1524" layer="91"/>
-<pinref part="SER2" gate="A" pin="3"/>
+<pinref part="JSER2" gate="A" pin="3"/>
 </segment>
 </net>
 <net name="N$27" class="0">
 <segment>
 <pinref part="U4" gate="A" pin="PD2"/>
-<pinref part="SER2" gate="A" pin="2"/>
+<pinref part="JSER2" gate="A" pin="2"/>
 <wire x1="104.14" y1="320.04" x2="182.88" y2="320.04" width="0.1524" layer="91"/>
 </segment>
 </net>

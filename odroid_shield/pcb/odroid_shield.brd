@@ -153,9 +153,9 @@
 <wire x1="14" y1="46" x2="16" y2="48" width="0.1" layer="21" curve="-90"/>
 <wire x1="16" y1="48" x2="32" y2="48" width="0.1" layer="21"/>
 <wire x1="32" y1="48" x2="34" y2="46" width="0.1" layer="21" curve="-90"/>
-<text x="49.9" y="5.2" size="1" layer="21" ratio="10">mjmech</text>
-<text x="49.9" y="1" size="1" layer="21" ratio="10">jjp@pobox.com</text>
-<text x="49.9" y="3.1" size="1" layer="21" ratio="10">(c) 2015</text>
+<text x="67.7" y="2" size="1" layer="21" ratio="10" rot="R180">mjmech</text>
+<text x="67.7" y="5" size="1" layer="21" ratio="10" rot="R180">jjp@pobox.com</text>
+<text x="67.7" y="3.5" size="1" layer="21" ratio="10" rot="R180">(c) 2015</text>
 </plain>
 <libraries>
 <library name="odroid_shield">
@@ -2310,140 +2310,160 @@ design rules under a new name.</description>
 <attribute name="DPN" value="296-16843-1-ND" x="8.4" y="24.6" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C1" library="rcl" package="C0603" value="0.1uF" x="11.3" y="24.6" smashed="yes" rot="R90">
-<attribute name="NAME" x="10.665" y="23.965" size="1" layer="25" ratio="10" rot="R90"/>
+<attribute name="NAME" x="12.335" y="23.065" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
-<element name="MAIN" library="odroid_shield" package="CK1101C" value="CK1101" x="65" y="14.5">
+<element name="MAIN" library="odroid_shield" package="CK1101C" value="CK1101" x="65" y="14.5" smashed="yes">
 <attribute name="DPN" value="CKN5001-ND" x="65" y="14.5" size="1.778" layer="27" display="off"/>
 <attribute name="PRICE1" value="3.85" x="65" y="14.5" size="1.778" layer="27" display="off"/>
 <attribute name="PRICE10" value="3.689" x="65" y="14.5" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="67.44" y="7.915" size="1.27" layer="21" rot="R180"/>
 </element>
 <element name="WEAP" library="odroid_shield" package="CK1101C" value="CK1101" x="29.8" y="40.5" smashed="yes" rot="R180">
 <attribute name="DPN" value="CKN5001-ND" x="29.8" y="40.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.44" y="48.515" size="1.27" layer="21" rot="R180"/>
+<attribute name="NAME" x="25.815" y="38.86" size="1.27" layer="21" rot="R90"/>
 </element>
-<element name="JWEAP" library="pinhead" package="2X04" value="" x="52.3" y="30.6" rot="R270"/>
-<element name="JD6" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="65.2" y="28.5" rot="R270">
+<element name="JWEAP" library="pinhead" package="2X04" value="" x="52.3" y="30.6" smashed="yes" rot="R270">
+<attribute name="NAME" x="51.425" y="36.32" size="1.27" layer="25" ratio="10" rot="R90"/>
+<attribute name="VALUE" x="47.855" y="35.68" size="1.27" layer="27" rot="R270"/>
+</element>
+<element name="JD6" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="65.2" y="28.5" smashed="yes" rot="R270">
 <attribute name="DPN" value="455-2249-ND" x="65.2" y="28.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="65.2" y="35.4" size="1.27" layer="21" rot="R90"/>
 </element>
-<element name="B+" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="77.9" y="22.2" rot="MR0"/>
-<element name="B-" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="72.4" y="22.2" rot="MR0"/>
-<element name="ARM" library="led" package="LED5MM" value="FLASH_RED" x="22.6" y="36.4" smashed="yes" rot="R90">
-<attribute name="DPN" value="67-1499-ND" x="22.6" y="36.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="25.4666" y="30.075" size="1.27" layer="25" ratio="10" rot="R90"/>
+<element name="B+" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="77.9" y="22.2" smashed="yes" rot="MR0">
+<attribute name="NAME" x="81.26" y="23.34" size="1.27" layer="22" rot="MR270"/>
+</element>
+<element name="B-" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="73.1" y="22.2" smashed="yes" rot="MR0">
+<attribute name="NAME" x="70.86" y="23.44" size="1.27" layer="22" rot="MR270"/>
+</element>
+<element name="ARM" library="led" package="LED5MM" value="FLASH_RED" x="22.6" y="36" smashed="yes" rot="R90">
+<attribute name="DPN" value="67-1499-ND" x="22.6" y="36" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="24.525" y="32.3666" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="PWR" library="led" package="CHIPLED_0805" value="GREEN" x="59.2" y="9.2" smashed="yes" rot="R270">
-<attribute name="NAME" x="61.53" y="8.57" size="1.27" layer="25"/>
+<attribute name="NAME" x="60.67" y="8.33" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="SHORE" library="odroid_shield" package="CUI_PJ_015AH_SMT" value="PJ-034ASMT" x="27" y="10.4" smashed="yes" rot="R180">
 <attribute name="DPN" value="CP-015AHPJ-CT-ND" x="27" y="10.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="35.8" y="3.9" size="1.27" layer="21" rot="R180"/>
+<attribute name="NAME" x="29.8" y="4" size="1.27" layer="21" rot="R180"/>
 </element>
 <element name="JI2C" library="pinhead" package="1X04" value="" x="18.2" y="7.8" rot="R90"/>
 <element name="F1" library="odroid_shield" package="KEYSTONE_HORIZ_FUSE_CLIP" value="FUSE" x="75.1" y="13.3" rot="R90">
 <attribute name="DPN" value="36-3569-ND" x="75.1" y="13.3" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="U3" library="odroid_shield" package="POWER_SO8" value="ST1S10" x="42.2" y="13.6" smashed="yes" rot="R270">
-<attribute name="NAME" x="40.295" y="16.267" size="1.27" layer="25"/>
+<attribute name="NAME" x="40.295" y="16.267" size="1" layer="25" ratio="10"/>
 </element>
 <element name="C2" library="rcl" package="C1206" value="10uF 16V" x="46.6" y="14.3" smashed="yes" rot="R90">
 <attribute name="DPN" value="399-7442-1-ND" x="46.6" y="14.3" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="45.33" y="13.03" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="47.73" y="12.17" size="1" layer="25" ratio="10"/>
 </element>
 <element name="C3" library="rcl" package="C0603" value="1uF 16V" x="37.8" y="16.4" smashed="yes" rot="R90">
 <attribute name="DPN" value="399-7847-1-ND" x="37.8" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="36.465" y="16.165" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="37.165" y="17.935" size="1" layer="25" ratio="10"/>
 </element>
-<element name="D1" library="odroid_shield" package="CMS06" value="30V 2A" x="45.6" y="6.4" rot="R90">
+<element name="D1" library="odroid_shield" package="CMS06" value="30V 2A" x="45.6" y="6.4" smashed="yes" rot="R90">
 <attribute name="DPN" value="CMS06QMCT-ND" x="45.6" y="6.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="47.1" y="5.5" size="1" layer="21" ratio="10"/>
 </element>
-<element name="D2" library="odroid_shield" package="CMS06" value="30V 2A" x="41.3" y="8.3">
+<element name="D2" library="odroid_shield" package="CMS06" value="30V 2A" x="41.3" y="8.3" smashed="yes">
 <attribute name="DPN" value="CMS06QMCT-ND" x="41.3" y="8.3" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="41" y="6.9" size="1" layer="21" ratio="10" rot="R180"/>
 </element>
 <element name="C4" library="rcl" package="C1206" value="22uF 16V" x="45" y="18" smashed="yes" rot="R180">
 <attribute name="DPN" value="445-3955-1-ND" x="45" y="18" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="46.27" y="16.73" size="1.27" layer="25" rot="R180"/>
+<attribute name="NAME" x="42.57" y="18.93" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
-<element name="L1" library="odroid_shield" package="WURTH_74404042033" value="33uH" x="49.8" y="16.6" rot="R90">
+<element name="L1" library="odroid_shield" package="WURTH_74404042033" value="33uH" x="49.8" y="16.6" smashed="yes" rot="R90">
 <attribute name="DPN" value="732-5505-1-ND" x="49.8" y="16.6" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="49.2" y="19.8" size="1" layer="21" ratio="10"/>
 </element>
 <element name="R1" library="rcl" package="R0603" value="105k 1%" x="35.7" y="16.4" smashed="yes" rot="R90">
-<attribute name="NAME" x="35.065" y="15.765" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="34.965" y="17.935" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R2" library="rcl" package="R0603" value="20k 1%" x="37.8" y="12.2" smashed="yes" rot="R90">
-<attribute name="NAME" x="36.465" y="11.465" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="37.235" y="12.765" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
-<element name="JD1" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="41.5" y="43.5" rot="MR180">
+<element name="JD1" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="41.5" y="43.5" smashed="yes" rot="MR180">
 <attribute name="DPN" value="S9490-ND" x="41.5" y="43.5" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="NAME" x="36.7" y="38.2" size="1.27" layer="22" rot="MR0"/>
 </element>
-<element name="JD2" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="66" y="43.5" rot="MR180">
+<element name="JD2" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="66" y="43.5" smashed="yes" rot="MR180">
 <attribute name="DPN" value="S9490-ND" x="66" y="43.5" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="NAME" x="61.1" y="38.4" size="1.27" layer="22" rot="MR0"/>
 </element>
-<element name="JD3" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="78.5" y="33.5" rot="MR270">
+<element name="JD3" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="78.5" y="33.5" smashed="yes" rot="MR270">
 <attribute name="DPN" value="S9490-ND" x="78.5" y="33.5" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="NAME" x="74.6" y="28.7" size="1.27" layer="22" rot="MR270"/>
 </element>
-<element name="JD4" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="58" y="4.5" rot="MR0">
+<element name="JD4" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="58" y="4.5" smashed="yes" rot="MR0">
 <attribute name="DPN" value="S9490-ND" x="58" y="4.5" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="NAME" x="62.8" y="9.5" size="1.27" layer="22" rot="MR180"/>
 </element>
-<element name="JD5" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="41.5" y="4.5" rot="MR0">
+<element name="JD5" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="41.5" y="4.5" smashed="yes" rot="MR0">
 <attribute name="DPN" value="S9490-ND" x="41.5" y="4.5" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="NAME" x="46.3" y="9.4" size="1.27" layer="22" rot="MR180"/>
 </element>
-<element name="JD7" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="59" y="28.5" rot="R270">
+<element name="JD7" library="odroid_shield" package="JST_XH_VERT_4" value="JST-XH4VERT" x="59" y="28.5" smashed="yes" rot="R270">
 <attribute name="DPN" value="455-2249-ND" x="59" y="28.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="59" y="35.4" size="1.27" layer="21" rot="R90"/>
 </element>
 <element name="C7" library="rcl" package="C0603" value=".1uF" x="37" y="26.3" smashed="yes" rot="R270">
-<attribute name="NAME" x="37.635" y="26.935" size="1.27" layer="25" rot="R270"/>
+<attribute name="NAME" x="36.535" y="26.665" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="C8" library="rcl" package="C1210" value="22uF 16V" x="40.2" y="40.3" smashed="yes" rot="R90">
 <attribute name="DPN" value="445-3955-1-ND" x="40.2" y="40.3" size="1" layer="27" ratio="10" rot="R90" display="off"/>
-<attribute name="NAME" x="38.93" y="39.03" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="39.43" y="42.57" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R3" library="rcl" package="R0603" value="500" x="27.6" y="32.9" smashed="yes">
-<attribute name="NAME" x="26.965" y="33.535" size="1.27" layer="25"/>
+<attribute name="NAME" x="28.635" y="32.265" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="R4" library="rcl" package="R0603" value="500" x="55.7" y="9.2" smashed="yes" rot="R180">
-<attribute name="NAME" x="56.435" y="11.765" size="1.27" layer="25" rot="R180"/>
+<attribute name="NAME" x="56.735" y="8.365" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="U7" library="odroid_shield" package="PQFN32" value="MP33926" x="41.2" y="33.1" smashed="yes">
-<attribute name="NAME" x="42" y="38.4" size="1.27" layer="21"/>
+<attribute name="NAME" x="44.6" y="37.8" size="1" layer="21" ratio="10"/>
 </element>
 <element name="C6" library="rcl" package="C0603" value=".1uF" x="37.1" y="38.8" smashed="yes" rot="R180">
-<attribute name="NAME" x="37.335" y="41.165" size="1.27" layer="25" rot="R180"/>
+<attribute name="NAME" x="35.565" y="39.535" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R5" library="rcl" package="R0603" value="100k" x="46.8" y="32.2" smashed="yes" rot="R270">
-<attribute name="NAME" x="47.435" y="32.835" size="1.27" layer="25" rot="R270"/>
+<attribute name="NAME" x="46.065" y="33.735" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R6" library="rcl" package="R0603" value="200" x="32.5" y="29.5" smashed="yes">
-<attribute name="NAME" x="31.865" y="30.135" size="1.27" layer="25"/>
+<attribute name="NAME" x="33.935" y="28.765" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="U5" library="v-reg" package="SOT25" value="TS5205" x="41.6" y="21.4" smashed="yes" rot="R90">
-<attribute name="NAME" x="39.295" y="20.195" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="42.495" y="22.905" size="1" layer="25" ratio="10"/>
 </element>
 <element name="C9" library="rcl" package="C0603" value="1uF" x="38.4" y="21.6" smashed="yes" rot="R90">
-<attribute name="NAME" x="40.165" y="20.265" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="37.935" y="21.865" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="C10" library="rcl" package="C0603" value="1uF" x="44.3" y="20.7" smashed="yes" rot="R90">
-<attribute name="NAME" x="44.865" y="15.765" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="45.065" y="19.935" size="1" layer="25" ratio="10"/>
 </element>
-<element name="Q1" library="zetex" package="SOT-23" value="" x="54.4" y="38.2" rot="R90">
+<element name="Q1" library="zetex" package="SOT-23" value="" x="54.4" y="38.2" smashed="yes" rot="R90">
 <attribute name="OC_NEWARK" value="unknown" x="54.4" y="38.2" size="1" layer="27" ratio="10" rot="R90" display="off"/>
 <attribute name="MPN" value="" x="54.4" y="38.2" size="1" layer="27" ratio="10" rot="R90" display="off"/>
 <attribute name="MF" value="" x="54.4" y="38.2" size="1" layer="27" ratio="10" rot="R90" display="off"/>
 <attribute name="OC_FARNELL" value="unknown" x="54.4" y="38.2" size="1" layer="27" ratio="10" rot="R90" display="off"/>
+<attribute name="VALUE" x="52.622" y="36.803" size="1.27" layer="27" ratio="10" rot="R90"/>
+<attribute name="NAME" x="53.603" y="40.102" size="1" layer="25" ratio="10"/>
 </element>
 <element name="U6" library="odroid_shield" package="MSOP8" value="TCA9517MSOP8" x="13.1" y="7.1" smashed="yes">
-<attribute name="NAME" x="11.95" y="7.25" size="1.016" layer="25"/>
+<attribute name="NAME" x="11.75" y="5.55" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="R7" library="rcl" package="R0603" value="4.7k" x="8.9" y="7.3" smashed="yes">
-<attribute name="NAME" x="8.265" y="7.935" size="1.27" layer="25"/>
+<attribute name="NAME" x="9.465" y="7.935" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R8" library="rcl" package="R0603" value="4.7k" x="8" y="9.4" smashed="yes">
-<attribute name="NAME" x="7.365" y="10.035" size="1.27" layer="25"/>
+<attribute name="NAME" x="7.365" y="10.035" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R9" library="rcl" package="R0603" value="4.7k" x="13.6" y="11.5" smashed="yes">
-<attribute name="NAME" x="12.965" y="12.135" size="1.27" layer="25"/>
+<attribute name="NAME" x="13.565" y="12.135" size="1" layer="25" ratio="10"/>
 </element>
 <element name="R10" library="rcl" package="R0603" value="4.7k" x="11.9" y="13.6" smashed="yes">
-<attribute name="NAME" x="11.265" y="14.235" size="1.27" layer="25"/>
+<attribute name="NAME" x="11.265" y="14.235" size="1" layer="25" ratio="10"/>
 </element>
 <element name="U4" library="odroid_shield" package="QFP80P1200X1200X120-44N" value="ATMEGA644P-20AU" x="10.1" y="34.7" smashed="yes" rot="R180">
 <attribute name="PACKAGE" value="TQFP-44" x="10.1" y="34.7" size="1" layer="27" ratio="10" rot="R180" display="off"/>
@@ -2451,52 +2471,60 @@ design rules under a new name.</description>
 <attribute name="MPN" value="ATMEGA644P-20AU" x="10.1" y="34.7" size="1" layer="27" ratio="10" rot="R180" display="off"/>
 <attribute name="SUPPLIER" value="Atmel" x="10.1" y="34.7" size="1" layer="27" ratio="10" rot="R180" display="off"/>
 <attribute name="OC_FARNELL" value="1455121" x="10.1" y="34.7" size="1" layer="27" ratio="10" rot="R180" display="off"/>
-<attribute name="NAME" x="14.2656" y="44.7838" size="2.0828" layer="25" ratio="10" rot="SR180"/>
+<attribute name="NAME" x="5.9344" y="41.4162" size="1" layer="25" ratio="10" rot="SR0"/>
 </element>
 <element name="J1" library="odroid_shield" package="CON6P2R" value="AVRISP6_COMPACT" x="23.8" y="27.7" smashed="yes"/>
-<element name="IND" library="led" package="CHIPLED_0805" value="RED" x="15.5" y="24.6"/>
-<element name="SER2" library="pinhead" package="1X04" value="" x="20.5" y="44.3" rot="R180">
-<attribute name="DPN" value="S9410-ND" x="20.5" y="44.3" size="1" layer="27" ratio="10" rot="R180" display="off"/>
+<element name="IND" library="led" package="CHIPLED_0805" value="RED" x="15.5" y="24.6" smashed="yes">
+<attribute name="NAME" x="16.27" y="25.07" size="1" layer="25" ratio="10" rot="R270"/>
+</element>
+<element name="JSER2" library="pinhead" package="1X04" value="" x="19.5" y="44.3" smashed="yes" rot="R180">
+<attribute name="DPN" value="S9410-ND" x="19.5" y="44.3" size="1" layer="27" ratio="10" rot="R180" display="off"/>
+<attribute name="NAME" x="17.0438" y="46.2288" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="24.58" y="47.475" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R11" library="rcl" package="R0603" value="200" x="13.6" y="24.6" smashed="yes" rot="R90">
-<attribute name="NAME" x="12.965" y="23.965" size="1.27" layer="25" rot="R90"/>
+<attribute name="NAME" x="12.365" y="26.235" size="1" layer="25" ratio="10"/>
 </element>
 <element name="U10" library="odroid_shield" package="ABM8G" value="ABM8G" x="19.7" y="39.5" rot="MR90">
 <attribute name="DPN" value="535-10267-6-ND" x="19.7" y="39.5" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
 <element name="C11" library="rcl" package="C0603" value="20pF" x="22.8" y="40.7" smashed="yes" rot="MR180">
-<attribute name="NAME" x="22.165" y="40.065" size="1.27" layer="26" rot="MR180"/>
+<attribute name="NAME" x="22.165" y="40.065" size="1" layer="26" ratio="10" rot="MR180"/>
 </element>
 <element name="C12" library="rcl" package="C0603" value="20pF" x="19.7" y="36.6" smashed="yes" rot="MR180">
-<attribute name="NAME" x="19.065" y="35.965" size="1.27" layer="26" rot="MR180"/>
+<attribute name="NAME" x="19.065" y="35.965" size="1" layer="26" ratio="10" rot="MR180"/>
 </element>
-<element name="U8" library="odroid_shield" package="LGA16" value="MAX21000" x="16.7" y="17.2"/>
+<element name="U8" library="odroid_shield" package="LGA16" value="MAX21000" x="16.7" y="17.2" smashed="yes">
+<attribute name="NAME" x="18.1" y="19" size="1" layer="21" ratio="10"/>
+</element>
 <element name="R12" library="rcl" package="R0603" value="100k" x="17.5" y="14.2" smashed="yes">
-<attribute name="NAME" x="16.865" y="14.835" size="1.27" layer="25"/>
+<attribute name="NAME" x="19.235" y="15.835" size="1" layer="25" ratio="10" rot="R270"/>
 </element>
 <element name="C13" library="rcl" package="C0603" value=".1uF" x="16.16" y="20" smashed="yes">
-<attribute name="NAME" x="15.525" y="20.635" size="1.27" layer="25"/>
+<attribute name="NAME" x="13.825" y="20.635" size="1" layer="25" ratio="10"/>
 </element>
-<element name="U9" library="odroid_shield" package="QFN16" value="MMA8451Q" x="10" y="17.2"/>
+<element name="U9" library="odroid_shield" package="QFN16" value="MMA8451Q" x="10" y="17.2" smashed="yes">
+<attribute name="NAME" x="8" y="18.9" size="1" layer="21" ratio="10"/>
+</element>
 <element name="C14" library="rcl" package="C0603" value=".1uF" x="11.34" y="20" smashed="yes">
-<attribute name="NAME" x="10.705" y="20.635" size="1.27" layer="25"/>
+<attribute name="NAME" x="9.305" y="20.735" size="1" layer="25" ratio="10"/>
 </element>
 <element name="C15" library="rcl" package="C0603" value=".1uF" x="7.4" y="16.7" smashed="yes" rot="R270">
-<attribute name="NAME" x="8.035" y="17.335" size="1.27" layer="25" rot="R270"/>
+<attribute name="NAME" x="6.665" y="15.465" size="1" layer="25" ratio="10" rot="R90"/>
 </element>
 <element name="C16" library="rcl" package="C0603" value=".1uF" x="2.1" y="30.8" smashed="yes" rot="R270">
-<attribute name="NAME" x="2.735" y="31.435" size="1.27" layer="25" rot="R270"/>
+<attribute name="NAME" x="1.465" y="29.565" size="1" layer="25" ratio="10" rot="R90"/>
 </element>
 <element name="C17" library="rcl" package="C0603" value=".1uF" x="2.1" y="34.9" smashed="yes" rot="R270">
-<attribute name="NAME" x="2.735" y="35.535" size="1.27" layer="25" rot="R270"/>
+<attribute name="NAME" x="1.465" y="33.665" size="1" layer="25" ratio="10" rot="R90"/>
 </element>
 <element name="C5" library="rcl" package="C1210" value="22uF 16V" x="33.8" y="32.5" smashed="yes" rot="R180">
 <attribute name="DPN" value="445-3955-1-ND" x="33.8" y="32.5" size="1" layer="27" ratio="10" rot="R180" display="off"/>
-<attribute name="NAME" x="35.705" y="30.595" size="1.27" layer="25" rot="R180"/>
+<attribute name="NAME" x="31.605" y="33.395" size="1" layer="25" ratio="10" rot="R180"/>
 </element>
 <element name="C18" library="rcl" package="C1210" value="22uF 16V" x="39.6" y="26" smashed="yes" rot="R270">
 <attribute name="DPN" value="445-3955-1-ND" x="39.6" y="26" size="1" layer="27" ratio="10" rot="R270" display="off"/>
-<attribute name="NAME" x="41.505" y="27.905" size="1.27" layer="25" rot="R270"/>
+<attribute name="NAME" x="41.295" y="25.705" size="1" layer="25" ratio="10"/>
 </element>
 </elements>
 <signals>
@@ -2544,7 +2572,7 @@ design rules under a new name.</description>
 <contactref element="U4" pad="38"/>
 <contactref element="U4" pad="27"/>
 <contactref element="J1" pad="2"/>
-<contactref element="SER2" pad="4"/>
+<contactref element="JSER2" pad="4"/>
 <contactref element="C17" pad="1"/>
 <wire x1="46.4" y1="18" x2="48.9" y2="18" width="1" layer="1"/>
 <wire x1="48.9" y1="18" x2="49.8" y2="18.9" width="1" layer="1"/>
@@ -2594,7 +2622,7 @@ design rules under a new name.</description>
 <wire x1="4.3596" y1="35.4874" x2="9.3126" y2="28.9596" width="0" layer="19" extent="1-1"/>
 <wire x1="2.1" y1="35.75" x2="4.3596" y2="35.4874" width="0" layer="19" extent="1-1"/>
 <wire x1="10.1" y1="40.4404" x2="4.3596" y2="35.4874" width="0" layer="19" extent="1-1"/>
-<wire x1="16.69" y1="44.3" x2="10.1" y2="40.4404" width="0" layer="19" extent="1-1"/>
+<wire x1="15.69" y1="44.3" x2="10.1" y2="40.4404" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GND">
 <contactref element="J4" pad="7"/>
@@ -2661,7 +2689,7 @@ design rules under a new name.</description>
 <contactref element="U4" pad="18"/>
 <contactref element="J1" pad="6"/>
 <contactref element="J1" pad="6"/>
-<contactref element="SER2" pad="1"/>
+<contactref element="JSER2" pad="1"/>
 <contactref element="U10" pad="2"/>
 <contactref element="U10" pad="4"/>
 <contactref element="IND" pad="C"/>
@@ -3133,7 +3161,7 @@ design rules under a new name.</description>
 <signal name="N$20">
 <contactref element="R3" pad="1"/>
 <contactref element="ARM" pad="A"/>
-<wire x1="22.6" y1="35.13" x2="26.75" y2="32.9" width="0" layer="19" extent="1-1"/>
+<wire x1="22.6" y1="34.73" x2="26.75" y2="32.9" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$22">
 <contactref element="R4" pad="1"/>
@@ -3341,13 +3369,13 @@ design rules under a new name.</description>
 </signal>
 <signal name="N$26">
 <contactref element="U4" pad="12"/>
-<contactref element="SER2" pad="3"/>
-<wire x1="14.0878" y1="40.4404" x2="19.23" y2="44.3" width="0" layer="19" extent="1-1"/>
+<contactref element="JSER2" pad="3"/>
+<wire x1="14.0878" y1="40.4404" x2="18.23" y2="44.3" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$27">
 <contactref element="U4" pad="11"/>
-<contactref element="SER2" pad="2"/>
-<wire x1="15.8404" y1="38.6878" x2="21.77" y2="44.3" width="0" layer="19" extent="1-1"/>
+<contactref element="JSER2" pad="2"/>
+<wire x1="15.8404" y1="38.6878" x2="20.77" y2="44.3" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$28">
 <contactref element="IND" pad="A"/>
