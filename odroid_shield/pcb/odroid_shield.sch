@@ -15159,10 +15159,10 @@ http://www.zetex.com&lt;p&gt;
 <part name="B+" library="odroid_shield" deviceset="BAT_TERM" device=""/>
 <part name="B-" library="odroid_shield" deviceset="BAT_TERM" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
-<part name="ARM" library="led" deviceset="LED" device="5MM">
+<part name="ARM" library="led" deviceset="LED" device="5MM" value="FLASH_RED">
 <attribute name="DPN" value="67-1499-ND"/>
 </part>
-<part name="PWR" library="led" deviceset="LED" device="CHIPLED_0805"/>
+<part name="PWR" library="led" deviceset="LED" device="CHIPLED_0805" value="GREEN"/>
 <part name="SHORE" library="odroid_shield" deviceset="PJ-034A" device="SMT" value="PJ-034ASMT">
 <attribute name="DPN" value="CP-015AHPJ-CT-ND"/>
 </part>
@@ -15178,10 +15178,10 @@ http://www.zetex.com&lt;p&gt;
 <part name="C3" library="rcl" deviceset="C-US" device="C0603" value="1uF 16V">
 <attribute name="DPN" value="399-7847-1-ND"/>
 </part>
-<part name="D1" library="odroid_shield" deviceset="DIODE-" device="CMS06">
+<part name="D1" library="odroid_shield" deviceset="DIODE-" device="CMS06" value="30V 2A">
 <attribute name="DPN" value="CMS06QMCT-ND"/>
 </part>
-<part name="D2" library="odroid_shield" deviceset="DIODE-" device="CMS06">
+<part name="D2" library="odroid_shield" deviceset="DIODE-" device="CMS06" value="30V 2A">
 <attribute name="DPN" value="CMS06QMCT-ND"/>
 </part>
 <part name="C4" library="rcl" deviceset="C-US" device="C1206" value="22uF 16V">
@@ -15248,7 +15248,7 @@ http://www.zetex.com&lt;p&gt;
 <part name="J1" library="odroid_shield" deviceset="AVRISP6" device="_COMPACT"/>
 <part name="P+8" library="supply1" deviceset="+5V" device=""/>
 <part name="GND11" library="supply1" deviceset="GND" device=""/>
-<part name="IND" library="led" deviceset="LED" device="CHIPLED_0805"/>
+<part name="IND" library="led" deviceset="LED" device="CHIPLED_0805" value="RED"/>
 <part name="SER2" library="pinhead" deviceset="PINHD-1X4" device="">
 <attribute name="DPN" value="S9410-ND"/>
 </part>
@@ -15273,6 +15273,10 @@ http://www.zetex.com&lt;p&gt;
 <part name="GND16" library="supply1" deviceset="GND" device=""/>
 <part name="C14" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
 <part name="C15" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
+<part name="C16" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
+<part name="GND17" library="supply1" deviceset="GND" device=""/>
+<part name="C17" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
+<part name="GND18" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -15403,7 +15407,7 @@ http://www.zetex.com&lt;p&gt;
 <instance part="R10" gate="G$1" x="269.24" y="22.86" rot="R90"/>
 <instance part="U4" gate="A" x="86.36" y="294.64"/>
 <instance part="GND10" gate="1" x="78.74" y="228.6"/>
-<instance part="P+7" gate="1" x="58.42" y="347.98"/>
+<instance part="P+7" gate="1" x="58.42" y="353.06"/>
 <instance part="J1" gate="A" x="12.7" y="292.1"/>
 <instance part="P+8" gate="1" x="-7.62" y="314.96"/>
 <instance part="GND11" gate="1" x="-7.62" y="284.48"/>
@@ -15432,6 +15436,10 @@ http://www.zetex.com&lt;p&gt;
 <instance part="GND16" gate="1" x="182.88" y="378.46"/>
 <instance part="C14" gate="G$1" x="142.24" y="393.7"/>
 <instance part="C15" gate="G$1" x="152.4" y="393.7"/>
+<instance part="C16" gate="G$1" x="55.88" y="307.34"/>
+<instance part="GND17" gate="1" x="55.88" y="299.72"/>
+<instance part="C17" gate="G$1" x="50.8" y="335.28"/>
+<instance part="GND18" gate="1" x="50.8" y="327.66"/>
 </instances>
 <busses>
 </busses>
@@ -15546,8 +15554,9 @@ http://www.zetex.com&lt;p&gt;
 </segment>
 <segment>
 <pinref part="P+7" gate="1" pin="+5V"/>
-<wire x1="58.42" y1="345.44" x2="58.42" y2="330.2" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="350.52" x2="58.42" y2="342.9" width="0.1524" layer="91"/>
 <pinref part="U4" gate="A" pin="VCC_2"/>
+<wire x1="58.42" y1="342.9" x2="58.42" y2="330.2" width="0.1524" layer="91"/>
 <wire x1="58.42" y1="330.2" x2="68.58" y2="330.2" width="0.1524" layer="91"/>
 <wire x1="58.42" y1="330.2" x2="58.42" y2="327.66" width="0.1524" layer="91"/>
 <junction x="58.42" y="330.2"/>
@@ -15561,6 +15570,10 @@ http://www.zetex.com&lt;p&gt;
 <junction x="58.42" y="325.12"/>
 <pinref part="U4" gate="A" pin="AVCC"/>
 <wire x1="58.42" y1="322.58" x2="68.58" y2="322.58" width="0.1524" layer="91"/>
+<pinref part="C17" gate="G$1" pin="1"/>
+<wire x1="50.8" y1="337.82" x2="50.8" y2="342.9" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="342.9" x2="50.8" y2="342.9" width="0.1524" layer="91"/>
+<junction x="58.42" y="342.9"/>
 </segment>
 <segment>
 <pinref part="P+8" gate="1" pin="+5V"/>
@@ -15823,6 +15836,14 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="152.4" y1="381" x2="167.64" y2="381" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="388.62" x2="152.4" y2="381" width="0.1524" layer="91"/>
 <junction x="152.4" y="381"/>
+</segment>
+<segment>
+<pinref part="C16" gate="G$1" pin="2"/>
+<pinref part="GND17" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="C17" gate="G$1" pin="2"/>
+<pinref part="GND18" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -16477,10 +16498,10 @@ http://www.zetex.com&lt;p&gt;
 <segment>
 <pinref part="U10" gate="G$1" pin="OSC@3"/>
 <wire x1="137.16" y1="358.14" x2="116.84" y2="358.14" width="0.1524" layer="91"/>
-<wire x1="116.84" y1="358.14" x2="45.72" y2="358.14" width="0.1524" layer="91"/>
-<wire x1="45.72" y1="358.14" x2="45.72" y2="317.5" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="358.14" x2="33.02" y2="358.14" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="358.14" x2="33.02" y2="317.5" width="0.1524" layer="91"/>
 <pinref part="U4" gate="A" pin="XTAL1"/>
-<wire x1="45.72" y1="317.5" x2="68.58" y2="317.5" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="317.5" x2="68.58" y2="317.5" width="0.1524" layer="91"/>
 <pinref part="C11" gate="G$1" pin="1"/>
 <wire x1="116.84" y1="347.98" x2="116.84" y2="358.14" width="0.1524" layer="91"/>
 <junction x="116.84" y="358.14"/>
@@ -16516,9 +16537,32 @@ http://www.zetex.com&lt;p&gt;
 <label x="160.02" y="139.7" size="1.778" layer="95"/>
 </segment>
 </net>
+<net name="N$30" class="0">
+<segment>
+<pinref part="C16" gate="G$1" pin="1"/>
+<pinref part="U4" gate="A" pin="AREF"/>
+<wire x1="55.88" y1="309.88" x2="68.58" y2="309.88" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="202,1,307.34,-83.82,U5,CB,,,,"/>
+<approved hash="104,1,68.58,330.2,U4,VCC_2,+5V,,,"/>
+<approved hash="104,1,68.58,327.66,U4,VCC_3,+5V,,,"/>
+<approved hash="104,1,68.58,325.12,U4,VCC,+5V,,,"/>
+<approved hash="104,1,68.58,322.58,U4,AVCC,+5V,,,"/>
+<approved hash="104,1,-2.54,299.72,J1,VCC,+5V,,,"/>
+<approved hash="206,1,137.16,353.06,N$32,,,,,"/>
+<approved hash="206,1,104.14,330.2,N$32,,,,,"/>
+<approved hash="113,1,84.6455,76.7842,J2,,,,,"/>
+<approved hash="113,1,120.057,74.6718,JUSB,,,,,"/>
+<approved hash="113,1,176.488,152.531,JWEAP,,,,,"/>
+<approved hash="113,1,279.637,12.8312,JI2C,,,,,"/>
+<approved hash="113,1,194.084,142.24,Q1,,,,,"/>
+<approved hash="113,1,183.117,320.171,SER2,,,,,"/>
+</errors>
 </schematic>
 </drawing>
 </eagle>
