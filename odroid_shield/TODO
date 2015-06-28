@@ -1,7 +1,7 @@
 
  * bottom chassis plate interferes with bottom USB connector on odroid
 
-   * line up all connectors
+   * thermals to gound and +8V are too small
    * try to line up other parts as best I can
    * ensure connectors have sufficient clearance around top plate
    * make ground plane
@@ -59,6 +59,7 @@
 DONE 2015-06-28
  * Gave useful names to all ICs
  * do schematic ERC
+ * line up all connectors
 
 DONE 2015-06-27
  * AVR crystal
