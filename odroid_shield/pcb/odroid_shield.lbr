@@ -4943,6 +4943,127 @@ PLASTIC QUAT FLATPACK&lt;p&gt;</description>
 <pad name="3" x="-1.27" y="0" drill="0.8"/>
 <pad name="4" x="1.27" y="0" drill="0.8"/>
 </package>
+<package name="ABM8G">
+<smd name="4" x="-1.1" y="0.85" dx="1.4" dy="1.2" layer="1"/>
+<smd name="3" x="1.1" y="0.85" dx="1.4" dy="1.2" layer="1"/>
+<smd name="2" x="1.1" y="-0.85" dx="1.4" dy="1.2" layer="1"/>
+<smd name="1" x="-1.1" y="-0.85" dx="1.4" dy="1.2" layer="1"/>
+<circle x="-2.5" y="-2.6" radius="0.5" width="0" layer="100"/>
+<wire x1="-1.6" y1="1.25" x2="1.6" y2="1.25" width="0.127" layer="100"/>
+<wire x1="1.6" y1="1.25" x2="1.6" y2="-1.25" width="0.127" layer="100"/>
+<wire x1="1.6" y1="-1.25" x2="-1.6" y2="-1.25" width="0.127" layer="100"/>
+<wire x1="-1.6" y1="-1.25" x2="-1.6" y2="1.25" width="0.127" layer="100"/>
+</package>
+<package name="JST_XH_SMT_RA_4">
+<smd name="3" x="1.25" y="4.6" dx="4.5" dy="1.3" layer="1" rot="R90"/>
+<smd name="4" x="3.75" y="4.6" dx="4.5" dy="1.3" layer="1" rot="R90"/>
+<smd name="SHLD2" x="6.3" y="-2.2" dx="3.9" dy="1.9" layer="1" rot="R90"/>
+<smd name="SHLD1" x="-6.3" y="-2.2" dx="3.9" dy="1.9" layer="1" rot="R90"/>
+<smd name="2" x="-1.25" y="4.6" dx="4.5" dy="1.3" layer="1" rot="R90"/>
+<smd name="1" x="-3.75" y="4.6" dx="4.5" dy="1.3" layer="1" rot="R90"/>
+<text x="-7.7" y="7.8" size="1.27" layer="21">&gt;NAME</text>
+<wire x1="-7.5" y1="-4.2" x2="-7.5" y2="3.2" width="0.127" layer="21"/>
+<wire x1="-7.5" y1="3.2" x2="7.6" y2="3.2" width="0.127" layer="21"/>
+<wire x1="7.6" y1="3.2" x2="7.6" y2="-4.2" width="0.127" layer="21"/>
+<wire x1="7.6" y1="-4.2" x2="-7.5" y2="-4.2" width="0.127" layer="21"/>
+</package>
+<package name="JST_XH_VERT_4">
+<pad name="3" x="1.25" y="0" drill="0.9"/>
+<pad name="2" x="-1.25" y="0" drill="0.9"/>
+<pad name="4" x="3.75" y="0" drill="0.9"/>
+<pad name="1" x="-3.75" y="0" drill="0.9"/>
+<wire x1="6.25" y1="-2.35" x2="6.25" y2="3.4" width="0.127" layer="21"/>
+<wire x1="6.25" y1="3.4" x2="-6.25" y2="3.4" width="0.127" layer="21"/>
+<wire x1="-6.25" y1="3.4" x2="-6.25" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="-6.25" y1="-2.35" x2="-1.25" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="-2.35" x2="1.25" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="1.25" y1="-2.35" x2="6.25" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="-2.35" x2="-1.25" y2="-1.75" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="-1.75" x2="1.25" y2="-1.75" width="0.127" layer="21"/>
+<wire x1="1.25" y1="-1.75" x2="1.25" y2="-2.35" width="0.127" layer="21"/>
+<text x="-6.1" y="3.9" size="1.27" layer="21">&gt;NAME</text>
+</package>
+<package name="KEYSTONE_HORIZ_FUSE_CLIP">
+<smd name="1" x="-4.05" y="2.55" dx="2.8" dy="2.5" layer="1" rot="R270"/>
+<smd name="2" x="-4.05" y="-2.55" dx="2.8" dy="2.5" layer="1" rot="R270"/>
+<smd name="3" x="4.05" y="2.55" dx="2.8" dy="2.5" layer="1" rot="R270"/>
+<smd name="4" x="4.05" y="-2.55" dx="2.8" dy="2.5" layer="1" rot="R270"/>
+<wire x1="-6" y1="4.3" x2="6" y2="4.3" width="0.127" layer="21"/>
+<wire x1="6" y1="4.3" x2="6" y2="-4.3" width="0.127" layer="21"/>
+<wire x1="6" y1="-4.3" x2="1.5" y2="-4.3" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-4.3" x2="-1.5" y2="-4.3" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-4.3" x2="-6" y2="-4.3" width="0.127" layer="21"/>
+<wire x1="-6" y1="-4.3" x2="-6" y2="4.3" width="0.127" layer="21"/>
+<text x="-5.7" y="4.6" size="1.27" layer="21">&gt;NAME</text>
+<wire x1="-1.5" y1="-4.3" x2="-1.5" y2="-3.1" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-3.1" x2="1.5" y2="-3.1" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-3.1" x2="1.5" y2="-4.3" width="0.127" layer="21"/>
+</package>
+<package name="CUI_PJ_015AH_SMT">
+<smd name="1" x="0" y="7.5" dx="5" dy="5" layer="1"/>
+<smd name="2" x="-2.375" y="-11.3" dx="5" dy="3.75" layer="1" rot="R90"/>
+<smd name="3" x="2.375" y="-11.3" dx="5" dy="3.75" layer="1" rot="R90"/>
+<hole x="0" y="0" drill="4.2"/>
+<hole x="4.1" y="-2" drill="1.6"/>
+<hole x="-4.1" y="-2" drill="1.6"/>
+<wire x1="-6.5" y1="5.9" x2="-6.5" y2="-9.8" width="0.127" layer="21"/>
+<wire x1="-6.5" y1="-9.8" x2="6.5" y2="-9.8" width="0.127" layer="21"/>
+<wire x1="6.5" y1="-9.8" x2="6.5" y2="5.9" width="0.127" layer="21"/>
+<wire x1="6.5" y1="5.9" x2="-6.5" y2="5.9" width="0.127" layer="21"/>
+<text x="3.9" y="6.6" size="1.27" layer="21">&gt;NAME</text>
+</package>
+<package name="MLF12">
+<smd name="PAD" x="0" y="0" dx="2.4" dy="1.7" layer="1" rot="R90"/>
+<smd name="3" x="-1.35" y="0.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="2" x="-1.35" y="0.75" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="1" x="-1.35" y="1.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="4" x="-1.35" y="-0.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="5" x="-1.35" y="-0.75" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="6" x="-1.35" y="-1.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="12" x="1.35" y="1.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="11" x="1.35" y="0.75" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="10" x="1.35" y="0.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="9" x="1.35" y="-0.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="8" x="1.35" y="-0.75" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<smd name="7" x="1.35" y="-1.25" dx="0.5" dy="0.25" layer="1" roundness="40" rot="R180"/>
+<pad name="PAD1" x="0" y="0.6" drill="0.3"/>
+<pad name="PAD2" x="0" y="-0.6" drill="0.3"/>
+<wire x1="-1.5" y1="1.5" x2="-1.1" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.1" y1="1.5" x2="-0.7" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-0.7" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.1" y1="1.5" x2="-0.9" y2="1.3" width="0.127" layer="21"/>
+<wire x1="-0.9" y1="1.3" x2="-0.7" y2="1.5" width="0.127" layer="21"/>
+<text x="-1.6" y="1.8" size="1.27" layer="21">&gt;NAME</text>
+</package>
+<package name="LGA16">
+<smd name="15" x="0" y="1.35" dx="0.35" dy="0.7" layer="1"/>
+<smd name="14" x="0.5" y="1.35" dx="0.35" dy="0.7" layer="1"/>
+<smd name="16" x="-0.5" y="1.35" dx="0.35" dy="0.7" layer="1"/>
+<smd name="6" x="-0.5" y="-1.35" dx="0.35" dy="0.7" layer="1"/>
+<smd name="7" x="0" y="-1.35" dx="0.35" dy="0.7" layer="1"/>
+<smd name="8" x="0.5" y="-1.35" dx="0.35" dy="0.7" layer="1"/>
+<smd name="11" x="1.35" y="0" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="12" x="1.35" y="0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="13" x="1.35" y="1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="10" x="1.35" y="-0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="9" x="1.35" y="-1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="5" x="-1.35" y="-1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="4" x="-1.35" y="-0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="3" x="-1.35" y="0" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="2" x="-1.35" y="0.5" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<smd name="1" x="-1.35" y="1" dx="0.35" dy="0.7" layer="1" rot="R90"/>
+<wire x1="-1.5" y1="1.5" x2="-1.5" y2="1.2" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="1.2" x2="-1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.5" x2="1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-1.5" x2="1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.5" x2="-1.2" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.2" y1="1.5" x2="-1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="1.2" x2="-1.2" y2="1.5" width="0.127" layer="21"/>
+<text x="-1.5" y="2" size="1.27" layer="21">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="M3_HEX_MOUNT">
@@ -5228,6 +5349,35 @@ PLASTIC QUAT FLATPACK&lt;p&gt;</description>
 <pin name="MOSI" x="15.24" y="2.54" length="middle" direction="out" rot="R180"/>
 <pin name="MISO" x="15.24" y="0" length="middle" direction="in" rot="R180"/>
 </symbol>
+<symbol name="ABM86">
+<wire x1="-5.08" y1="10.16" x2="5.08" y2="10.16" width="0.254" layer="94"/>
+<wire x1="5.08" y1="10.16" x2="5.08" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-12.7" x2="-5.08" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="-5.08" y1="-12.7" x2="-5.08" y2="10.16" width="0.254" layer="94"/>
+<pin name="GND@2" x="-2.54" y="-17.78" length="middle" direction="pwr" rot="R90"/>
+<pin name="GND@4" x="2.54" y="-17.78" length="middle" rot="R90"/>
+<pin name="OSC@1" x="-2.54" y="15.24" length="middle" direction="out" rot="R270"/>
+<pin name="OSC@3" x="2.54" y="15.24" length="middle" direction="out" rot="R270"/>
+<text x="-2.794" y="-1.778" size="1.27" layer="94">ABM8G</text>
+</symbol>
+<symbol name="MAX21000">
+<wire x1="-7.62" y1="12.7" x2="-7.62" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-17.78" x2="10.16" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-17.78" x2="10.16" y2="12.7" width="0.254" layer="94"/>
+<wire x1="10.16" y1="12.7" x2="-7.62" y2="12.7" width="0.254" layer="94"/>
+<text x="-5.08" y="10.16" size="1.27" layer="94">MAX21000</text>
+<pin name="GND" x="-12.7" y="-7.62" length="middle"/>
+<pin name="VDDIO" x="-12.7" y="2.54" length="middle"/>
+<pin name="VDD" x="-12.7" y="7.62" length="middle"/>
+<pin name="SCL" x="15.24" y="7.62" length="middle" rot="R180"/>
+<pin name="SDA" x="15.24" y="5.08" length="middle" rot="R180"/>
+<pin name="SA0" x="15.24" y="0" length="middle" rot="R180"/>
+<pin name="CS" x="15.24" y="-2.54" length="middle" rot="R180"/>
+<pin name="DSYNC" x="15.24" y="-7.62" length="middle" rot="R180"/>
+<pin name="INT1" x="15.24" y="-12.7" length="middle" rot="R180"/>
+<pin name="INT2" x="15.24" y="-15.24" length="middle" rot="R180"/>
+<text x="-7.62" y="15.24" size="1.27" layer="94">&gt;NAME</text>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="M3_HEX_MOUNT">
@@ -5470,6 +5620,16 @@ Distributor Buerklin, 11G810</description>
 </gates>
 <devices>
 <device name="" package="PJ-034A">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SMT" package="CUI_PJ_015AH_SMT">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -5841,6 +6001,15 @@ Distributor Buerklin, 11G810</description>
 <connects>
 <connect gate="G$1" pin="1" pad="P$1"/>
 <connect gate="G$1" pin="2" pad="P$2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="" package="KEYSTONE_HORIZ_FUSE_CLIP">
+<connects>
+<connect gate="G$1" pin="1" pad="1 2"/>
+<connect gate="G$1" pin="2" pad="3 4"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -7237,6 +7406,77 @@ Distributor Buerklin, 11G810</description>
 <connect gate="A" pin="MOSI" pad="4"/>
 <connect gate="A" pin="SCK" pad="3"/>
 <connect gate="A" pin="VCC" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="ABM8G">
+<gates>
+<gate name="G$1" symbol="ABM86" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="ABM8G">
+<connects>
+<connect gate="G$1" pin="GND@2" pad="2"/>
+<connect gate="G$1" pin="GND@4" pad="4"/>
+<connect gate="G$1" pin="OSC@1" pad="1"/>
+<connect gate="G$1" pin="OSC@3" pad="3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="JST-XH4">
+<gates>
+<gate name="G$1" symbol="CON04" x="0" y="0"/>
+</gates>
+<devices>
+<device name="SMT_RA" package="JST_XH_SMT_RA_4">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="VERT" package="JST_XH_VERT_4">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MAX21000">
+<gates>
+<gate name="G$1" symbol="MAX21000" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="LGA16">
+<connects>
+<connect gate="G$1" pin="CS" pad="8"/>
+<connect gate="G$1" pin="DSYNC" pad="12"/>
+<connect gate="G$1" pin="GND" pad="5"/>
+<connect gate="G$1" pin="INT1" pad="11"/>
+<connect gate="G$1" pin="INT2" pad="9"/>
+<connect gate="G$1" pin="SA0" pad="7"/>
+<connect gate="G$1" pin="SCL" pad="4"/>
+<connect gate="G$1" pin="SDA" pad="6"/>
+<connect gate="G$1" pin="VDD" pad="14 15"/>
+<connect gate="G$1" pin="VDDIO" pad="1"/>
 </connects>
 <technologies>
 <technology name=""/>
