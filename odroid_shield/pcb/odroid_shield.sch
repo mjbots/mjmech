@@ -15835,11 +15835,6 @@ http://www.zetex.com&lt;p&gt;
 <wire x1="55.88" y1="383.54" x2="55.88" y2="401.32" width="0.1524" layer="91"/>
 <pinref part="U8" gate="G$1" pin="GND"/>
 <wire x1="55.88" y1="401.32" x2="58.42" y2="401.32" width="0.1524" layer="91"/>
-<pinref part="U8" gate="G$1" pin="CS"/>
-<wire x1="86.36" y1="406.4" x2="91.44" y2="406.4" width="0.1524" layer="91"/>
-<wire x1="91.44" y1="406.4" x2="91.44" y2="383.54" width="0.1524" layer="91"/>
-<wire x1="91.44" y1="383.54" x2="73.66" y2="383.54" width="0.1524" layer="91"/>
-<junction x="73.66" y="383.54"/>
 <pinref part="C13" gate="G$1" pin="2"/>
 <wire x1="35.56" y1="406.4" x2="35.56" y2="383.54" width="0.1524" layer="91"/>
 <wire x1="35.56" y1="383.54" x2="55.88" y2="383.54" width="0.1524" layer="91"/>
@@ -16278,12 +16273,17 @@ http://www.zetex.com&lt;p&gt;
 <pinref part="U8" gate="G$1" pin="VDDIO"/>
 <wire x1="48.26" y1="411.48" x2="58.42" y2="411.48" width="0.1524" layer="91"/>
 <pinref part="R12" gate="G$1" pin="2"/>
-<wire x1="48.26" y1="436.88" x2="96.52" y2="436.88" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="436.88" x2="91.44" y2="436.88" width="0.1524" layer="91"/>
+<wire x1="91.44" y1="436.88" x2="96.52" y2="436.88" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="436.88" x2="96.52" y2="431.8" width="0.1524" layer="91"/>
 <junction x="48.26" y="436.88"/>
 <pinref part="C13" gate="G$1" pin="1"/>
 <wire x1="35.56" y1="414.02" x2="35.56" y2="416.56" width="0.1524" layer="91"/>
 <wire x1="35.56" y1="416.56" x2="48.26" y2="416.56" width="0.1524" layer="91"/>
+<pinref part="U8" gate="G$1" pin="CS"/>
+<wire x1="86.36" y1="406.4" x2="91.44" y2="406.4" width="0.1524" layer="91"/>
+<wire x1="91.44" y1="406.4" x2="91.44" y2="436.88" width="0.1524" layer="91"/>
+<junction x="91.44" y="436.88"/>
 </segment>
 <segment>
 <pinref part="+3V5" gate="G$1" pin="+3V3"/>
