@@ -2346,11 +2346,11 @@ design rules under a new name.</description>
 <attribute name="DPN" value="455-2249-ND" x="65.2" y="28.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="67.6" y="35.3" size="1.27" layer="21" rot="R90"/>
 </element>
-<element name="B+" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="77.9" y="22.2" smashed="yes" rot="MR0">
-<attribute name="NAME" x="81.26" y="23.34" size="1.27" layer="22" rot="MR270"/>
+<element name="B+" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="78" y="23.5" smashed="yes" rot="MR0">
+<attribute name="NAME" x="81.36" y="24.64" size="1.27" layer="22" rot="MR270"/>
 </element>
-<element name="B-" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="73.1" y="22.2" smashed="yes" rot="MR0">
-<attribute name="NAME" x="70.86" y="23.44" size="1.27" layer="22" rot="MR270"/>
+<element name="B-" library="odroid_shield" package="BAT_TERM" value="BAT_TERM" x="73" y="23.5" smashed="yes" rot="MR0">
+<attribute name="NAME" x="70.76" y="24.74" size="1.27" layer="22" rot="MR270"/>
 </element>
 <element name="ARM" library="led" package="LED5MM" value="FLASH_RED" x="22.6" y="36" smashed="yes" rot="R90">
 <attribute name="DPN" value="67-1499-ND" x="22.6" y="36" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2367,9 +2367,9 @@ design rules under a new name.</description>
 <attribute name="NAME" x="20.3562" y="2.2712" size="1.27" layer="25" ratio="10" rot="R180"/>
 <attribute name="VALUE" x="21.375" y="2.72" size="1.27" layer="27" rot="R90"/>
 </element>
-<element name="F1" library="odroid_shield" package="KEYSTONE_HORIZ_FUSE_CLIP" value="FUSE" x="75.1" y="13.3" smashed="yes" rot="R90">
-<attribute name="DPN" value="36-3569-ND" x="75.1" y="13.3" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="74.3" y="7" size="1" layer="21" ratio="10" rot="R270"/>
+<element name="F1" library="odroid_shield" package="KEYSTONE_HORIZ_FUSE_CLIP" value="FUSE" x="75.1" y="14.3" smashed="yes" rot="R90">
+<attribute name="DPN" value="36-3569-ND" x="75.1" y="14.3" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="74.3" y="8" size="1" layer="21" ratio="10" rot="R270"/>
 </element>
 <element name="U3" library="odroid_shield" package="POWER_SO8" value="ST1S10" x="42.2" y="13.6" smashed="yes" rot="R270">
 <attribute name="NAME" x="40.295" y="16.267" size="1" layer="25" ratio="10"/>
@@ -3001,16 +3001,16 @@ design rules under a new name.</description>
 <contactref element="F1" pad="1"/>
 <contactref element="F1" pad="2"/>
 <wire x1="65" y1="9.801" x2="71.999" y2="9.801" width="1.5" layer="1"/>
-<wire x1="71.999" y1="9.801" x2="72.55" y2="9.25" width="1.5" layer="1"/>
-<wire x1="72.55" y1="9.25" x2="77.65" y2="9.25" width="1.5" layer="1"/>
+<wire x1="71.999" y1="9.801" x2="72.55" y2="10.25" width="1.5" layer="1"/>
+<wire x1="72.55" y1="10.25" x2="77.65" y2="10.25" width="1.5" layer="1"/>
 </signal>
 <signal name="N$7">
 <contactref element="B+" pad="1"/>
 <contactref element="F1" pad="3"/>
 <contactref element="F1" pad="4"/>
-<wire x1="77.9" y1="22.2" x2="77.9" y2="17.6" width="1.5" layer="1"/>
-<wire x1="77.9" y1="17.6" x2="77.65" y2="17.35" width="1.5" layer="1"/>
-<wire x1="77.65" y1="17.35" x2="72.55" y2="17.35" width="1.5" layer="1"/>
+<wire x1="78" y1="23.5" x2="77.9" y2="17.6" width="1.5" layer="1"/>
+<wire x1="77.9" y1="17.6" x2="77.65" y2="18.35" width="1.5" layer="1"/>
+<wire x1="77.65" y1="18.35" x2="72.55" y2="18.35" width="1.5" layer="1"/>
 </signal>
 <signal name="N$11">
 <contactref element="U3" pad="2"/>
@@ -3051,8 +3051,8 @@ design rules under a new name.</description>
 <vertex x="47.8" y="44.7"/>
 <vertex x="72.1" y="44.7"/>
 <vertex x="78" y="36.2"/>
-<vertex x="78" y="24.8"/>
-<vertex x="69.2" y="24.8"/>
+<vertex x="78" y="25.9"/>
+<vertex x="69.2" y="25.9"/>
 <vertex x="69.2" y="2.5"/>
 <vertex x="33.9" y="2.5"/>
 <vertex x="34" y="6.5"/>
