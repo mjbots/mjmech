@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -5287,12 +5287,12 @@ PLASTIC QUAT FLATPACK&lt;p&gt;</description>
 <pin name="OUT2" x="20.32" y="-15.24" length="middle" rot="R180"/>
 <pin name="VPROPI" x="20.32" y="-22.86" length="middle" rot="R180"/>
 </symbol>
-<symbol name="MP33926">
+<symbol name="MC33926">
 <wire x1="-10.16" y1="15.24" x2="-10.16" y2="-17.78" width="0.254" layer="94"/>
 <wire x1="-10.16" y1="-17.78" x2="10.16" y2="-17.78" width="0.254" layer="94"/>
 <wire x1="10.16" y1="-17.78" x2="10.16" y2="15.24" width="0.254" layer="94"/>
 <wire x1="10.16" y1="15.24" x2="-10.16" y2="15.24" width="0.254" layer="94"/>
-<text x="-5.08" y="12.7" size="1.27" layer="94">MP33926</text>
+<text x="-5.08" y="12.7" size="1.27" layer="94">MC33926</text>
 <text x="-10.16" y="17.78" size="1.27" layer="94">&gt;NAME</text>
 <pin name="SF/" x="-15.24" y="10.16" length="middle"/>
 <pin name="FB" x="-15.24" y="7.62" length="middle"/>
@@ -7271,9 +7271,9 @@ Distributor Buerklin, 11G810</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="MP33926">
+<deviceset name="MC33926">
 <gates>
-<gate name="G$1" symbol="MP33926" x="0" y="0"/>
+<gate name="G$1" symbol="MC33926" x="0" y="0"/>
 </gates>
 <devices>
 <device name="" package="PQFN32">

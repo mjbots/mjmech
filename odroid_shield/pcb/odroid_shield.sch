@@ -5138,12 +5138,12 @@ Source: www.bourns.com .. 6000_series.pdf</description>
 <pin name="2" x="0" y="-7.62" visible="off" length="short" direction="pas" swaplevel="1" rot="R90"/>
 <pin name="1" x="0" y="7.62" visible="off" length="short" direction="pas" swaplevel="1" rot="R270"/>
 </symbol>
-<symbol name="MP33926">
+<symbol name="MC33926">
 <wire x1="-10.16" y1="15.24" x2="-10.16" y2="-17.78" width="0.254" layer="94"/>
 <wire x1="-10.16" y1="-17.78" x2="10.16" y2="-17.78" width="0.254" layer="94"/>
 <wire x1="10.16" y1="-17.78" x2="10.16" y2="15.24" width="0.254" layer="94"/>
 <wire x1="10.16" y1="15.24" x2="-10.16" y2="15.24" width="0.254" layer="94"/>
-<text x="-5.08" y="12.7" size="1.27" layer="94">MP33926</text>
+<text x="-5.08" y="12.7" size="1.27" layer="94">MC33926</text>
 <text x="-10.16" y="17.78" size="1.27" layer="94">&gt;NAME</text>
 <pin name="SF/" x="-15.24" y="10.16" length="middle"/>
 <pin name="FB" x="-15.24" y="7.62" length="middle"/>
@@ -7074,9 +7074,9 @@ Source: www.bourns.com .. 6000_series.pdf</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="MP33926">
+<deviceset name="MC33926">
 <gates>
-<gate name="G$1" symbol="MP33926" x="0" y="0"/>
+<gate name="G$1" symbol="MC33926" x="0" y="0"/>
 </gates>
 <devices>
 <device name="" package="PQFN32">
@@ -15234,7 +15234,9 @@ http://www.zetex.com&lt;p&gt;
 </part>
 <part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="500"/>
 <part name="R4" library="rcl" deviceset="R-US_" device="R0603" value="500"/>
-<part name="U7" library="odroid_shield" deviceset="MP33926" device=""/>
+<part name="U7" library="odroid_shield" deviceset="MC33926" device="">
+<attribute name="DPN" value="MC33926PNB-ND"/>
+</part>
 <part name="C6" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
 <part name="R5" library="rcl" deviceset="R-US_" device="R0603" value="100k"/>
 <part name="P+5" library="supply1" deviceset="+5V" device=""/>
@@ -15400,7 +15402,9 @@ http://www.zetex.com&lt;p&gt;
 </instance>
 <instance part="R3" gate="G$1" x="17.78" y="154.94" rot="R90"/>
 <instance part="R4" gate="G$1" x="53.34" y="-76.2" rot="R90"/>
-<instance part="U7" gate="G$1" x="109.22" y="149.86"/>
+<instance part="U7" gate="G$1" x="109.22" y="149.86">
+<attribute name="DPN" x="109.22" y="149.86" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C6" gate="G$1" x="139.7" y="165.1"/>
 <instance part="R5" gate="G$1" x="91.44" y="167.64" rot="R90"/>
 <instance part="P+5" gate="1" x="91.44" y="182.88"/>
