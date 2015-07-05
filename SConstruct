@@ -11,5 +11,6 @@ else:
 #canonenv.ParseConfig('pkg-config --cflags --libs gazebo')
 Export('canonenv')
 
-SConscript(['SConscript', 'legtool/SConscript', 'scoring/manager/SConscript'])
+SConscript(['SConscript', 'legtool/SConscript', 'scoring/manager/SConscript',
+            'gait_driver/SConscript'])
 SConscript(['imu/SConscript'], variant_dir='imu/build')
