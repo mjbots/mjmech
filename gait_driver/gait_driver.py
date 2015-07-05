@@ -15,6 +15,10 @@
 # limitations under the License.
 
 
+# TODO jpieper
+#   * Make logging work even if a driver isn't currently active.
+
+
 # Hack so that pygame won't barf in a headless environment.
 import os
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
@@ -498,12 +502,24 @@ def imu_thread(loop, gait_driver):
             result = result - 65536
         return result
 
+    def accel_read(addr, size):
+        return sm.read_i2c_block_data(0x1d, addr, size)
+
+    def accel_write(addr, data):
+        sm.write_i2c_block_data(0x1d, addr, data)
+
     try:
         whoami = gyro_read(0x0f, 1)[0]
         if whoami != 0xd7:
             raise RuntimeError('L3GD20 whomai %02x != D7' % whoami)
     except Exception as e:
         print 'Could not initialize gyro:', str(e)
+        return
+
+    try:
+        accel_read(0x20, 1)
+    except Exception as e:
+        print 'Could not initialize accelerometer:', str(e)
         return
 
     print 'initializing gyro'
@@ -516,13 +532,30 @@ def imu_thread(loop, gait_driver):
                [0x80, # BDU=1, BLE=0, FS=0
                 ])
 
+    print 'initializing accelerometer'
+    accel_write(0x20,
+                [0b01010111, # ODR=100Hz, low_power=off all enabled
+                 ])
+    accel_write(0x23,
+                [0b10101000, # BDU=(block), BLE=off, FS=11 (8g) HR=1
+                 ])
+
     imu_data = capnp.load('imu_data.capnp')
 
-    print 'reading gyro'
+    print 'reading imu'
 
-    # Now read as fast as we can.
     while True:
-        data = gyro_read(0xa7, 7)
+        # Read gyro values until we get a new one.
+        for i in range(15):
+            gdata = gyro_read(0xa7, 1)
+            if gdata[0] & 0x08 != 0:
+                break
+
+        gdata = gyro_read(0xa7, 7)
+
+        # Then read an accelerometer value.
+        adata = accel_read(0xa7, 7)
+
         timestamp = time.time()
 
         # TODO jpieper: Transform this into a preferred coordinate
@@ -531,10 +564,16 @@ def imu_thread(loop, gait_driver):
         message = imu_data.ImuData.new_message()
         message.timestamp = time.time()
         # For a 250dps full scale range
-        SENSITIVITY = 0.00875
-        message.xRateDps = to_int16(data[2], data[1]) * SENSITIVITY
-        message.yRateDps = to_int16(data[4], data[3]) * SENSITIVITY
-        message.zRateDps = to_int16(data[6], data[5]) * SENSITIVITY
+        GSENSITIVITY = 0.00875
+        message.xRateDps = to_int16(gdata[2], gdata[1]) * GSENSITIVITY
+        message.yRateDps = to_int16(gdata[4], gdata[3]) * GSENSITIVITY
+        message.zRateDps = to_int16(gdata[6], gdata[5]) * GSENSITIVITY
+
+        G = 9.80665
+        ASENSITIVITY = 0.004 / 64
+        message.xAccelMps2 = to_int16(adata[2], adata[1]) * ASENSITIVITY * G
+        message.yAccelMps2 = to_int16(adata[4], adata[3]) * ASENSITIVITY * G
+        message.zAccelMps2 = to_int16(adata[6], adata[5]) * ASENSITIVITY * G
 
         loop.call_soon_threadsafe(functools.partial(
                 gait_driver.handle_imu, message))
