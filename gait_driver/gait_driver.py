@@ -19,6 +19,7 @@
 import os
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
+import capnp
 import ConfigParser
 import datetime
 import functools
@@ -42,11 +43,14 @@ from legtool.gait import leg_ik
 from legtool.gait import ripple
 from legtool.gait.common import Command
 
+import telemetry_log
+
 UPDATE_TIME = 0.04
 
 
-LOG_IMU = 1
-LOG_SERVO = 2
+def localpath(x):
+    return os.path.join(sys.path[0], x)
+
 
 class GaitDriver(object):
     '''This class takes a gait controller, and a servo controller
@@ -80,15 +84,17 @@ class GaitDriver(object):
         now = datetime.datetime.utcnow()
         filename = '/tmp/data-%04d%02d%02d-%02d%02d%02d.log' % (
             now.year, now.month, now.day, now.hour, now.minute, now.second)
-        self.log = open(filename, 'w')
-        self.log.write('MJDATA01')
 
-    def log_packet(self, timestamp, ident, data):
-        block = struct.pack('IdI', ident, timestamp, len(data)) + data
-        self.log.write(block)
+        self.log = telemetry_log.Writer(open(filename, 'w'))
+        self.imu_log = self.log.register(
+            'imu', open(localpath('imu_data.capnp')).read(), 'ImuData')
+        self.servo_data = capnp.load('servo_data.capnp')
+        self.servo_command_log = self.log.register(
+            'servo_command', open(localpath('servo_data.capnp')).read(),
+            'ServoData')
 
-    def handle_imu(self, timestamp, data):
-        self.log_packet(timestamp, LOG_IMU, data)
+    def handle_imu(self, message):
+        self.imu_log(message)
 
     @asyncio.coroutine
     def run(self):
@@ -176,11 +182,16 @@ class GaitDriver(object):
                 allow_new=True))
 
     def log_pose(self, id_to_deg_map):
-        timestamp = time.time()
+        message = self.servo_data.ServoData.new_message()
 
-        data = ''.join(struct.pack('Bd', ident, deg)
-                       for ident, deg in id_to_deg_map.iteritems())
-        self.log_packet(timestamp, LOG_SERVO, data)
+        message.timestamp = time.time()
+        message.init('values', len(id_to_deg_map))
+
+        for index, (ident, deg) in enumerate(id_to_deg_map.iteritems()):
+            message.values[index].id = ident
+            message.values[index].angleDeg = deg
+
+        self.servo_command_log(message)
 
     @asyncio.coroutine
     def _run_while(self, condition, allow_new):
@@ -342,10 +353,10 @@ class MechDriver(object):
             setattr(result, key, value)
         return result
 
-    def handle_imu(self, timestamp, data):
+    def handle_imu(self, message):
         if self.driver is None:
             return
-        self.driver.handle_imu(timestamp, ''.join(chr(x) for x in data))
+        self.driver.handle_imu(message)
 
     @asyncio.coroutine
     def connect_servo(self):
@@ -481,6 +492,12 @@ def imu_thread(loop, gait_driver):
     def gyro_write(addr, data):
         sm.write_i2c_block_data(0x6b, addr, data)
 
+    def to_int16(msb, lsb):
+        result = msb * 256 + lsb
+        if result > 32767:
+            result = result - 65536
+        return result
+
     try:
         whoami = gyro_read(0x0f, 1)[0]
         if whoami != 0xd7:
@@ -499,6 +516,7 @@ def imu_thread(loop, gait_driver):
                [0x80, # BDU=1, BLE=0, FS=0
                 ])
 
+    imu_data = capnp.load('imu_data.capnp')
 
     print 'reading gyro'
 
@@ -507,9 +525,19 @@ def imu_thread(loop, gait_driver):
         data = gyro_read(0xa7, 7)
         timestamp = time.time()
 
+        # TODO jpieper: Transform this into a preferred coordinate
+        # system.
+
+        message = imu_data.ImuData.new_message()
+        message.timestamp = time.time()
+        # For a 250dps full scale range
+        SENSITIVITY = 0.00875
+        message.xRateDps = to_int16(data[2], data[1]) * SENSITIVITY
+        message.yRateDps = to_int16(data[4], data[3]) * SENSITIVITY
+        message.zRateDps = to_int16(data[6], data[5]) * SENSITIVITY
+
         loop.call_soon_threadsafe(functools.partial(
-                gait_driver.handle_imu,
-                timestamp, data))
+                gait_driver.handle_imu, message))
         time.sleep(0.001)
 
 
