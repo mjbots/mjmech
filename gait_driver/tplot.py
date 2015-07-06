@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
 
+import capnp
+import datetime
 import sys
 
 import matplotlib
@@ -18,13 +20,69 @@ import ui_tplot_main_window
 
 import telemetry_log
 
+class BoolGuard(object):
+    def __init__(self):
+        self.value = False
+
+    def __enter__(self):
+        self.value = True
+
+    def __exit__(self, type, value, traceback):
+        self.value = False
+
+    def active(self):
+        return self.value
+
+
 class Log(object):
     def __init__(self, filename):
         self.reader = telemetry_log.BulkReader(open(filename))
         self.records = self.reader.records()
+        self.all = None
 
     def get_all(self):
+        if self.all:
+            return
         self.all = self.reader.get()
+
+
+def _bisect(array, item, key):
+    if len(array) == 0:
+        return None
+    if item < key(array[0]):
+        return None
+
+    lower = 0
+    upper = len(array)
+
+    while abs(lower - upper) > 1:
+        mid = (lower + upper) / 2
+        value = key(array[mid])
+        if item < value:
+            upper = mid
+        else:
+            lower = mid
+
+    return lower
+
+
+def _clear_tree_widget(item):
+    item.setText(1, '')
+    for i in range(item.childCount()):
+        child = item.child(i)
+        _clear_tree_widget(child)
+
+
+def _set_tree_widget_data(item, struct):
+    for i in range(item.childCount()):
+        child = item.child(i)
+        name = child.text(0)
+
+        field = getattr(struct, name)
+        if isinstance(field, capnp.lib.capnp._DynamicStructReader):
+            _set_tree_widget_data(child, field)
+        else:
+            child.setText(1, str(field))
 
 
 class Tplot(QtGui.QMainWindow):
@@ -60,10 +118,20 @@ class Tplot(QtGui.QMainWindow):
         self.COLORS = 'rgbcmyk'
         self.next_color = 0
 
+        self.time_start = None
+        self.time_end = None
+        self.time_current = None
+
         self.ui.recordCombo.currentIndexChanged.connect(
             self.handle_record_combo)
         self.ui.addPlotButton.clicked.connect(self.handle_add_plot_button)
         self.ui.removeButton.clicked.connect(self.handle_remove_button)
+        self.ui.treeWidget.itemExpanded.connect(self.handle_item_expanded)
+        self.tree_items = []
+        self.ui.treeWidget.header().setResizeMode(
+            QtGui.QHeaderView.ResizeToContents)
+        self.ui.timeSlider.valueChanged.connect(self.handle_time_slider)
+        self._updating_slider = BoolGuard()
 
     def open(self, filename):
         try:
@@ -75,6 +143,7 @@ class Tplot(QtGui.QMainWindow):
 
         # OK, we're good, clear out our UI.
         self.ui.treeWidget.clear()
+        self.tree_items = []
         self.ui.recordCombo.clear()
         self.ui.xCombo.clear()
         self.ui.yCombo.clear()
@@ -83,14 +152,31 @@ class Tplot(QtGui.QMainWindow):
         for name in self.log.records.keys():
             self.ui.recordCombo.addItem(name)
 
+            item = QtGui.QTreeWidgetItem()
+            item.setText(0, name)
+            self.ui.treeWidget.addTopLevelItem(item)
+            self.tree_items.append(item)
+
+            exemplar = self.log.records[name]
+            def add_item(parent, element):
+                for name in sorted(dir(element)):
+                    item = QtGui.QTreeWidgetItem(parent)
+                    item.setText(0, name)
+
+                    child = getattr(element, name)
+                    if isinstance(child, capnp.lib.capnp._DynamicStructReader):
+                        add_item(item, child)
+            add_item(item, exemplar)
+
     def handle_record_combo(self):
         record = self.ui.recordCombo.currentText()
         self.ui.xCombo.clear()
         self.ui.yCombo.clear()
+        self.ui.treeWidget.clear()
 
         exemplar = self.log.records[record]
         default_x = None
-        for index, name in enumerate(dir(exemplar)):
+        for index, name in enumerate(sorted(dir(exemplar))):
             self.ui.xCombo.addItem(name)
             self.ui.yCombo.addItem(name)
 
@@ -99,8 +185,6 @@ class Tplot(QtGui.QMainWindow):
 
         if default_x:
             self.ui.xCombo.setCurrentIndex(default_x)
-
-        # TODO jpieper: Update tree view.
 
     def handle_add_plot_button(self):
         self.log.get_all()
@@ -139,10 +223,81 @@ class Tplot(QtGui.QMainWindow):
 
         self.canvas.draw()
 
+    def handle_item_expanded(self):
+        self.update_timeline()
+
+    def update_timeline(self):
+        if self.time_start is not None:
+            return
+
+        self.log.get_all()
+
+        # Look through all the records for those which have a
+        # "timestamp" field.  Find the minimum and maximum of each.
+        for record, exemplar in self.log.records.iteritems():
+            if not hasattr(exemplar, 'timestamp'):
+                continue
+
+            these_times = [x.timestamp for x in self.log.all[record]]
+            this_min = min(these_times)
+            this_max = max(these_times)
+
+            if self.time_start is None or this_min < self.time_start:
+                self.time_start = this_min
+            if self.time_end is None or this_max > self.time_end:
+                self.time_end = this_max
+
+        self.time_current = self.time_start
+        self.update_time(self.time_current, update_slider=False)
+
     def handle_mouse(self, event):
         if not event.inaxes:
             return
         self.statusBar().showMessage('%f,%f' % (event.xdata, event.ydata))
+
+    def update_time(self, new_time, update_slider=True):
+        self.time_current = new_time
+
+        # Update the tree view.
+        self.update_tree_view(new_time)
+
+        # Update dots on the plot.
+
+        # Update the text fields.
+        dt = datetime.datetime.utcfromtimestamp(new_time)
+        self.ui.clockEdit.setText('%04d-%02d-%02d %02d:%02d:%02.3f' % (
+                dt.year, dt.month, dt.day,
+                dt.hour, dt.minute, dt.second + dt.microsecond / 1e6))
+        self.ui.elapsedEdit.setText('%.3f' % (new_time - self.time_start))
+
+        if update_slider:
+            with self._updating_slider:
+                elapsed = new_time - self.time_start
+                total_time = self.time_end - self.time_start
+                self.ui.timeSlider.setValue(
+                    int(1000 * elapsed / total_time))
+
+    def handle_time_slider(self):
+        if self._updating_slider.active():
+            return
+
+        total_time = self.time_end - self.time_start
+        current = self.ui.timeSlider.value() / 1000.0
+        self.update_time(self.time_start + current * total_time,
+                         update_slider=False)
+
+    def update_tree_view(self, time):
+        for item in self.tree_items:
+            name = item.text(0)
+            all_data = self.log.all[name]
+
+            this_data_index = _bisect(all_data, time,
+                                      key=lambda x: x.timestamp)
+            if this_data_index is None:
+                _clear_tree_widget(item)
+            else:
+                this_data = all_data[this_data_index]
+                _set_tree_widget_data(item, this_data)
 
 
 def main():

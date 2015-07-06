@@ -6,22 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
-    <height>781</height>
+    <width>1010</width>
+    <height>838</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_12">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QWidget" name="">
-       <layout class="QVBoxLayout" name="verticalLayout_11" stretch="1,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
         <item>
          <widget class="QFrame" name="plotFrame">
           <property name="sizePolicy">
@@ -39,156 +39,100 @@
          </widget>
         </item>
         <item>
-         <widget class="QSlider" name="horizontalSlider">
+         <widget class="QSlider" name="timeSlider">
+          <property name="maximum">
+           <number>1000</number>
+          </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="QPushButton" name="fastReverseButton">
-              <property name="text">
-               <string>&lt;&lt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="fastReverseSpin"/>
-            </item>
-           </layout>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="fastReverseButton">
+            <property name="text">
+             <string>&lt;&lt;</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QPushButton" name="stepBackButton">
-              <property name="text">
-               <string>&lt;|</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="stepBackSpin"/>
-            </item>
-           </layout>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="stepBackButton">
+            <property name="text">
+             <string>&lt;|</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <widget class="QPushButton" name="pushButton_3">
-              <property name="text">
-               <string>&lt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>28</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="pushButton_3">
+            <property name="text">
+             <string>&lt;</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QPushButton" name="stopButton">
-              <property name="text">
-               <string>Stop</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="stopButton">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <item>
-             <widget class="QPushButton" name="playButton">
-              <property name="text">
-               <string>&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="playButton">
+            <property name="text">
+             <string>&gt;</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QPushButton" name="stepForwardButton">
-              <property name="text">
-               <string>|&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="stepForwardSpin"/>
-            </item>
-           </layout>
+          <item row="0" column="5">
+           <widget class="QPushButton" name="stepForwardButton">
+            <property name="text">
+             <string>|&gt;</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QPushButton" name="fastForwardButton">
-              <property name="text">
-               <string>&gt;&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="fastForwardSpin"/>
-            </item>
-           </layout>
+          <item row="0" column="6">
+           <widget class="QPushButton" name="fastForwardButton">
+            <property name="text">
+             <string>&gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QDoubleSpinBox" name="fastReverseSpin"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="stepBackSpin"/>
+          </item>
+          <item row="1" column="5">
+           <widget class="QDoubleSpinBox" name="stepForwardSpin"/>
+          </item>
+          <item row="1" column="6">
+           <widget class="QDoubleSpinBox" name="fastForwardSpin"/>
           </item>
          </layout>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="">
-       <layout class="QVBoxLayout" name="verticalLayout_10">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTreeWidget" name="treeWidget">
+          <property name="columnCount">
+           <number>2</number>
+          </property>
           <attribute name="headerVisible">
            <bool>false</bool>
           </attribute>
           <column>
            <property name="text">
             <string notr="true">1</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">2</string>
            </property>
           </column>
          </widget>
@@ -261,6 +205,43 @@
           </layout>
          </widget>
         </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Time</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="clockLabel">
+             <property name="text">
+              <string>Clock:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="clockEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="elapsedLabel">
+             <property name="text">
+              <string>Elapsed:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="elapsedEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -272,7 +253,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>845</width>
+     <width>1010</width>
      <height>20</height>
     </rect>
    </property>
