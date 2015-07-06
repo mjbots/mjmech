@@ -15196,10 +15196,10 @@ http://www.zetex.com&lt;p&gt;
 <part name="D2" library="odroid_shield" deviceset="DIODE-" device="CMS06" value="30V 2A">
 <attribute name="DPN" value="CMS06QMCT-ND"/>
 </part>
-<part name="C4" library="rcl" deviceset="C-US" device="C1206" value="22uF 16V">
+<part name="C4" library="rcl" deviceset="C-US" device="C1210" value="22uF 16V">
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
-<part name="L1" library="odroid_shield" deviceset="L-US" device="WURTH_74404042033" value="33uH">
+<part name="L1" library="odroid_shield" deviceset="L-US" device="WURTH_74404042033" value="3.3uH">
 <attribute name="DPN" value="732-5505-1-ND"/>
 </part>
 <part name="R1" library="rcl" deviceset="R-US_" device="R0603" value="105k 1%"/>
@@ -15232,15 +15232,15 @@ http://www.zetex.com&lt;p&gt;
 <part name="C8" library="rcl" deviceset="C-US" device="C1210" value="22uF 16V">
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
-<part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="500"/>
-<part name="R4" library="rcl" deviceset="R-US_" device="R0603" value="500"/>
+<part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="560"/>
+<part name="R4" library="rcl" deviceset="R-US_" device="R0603" value="560"/>
 <part name="U7" library="odroid_shield" deviceset="MC33926" device="">
 <attribute name="DPN" value="MC33926PNB-ND"/>
 </part>
 <part name="C6" library="rcl" deviceset="C-US" device="C0603" value=".1uF"/>
 <part name="R5" library="rcl" deviceset="R-US_" device="R0603" value="100k"/>
 <part name="P+5" library="supply1" deviceset="+5V" device=""/>
-<part name="R6" library="rcl" deviceset="R-US_" device="R0603" value="200"/>
+<part name="R6" library="rcl" deviceset="R-US_" device="R0603" value="220"/>
 <part name="U5" library="v-reg" deviceset="TS5205" device=""/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
@@ -15249,10 +15249,10 @@ http://www.zetex.com&lt;p&gt;
 <part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
 <part name="Q1" library="zetex" deviceset="NMOSSOT23" device=""/>
 <part name="U6" library="odroid_shield" deviceset="TCA9517" device="MSOP8"/>
-<part name="R7" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
-<part name="R8" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
-<part name="R9" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
-<part name="R10" library="rcl" deviceset="R-US_" device="R0603" value="4.7k"/>
+<part name="R7" library="rcl" deviceset="R-US_" device="R0603" value="5.6k"/>
+<part name="R8" library="rcl" deviceset="R-US_" device="R0603" value="5.6k"/>
+<part name="R9" library="rcl" deviceset="R-US_" device="R0603" value="5.6k"/>
+<part name="R10" library="rcl" deviceset="R-US_" device="R0603" value="5.6k"/>
 <part name="U4" library="odroid_shield" deviceset="ATMEGA644P-20AU" device=""/>
 <part name="GND10" library="supply1" deviceset="GND" device=""/>
 <part name="P+7" library="supply1" deviceset="+5V" device=""/>
@@ -15265,13 +15265,13 @@ http://www.zetex.com&lt;p&gt;
 </part>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
 <part name="P+9" library="supply1" deviceset="+5V" device=""/>
-<part name="R11" library="rcl" deviceset="R-US_" device="R0603" value="200"/>
+<part name="R11" library="rcl" deviceset="R-US_" device="R0603" value="220"/>
 <part name="U10" library="odroid_shield" deviceset="ABM8G" device="">
 <attribute name="DPN" value="535-10267-6-ND"/>
 </part>
 <part name="GND13" library="supply1" deviceset="GND" device=""/>
-<part name="C11" library="rcl" deviceset="C-US" device="C0603" value="20pF"/>
-<part name="C12" library="rcl" deviceset="C-US" device="C0603" value="20pF"/>
+<part name="C11" library="rcl" deviceset="C-US" device="C0603" value="22pF"/>
+<part name="C12" library="rcl" deviceset="C-US" device="C0603" value="22pF"/>
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="+3V3" library="supply1" deviceset="+3V3" device=""/>
 <part name="U8" library="odroid_shield" deviceset="MAX21000" device=""/>
@@ -16594,8 +16594,6 @@ http://www.zetex.com&lt;p&gt;
 <approved hash="113,1,120.057,74.6718,JUSB,,,,,"/>
 <approved hash="113,1,176.488,152.531,JWEAP,,,,,"/>
 <approved hash="113,1,279.637,12.8312,JI2C,,,,,"/>
-<approved hash="113,1,194.084,142.24,Q1,,,,,"/>
-<approved hash="113,1,183.117,320.171,SER2,,,,,"/>
 </errors>
 </schematic>
 </drawing>
