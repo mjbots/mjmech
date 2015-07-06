@@ -146,23 +146,41 @@ class BulkReader(object):
 
             yield block_type, block_data
 
-    def records(self):
-        '''Return a list of all records in the log.'''
+    def _parse_description(self, block_data, filter=None):
+        '''Returns a tuple of (identifier, _BulkRecord)'''
 
-        result = []
+        (flags, identifier, namelen), rest = _parse_struct(
+            _DESCRIPTION_STRUCT, block_data)
+
+        if len(rest) < namelen:
+            raise RuntimeError('malformed data')
+
+        name = rest[0:namelen]
+
+        if not (filter is None or
+                isinstance(filter, list) and name in filter or
+                filter(name)):
+            return None, None
+
+        rest = rest[namelen:]
+        (struct_name_len,), rest = _parse_struct(_PSTRING_STRUCT, rest)
+        struct_name = rest[0:struct_name_len]
+        rest = rest[struct_name_len:]
+
+        return identifier, _BulkRecord(identifier, name, rest, struct_name)
+
+    def records(self):
+        '''Return a dictionary mapping record names to an empty
+        element of each record type.'''
+
+        result = {}
 
         for block_type, block_data in self._read_blocks():
             if block_type != _BLOCK_DESCRIPTION:
                 continue
 
-            (flags, identifier, namelen), rest = _parse_struct(
-                _DESCRIPTION_STRUCT, block_data)
-
-            if len(rest) < namelen:
-                raise RuntimeError('malformed description')
-
-            name = rest[0:namelen]
-            result.append(name)
+            identifier, bulk_record = self._parse_description(block_data)
+            result[bulk_record.name] = bulk_record.message.new_message()
 
         return result
 
@@ -179,26 +197,11 @@ class BulkReader(object):
 
         for block_type, block_data in self._read_blocks():
             if block_type == _BLOCK_DESCRIPTION:
-                (flags, identifier, namelen), rest = _parse_struct(
-                    _DESCRIPTION_STRUCT, block_data)
-
-                if len(rest) < namelen:
-                    raise RuntimeError('malformed data')
-
-                name = rest[0:namelen]
-
-                if not (filter is None or
-                        isinstance(filter, list) and name in filter or
-                        filter(name)):
+                identifier, bulk_record = self._parse_description(
+                    block_data, filter=filter)
+                if identifier is None:
                     continue
-
-                rest = rest[namelen:]
-                (struct_name_len,), rest = _parse_struct(_PSTRING_STRUCT, rest)
-                struct_name = rest[0:struct_name_len]
-                rest = rest[struct_name_len:]
-
-                records[identifier] = _BulkRecord(
-                    identifier, name, rest, struct_name)
+                records[identifier] = bulk_record
             elif block_type == _BLOCK_DATA:
                 (flags, identifier), rest = _parse_struct(
                     _DATA_STRUCT, block_data)

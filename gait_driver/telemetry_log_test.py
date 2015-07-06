@@ -52,7 +52,7 @@ struct Sample {
 
         r = telemetry_log.BulkReader(StringIO.StringIO(output.getvalue()))
 
-        self.assertEquals(r.records(), ['record1'])
+        self.assertEquals(r.records().keys(), ['record1'])
 
         everything = r.get()
 
