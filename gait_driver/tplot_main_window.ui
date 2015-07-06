@@ -65,7 +65,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="playReverseButton">
             <property name="text">
              <string>&lt;</string>
             </property>
@@ -100,16 +100,56 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QDoubleSpinBox" name="fastReverseSpin"/>
+           <widget class="QDoubleSpinBox" name="fastReverseSpin">
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>1000.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="stepBackSpin"/>
+           <widget class="QDoubleSpinBox" name="stepBackSpin">
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="5">
-           <widget class="QDoubleSpinBox" name="stepForwardSpin"/>
+           <widget class="QDoubleSpinBox" name="stepForwardSpin">
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="6">
-           <widget class="QDoubleSpinBox" name="fastForwardSpin"/>
+           <widget class="QDoubleSpinBox" name="fastForwardSpin">
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>1000.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

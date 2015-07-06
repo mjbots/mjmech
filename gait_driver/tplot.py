@@ -4,6 +4,7 @@
 import capnp
 import datetime
 import sys
+import time
 
 import matplotlib
 
@@ -118,6 +119,9 @@ class Tplot(QtGui.QMainWindow):
         self.COLORS = 'rgbcmyk'
         self.next_color = 0
 
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.handle_timeout)
+
         self.time_start = None
         self.time_end = None
         self.time_current = None
@@ -132,6 +136,19 @@ class Tplot(QtGui.QMainWindow):
             QtGui.QHeaderView.ResizeToContents)
         self.ui.timeSlider.valueChanged.connect(self.handle_time_slider)
         self._updating_slider = BoolGuard()
+
+        self.ui.fastReverseButton.clicked.connect(
+            self.handle_fast_reverse_button)
+        self.ui.stepBackButton.clicked.connect(
+            self.handle_step_back_button)
+        self.ui.playReverseButton.clicked.connect(
+            self.handle_play_reverse_button)
+        self.ui.stopButton.clicked.connect(self.handle_stop_button)
+        self.ui.playButton.clicked.connect(self.handle_play_button)
+        self.ui.stepForwardButton.clicked.connect(
+            self.handle_step_forward_button)
+        self.ui.fastForwardButton.clicked.connect(
+            self.handle_fast_forward_button)
 
     def open(self, filename):
         try:
@@ -256,6 +273,7 @@ class Tplot(QtGui.QMainWindow):
         self.statusBar().showMessage('%f,%f' % (event.xdata, event.ydata))
 
     def update_time(self, new_time, update_slider=True):
+        new_time = max(self.time_start, min(self.time_end, new_time))
         self.time_current = new_time
 
         # Update the tree view.
@@ -298,6 +316,47 @@ class Tplot(QtGui.QMainWindow):
             else:
                 this_data = all_data[this_data_index]
                 _set_tree_widget_data(item, this_data)
+
+    def handle_fast_reverse_button(self):
+        self.play_start(-self.ui.fastReverseSpin.value())
+
+    def handle_step_back_button(self):
+        self.play_stop()
+        self.update_time(self.time_current - self.ui.stepBackSpin.value())
+
+    def handle_play_reverse_button(self):
+        self.play_start(-1.0)
+
+    def handle_stop_button(self):
+        self.play_stop()
+
+    def handle_play_button(self):
+        self.play_start(1.0)
+
+    def handle_step_forward_button(self):
+        self.play_stop()
+        self.update_time(self.time_current + self.ui.stepForwardSpin.value())
+
+    def handle_fast_forward_button(self):
+        self.play_start(self.ui.fastForwardSpin.value())
+
+    def play_stop(self):
+        self.speed = None
+        self.last_time = None
+        self.timer.stop()
+
+    def play_start(self, speed):
+        self.speed = speed
+        self.last_time = time.time()
+        self.timer.start(100)
+
+    def handle_timeout(self):
+        assert self.last_time is not None
+        this_time = time.time()
+        delta_t = this_time - self.last_time
+        self.last_time = this_time
+
+        self.update_time(self.time_current + delta_t * self.speed)
 
 
 def main():
