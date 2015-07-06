@@ -189,7 +189,6 @@ class Tplot(QtGui.QMainWindow):
         record = self.ui.recordCombo.currentText()
         self.ui.xCombo.clear()
         self.ui.yCombo.clear()
-        self.ui.treeWidget.clear()
 
         exemplar = self.log.records[record]
         default_x = None
@@ -215,6 +214,9 @@ class Tplot(QtGui.QMainWindow):
         ydata = [getattr(x, yname) for x in data]
 
         line = matplotlib.lines.Line2D(xdata, ydata)
+        line.tplot_record_name = record
+        line.tplot_xname = xname
+        line.tplot_yname = yname
         label = '%s %s vs. %s' % (record, xname, yname)
         line.set_label(label)
         line.set_color(self.COLORS[self.next_color])
@@ -235,6 +237,8 @@ class Tplot(QtGui.QMainWindow):
         if index < 0:
             return
         line = self.ui.plotsCombo.itemData(index)
+        if hasattr(line, 'tplot_marker'):
+            line.tplot_marker.remove()
         line.remove()
         self.ui.plotsCombo.removeItem(index)
 
@@ -280,6 +284,7 @@ class Tplot(QtGui.QMainWindow):
         self.update_tree_view(new_time)
 
         # Update dots on the plot.
+        self.update_plot_dots(new_time)
 
         # Update the text fields.
         dt = datetime.datetime.utcfromtimestamp(new_time)
@@ -316,6 +321,37 @@ class Tplot(QtGui.QMainWindow):
             else:
                 this_data = all_data[this_data_index]
                 _set_tree_widget_data(item, this_data)
+
+    def update_plot_dots(self, new_time):
+        updated = False
+        for line in self.left_axis.lines:
+            if not hasattr(line, 'tplot_record_name'):
+                continue
+            if not hasattr(self.log.records[line.tplot_record_name],
+                           'timestamp'):
+                continue
+
+            all_data = self.log.all[line.tplot_record_name]
+            this_index = _bisect(all_data, new_time, lambda x: x.timestamp)
+            if this_index is None:
+                continue
+
+            this_data = all_data[this_index]
+
+            if not hasattr(line, 'tplot_marker'):
+                line.tplot_marker = matplotlib.lines.Line2D([], [])
+                line.tplot_marker.set_marker('o')
+                line.tplot_marker.set_color(line._color)
+                self.left_axis.add_line(line.tplot_marker)
+
+            updated = True
+            xdata = [getattr(this_data, line.tplot_xname)]
+            ydata = [getattr(this_data, line.tplot_yname)]
+            line.tplot_marker.set_data(xdata, ydata)
+
+        if updated:
+            self.canvas.draw()
+
 
     def handle_fast_reverse_button(self):
         self.play_start(-self.ui.fastReverseSpin.value())
