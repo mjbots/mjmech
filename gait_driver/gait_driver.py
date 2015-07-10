@@ -96,6 +96,10 @@ class GaitDriver(object):
         self.servo_command_log = self.log.register(
             'servo_command', open(localpath('servo_data.capnp')).read(),
             'ServoData')
+        self.gait_data = capnp.load('gait_data.capnp')
+        self.gait_data_log = self.log.register(
+            'gait_data', open(localpath('gait_data.capnp')).read(),
+            'GaitData')
 
     def handle_imu(self, message):
         self.imu_log(message)
@@ -185,7 +189,7 @@ class GaitDriver(object):
                 lambda: self.mode == self.COMMAND,
                 allow_new=True))
 
-    def log_pose(self, id_to_deg_map):
+    def log_pose(self, state, id_to_deg_map):
         message = self.servo_data.ServoData.new_message()
 
         message.timestamp = time.time()
@@ -196,6 +200,39 @@ class GaitDriver(object):
             message.values[index].angleDeg = deg
 
         self.servo_command_log(message)
+
+        gait_data = self.gait_data.GaitData.new_message()
+
+        gait_data.timestamp = message.timestamp
+
+        def format_point(point, dest):
+            dest.x = point.x
+            dest.y = point.y
+            dest.z = point.z
+
+        def format_transform(transform, dest):
+            format_point(transform.translation, dest.translation)
+            dest.rotation.x = transform.rotation.x
+            dest.rotation.y = transform.rotation.y
+            dest.rotation.z = transform.rotation.z
+            dest.rotation.w = transform.rotation.w
+
+        format_transform(state.body_frame.transform_to_frame(state.robot_frame),
+                         gait_data.bodyRobot)
+        format_transform(state.cog_frame.transform_to_frame(state.robot_frame),
+                         gait_data.cogRobot)
+        gait_data.phase = state.phase
+        for index, dest in [(0, gait_data.leg1Robot),
+                            (1, gait_data.leg2Robot),
+                            (2, gait_data.leg3Robot),
+                            (3, gait_data.leg4Robot)]:
+            format_point(
+                state.legs[index].frame.map_to_frame(
+                    state.robot_frame, state.legs[index].point),
+                dest)
+
+        self.gait_data_log(gait_data)
+
 
     @asyncio.coroutine
     def _run_while(self, condition, allow_new):
@@ -216,7 +253,7 @@ class GaitDriver(object):
             self.state = self.gait.advance_time(UPDATE_TIME)
             try:
                 servo_pose = self.state.command_dict()
-                self.log_pose(servo_pose)
+                self.log_pose(self.state, servo_pose)
                 yield From(self.servo.set_pose(
                         servo_pose, pose_time=3 * UPDATE_TIME))
             except ripple.NotSupported:
