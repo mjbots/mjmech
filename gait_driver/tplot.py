@@ -86,6 +86,13 @@ def _set_tree_widget_data(item, struct):
             child.setText(1, str(field))
 
 
+def _get_data(value, name):
+    fields = name.split('.')
+    for field in fields:
+        value = getattr(value, field)
+    return value
+
+
 class Tplot(QtGui.QMainWindow):
     def __init__(self):
         super(Tplot, self).__init__()
@@ -181,7 +188,7 @@ class Tplot(QtGui.QMainWindow):
                     item.setText(0, name)
 
                     child = getattr(element, name)
-                    if isinstance(child, capnp.lib.capnp._DynamicStructReader):
+                    if isinstance(child, capnp.lib.capnp._DynamicStructBuilder):
                         add_item(item, child)
             add_item(item, exemplar)
 
@@ -192,12 +199,30 @@ class Tplot(QtGui.QMainWindow):
 
         exemplar = self.log.records[record]
         default_x = None
-        for index, name in enumerate(sorted(dir(exemplar))):
-            self.ui.xCombo.addItem(name)
-            self.ui.yCombo.addItem(name)
+        index = [0, None]
 
-            if name == 'timestamp':
-                default_x = index
+        def add_item(index, parent, exemplar):
+            for name in sorted(dir(exemplar)):
+                this_name = parent
+                if len(this_name):
+                    this_name += '.'
+                this_name += name
+
+                value = getattr(exemplar, name)
+
+                if isinstance(value, capnp.lib.capnp._DynamicStructBuilder):
+                    add_item(index, this_name, value)
+                else:
+                    self.ui.xCombo.addItem(this_name)
+                    self.ui.yCombo.addItem(this_name)
+
+                    if name == 'timestamp':
+                        index[1] = index[0]
+
+                    index[0] += 1
+
+        add_item(index, '', exemplar)
+        default_x = index[1]
 
         if default_x:
             self.ui.xCombo.setCurrentIndex(default_x)
@@ -210,8 +235,8 @@ class Tplot(QtGui.QMainWindow):
         yname = self.ui.yCombo.currentText()
 
         data = self.log.all[record]
-        xdata = [getattr(x, xname) for x in data]
-        ydata = [getattr(x, yname) for x in data]
+        xdata = [_get_data(x, xname) for x in data]
+        ydata = [_get_data(x, yname) for x in data]
 
         line = matplotlib.lines.Line2D(xdata, ydata)
         line.tplot_record_name = record
@@ -345,8 +370,8 @@ class Tplot(QtGui.QMainWindow):
                 self.left_axis.add_line(line.tplot_marker)
 
             updated = True
-            xdata = [getattr(this_data, line.tplot_xname)]
-            ydata = [getattr(this_data, line.tplot_yname)]
+            xdata = [_get_data(this_data, line.tplot_xname)]
+            ydata = [_get_data(this_data, line.tplot_yname)]
             line.tplot_marker.set_data(xdata, ydata)
 
         if updated:
