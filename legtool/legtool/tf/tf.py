@@ -206,7 +206,7 @@ class Frame(object):
         return self.relation_to_frame(other_frame).transform()
 
     def map_to_frame(self, other_frame, point_or_transform):
-        '''Given a point or tranform measured in this reference frame,
+        '''Given a point or transform measured in this reference frame,
         map it into an arbitrary other reference frame.'''
         return self.transform_to_frame(other_frame).apply(point_or_transform)
 
