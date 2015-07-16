@@ -49,7 +49,7 @@ from legtool.gait.common import Command
 
 import telemetry_log
 
-UPDATE_TIME = 0.04
+UPDATE_TIME = 0.001
 
 
 def localpath(x):
@@ -254,7 +254,9 @@ class GaitDriver(object):
                 self.next_command = None
                 self.command_event.clear()
 
-            self.state = self.gait.advance_time(UPDATE_TIME)
+            next_time = time.time()
+            delta = next_time - current_time
+            self.state = self.gait.advance_time(delta)
             try:
                 servo_pose = self.state.command_dict()
                 self.log_pose(self.state, servo_pose)
@@ -263,10 +265,11 @@ class GaitDriver(object):
             except ripple.NotSupported:
                 pass
 
-            delay = (current_time + UPDATE_TIME) - time.time()
-            if delay > 0.0:
-                yield From(asyncio.sleep(delay))
-            current_time += UPDATE_TIME
+            #delay = (current_time + UPDATE_TIME) - time.time()
+            #if delay > 0.0:
+            #    yield From(asyncio.sleep(delay))
+            yield From(asyncio.sleep(UPDATE_TIME))
+            current_time = next_time
 
     @asyncio.coroutine
     def _transition_to_idle(self):
@@ -430,6 +433,18 @@ def _load_ik(config):
 
     return leg_ik_map
 
+
+_DEADBAND = 0.20
+
+
+def remove_deadband(value):
+    if abs(value) < _DEADBAND:
+        return 0.0
+    if value > 0.0:
+        return (value - _DEADBAND) / (1.0 - _DEADBAND)
+    return (value + _DEADBAND) / (1.0 - _DEADBAND)
+
+
 @asyncio.coroutine
 def handle_input(driver):
     pygame.init()
@@ -446,23 +461,22 @@ def handle_input(driver):
     command = driver.create_default_command()
     idle = True
 
+    values = {}
+
     while True:
         pygame.event.pump()
 
-        x_speed = joystick.get_axis(0)
-        if abs(x_speed) < 0.15:
-            x_speed = 0.0
-        y_speed = -joystick.get_axis(1)
-        if abs(y_speed) < 0.15:
-            y_speed = 0.0
-        rot_speed = joystick.get_axis(3)
-        if abs(rot_speed) < 0.15:
-            rot_speed = 0.0
-        z_height = joystick.get_axis(2)
-        if abs(z_height) < 0.15:
-            z_height = 0.0
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.JOYAXISMOTION:
+                values[event.axis] = event.value
 
-        print x_speed, y_speed, rot_speed
+        x_speed = remove_deadband(values.get(0, 0.0))
+        y_speed = -remove_deadband(values.get(1, 0.0))
+        rot_speed = remove_deadband(values.get(3, 0.0))
+        z_height = -remove_deadband(values.get(4, 0.0))
+
+        #print time.time(), x_speed, y_speed, rot_speed, z_height
 
         command.translate_x_mm_s = x_speed * 100
         command.translate_y_mm_s = y_speed * 250
@@ -487,8 +501,8 @@ def handle_input(driver):
 
             driver.driver.joystick_data_log(jdata)
 
-        yield From(asyncio.sleep(0.05))
-        clock.tick(5)
+        yield From(asyncio.sleep(0.001))
+        clock.tick(100)
 
 def imu_thread(loop, gait_driver):
     try:
@@ -583,7 +597,7 @@ def imu_thread(loop, gait_driver):
 
         loop.call_soon_threadsafe(functools.partial(
                 gait_driver.handle_imu, message))
-        time.sleep(0.001)
+        time.sleep(0.005)
 
 
 @asyncio.coroutine
