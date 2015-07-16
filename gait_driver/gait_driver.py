@@ -15,10 +15,6 @@
 # limitations under the License.
 
 
-# TODO jpieper
-#   * Make logging work even if a driver isn't currently active.
-
-
 # Hack so that pygame won't barf in a headless environment.
 import os
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
@@ -390,12 +386,14 @@ class MechDriver(object):
             x.result()
 
     def set_command(self, command):
-        self.command_time = time.time()
-        self.driver.set_command(self.gait, command)
+        if self.driver:
+            self.command_time = time.time()
+            self.driver.set_command(self.gait, command)
 
     def set_idle(self):
-        self.command_time = time.time()
-        self.driver.set_idle()
+        if self.driver:
+            self.command_time = time.time()
+            self.driver.set_idle()
 
     @asyncio.coroutine
     def _make_idle(self):
@@ -434,7 +432,7 @@ def _load_ik(config):
     return leg_ik_map
 
 
-_DEADBAND = 0.20
+_DEADBAND = 0.25
 
 
 def remove_deadband(value):
@@ -459,7 +457,6 @@ def handle_input(driver):
     print "numbuttons=", joystick.get_numbuttons()
 
     command = driver.create_default_command()
-    idle = True
 
     values = {}
 
@@ -481,15 +478,17 @@ def handle_input(driver):
         command.translate_x_mm_s = x_speed * 100
         command.translate_y_mm_s = y_speed * 250
         command.rotate_deg_s = rot_speed * 30
-        command.body_z_mm = z_height * 25
+        if z_height > 0.0:
+            command.body_z_mm = z_height * 20
+        else:
+            command.body_z_mm = z_height * 35
 
         if x_speed != 0.0 or y_speed != 0.0 or rot_speed != 0.0:
-            driver.set_command(command)
-            idle = False
+            command.lift_height_percent = 100.0
         else:
-            if not idle:
-                driver.set_idle()
-                idle = True
+            command.lift_height_percent = 0.0
+
+        driver.set_command(command)
 
         if driver.driver:
             jdata = driver.driver.joystick_data.JoystickData.new_message()
