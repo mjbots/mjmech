@@ -100,6 +100,10 @@ class GaitDriver(object):
         self.gait_data_log = self.log.register(
             'gait_data', open(localpath('gait_data.capnp')).read(),
             'GaitData')
+        self.joystick_data = capnp.load('joystick_data.capnp')
+        self.joystick_data_log = self.log.register(
+            'joystick', open(localpath('joystick_data.capnp')).read(),
+            'JoystickData')
 
     def handle_imu(self, message):
         self.imu_log(message)
@@ -305,55 +309,6 @@ class ConfigRippleGait(object):
         # the GaitDriver entirely.
         raise Return(True)
 
-        # Command 0 speed, wait for the command to be active, then
-        # wait for at least 1 phase, then wait for all legs to be in
-        # stance.
-        self.gait.set_command(ripple.Command())
-
-        yield From(run(
-                lambda: (self.gait.is_command_pending() and
-                         not early_exit()),
-                allow_new=False))
-
-        if early_exit():
-            raise Return(False)
-
-        class PhaseChecker(object):
-            def __init__(self, parent):
-                self.phase_delta = 0.0
-                self.parent = parent
-                self.old_phase = self.parent.gait.state.phase
-
-            def check(self):
-                self.phase_delta += _wrap_phase(
-                    self.parent.gait.state.phase - self.old_phase)
-                self.old_phase = self.parent.gait.state.phase
-                return (self.phase_delta < 0.95)
-
-        checker = PhaseChecker(self)
-
-        yield From(run(lambda: checker.check() and not early_exit(),
-                       allow_new=False))
-
-        if early_exit():
-            raise Return(False)
-
-        def any_non_stance():
-            if early_exit():
-                return False
-
-            for legnum, leg in self.gait.state.legs.iteritems():
-                if leg.mode != ripple.STANCE:
-                    return True
-            return False
-
-        yield From(run(any_non_stance, allow_new=False))
-
-        if early_exit():
-            raise Return(False)
-
-        raise Return(True)
-
 
 class MechDriver(object):
     def __init__(self, options):
@@ -488,27 +443,31 @@ def handle_input(driver):
     print "numaxes=", joystick.get_numaxes()
     print "numbuttons=", joystick.get_numbuttons()
 
-    command = ripple.Command()
+    command = driver.create_default_command()
     idle = True
 
     while True:
         pygame.event.pump()
 
         x_speed = joystick.get_axis(0)
-        if abs(x_speed) < 0.1:
+        if abs(x_speed) < 0.15:
             x_speed = 0.0
         y_speed = -joystick.get_axis(1)
-        if abs(y_speed) < 0.1:
+        if abs(y_speed) < 0.15:
             y_speed = 0.0
         rot_speed = joystick.get_axis(3)
-        if abs(rot_speed) < 0.1:
+        if abs(rot_speed) < 0.15:
             rot_speed = 0.0
+        z_height = joystick.get_axis(2)
+        if abs(z_height) < 0.15:
+            z_height = 0.0
 
         print x_speed, y_speed, rot_speed
 
         command.translate_x_mm_s = x_speed * 100
         command.translate_y_mm_s = y_speed * 250
         command.rotate_deg_s = rot_speed * 30
+        command.body_z_mm = z_height * 25
 
         if x_speed != 0.0 or y_speed != 0.0 or rot_speed != 0.0:
             driver.set_command(command)
@@ -518,8 +477,18 @@ def handle_input(driver):
                 driver.set_idle()
                 idle = True
 
+        if driver.driver:
+            jdata = driver.driver.joystick_data.JoystickData.new_message()
+            jdata.timestamp = time.time()
+            jdata.translateXMmS = command.translate_x_mm_s
+            jdata.translateYMmS = command.translate_y_mm_s
+            jdata.rotateDps = command.rotate_deg_s
+            jdata.bodyZMm = command.body_z_mm
+
+            driver.driver.joystick_data_log(jdata)
+
         yield From(asyncio.sleep(0.05))
-        clock.tick(10)
+        clock.tick(5)
 
 def imu_thread(loop, gait_driver):
     try:
