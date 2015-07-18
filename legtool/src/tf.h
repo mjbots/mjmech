@@ -114,6 +114,8 @@ struct Frame : boost::noncopyable {
   class Relation : boost::noncopyable {
    public:
     Relation(const Frame* source, const Frame* destination) {
+      // TODO jpieper: It would be nice if this calculation didn't
+      // require so much dynamic memory allocation.
       std::set<const Frame*> source_parents_dict;
       for (const Frame* node = source; node; node = node->parent) {
         source_parents_list_.push_back(node);
