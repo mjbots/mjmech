@@ -1,4 +1,4 @@
-# Copyright 2014 Josh Pieper, jjp@pobox.com.
+# Copyright 2014-2015 Josh Pieper, jjp@pobox.com.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+Import('canonenv')
+env = canonenv.Clone()
 
-canonenv = Environment()
+env.Append(CPPPATH=['.'])
+env.ParseConfig('pkg-config --cflags --libs eigen3')
 
-canonenv.Append(CPPFLAGS=['-Wall', '-Werror', '-g', '-std=c++1y'])
-if ARGUMENTS.get('debug', 0):
-    canonenv.Append(CPPFLAGS=['-O0'])
-else:
-    canonenv.Append(CPPFLAGS=['-O3'])
+liblegtool = env.SharedLibrary([])
 
-Export('canonenv')
-SConscript(['src/SConscript'], variant_dir='src/build')
-SConscript(['SConscript'])
+TESTS = ['test/' + x for x in [
+    'test_main.cc',
+    'test_quaternion.cc',
+    'test_tf.cc',
+    ]]
+
+testenv = env.Clone()
+testenv.Append(LIBS=['boost_unit_test_framework'])
+
+test_legtool = testenv.Program('test_legtool', TESTS + liblegtool)
+testenv.Command('test_legtool.passed', test_legtool,
+                '$SOURCE && touch $TARGET')
