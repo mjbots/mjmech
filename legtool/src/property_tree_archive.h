@@ -15,9 +15,7 @@
 #pragma once
 
 #include <tuple>
-#include <type_traits>
 
-#include <boost/utility/enable_if.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "visitor.h"
