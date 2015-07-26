@@ -84,3 +84,6 @@ class AsyncioSerial(object):
             result += data
             if data == '\r' or data == '\n':
                 raise Return(result)
+
+    def close(self):
+        self.raw_serial.close()
