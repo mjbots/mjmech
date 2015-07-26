@@ -510,3 +510,74 @@ class HerkuleX(object):
                 assert size == 2
                 result[key] = value[1] << 8 | value[0]
         raise Return(result)
+
+    def _format_mdeg(self, mdeg):
+        return [mdeg & 0x7f, (mdeg >> 7) & 0x7f,
+                (mdeg >> 14) & 0x7f,
+                (mdeg >> 21) & 0x7f]
+
+    @asyncio.coroutine
+    def _set_gimbal_target_attitude_value(self, servo, address, value_deg):
+        yield From(
+            self.ram_write(servo, address,
+                           self._format_mdeg(int(value_deg * 1000.0))))
+
+    @asyncio.coroutine
+    def set_gimbal_target_pitch(self, servo, pitch_deg):
+        yield From(self._set_gimbal_target_attitude_value(servo, 80, pitch_deg))
+
+    @asyncio.coroutine
+    def set_gimbal_target_yaw(self, servo, yaw_deg):
+        yield From(self._set_gimbal_target_attitude_value(servo, 84, yaw_deg))
+
+    @asyncio.coroutine
+    def set_gimbal_target_attitude(self, servo, pitch_deg, yaw_deg):
+        yield From(
+            self.ram_write(servo, 80,
+                           self._format_mdeg(int(pitch_deg * 1000.0)) +
+                           self._format_mdeg(int(yaw_deg * 1000.0))))
+
+    def _make_attitude_value(self, data):
+        value = (data[0] |
+                 data[1] << 7 |
+                 data[2] << 14 |
+                 data[3] << 21)
+        if value >= (0x40 << 21):
+            value = value - (0x80 << 21)
+        return value
+
+    @asyncio.coroutine
+    def gimbal_target_pitch(self, servo):
+        try:
+            data = yield From(self.ram_read(servo, 80, 4))
+            raise Return(self._make_attitude_value(data.data) / 1000.0)
+        except asyncio.TimeoutError:
+            raise Return(None)
+
+    @asyncio.coroutine
+    def gimbal_target_yaw(self, servo):
+        try:
+            data = yield From(self.ram_read(servo, 84, 4))
+            raise Return(self._make_attitude_value(data.data) / 1000.0)
+        except asyncio.TimeoutError:
+            raise Return(None)
+
+    @asyncio.coroutine
+    def gimbal_attitude(self, servo):
+        try:
+            data = yield From(self.ram_read(servo, 88, 8))
+            pitch = self._make_attitude_value(data.data[0:4]) / 1000.0
+            yaw = self._make_attitude_value(data.data[4:8]) / 1000.0
+            raise Return((pitch, yaw))
+        except asyncio.TimeoutError:
+            raise Return(None)
+
+    @asyncio.coroutine
+    def gimbal_encoder_yaw(self, servo):
+        try:
+            data = yield From(self.ram_read(servo, 0x66, 2))
+            value = (data.data[0] |
+                     (data.data[1] << 7))
+            raise Return(value)
+        except asyncio.TimeoutError:
+            raise Return(None)
