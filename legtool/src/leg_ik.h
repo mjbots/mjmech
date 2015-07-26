@@ -49,7 +49,7 @@ class IKSolver : boost::noncopyable {
   ///  +z is up
   ///
   /// If no solution is possible, return an object with NaN values.
-  virtual JointAngles Solve(const Point3D&) = 0;
+  virtual JointAngles Solve(const Point3D&) const = 0;
 };
 
 /// Inverse kinematics solver for lizard style 3-dof legs.
@@ -61,7 +61,7 @@ class LizardIK : IKSolver {
       double idle_deg = 0;
       double max_deg = 0;
       double length_mm = 0;
-      double sign = 0;
+      double sign = 1;
       int ident = 0;
 
       template <typename Archive>
