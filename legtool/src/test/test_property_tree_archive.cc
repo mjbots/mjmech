@@ -31,7 +31,7 @@ struct TestData {
 
 struct Container {
   TestData child;
-  int stuff;
+  int stuff = 5;
 
   template <typename Archive>
   void Serialize(Archive* a) {
