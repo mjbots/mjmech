@@ -49,11 +49,12 @@ BOOST_AUTO_TEST_CASE(BasicPropertyTreeTest) {
     std::ostringstream ostr;
     pt::write_json(ostr,
                    legtool::PropertyTreeWriteArchive().Accept(&data).tree());
-    BOOST_CHECK_EQUAL(ostr.str(),
-                      "{\n"
-                      "    \"intval\": \"3\",\n"
-                      "    \"doubleval\": \"9.1\"\n"
-                      "}\n");
+    std::string expected =
+        "{\n"
+        "    \"intval\": \"3\",\n"
+        "    \"doubleval\": \"9.1\"\n"
+        "}\n";
+    BOOST_CHECK_EQUAL(ostr.str(), expected);
   }
 
   {
@@ -70,5 +71,59 @@ BOOST_AUTO_TEST_CASE(BasicPropertyTreeTest) {
                       "    },\n"
                       "    \"stuff\": \"5\"\n"
                       "}\n");
+  }
+}
+
+namespace {
+struct VectorTest {
+  std::vector<int> intvector;
+  std::vector<TestData> structvector;
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(intvector));
+    a->Visit(LT_NVP(structvector));
+  }
+};
+}
+
+BOOST_AUTO_TEST_CASE(VectorPropertyTreeTest) {
+  {
+    VectorTest foo;
+    std::ostringstream ostr;
+    pt::write_json(ostr,
+                   legtool::PropertyTreeWriteArchive().Accept(&foo).tree());
+    std::string expected =
+        "{\n"
+        "    \"intvector\": \"\",\n"
+        "    \"structvector\": \"\"\n"
+        "}\n";
+    BOOST_CHECK_EQUAL(ostr.str(), expected);
+  }
+  {
+    VectorTest foo;
+    foo.intvector = { 3, 5, 6 };
+    foo.structvector.emplace_back(TestData());
+
+    std::ostringstream ostr;
+    pt::write_json(ostr,
+                   legtool::PropertyTreeWriteArchive().Accept(&foo).tree());
+    std::string expected =
+        "{\n"
+        "    \"intvector\":\n"
+        "    [\n"
+        "        \"3\",\n"
+        "        \"5\",\n"
+        "        \"6\"\n"
+        "    ],\n"
+        "    \"structvector\":\n"
+        "    [\n"
+        "        {\n"
+        "            \"intval\": \"3\",\n"
+        "            \"doubleval\": \"9.1\"\n"
+        "        }\n"
+        "    ]\n"
+        "}\n";
+    BOOST_CHECK_EQUAL(ostr.str(), expected);
   }
 }

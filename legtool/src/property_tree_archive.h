@@ -23,6 +23,8 @@
 namespace legtool {
 class PropertyTreeWriteArchive {
  public:
+  typedef boost::property_tree::ptree ptree;
+
   template <typename Serializable>
   PropertyTreeWriteArchive& Accept(Serializable* object) {
     object->Serialize(this);
@@ -31,20 +33,32 @@ class PropertyTreeWriteArchive {
 
   template <typename NameValuePair>
   void Visit(const NameValuePair& pair) {
-    VisitHelper(pair, 0);
+    ptree tree;
+    VisitHelper(pair.value(), &tree, 0);
+    tree_.put_child(pair.name(), tree);
   }
 
-  template <typename NameValuePair>
-  auto VisitHelper(const NameValuePair& pair, int) ->
-      decltype(pair.value()->Serialize((PropertyTreeWriteArchive*)nullptr)) {
+  template <typename Value>
+  auto VisitHelper(Value* value, ptree* tree, int) ->
+      decltype(value->Serialize((PropertyTreeWriteArchive*)nullptr)) {
     PropertyTreeWriteArchive sub;
-    sub.Accept(pair.value());
-    tree_.put_child(pair.name(), sub.tree());
+    sub.Accept(value);
+    *tree = sub.tree();
   }
 
-  template <typename NameValuePair>
-  void VisitHelper(const NameValuePair& pair, long) {
-    tree_.put(pair.name(), *pair.value());
+  template <typename Value>
+  void VisitHelper(std::vector<Value>* value_vector,
+                   ptree* tree, int) {
+    for (int i = 0; i < value_vector->size(); i++) {
+      ptree element;
+      VisitHelper(&(*value_vector)[i], &element, 0);
+      tree->push_back(ptree::value_type("", element));
+    }
+  }
+
+  template <typename Value>
+  void VisitHelper(Value* value, ptree* tree, long) {
+    tree->put_value(*value);
   }
 
   boost::property_tree::ptree tree() const { return tree_; }
