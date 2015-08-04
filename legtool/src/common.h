@@ -27,4 +27,10 @@ inline double Degrees(double radians) {
 inline double Radians(double degrees) {
   return M_PI * degrees / 180.0;
 }
+
+inline double GetSign(double value) {
+  if (value < 0.0) { return -1.0; }
+  else if (value > 0.0) { return 1.0; }
+  else { return 0.0; }
+}
 }

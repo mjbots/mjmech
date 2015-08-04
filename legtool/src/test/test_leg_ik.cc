@@ -18,8 +18,17 @@
 
 namespace {
 using namespace legtool;
+
+const int kCoxaIdent = 0;
+const int kFemurIdent = 1;
+const int kTibiaIdent = 2;
+
 LizardIK::Config MakeConfig() {
   LizardIK::Config r;
+
+  r.coxa.ident = kCoxaIdent;
+  r.femur.ident = kFemurIdent;
+  r.tibia.ident = kTibiaIdent;
 
   r.coxa.length_mm = 50;
   r.femur.length_mm = 40;
@@ -38,10 +47,19 @@ LizardIK::Config MakeConfig() {
 }
 
 template <typename T>
+double GetAngle(T joints, int ident) {
+  for (const auto& joint: joints.joints) {
+    if (joint.ident == ident) { return joint.angle_deg; }
+  }
+  BOOST_CHECK(false);
+  return 0.0;
+}
+
+template <typename T>
 void CheckJoints(T joints, double coxa_deg, double femur_deg, double tibia_deg) {
-  BOOST_CHECK_SMALL(std::abs(joints.coxa_deg - coxa_deg), 1e-2);
-  BOOST_CHECK_SMALL(std::abs(joints.femur_deg - femur_deg), 1e-2);
-  BOOST_CHECK_SMALL(std::abs(joints.tibia_deg - tibia_deg), 1e-2);
+  BOOST_CHECK_SMALL(std::abs(GetAngle(joints, kCoxaIdent) - coxa_deg), 1e-2);
+  BOOST_CHECK_SMALL(std::abs(GetAngle(joints, kFemurIdent) - femur_deg), 1e-2);
+  BOOST_CHECK_SMALL(std::abs(GetAngle(joints, kTibiaIdent) - tibia_deg), 1e-2);
 }
 }
 

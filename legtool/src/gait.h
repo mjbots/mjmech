@@ -32,7 +32,7 @@ struct Leg {
     Point3D idle_mm;
     std::shared_ptr<IKSolver> leg_ik;
 
-    template <typename Achive>
+    template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(mount_mm));
       a->Visit(LT_NVP(idle_mm));
@@ -41,12 +41,12 @@ struct Leg {
 
   struct Result {
     Point3D point;
-    Mode mode;
+    Mode mode = Mode::kUnknown;
   };
 
   struct State {
     Point3D point;
-    Mode mode = kUnknown;
+    Mode mode = Mode::kUnknown;
     IKSolver* leg_ik = nullptr;
     Frame* frame = nullptr;
     Frame* shoulder_frame = nullptr;
@@ -75,12 +75,55 @@ struct Command {
   double body_roll_deg = 0;
   double body_yaw_deg = 0;
   double lift_height_percent = 0;
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(translate_x_mm_s));
+    a->Visit(LT_NVP(translate_y_mm_s));
+    a->Visit(LT_NVP(rotate_deg_s));
+    a->Visit(LT_NVP(body_x_mm));
+    a->Visit(LT_NVP(body_y_mm));
+    a->Visit(LT_NVP(body_z_mm));
+    a->Visit(LT_NVP(body_pitch_deg));
+    a->Visit(LT_NVP(body_roll_deg));
+    a->Visit(LT_NVP(body_yaw_deg));
+    a->Visit(LT_NVP(lift_height_percent));
+  }
 };
 
 struct CommonState {
-  std::vector<Leg::State> legs;
   Frame world_frame;
   Frame robot_frame;
+  Frame body_frame;
+  Frame cog_frame;
 
+  CommonState() :
+      world_frame(),
+      robot_frame({}, {}, &world_frame),
+      body_frame({}, {}, &robot_frame),
+      cog_frame({}, {}, &body_frame) {}
+
+  CommonState(const CommonState& rhs) : CommonState() {
+    world_frame.transform = rhs.world_frame.transform;
+    robot_frame.transform = rhs.robot_frame.transform;
+    body_frame.transform = rhs.body_frame.transform;
+    cog_frame.transform = rhs.cog_frame.transform;
+  };
+};
+
+struct JointCommand {
+  struct Joint {
+    int servo_number;
+    double angle_deg;
+  };
+
+  std::vector<Joint> joints;
+};
+
+class Gait : boost::noncopyable {
+ public:
+  virtual ~Gait() {};
+  virtual JointCommand AdvancePhase(double delpha_phase) = 0;
+  virtual JointCommand AdvanceTime(double delta_s) = 0;
 };
 }

@@ -20,21 +20,18 @@
 
 namespace legtool {
 struct JointAngles {
-  double coxa_deg = 0.0;
-  double femur_deg = 0.0;
-  double tibia_deg = 0.0;
+  struct Joint {
+    int ident = 0;
+    double angle_deg = 0;
 
-  static JointAngles Invalid() {
-    JointAngles result;
-    result.coxa_deg = kNaN;
-    result.femur_deg = kNaN;
-    result.tibia_deg = kNaN;
-    return result;
-  }
+    Joint() {}
+    Joint(int ident, double angle_deg) : ident(ident), angle_deg(angle_deg) {}
+  };
 
-  bool Valid() const {
-    return std::isfinite(coxa_deg);
-  }
+  std::vector<Joint> joints;
+
+  static JointAngles Invalid() { return JointAngles(); }
+  bool Valid() const { return !joints.empty(); }
 };
 
 class IKSolver : boost::noncopyable {
@@ -53,7 +50,7 @@ class IKSolver : boost::noncopyable {
 };
 
 /// Inverse kinematics solver for lizard style 3-dof legs.
-class LizardIK : IKSolver {
+class LizardIK : public IKSolver {
  public:
   struct Config {
     struct Joint {
@@ -188,9 +185,12 @@ class LizardIK : IKSolver {
     }
 
     JointAngles result;
-    result.coxa_deg = coxa_deg;
-    result.femur_deg = femur_deg;
-    result.tibia_deg = tibia_deg;
+    result.joints.emplace_back(
+        JointAngles::Joint{config_.coxa.ident, coxa_deg});
+    result.joints.emplace_back(
+        JointAngles::Joint{config_.femur.ident, femur_deg});
+    result.joints.emplace_back(
+        JointAngles::Joint{config_.tibia.ident, tibia_deg});
     return result;
   }
 
