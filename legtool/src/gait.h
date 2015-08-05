@@ -113,8 +113,12 @@ struct CommonState {
 
 struct JointCommand {
   struct Joint {
-    int servo_number;
-    double angle_deg;
+    int servo_number = 0;
+    double angle_deg = 0.0;
+
+    Joint() {}
+    Joint(int servo_number, double angle_deg)
+        : servo_number(servo_number), angle_deg(angle_deg) {}
   };
 
   std::vector<Joint> joints;
