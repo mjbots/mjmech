@@ -62,6 +62,10 @@ struct Transform {
         conjugated.Rotate(translation.scaled(-1.0)),
         conjugated};
   }
+
+  Transform() {}
+  Transform(const Point3D& translation, const Quaternion& rotation)
+      : translation(translation), rotation(rotation) {}
 };
 
 

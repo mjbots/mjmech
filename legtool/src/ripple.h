@@ -106,7 +106,7 @@ struct RippleState : public CommonState {
 
     for (auto& leg: legs) {
       leg.frame = map_frame(leg.frame);
-      leg.shoulder_frame = map_frame(leg.shoulder_frame);
+      leg.shoulder_frame.parent = &body_frame;
     }
   }
 };
@@ -181,7 +181,7 @@ class RippleGait : public Gait {
     JointCommand result;
     for (const auto& leg: state_.legs) {
       Point3D shoulder_point =
-          leg.shoulder_frame->MapFromFrame(leg.frame, leg.point);
+          leg.shoulder_frame.MapFromFrame(leg.frame, leg.point);
       auto joints = leg.leg_ik->Solve(shoulder_point);
       for (const auto& joint: joints.joints) {
         result.joints.emplace_back(
@@ -322,6 +322,17 @@ class RippleGait : public Gait {
       leg_state.point = result.world_frame.MapFromFrame(
           &result.body_frame, point);
       leg_state.frame = &result.world_frame;
+
+      // For now, we are assuming that shoulders face away from the y
+      // axis.
+      const double rotation_rad = (leg_config.mount_mm.x > 0.0) ?
+                                  (0.5 * M_PI) : (-0.5 * M_PI);
+      leg_state.shoulder_frame.transform = Transform(
+          leg_config.mount_mm,
+          Quaternion::FromEuler(0, 0, rotation_rad));
+      leg_state.shoulder_frame.parent = &result.body_frame;
+
+      leg_state.leg_ik = leg_config.leg_ik.get();
 
       result.legs.push_back(leg_state);
     }

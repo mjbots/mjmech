@@ -49,7 +49,7 @@ struct Leg {
     Mode mode = Mode::kUnknown;
     IKSolver* leg_ik = nullptr;
     Frame* frame = nullptr;
-    Frame* shoulder_frame = nullptr;
+    Frame shoulder_frame;
   };
 };
 
