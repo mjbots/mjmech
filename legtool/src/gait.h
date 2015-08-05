@@ -129,5 +129,6 @@ class Gait : boost::noncopyable {
   virtual ~Gait() {};
   virtual JointCommand AdvancePhase(double delpha_phase) = 0;
   virtual JointCommand AdvanceTime(double delta_s) = 0;
+  virtual void SetCommand(const Command&) = 0;
 };
 }

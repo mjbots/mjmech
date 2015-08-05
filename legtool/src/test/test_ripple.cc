@@ -14,6 +14,7 @@
 
 #include "ripple.h"
 
+#include <boost/format.hpp>
 #include <boost/test/auto_unit_test.hpp>
 
 namespace {
@@ -23,6 +24,34 @@ void CheckPoints(const Point3D& lhs, const Point3D& rhs) {
   BOOST_CHECK_SMALL(lhs.x - rhs.x, 1e-2);
   BOOST_CHECK_SMALL(lhs.y - rhs.y, 1e-2);
   BOOST_CHECK_SMALL(lhs.z - rhs.z, 1e-2);
+}
+
+template <typename T>
+void SanityCheckState(const T& state) {
+  BOOST_CHECK_EQUAL(state.robot_frame.parent, &state.world_frame);
+  BOOST_CHECK_EQUAL(state.body_frame.parent, &state.robot_frame);
+
+  std::set<const Frame*> valid_frames{
+    &state.world_frame, &state.robot_frame, &state.body_frame
+        };
+
+  int stance_legs = 0;
+  for (const auto& leg: state.legs) {
+    BOOST_CHECK_EQUAL(valid_frames.count(leg.frame), 1);
+
+    if (leg.mode == Leg::Mode::kStance) {
+      stance_legs += 1;
+      BOOST_CHECK_EQUAL(leg.frame, &state.world_frame);
+    } else if (leg.mode == Leg::Mode::kSwing) {
+    } else {
+      BOOST_CHECK_MESSAGE(false,
+                          (boost::format("unknown leg mode %d") %
+                           static_cast<int>(leg.mode)).str());
+    }
+  }
+
+  // Require at least 2 legs in stance at all times.
+  BOOST_CHECK_GE(stance_legs, 2);
 }
 
 std::shared_ptr<IKSolver> MakeIKSolver(int start_servo_num) {
@@ -87,16 +116,50 @@ RippleConfig MakeConfig() {
 
   return result;
 }
+
+template <typename Gait, typename Command>
+void RunCycle(Gait& gait, const Command& command,
+              double total_time_s, double time_step_s) {
+  gait.SetCommand(command);
+
+  double cur_time_s = 0.0;
+  while (cur_time_s < total_time_s) {
+    const auto& joints = gait.AdvanceTime(time_step_s);
+    cur_time_s += time_step_s;
+
+    BOOST_CHECK_GE(joints.joints.size(), 1);
+
+    SanityCheckState(gait.state());
+  }
+}
 }
 
 BOOST_AUTO_TEST_CASE(TestRippleBasic) {
   RippleConfig config = MakeConfig();
   RippleGait gait(config);
 
-  const auto& state = gait.state();
+  // We want to:
+  //  1. get the idle state
+  //  2. initialize ourselves to that
+  //
+  // then,
+  //  a) command no motion... verify stepping in place
+  //  b) command forward motion
+  //  c) command rotation
+  //  d) do all of the above with each of the other 6 degrees of
+  //     freedom altered
+
+  // Also, we will want to test changes in command, and coming to a
+  // stop.
+  const auto state = gait.state();
 
   CheckPoints(state.legs.at(0).point, Point3D(190, 90, 0));
   CheckPoints(state.legs.at(1).point, Point3D(190, -90, 0));
   CheckPoints(state.legs.at(2).point, Point3D(-190, -90, 0));
   CheckPoints(state.legs.at(3).point, Point3D(-190, 90, 0));
+
+  SanityCheckState(state);
+
+  Command command;
+  RunCycle(gait, command, 10.0, 0.01);
 }

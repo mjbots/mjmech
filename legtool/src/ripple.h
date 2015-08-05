@@ -112,7 +112,7 @@ struct RippleState : public CommonState {
 };
 
 struct Options {
-  double cycle_time_s = 0.0;
+  double cycle_time_s = 1.0;
   double servo_speed_dps = 0.0;
 };
 
@@ -127,7 +127,11 @@ class RippleGait : public Gait {
 
   virtual ~RippleGait() {}
 
-  virtual JointCommand AdvancePhase(double delta_phase) {
+  virtual void SetCommand(const Command& command) override {
+    // TODO jpieper.
+  }
+
+  virtual JointCommand AdvancePhase(double delta_phase) override {
     if (config_.leg_order.empty()) {
       state_.phase = std::fmod(state_.phase + delta_phase, 1.0);
       return MakeJointCommand();
@@ -168,7 +172,7 @@ class RippleGait : public Gait {
     return MakeJointCommand();
   }
 
-  virtual JointCommand AdvanceTime(double delta_s) {
+  virtual JointCommand AdvanceTime(double delta_s) override {
     return AdvancePhase(delta_s / phase_time_s());
   }
 
@@ -236,7 +240,9 @@ class RippleGait : public Gait {
   void DoAction(int action_index) {
     const auto& action = actions_[action_index];
 
-    for (int leg_num: config_.leg_order[action.leg_group]) {
+    if (action.action == RippleState::kActionEnd) { return; }
+
+    for (int leg_num: config_.leg_order.at(action.leg_group)) {
       auto& leg = state_.legs.at(leg_num);
 
       if (action.action == RippleState::kActionStartStance) {
@@ -298,8 +304,6 @@ class RippleGait : public Gait {
     return end_frame.MapToParent(idle_state_.legs.at(leg_num).point);
   }
 
-  double phase_time_s() const { return options_.cycle_time_s; }
-
   RippleState GetIdleState() const {
     RippleState result;
 
@@ -322,6 +326,7 @@ class RippleGait : public Gait {
       leg_state.point = result.world_frame.MapFromFrame(
           &result.body_frame, point);
       leg_state.frame = &result.world_frame;
+      leg_state.mode = Leg::Mode::kStance;
 
       // For now, we are assuming that shoulders face away from the y
       // axis.
@@ -365,6 +370,8 @@ class RippleGait : public Gait {
   double swing_phase_time() const {
     return (1.0 / config_.leg_order.size()) * 0.01 * config_.swing_percent;
   }
+
+  double phase_time_s() const { return options_.cycle_time_s; }
 
   const RippleConfig config_;
   Options options_;
