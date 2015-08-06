@@ -28,8 +28,14 @@
 //
 //  * I'm not sure how many heap operations are required for a single
 //    gait update.  Ideally, it would be 0.
+//
+//  * Setting a new command is a very heavyweight operation, since it
+//    must do a full IK simulation to see if the new command is
+//    feasible or not.
 
 #pragma once
+
+#include <map>
 
 #include "gait.h"
 
@@ -49,6 +55,7 @@ struct RippleConfig {
   double static_center_factor = 3.0;
   double static_stable_factor = 10.0;
   double static_margin_mm = 20.0;
+  double servo_speed_dps = 360.0;
 
   template <typename Archive>
   void Serialize(Archive* a) {
@@ -65,6 +72,7 @@ struct RippleConfig {
     a->Visit(LT_NVP(static_center_factor));
     a->Visit(LT_NVP(static_stable_factor));
     a->Visit(LT_NVP(static_margin_mm));
+    a->Visit(LT_NVP(servo_speed_dps));
   }
 };
 
@@ -127,8 +135,17 @@ class RippleGait : public Gait {
 
   virtual ~RippleGait() {}
 
-  virtual void SetCommand(const Command& command) override {
-    // TODO jpieper.
+  virtual Result SetCommand(const Command& command) override {
+    Command command_copy = command;
+    boost::optional<Options> options = SelectCommandOptions(&command_copy);
+
+    if (!options) {
+      return kNotSupported;
+    }
+
+    ReallySetCommand(command_copy, *options);
+    options_ = *options;
+    return kValid;
   }
 
   virtual JointCommand AdvancePhase(double delta_phase) override {
@@ -194,6 +211,144 @@ class RippleGait : public Gait {
     }
 
     return result;
+  }
+
+  boost::optional<Options> SelectCommandOptions(Command* command) const {
+    if (config_.leg_order.empty()) { return Options(); }
+
+    // First, iterate, solving IK for all legs in time until we
+    // find the point at which the first leg is unsolvable.
+    const double dt = 0.05;
+
+    double time_s = 0.0;
+
+    RippleState my_state = idle_state_;
+    ApplyBodyCommand(&my_state, *command);
+
+    boost::optional<double> end_time_s = 0.0;
+    end_time_s = boost::none; // work around maybe-uninitialized
+    boost::optional<double> min_observed_speed = 0.0;
+    min_observed_speed = boost::none; // work around maybe-uninitialized
+
+    std::map<std::pair<int, int>, double> old_joint_angle_deg;
+
+    const double fraction_in_stance = 1.0 - swing_phase_time();
+    const double margin =
+        0.01 * config_.position_margin_percent * fraction_in_stance;
+
+    const double final_time_s = 0.5 * config_.max_cycle_time_s / margin;
+    while (time_s < final_time_s) {
+      if (!!end_time_s) { break; }
+      time_s += dt;
+
+      for (const double direction: std::vector<double>{-1, 1}) {
+        auto frame = GetUpdateFrameCommand(direction * time_s, *command);
+
+        if (!!end_time_s) { break; }
+
+        int leg_num = 0;
+        for (const auto& leg: my_state.legs) {
+          // TODO: Need to do this for the lifted leg as well.
+          auto leg_robot_frame_point = frame.MapToParent(leg.point);
+          auto leg_shoulder_point = leg.shoulder_frame.MapFromFrame(
+              &my_state.robot_frame, leg_robot_frame_point);
+
+          const auto& leg_config = config_.mechanical.leg_config.at(leg_num);
+
+          auto result = leg_config.leg_ik->Solve(leg_shoulder_point);
+          if (!result.Valid()) {
+            // Break, so that we can take action knowing
+            // how far we can go.
+            end_time_s = time_s;
+            break;
+          }
+
+          double largest_change_deg = 0.0;
+          for (const auto& joint: result.joints) {
+            auto old_result_it =
+                old_joint_angle_deg.find(
+                    std::make_pair(direction, joint.ident));
+            if (old_result_it != old_joint_angle_deg.end()) {
+              const double old_angle_deg = old_result_it->second;
+              const double new_angle_deg = joint.angle_deg;
+              const double delta_deg = std::abs(old_angle_deg - new_angle_deg);
+              if (delta_deg > largest_change_deg) {
+                largest_change_deg = delta_deg;
+              }
+            }
+
+            old_joint_angle_deg.insert(
+                std::make_pair(
+                    std::make_pair(direction, leg_num),
+                    joint.angle_deg));
+          }
+          const double this_speed_deg_s = largest_change_deg / dt;
+
+          if (!min_observed_speed ||
+              this_speed_deg_s < *min_observed_speed) {
+            min_observed_speed = this_speed_deg_s;
+          }
+        }
+      }
+    }
+
+    if (!min_observed_speed) {
+      return boost::none;
+    }
+
+    Options result;
+    if (!end_time_s) {
+      // We can achieve this at the maximum time.
+      result.cycle_time_s = config_.max_cycle_time_s;
+    } else {
+      result.cycle_time_s = (2.0 * (*end_time_s) * margin);
+    }
+
+    // TODO jpieper: See if this cycle time is feasible.  We will
+    // do this by checking to see if the swing leg has to move too
+    // fast.
+    const double min_swing_speed =
+        (*min_observed_speed *
+         (1.0 - swing_phase_time()) /
+         swing_phase_time());
+
+    result.servo_speed_dps = min_swing_speed;
+
+    const double servo_speed_dps = config_.servo_speed_dps;
+
+    const double speed_margin = 0.01 * config_.servo_speed_margin_percent;
+    if (min_swing_speed > speed_margin * servo_speed_dps) {
+      // Slow the command down.
+      const double slow_down_factor =
+          (min_swing_speed /
+           (speed_margin * servo_speed_dps));
+      command->translate_x_mm_s /= slow_down_factor;
+      command->translate_y_mm_s /= slow_down_factor;
+      command->rotate_deg_s /= slow_down_factor;
+      result.cycle_time_s *= slow_down_factor;
+      result.servo_speed_dps = speed_margin * servo_speed_dps;
+    }
+
+    return result;
+  }
+
+  void ReallySetCommand(const Command& command, const Options& options) {
+    command_ = command;
+    options_ = options;
+
+    ApplyBodyCommand(&state_, command);
+  }
+
+  void ApplyBodyCommand(RippleState* state, const Command& command) const {
+    // TODO jpieper: Handle statically stable gaits.
+    state->body_frame.transform.translation.x = command.body_x_mm;
+    state->body_frame.transform.translation.y = command.body_y_mm;
+    state->body_frame.transform.translation.z = command.body_z_mm;
+    state->body_frame.transform.translation.z += config_.body_z_offset_mm;
+    state->body_frame.transform.rotation = Quaternion::FromEuler(
+        Radians(command.body_roll_deg),
+        Radians(command.body_pitch_deg),
+        Radians(command.body_yaw_deg));
   }
 
   void AdvancePhaseNoaction(double delta_phase, double final_phase) {
@@ -263,18 +418,22 @@ class RippleGait : public Gait {
   }
 
   Frame GetUpdateFrame(double dt) const {
+    return GetUpdateFrameCommand(dt, command_);
+  }
+
+  Frame GetUpdateFrameCommand(double dt, const Command& command) const {
     Frame result;
     result.parent = &state_.robot_frame;
 
-    const double vx = command_.translate_x_mm_s;
-    const double vy = command_.translate_y_mm_s;
+    const double vx = command.translate_x_mm_s;
+    const double vy = command.translate_y_mm_s;
     double dx = 0.0;
     double dy = 0.0;
-    if (command_.rotate_deg_s == 0.0) {
+    if (command.rotate_deg_s == 0.0) {
       dx = vx * dt;
       dy = vy * dt;
     } else {
-      const double vyaw = Radians(command_.rotate_deg_s);
+      const double vyaw = Radians(command.rotate_deg_s);
       dx = ((std::cos(dt * vyaw) - 1) * vy +
             std::sin(dt * vyaw) * vx) / vyaw;
       dy = ((std::cos(dt * vyaw) - 1) * vx +
