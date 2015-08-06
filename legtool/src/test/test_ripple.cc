@@ -121,6 +121,7 @@ template <typename Gait, typename Command>
 void RunCycle(Gait& gait, const Command& command,
               double total_time_s, double time_step_s) {
   gait.SetCommand(command);
+  auto old_state = gait.state();
 
   double cur_time_s = 0.0;
   while (cur_time_s < total_time_s) {
@@ -129,7 +130,41 @@ void RunCycle(Gait& gait, const Command& command,
 
     BOOST_CHECK_GE(joints.joints.size(), 1);
 
-    SanityCheckState(gait.state());
+    auto this_state = gait.state();
+    SanityCheckState(this_state);
+
+    for (size_t leg_num = 0; leg_num < this_state.legs.size(); leg_num++) {
+      const auto& this_leg = this_state.legs.at(leg_num);
+      const auto& old_leg = old_state.legs.at(leg_num);
+
+      Point3D current_world_point = this_state.world_frame.MapFromFrame(
+          this_leg.frame, this_leg.point);
+      Point3D old_world_point = old_state.world_frame.MapFromFrame(
+          old_leg.frame, old_leg.point);
+
+      // Lets identified as in stance do not move in the world frame.
+      if (this_leg.mode == Leg::Mode::kStance &&
+          old_leg.mode == Leg::Mode::kStance) {
+        CheckPoints(current_world_point, old_world_point);
+      }
+
+      // No leg moves faster than X in the world frame.
+      double world_speed_mm_s =
+          (current_world_point - old_world_point).length() / time_step_s;
+      BOOST_CHECK_LT(world_speed_mm_s, 1000);
+
+      // No leg moves faster than Y in the body frame.
+      Point3D current_body_point = this_state.body_frame.MapFromFrame(
+          this_leg.frame, this_leg.point);
+      Point3D old_body_point = old_state.body_frame.MapFromFrame(
+          old_leg.frame, old_leg.point);
+
+      double body_speed_mm_s =
+          (current_body_point - old_body_point).length() / time_step_s;
+      BOOST_CHECK_LT(body_speed_mm_s, 600);
+
+      old_state = this_state;
+    }
   }
 }
 }
@@ -162,4 +197,25 @@ BOOST_AUTO_TEST_CASE(TestRippleBasic) {
 
   Command command;
   RunCycle(gait, command, 10.0, 0.01);
+  RunCycle(gait, command, 10.0, 0.0073);
+}
+
+BOOST_AUTO_TEST_CASE(TestRippleAdvanced) {
+  RippleConfig config = MakeConfig();
+  Command command;
+
+  config.max_cycle_time_s = 1.7;
+  {
+    RippleGait gait(config);
+    RunCycle(gait, command, 5.0, 0.01);
+  }
+
+  command.translate_y_mm_s = 50.0;
+  {
+    RippleGait gait(config);
+    RunCycle(gait, command, 7.0, 0.005);
+
+    RunCycle(gait, command, 7.0, 0.03);
+    RunCycle(gait, command, 7.0, 0.04);
+  }
 }
