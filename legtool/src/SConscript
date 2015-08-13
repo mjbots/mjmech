@@ -26,6 +26,7 @@ TESTS = ['test/' + x for x in [
         'test_property_tree_archive.cc',
         'test_quaternion.cc',
         'test_ripple.cc',
+        'test_signal_result.cc',
         'test_tf.cc',
         ]]
 
