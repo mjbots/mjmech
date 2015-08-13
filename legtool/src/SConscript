@@ -17,10 +17,20 @@ env = canonenv.Clone()
 
 env.Append(CPPPATH=['.'])
 env.ParseConfig('pkg-config --cflags --libs eigen3')
+env.Append(LIBS=['boost_system',
+                 'boost_program_options',
+                 'boost_coroutine',
+                 'boost_context',
+                 'pthread'])
 
-liblegtool = env.SharedLibrary([])
+SOURCES = [
+    'comm_factory.cc',
+    ]
+
+liblegtool = env.StaticLibrary('legtool', SOURCES)
 
 TESTS = ['test/' + x for x in [
+        'test_comm.cc',
         'test_leg_ik.cc',
         'test_main.cc',
         'test_property_tree_archive.cc',
@@ -36,3 +46,6 @@ testenv.Append(LIBS=['boost_unit_test_framework'])
 test_legtool = testenv.Program('test_legtool', TESTS + liblegtool)
 testenv.Command('test_legtool.passed', test_legtool,
                 '$SOURCE && touch $TARGET')
+
+comm_manual_test = env.Program('comm_manual_test',
+                               ['test/comm_manual_test.cc'] + liblegtool)
