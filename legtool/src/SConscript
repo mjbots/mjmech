@@ -31,6 +31,7 @@ liblegtool = env.StaticLibrary('legtool', SOURCES)
 
 TESTS = ['test/' + x for x in [
         'test_comm.cc',
+        'test_herkulex.cc',
         'test_leg_ik.cc',
         'test_main.cc',
         'test_property_tree_archive.cc',
