@@ -23,5 +23,5 @@ else:
     canonenv.Append(CPPFLAGS=['-O3'])
 
 Export('canonenv')
-SConscript(['src/SConscript'], variant_dir='src/build')
+SConscript(['src/SConscript'], variant_dir='src/build', duplicate=0)
 SConscript(['SConscript'])

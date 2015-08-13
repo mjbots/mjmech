@@ -12,7 +12,8 @@ else:
 Export('canonenv')
 
 SConscript(['imu/SConscript'], variant_dir='imu/build')
-SConscript(['legtool/src/SConscript'], variant_dir='legtool/src/build')
+SConscript(['legtool/src/SConscript'], variant_dir='legtool/src/build',
+           duplicate=0)
 SConscript(['SConscript',
             'legtool/SConscript', 'scoring/manager/SConscript',
             'gait_driver/SConscript'])
