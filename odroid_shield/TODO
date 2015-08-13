@@ -1,3 +1,8 @@
+r1 defects
+  * JD connectors on bottom have incorrect part number
+  * Master fuse pads are on top of board instead of bottom
+
+
 
    * autoroute
    * ensure leadless parts have moderately accessible test points for
