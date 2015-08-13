@@ -17,6 +17,11 @@
 #include <cmath>
 #include <limits>
 
+#include <boost/asio/spawn.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/format.hpp>
+#include <boost/system/system_error.hpp>
+
 namespace legtool {
 const double kNaN = std::numeric_limits<double>::signaling_NaN();
 
@@ -32,5 +37,36 @@ inline double GetSign(double value) {
   if (value < 0.0) { return -1.0; }
   else if (value > 0.0) { return 1.0; }
   else { return 0.0; }
+}
+
+/// The following routine can be used to wrap coroutines such that
+/// boost::system_error information is captured.  The default
+/// boost::exception_ptr ignores this exception, making it challenging
+/// to even report what happened.
+template <typename Coroutine>
+auto ErrorWrap(Coroutine coro) {
+  return [=](boost::asio::yield_context yield) {
+    try {
+      return coro(yield);
+    } catch (boost::system::system_error& e) {
+      std::throw_with_nested(
+          std::runtime_error(
+              (boost::format("system_error: %s: %s") %
+               e.what() % e.code()).str()));
+    } catch (std::runtime_error& e) {
+      std::throw_with_nested(std::runtime_error(e.what()));
+    }
+  };
+}
+
+inline boost::posix_time::time_duration
+ConvertSecondsToDuration(double time_s) {
+  const int64_t int_time = static_cast<int64_t>(time_s);
+  const int64_t counts =
+      static_cast<int64_t>(
+          (time_s - static_cast<double>(int_time)) *
+          boost::posix_time::time_duration::ticks_per_second());
+  return boost::posix_time::seconds(static_cast<int>(time_s)) +
+      boost::posix_time::time_duration(0, 0, 0, counts);
 }
 }
