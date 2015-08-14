@@ -25,9 +25,13 @@ env.Append(LIBS=['boost_system',
 
 SOURCES = [
     'comm_factory.cc',
+    'herkulex.cc',
     ]
 
 liblegtool = env.StaticLibrary('legtool', SOURCES)
+
+herkulex_tool = env.Program('herkulex_tool',
+                            ['herkulex_tool.cc'] + liblegtool)
 
 TESTS = ['test/' + x for x in [
         'test_comm.cc',

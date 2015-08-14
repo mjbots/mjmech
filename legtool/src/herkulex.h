@@ -158,16 +158,25 @@ class HerkuleXProtocol : boost::noncopyable {
   SendReceivePacket(const Packet& to_send, Handler handler) {
     boost::asio::detail::async_result_init<
         Handler,
-        void (boost::system::error_code)> init(
+        void (boost::system::error_code, Packet)> init(
             BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    SendPacket(to_send, [=](const boost::system::error_code& ec) {
+    SendPacket(to_send, [=](const boost::system::error_code& ec) mutable {
         if (ec) {
           init.handler(ec, Packet());
           return;
         }
 
-        ReceivePacket(init.handler);
+        // We can't directly pass init.handler to SignalResult::Wait
+        // here, or the asio auto-coroutine magic gets confused and
+        // thinks we are in a coroutine if SendReceivePacket was
+        // called from a coroutine.
+        SignalResult::Wait(
+            service_, &read_signal_,
+            parameters_.packet_timeout_s,
+            [=](const boost::system::error_code& ec, Packet packet) mutable {
+              init.handler(ec, packet);
+            });
       });
 
     return init.result.get();
@@ -308,6 +317,34 @@ class HerkuleXProtocol : boost::noncopyable {
   char buffer_[256];
 };
 
+struct HerkuleXConstants {
+  struct Register {
+    constexpr Register(const uint8_t position, const uint8_t length)
+        : position(position), length(length) {}
+
+    uint8_t position;
+    uint8_t length;
+  };
+
+  HerkuleXConstants();
+
+  const std::map<std::string, Register> ram_registers;
+
+  // RAM registers
+  static constexpr Register temperature_c() { return Register{55, 1}; }
+  static constexpr Register voltage() { return Register{54, 1}; }
+  static constexpr Register position() { return Register{60, 2}; }
+  // NOTE: Older versions of the datasheet say this should be a RAM
+  // register 62, but the newer ones have the correct value of 64.
+  static constexpr Register pwm() { return Register{64, 2}; }
+  static constexpr Register cal_diff() { return Register{53, 1}; }
+  static constexpr Register torque_control() { return Register{52, 1}; }
+
+
+  // EEPROM registers
+  static constexpr Register id() { return Register{6, 1}; }
+};
+
 template <class Factory>
 class HerkuleX : public HerkuleXProtocol<Factory> {
  public:
@@ -351,6 +388,7 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     uint8_t register_start = 0;
     uint8_t length = 0;
+    std::string register_data{Base::StatusResponse::data.substr(2, length)};
   };
 
   MemReadResponse MemRead(uint8_t command, uint8_t servo,
@@ -359,11 +397,11 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
     typename Base::Packet to_send;
     to_send.servo = servo;
     to_send.command = command;
-    char buf[2] = { reg, length };
-    to_send.data = std::string(buf, 2);
+    uint8_t buf[2] = { reg, length };
+    to_send.data = std::string(reinterpret_cast<const char*>(buf), 2);
 
-    typename Base::Packet result = SendReceivePacket(to_send, yield);
-    if (result.servo != to_send.servo && result.servo != BROADCAST) {
+    typename Base::Packet result = this->SendReceivePacket(to_send, yield);
+    if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
       throw std::runtime_error(
           (boost::format("Synchronization error, sent request for servo 0x%02x, "
                          "response from 0x%02x") %
@@ -403,6 +441,149 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     return response;
   }
+
+  typename Base::StatusResponse Status(uint8_t servo,
+                                       boost::asio::yield_context yield) {
+    typename Base::Packet to_send;
+    to_send.servo = servo;
+    to_send.command = STAT;
+
+    auto result = this->SendReceivePacket(to_send, yield);
+    if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
+      throw std::runtime_error(
+          (boost::format("Synchronization error, send status to servo 0x%02x, "
+                         "response from 0x%02x") %
+           static_cast<int>(to_send.servo) %
+           static_cast<int>(result.servo)).str());
+    }
+
+    if (result.command != ACK_STAT) {
+      throw std::runtime_error(
+          (boost::format("Expected response command 0x%02x, received 0x%02x") %
+           static_cast<int>(ACK_STAT) %
+           static_cast<int>(result.command)).str());
+    }
+
+    if (result.data.size() != 2) {
+      throw std::runtime_error(
+          (boost::format("Received status of incorrect size, expected 2, "
+                         "got %d") %
+           result.data.size()).str());
+    }
+
+    return typename Base::StatusResponse(result);
+  }
+
+  void Reboot(uint8_t servo, boost::asio::yield_context yield) {
+    typename Base::Packet to_send;
+    to_send.servo = servo;
+    to_send.command = REBOOT;
+
+    this->SendPacket(to_send, yield);
+  }
+
+  void MemWrite(uint8_t command, uint8_t servo, uint8_t address,
+                const std::string& data,
+                boost::asio::yield_context yield) {
+    typename Base::Packet to_send;
+    to_send.servo = servo;
+    to_send.command = command;
+    std::ostringstream ostr;
+
+    ostr.write(reinterpret_cast<const char*>(&address), 1);
+    uint8_t length = data.size();
+    ostr.write(reinterpret_cast<const char*>(&length), 1);
+
+    ostr.write(data.data(), data.size());
+
+    to_send.data = ostr.str();
+
+    this->SendPacket(to_send, yield);
+  }
+
+  template <typename T>
+  void MemWriteValue(uint8_t command, uint8_t servo, T field, int value_in,
+                     boost::asio::yield_context yield) {
+    int value = value_in;
+
+    std::ostringstream ostr;
+    for (int i = 0; i < field.length; i++) {
+      uint8_t byte = value & 0xff;
+      ostr.write(reinterpret_cast<const char*>(&byte), 1);
+      value = value >> 8;
+    }
+
+    MemWrite(command, servo, field.position, ostr.str(), yield);
+  }
+
+  template <typename T>
+  void RamWrite(uint8_t servo, T field, int value,
+                boost::asio::yield_context yield) {
+    MemWriteValue(RAM_WRITE, servo, field, value, yield);
+  }
+
+  template <typename T>
+  void EepWrite(uint8_t servo, T field, int value,
+                boost::asio::yield_context yield) {
+    MemWriteValue(EEP_WRITE, servo, field, value, yield);
+  }
+
+  template <typename T>
+  int MemReadValue(uint8_t command, uint8_t servo, T field,
+                   boost::asio::yield_context yield) {
+    auto response = MemRead(
+        command, servo, field.position, field.length, yield);
+    int result = 0;
+    BOOST_ASSERT(response.register_data.size() >= field.length);
+    for (int i = 0; i < field.length; i++) {
+      result |= (static_cast<int>(response.register_data[i]) << (i * 8));
+    }
+
+    if (result >= (0x80 << ((field.length - 1) * 8))) {
+      result = result - (1 << (field.length * 8));
+    }
+
+    return result;
+  }
+
+  template <typename T>
+  int RamRead(uint8_t servo, T field,
+              boost::asio::yield_context yield) {
+    return MemReadValue(RAM_READ, servo, field, yield);
+  }
+
+  template <typename T>
+  int EepRead(uint8_t servo, T field,
+              boost::asio::yield_context yield) {
+    return MemReadValue(EEP_READ, servo, field, yield);
+  }
+
+  template <typename Targets>
+  void SJog(const Targets& targets,
+            double time_s,
+            boost::asio::yield_context yield) {
+    std::ostringstream data;
+
+    uint8_t int_time = static_cast<uint8_t>(
+        std::max(0.0, std::min(255.0, time_s * 1000.0 / 11.2)));
+    data.write(reinterpret_cast<const char*>(&int_time), 1);
+
+    for (const auto& target: targets) {
+      uint8_t buf[] = {
+        target.servo,
+        target.position & 0xff,
+        (target.position >> 8) & 0xff,
+        target.leds,
+      };
+      data.write(reinterpret_cast<const char*>(buf), sizeof(buf));
+    }
+
+    typename Base::Packet to_send;
+    to_send.servo = BROADCAST;
+    to_send.data = data.str();
+    to_send.command = S_JOG;
+
+    this->SendPacket(to_send, yield);
+  }
 };
 }
-
