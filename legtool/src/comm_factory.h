@@ -124,7 +124,8 @@ class StreamFactory : boost::noncopyable {
             BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
     bool visited = false;
-    TryCreate try_create(this, parameters, init.handler, &visited);
+    TryCreate try_create(this, parameters, StreamHandler(init.handler),
+                         &visited);
     meta::for_each(Types{}, try_create);
     if (!visited) {
       throw std::runtime_error(
