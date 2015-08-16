@@ -19,7 +19,6 @@
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
-#include <boost/asio/spawn.hpp>
 #include <boost/system/error_code.hpp>
 
 namespace legtool {
