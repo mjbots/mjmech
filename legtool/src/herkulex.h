@@ -194,88 +194,114 @@ class HerkuleXProtocol : boost::noncopyable {
     BOOST_ASSERT(!stream_);
     stream_ = stream;
 
-    boost::asio::spawn(
-        service_, ErrorWrap(std::bind(&HerkuleXProtocol::ReadLoop, this,
-                                      std::placeholders::_1)));
+    ReadLoop1(boost::system::error_code());
 
     service_.post(std::bind(handler, boost::system::error_code()));
   }
 
-  void ReadLoop(boost::asio::yield_context yield) {
-    char data_buffer[256] = {};
-    boost::asio::streambuf streambuf(512);
-    while (true) {
-      // Read until we get a frame header.
-      boost::asio::async_read_until(
-          *stream_, streambuf, "\xff\xff", yield);
+  void ReadLoop1(boost::system::error_code ec) {
+    if (ec) { throw boost::system::system_error(ec); }
 
-      // Clear out the streambuf until we have our delimeter.
-      std::istream istr(&streambuf);
-      std::string buf;
-      while (buf != "\xff\xff") {
-        char c = 0;
-        istr.read(&c, 1);
-        if (istr.gcount() != 1) {
-          throw std::runtime_error("inconsistent header");
-        }
-        buf = buf + std::string(&c, 1);
-        if (buf.size() > 2) {
-          buf = buf.substr(buf.size() - 2);
-        }
-      }
+    // Read until we get a frame header.
+    boost::asio::async_read_until(
+        *stream_, rx_streambuf_, "\xff\xff",
+        std::bind(&HerkuleXProtocol::ReadLoop2, this,
+                  std::placeholders::_1,
+                  std::placeholders::_2));
+  }
 
-      // Read the header.
-      if (streambuf.size() < 5) {
-        boost::asio::async_read(
-            *stream_, streambuf,
-            boost::asio::transfer_at_least(5 - streambuf.size()),
-            yield);
-      }
-
-      char header[5] = {};
-      istr.read(header, 5);
-      if (istr.gcount() != 5) {
+  void ReadLoop2(boost::system::error_code ec, std::size_t) {
+    // Clear out the streambuf until we have our delimeter.
+    std::istream istr(&rx_streambuf_);
+    std::string buf;
+    while (buf != "\xff\xff") {
+      char c = 0;
+      istr.read(&c, 1);
+      if (istr.gcount() != 1) {
         throw std::runtime_error("inconsistent header");
       }
-
-      uint8_t size = header[0];
-      uint8_t servo = header[1];
-      uint8_t command = header[2];
-      uint8_t cksum1 = header[3];
-      uint8_t cksum2 = header[4];
-
-      if (size < 7) {
-        // Malformed header.  Skip back to looking for
-        // synchronization.  Probably should log?
-
-        // TODO jpieper: Think about logging.
-        continue;
+      buf = buf + std::string(&c, 1);
+      if (buf.size() > 2) {
+        buf = buf.substr(buf.size() - 2);
       }
-
-      if (streambuf.size() < (size - 7)) {
-        boost::asio::async_read(
-            *stream_,
-            streambuf,
-            boost::asio::transfer_at_least(
-                (size - 7) - streambuf.size()),
-            yield);
-      }
-
-      istr.read(data_buffer, size - 7);
-      std::string data(data_buffer, size - 7);
-
-      uint8_t expected_cksum1 = Checksum1(size, servo, command, data);
-      uint8_t expected_cksum2 = expected_cksum1 ^ 0xff;
-
-      Packet result;
-      result.servo = servo;
-      result.command = command;
-      result.data = data;
-      result.cksum_good = (cksum1 == (expected_cksum1 & 0xfe) &&
-                           cksum2 == (expected_cksum2 & 0xfe));
-
-      read_signal_(&result);
     }
+
+    // Read the header.
+    if (rx_streambuf_.size() < 5) {
+      boost::asio::async_read(
+          *stream_, rx_streambuf_,
+          boost::asio::transfer_at_least(5 - rx_streambuf_.size()),
+          std::bind(&HerkuleXProtocol::ReadLoop3, this,
+                    std::placeholders::_1,
+                    std::placeholders::_2));
+    } else {
+      ReadLoop3(boost::system::error_code(), 0);
+    }
+  }
+
+  void ReadLoop3(boost::system::error_code ec, std::size_t) {
+    if (ec) { throw boost::system::system_error(ec); }
+
+    char header[5] = {};
+    std::istream istr(&rx_streambuf_);
+    istr.read(header, 5);
+    if (istr.gcount() != 5) {
+      throw std::runtime_error("inconsistent header");
+    }
+
+    const uint8_t size = header[0];
+
+    if (size < 7) {
+      // Malformed header.  Skip back to looking for
+      // synchronization.  Probably should log?
+
+      // TODO jpieper: Think about logging.
+      ReadLoop1(boost::system::error_code());
+      return;
+    }
+
+    if (rx_streambuf_.size() < (size - 7)) {
+      boost::asio::async_read(
+          *stream_,
+          rx_streambuf_,
+          boost::asio::transfer_at_least(
+              (size - 7) - rx_streambuf_.size()),
+          std::bind(&HerkuleXProtocol::ReadLoop4, this,
+                    std::placeholders::_1,
+                    std::placeholders::_2, header));
+    } else {
+      ReadLoop4(boost::system::error_code(), 0, header);
+    }
+  }
+
+  void ReadLoop4(boost::system::error_code ec, std::size_t,
+                 char header[5]) {
+    if (ec) { throw boost::system::system_error(ec); }
+
+    const uint8_t size = header[0];
+    const uint8_t servo = header[1];
+    const uint8_t command = header[2];
+    const uint8_t cksum1 = header[3];
+    const uint8_t cksum2 = header[4];
+
+    std::istream istr(&rx_streambuf_);
+    char data_buffer[256] = {};
+    istr.read(data_buffer, size - 7);
+    std::string data(data_buffer, size - 7);
+
+    uint8_t expected_cksum1 = Checksum1(size, servo, command, data);
+    uint8_t expected_cksum2 = expected_cksum1 ^ 0xff;
+
+    Packet result;
+    result.servo = servo;
+    result.command = command;
+    result.data = data;
+    result.cksum_good = (cksum1 == (expected_cksum1 & 0xfe) &&
+                         cksum2 == (expected_cksum2 & 0xfe));
+
+    read_signal_(&result);
+
+    ReadLoop1(boost::system::error_code());
   }
 
   void SendPacket(boost::asio::yield_context yield,
@@ -314,7 +340,8 @@ class HerkuleXProtocol : boost::noncopyable {
   Parameters parameters_;
   SharedStream stream_;
   boost::signals2::signal<void (const Packet*)> read_signal_;
-  char buffer_[256];
+  char buffer_[256] = {};
+  boost::asio::streambuf rx_streambuf_{512};
 };
 
 struct HerkuleXConstants {
