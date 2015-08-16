@@ -19,19 +19,28 @@ env.Append(CPPPATH=['.'])
 env.ParseConfig('pkg-config --cflags --libs eigen3')
 env.Append(LIBS=['boost_system',
                  'boost_program_options',
-                 'boost_coroutine',
-                 'boost_context',
                  'pthread'])
+
+crenv = env.Clone()
+crenv.Append(LIBS=['boost_coroutine',
+                   'boost_context',
+                   ])
 
 SOURCES = [
     'comm_factory.cc',
     'herkulex.cc',
     ]
 
-liblegtool = env.StaticLibrary('legtool', SOURCES)
+liblegtool = crenv.StaticLibrary('legtool', SOURCES)
 
-herkulex_tool = env.Program('herkulex_tool',
+herkulex_tool = crenv.Program('herkulex_tool',
                             ['herkulex_tool.cc'] + liblegtool)
+
+bpenv = env.Clone()
+bpenv.Append(LIBS=['boost_python'])
+bpenv.ParseConfig('pkg-config --cflags --libs python')
+pylegtool = bpenv.SharedLibrary('_legtool', SOURCES + ['py_legtool.cc'],
+                                LIBPREFIX='')
 
 TESTS = ['test/' + x for x in [
         'test_comm.cc',
@@ -45,12 +54,12 @@ TESTS = ['test/' + x for x in [
         'test_tf.cc',
         ]]
 
-testenv = env.Clone()
+testenv = crenv.Clone()
 testenv.Append(LIBS=['boost_unit_test_framework'])
 
 test_legtool = testenv.Program('test_legtool', TESTS + liblegtool)
 testenv.Command('test_legtool.passed', test_legtool,
                 '$SOURCE && touch $TARGET')
 
-comm_manual_test = env.Program('comm_manual_test',
-                               ['test/comm_manual_test.cc'] + liblegtool)
+comm_manual_test = crenv.Program('comm_manual_test',
+                                 ['test/comm_manual_test.cc'] + liblegtool)

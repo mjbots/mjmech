@@ -597,9 +597,9 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     for (const auto& target: targets) {
       uint8_t buf[] = {
-        target.servo,
-        target.position & 0xff,
-        (target.position >> 8) & 0xff,
+        target.address,
+        static_cast<uint8_t>(target.position & 0xff),
+        static_cast<uint8_t>((target.position >> 8) & 0xff),
         target.leds,
       };
       data.write(reinterpret_cast<const char*>(buf), sizeof(buf));
