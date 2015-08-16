@@ -41,6 +41,8 @@ class HerkuleXProtocol : boost::noncopyable {
   typedef boost::optional<Packet> OptionalPacket;
 
   struct StatusResponse : public Packet {
+    StatusResponse() {}
+
     StatusResponse(const Packet& packet)
         : StatusResponse(packet, packet.data) {}
 
@@ -304,30 +306,6 @@ class HerkuleXProtocol : boost::noncopyable {
     ReadLoop1(boost::system::error_code());
   }
 
-  void SendPacket(boost::asio::yield_context yield,
-                  int servo, int command, const std::string& data) {
-    BOOST_ASSERT(servo >= 0 && servo <= 0xfe);
-    BOOST_ASSERT(command >= 0 && command <= 0xff);
-
-    int packet_size = data.size() + 7;
-    uint8_t cksum1 = Checksum1(packet_size, servo, command, data);
-    uint8_t cksum2 = cksum1 ^ 0xff;
-
-    uint8_t header[] = {
-      0xff,
-      0xff,
-      packet_size,
-      servo,
-      command,
-      cksum1 & 0xfe,
-      cksum2 & 0xfe,
-    };
-
-    ConstBufferSequence buffers{
-      boost::asio::buffer(header), boost::asio::buffer(data)};
-    boost::asio::async_write(*stream_, buffers, yield);
-  }
-
   static uint8_t Checksum1(uint8_t size, uint8_t servo, uint8_t cmd,
                            const std::string& data) {
     return size ^ servo ^ cmd ^
@@ -407,6 +385,8 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
   };
 
   struct MemReadResponse : public Base::StatusResponse {
+    MemReadResponse() {}
+
     MemReadResponse(const typename Base::Packet& packet)
         : Base::StatusResponse(packet,
                                packet.data.substr(packet.data.size() - 2)),
@@ -415,31 +395,62 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     uint8_t register_start = 0;
     uint8_t length = 0;
-    std::string register_data{Base::StatusResponse::data.substr(2, length)};
+    std::string register_data{
+      Base::StatusResponse::data.substr(
+          std::min(static_cast<std::size_t>(2),
+                   Base::StatusResponse::data.size()), length)};
   };
 
-  MemReadResponse MemRead(uint8_t command, uint8_t servo,
-                          uint8_t reg, uint8_t length,
-                          boost::asio::yield_context yield) {
+  template <typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code, MemReadResponse))
+  MemRead(uint8_t command, uint8_t servo,
+          uint8_t reg, uint8_t length,
+          Handler handler) {
+    boost::asio::detail::async_result_init<
+        Handler,
+        void (boost::system::error_code, MemReadResponse)> init(
+            BOOST_ASIO_MOVE_CAST(Handler)(handler));
+
     typename Base::Packet to_send;
     to_send.servo = servo;
     to_send.command = command;
     uint8_t buf[2] = { reg, length };
     to_send.data = std::string(reinterpret_cast<const char*>(buf), 2);
 
-    typename Base::Packet result = this->SendReceivePacket(to_send, yield);
+    this->SendReceivePacket(
+        to_send, std::bind(&HerkuleX::MemReadHandler, this,
+                           std::placeholders::_1,
+                           std::placeholders::_2,
+                           reg, length, to_send, init.handler));
+
+    return init.result.get();
+  }
+
+  void MemReadHandler(const boost::system::error_code& ec,
+                      typename Base::Packet result,
+                      uint8_t reg,
+                      uint8_t length,
+                      typename Base::Packet to_send,
+                      std::function<void (boost::system::error_code,
+                                          MemReadResponse)> handler) {
+    if (ec) {
+      handler(ec, MemReadResponse());
+      return;
+    }
+
     if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
       throw std::runtime_error(
-          (boost::format("Synchronization error, sent request for servo 0x%02x, "
-                         "response from 0x%02x") %
+          (boost::format("Synchronization error, sent request for servo "
+                         "0x%02x, response from 0x%02x") %
            static_cast<int>(to_send.servo) %
            static_cast<int>(result.servo)).str());
     }
 
-    if (result.command != (0x40 | command)) {
+    if (result.command != (0x40 | to_send.command)) {
       throw std::runtime_error(
           (boost::format("Expected response command 0x%02x, received 0x%02x") %
-           static_cast<int>(0x40 | command) %
+           static_cast<int>(0x40 | to_send.command) %
            static_cast<int>(result.command)).str());
     }
 
@@ -466,16 +477,44 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
            static_cast<int>(response.length)).str());
     }
 
-    return response;
+    handler(boost::system::error_code(), response);
   }
 
-  typename Base::StatusResponse Status(uint8_t servo,
-                                       boost::asio::yield_context yield) {
+  typedef std::function<void (const boost::system::error_code&,
+                              typename Base::StatusResponse)> StatusHandler;
+
+  template <typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code, typename Base::StatusResponse))
+  Status(uint8_t servo, Handler handler) {
+    boost::asio::detail::async_result_init<
+      Handler,
+      void (boost::system::error_code, typename Base::StatusResponse)> init(
+          BOOST_ASIO_MOVE_CAST(Handler)(handler));
+
     typename Base::Packet to_send;
     to_send.servo = servo;
     to_send.command = STAT;
 
-    auto result = this->SendReceivePacket(to_send, yield);
+    this->SendReceivePacket(
+        to_send, std::bind(&HerkuleX::HandleStatusResponse, this,
+                           std::placeholders::_1,
+                           std::placeholders::_2,
+                           to_send, StatusHandler(init.handler)));
+
+    return init.result.get();
+  }
+
+  void HandleStatusResponse(
+      const boost::system::error_code& ec,
+      typename Base::StatusResponse result,
+      typename Base::Packet to_send,
+      StatusHandler handler) {
+    if (ec) {
+      handler(ec, typename Base::StatusResponse());
+      return;
+    }
+
     if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
       throw std::runtime_error(
           (boost::format("Synchronization error, send status to servo 0x%02x, "
@@ -498,20 +537,39 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
            result.data.size()).str());
     }
 
-    return typename Base::StatusResponse(result);
+    handler(boost::system::error_code(),
+            typename Base::StatusResponse(result));
   }
 
-  void Reboot(uint8_t servo, boost::asio::yield_context yield) {
+  template <typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code))
+  Reboot(uint8_t servo, Handler handler) {
+    boost::asio::detail::async_result_init<
+        Handler,
+        void (boost::system::error_code)> init(
+            BOOST_ASIO_MOVE_CAST(Handler)(handler));
+
     typename Base::Packet to_send;
     to_send.servo = servo;
     to_send.command = REBOOT;
 
-    this->SendPacket(to_send, yield);
+    this->SendPacket(to_send, ErrorHandler(init.handler));
+
+    return init.result.get();
   }
 
-  void MemWrite(uint8_t command, uint8_t servo, uint8_t address,
-                const std::string& data,
-                boost::asio::yield_context yield) {
+  template <typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code))
+  MemWrite(uint8_t command, uint8_t servo, uint8_t address,
+           const std::string& data,
+           Handler handler) {
+    boost::asio::detail::async_result_init<
+        Handler,
+        void (boost::system::error_code)> init(
+            BOOST_ASIO_MOVE_CAST(Handler)(handler));
+
     typename Base::Packet to_send;
     to_send.servo = servo;
     to_send.command = command;
@@ -525,12 +583,21 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     to_send.data = ostr.str();
 
-    this->SendPacket(to_send, yield);
+    this->SendPacket(to_send, ErrorHandler(init.handler));
+
+    return init.result.get();
   }
 
-  template <typename T>
-  void MemWriteValue(uint8_t command, uint8_t servo, T field, int value_in,
-                     boost::asio::yield_context yield) {
+  template <typename T, typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code))
+  MemWriteValue(uint8_t command, uint8_t servo, T field, int value_in,
+                Handler handler) {
+    boost::asio::detail::async_result_init<
+        Handler,
+        void (boost::system::error_code)> init(
+            BOOST_ASIO_MOVE_CAST(Handler)(handler));
+
     int value = value_in;
 
     std::ostringstream ostr;
@@ -540,55 +607,85 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
       value = value >> 8;
     }
 
-    MemWrite(command, servo, field.position, ostr.str(), yield);
+    MemWrite(command, servo, field.position, ostr.str(),
+             ErrorHandler(init.handler));
+
+    return init.result.get();
   }
 
-  template <typename T>
-  void RamWrite(uint8_t servo, T field, int value,
-                boost::asio::yield_context yield) {
-    MemWriteValue(RAM_WRITE, servo, field, value, yield);
+  template <typename T, typename Handler>
+  void RamWrite(uint8_t servo, T field, int value, Handler handler) {
+    MemWriteValue(RAM_WRITE, servo, field, value, handler);
   }
 
-  template <typename T>
-  void EepWrite(uint8_t servo, T field, int value,
-                boost::asio::yield_context yield) {
-    MemWriteValue(EEP_WRITE, servo, field, value, yield);
+  template <typename T, typename Handler>
+  void EepWrite(uint8_t servo, T field, int value, Handler handler) {
+    MemWriteValue(EEP_WRITE, servo, field, value, handler);
   }
 
-  template <typename T>
-  int MemReadValue(uint8_t command, uint8_t servo, T field,
-                   boost::asio::yield_context yield) {
-    auto response = MemRead(
-        command, servo, field.position, field.length, yield);
-    int result = 0;
-    BOOST_ASSERT(response.register_data.size() >= field.length);
-    for (int i = 0; i < field.length; i++) {
-      result |= (static_cast<int>(response.register_data[i]) << (i * 8));
-    }
+  typedef std::function<void (boost::system::error_code, int)> IntHandler;
 
-    if (result >= (0x80 << ((field.length - 1) * 8))) {
-      result = result - (1 << (field.length * 8));
-    }
+  template <typename T, typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code, int))
+  MemReadValue(uint8_t command, uint8_t servo, T field,
+                    Handler handler) {
+    boost::asio::detail::async_result_init<
+        Handler,
+        void (boost::system::error_code, int)> init(
+            BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    return result;
+    MemRead(
+        command, servo, field.position, field.length,
+        [=](const boost::system::error_code& ec,
+            MemReadResponse response) mutable {
+          if (ec) {
+            init.handler(ec, 0);
+            return;
+          }
+
+          int result = 0;
+          BOOST_ASSERT(response.register_data.size() >= field.length);
+          for (int i = 0; i < field.length; i++) {
+            result |= (static_cast<int>(
+                           response.register_data[i]) << (i * 8));
+          }
+
+          if (result >= (0x80 << ((field.length - 1) * 8))) {
+            result = result - (1 << (field.length * 8));
+          }
+
+          init.handler(boost::system::error_code(), result);
+        });
+
+    return init.result.get();
   }
 
-  template <typename T>
-  int RamRead(uint8_t servo, T field,
-              boost::asio::yield_context yield) {
-    return MemReadValue(RAM_READ, servo, field, yield);
+  template <typename T, typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code, int))
+  RamRead(uint8_t servo, T field, Handler handler) {
+    return MemReadValue(RAM_READ, servo, field, handler);
   }
 
-  template <typename T>
-  int EepRead(uint8_t servo, T field,
-              boost::asio::yield_context yield) {
-    return MemReadValue(EEP_READ, servo, field, yield);
+  template <typename T, typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code, int))
+  EepRead(uint8_t servo, T field, Handler handler) {
+    return MemReadValue(EEP_READ, servo, field, handler);
   }
 
-  template <typename Targets>
-  void SJog(const Targets& targets,
-            double time_s,
-            boost::asio::yield_context yield) {
+  template <typename Targets, typename Handler>
+  BOOST_ASIO_INITFN_RESULT_TYPE(
+      Handler, void(boost::system::error_code))
+  SJog(const Targets& targets,
+       double time_s,
+       Handler handler) {
+    boost::asio::detail::async_result_init<
+        Handler,
+        void (boost::system::error_code)> init(
+            BOOST_ASIO_MOVE_CAST(Handler)(handler));
+
     std::ostringstream data;
 
     uint8_t int_time = static_cast<uint8_t>(
@@ -610,7 +707,9 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
     to_send.data = data.str();
     to_send.command = S_JOG;
 
-    this->SendPacket(to_send, yield);
+    this->SendPacket(to_send, ErrorHandler(init.handler));
+
+    return init.result.get();
   }
 };
 }
