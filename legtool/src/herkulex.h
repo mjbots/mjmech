@@ -629,7 +629,7 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
   BOOST_ASIO_INITFN_RESULT_TYPE(
       Handler, void(boost::system::error_code, int))
   MemReadValue(uint8_t command, uint8_t servo, T field,
-                    Handler handler) {
+               Handler handler) {
     boost::asio::detail::async_result_init<
         Handler,
         void (boost::system::error_code, int)> init(

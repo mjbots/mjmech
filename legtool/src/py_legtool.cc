@@ -25,6 +25,53 @@ typedef StreamFactory<StdioGenerator,
 typedef HerkuleX<Factory> Servo;
 namespace bp = boost::python;
 
+class ServoInterfaceWrapper : boost::noncopyable {
+ public:
+  ServoInterfaceWrapper(ServoInterface* servo) : servo_(servo) {}
+  ServoInterfaceWrapper(const ServoInterfaceWrapper& rhs)
+    : servo_(rhs.servo_) {}
+
+  void SetPose(const std::vector<ServoInterface::Joint>& joints,
+               bp::object callback) {
+    servo_->SetPose(joints, [=](boost::system::error_code ec) {
+        if (ec) { throw boost::system::system_error(ec); }
+        callback();
+      });
+  }
+
+  void EnablePower(ServoInterface::PowerState power_state,
+                   bp::object py_addresses,
+                   bp::object callback) {
+    std::vector<int> addresses;
+    for (int i = 0; i < bp::len(py_addresses); i++) {
+      addresses.push_back(bp::extract<int>(py_addresses[i]));
+    }
+    servo_->EnablePower(
+        power_state, addresses,
+        [=](boost::system::error_code ec) {
+          if (ec) { throw boost::system::system_error(ec); }
+          callback();
+        });
+  }
+
+  void GetPose(const std::vector<int>& addresses, bp::object callback) {
+    servo_->GetPose(addresses, [=](
+                        boost::system::error_code ec,
+                        const std::vector<ServoInterface::Joint> joints) {
+        if (ec) { throw boost::system::system_error(ec); }
+        bp::dict result;
+        for (const auto& joint: joints) {
+          result[joint.address] = joint.angle_deg;
+        }
+
+        callback(result);
+      });
+  }
+
+ private:
+  ServoInterface* const servo_;
+};
+
 class Selector : boost::noncopyable {
  public:
   void poll() {
@@ -48,38 +95,43 @@ class Selector : boost::noncopyable {
     params->stream.type = "serial";
     params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
 
-    servo_.AsyncStart(boost::bind(&Selector::HandleStart, this, _1, callback));
+    servo_.AsyncStart([=](boost::system::error_code ec) mutable {
+        if (ec) { throw boost::system::system_error(ec); }
+        callback();
+      });
   }
 
-  ServoInterface* controller() { return &servo_interface_; }
+  ServoInterfaceWrapper* controller() {
+    return &wrapper_;
+  }
 
  private:
-  void HandleStart(const boost::system::error_code& ec,
-                   bp::object callback) {
-    if (ec) {
-      callback(false);
-    }
-    started_ = true;
-    callback(true);
-  }
-  
+
   boost::asio::io_service service_;
   Factory factory_{service_};
   Servo servo_{service_, factory_};
   HerkuleXServoInterface<Servo> servo_interface_{&servo_};
+  ServoInterfaceWrapper wrapper_{&servo_interface_};
   bool started_{false};
 };
 
 BOOST_PYTHON_MODULE(_legtool) {
   using namespace boost::python;
 
+  enum_<ServoInterface::PowerState>("PowerState")
+      .value("kPowerFree", ServoInterface::kPowerFree)
+      .value("kPowerBrake", ServoInterface::kPowerBrake)
+      .value("kPowerEnable", ServoInterface::kPowerEnable)
+      ;
+
   class_<ServoInterface::Joint>("ServoInterfaceJoint")
       .def_readwrite("address", &ServoInterface::Joint::address)
       .def_readwrite("angle_deg", &ServoInterface::Joint::angle_deg)
       ;
-  
-  class_<ServoInterface, boost::noncopyable>("ServoInterface", no_init)
-      .def("SetPose", &ServoInterface::SetPose)
+
+  class_<ServoInterfaceWrapper, boost::noncopyable>("ServoInterface", no_init)
+      .def("SetPose", &ServoInterfaceWrapper::SetPose)
+      .def("EnablePower", &ServoInterfaceWrapper::EnablePower)
       ;
 
   class_<Selector, boost::noncopyable>("Selector")

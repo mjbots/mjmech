@@ -21,7 +21,7 @@ template <typename Servo>
 class HerkuleXServoInterface : public ServoInterface {
  public:
   typedef HerkuleXConstants HC;
-  
+
   HerkuleXServoInterface(Servo* servo) : servo_(servo) {}
   Servo* servo() { return servo_; }
   const Servo* servo() const { return servo_; }
@@ -38,7 +38,7 @@ class HerkuleXServoInterface : public ServoInterface {
   Parameters* parameters() { return &parameters_; }
 
   virtual void SetPose(const std::vector<Joint>& joints,
-                       boost::asio::yield_context yield) override {
+                       ErrorHandler handler) override {
     struct Target {
       uint8_t address;
       uint16_t position;
@@ -49,12 +49,12 @@ class HerkuleXServoInterface : public ServoInterface {
       targets.emplace_back(Target{
           MapAddress(joint.address), AngleToCount(joint.angle_deg), 0});
     }
-    servo_->SJog(targets, parameters_.pose_time_s, yield);
+    servo_->SJog(targets, parameters_.pose_time_s, handler);
   }
 
   virtual void EnablePower(PowerState power_state,
                            const std::vector<int>& ids_in,
-                           boost::asio::yield_context yield) override {
+                           ErrorHandler handler) override {
     uint8_t value = [power_state]() {
       switch (power_state) {
         case kPowerFree: { return 0x00; }
@@ -67,42 +67,82 @@ class HerkuleXServoInterface : public ServoInterface {
     std::vector<int> ids(ids_in);
     if (ids.empty()) { ids.push_back(Servo::BROADCAST); }
 
-    for (int address: ids) {
-      servo_->RamWrite(address, HC::torque_control(), value, yield);
-    }
+    HandlePowerAck(boost::system::error_code(), ids, value, handler);
   }
 
-  virtual std::vector<Joint> GetPose(
-      const std::vector<int>& ids,
-      boost::asio::yield_context yield) override {
+  void HandlePowerAck(const boost::system::error_code& ec,
+                      const std::vector<int>& ids,
+                      uint8_t value,
+                      ErrorHandler handler) {
+    if (ec) { handler(ec); return; }
+
+    if (ids.empty()) {
+      handler(boost::system::error_code());
+      return;
+    }
+
+    std::vector<int> new_ids = ids;
+    int to_send = new_ids.back();
+    new_ids.pop_back();
+
+    servo_->RamWrite(to_send, HC::torque_control(), value,
+                     std::bind(&HerkuleXServoInterface::HandlePowerAck, this,
+                               std::placeholders::_1,
+                               new_ids, value, handler));
+  }
+
+  virtual void GetPose(
+      const std::vector<int>& ids, PoseHandler handler) override {
+    DoGetPose(boost::system::error_code(), 0,
+              boost::none,
+              ids, std::vector<Joint>{}, handler);
+  }
+
+  void DoGetPose(const boost::system::error_code& ec,
+                 int value,
+                 boost::optional<int> address,
+                 const std::vector<int>& ids,
+                 const std::vector<Joint>& current_result,
+                 PoseHandler handler) {
+    if (ec) { handler(ec, {}); return; }
+    if (ids.empty()) { handler(ec, current_result); return; }
     std::vector<Joint> result;
-    for (int address: ids) {
-      result.emplace_back(Joint{address, CountsToAngleDeg(
-              servo_->RamRead(address, HC::position(), yield))});
+    if (address) {
+      result.emplace_back(Joint{*address, CountsToAngleDeg(value)});
     }
-    return result;
+
+    int to_send = ids.back();
+    std::vector<int> new_ids = ids;
+    new_ids.pop_back();
+    servo_->RamRead(to_send, HC::position(),
+                    std::bind(&HerkuleXServoInterface::DoGetPose, this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              to_send,
+                              new_ids, result, handler));
   }
 
-  virtual std::vector<Temperature> GetTemperature(
-      const std::vector<int>& ids,
-      boost::asio::yield_context yield) override {
-    std::vector<Temperature> result;
-    for (int address: ids) {
-      result.emplace_back(Temperature{address, CountsToTemperatureC(
-              servo_->RamRead(address, HC::temperature_c(), yield))});
-    }
-    return result;
+  virtual void GetTemperature(
+      const std::vector<int>& ids, TemperatureHandler handler) override {
+    throw std::runtime_error("not implemented");
+    // std::vector<Temperature> result;
+    // for (int address: ids) {
+    //   result.emplace_back(Temperature{address, CountsToTemperatureC(
+    //           servo_->RamRead(address, HC::temperature_c(), yield))});
+    // }
+    // return result;
   }
 
-  virtual std::vector<Voltage> GetVoltage(
-      const std::vector<int>& ids,
-      boost::asio::yield_context yield) override {
-    std::vector<Voltage> result;
-    for (int address: ids) {
-      result.emplace_back(Voltage{address, CountsToVoltage(
-              servo_->RamRead(address, HC::voltage(), yield))});
-    }
-    return result;
+  virtual void GetVoltage(
+      const std::vector<int>& ids, VoltageHandler handler) override {
+    throw std::runtime_error("not implemented");
+
+    // std::vector<Voltage> result;
+    // for (int address: ids) {
+    //   result.emplace_back(Voltage{address, CountsToVoltage(
+    //           servo_->RamRead(address, HC::voltage(), yield))});
+    // }
+    // return result;
   }
 
   uint16_t AngleToCount(double angle_deg) const {
@@ -131,7 +171,7 @@ class HerkuleXServoInterface : public ServoInterface {
     }
     return static_cast<uint8_t>(address);
   }
-    
+
   Parameters parameters_;
   Servo* const servo_;
 };

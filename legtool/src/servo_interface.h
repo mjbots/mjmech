@@ -21,8 +21,7 @@ class ServoInterface : boost::noncopyable {
     int address;
     double angle_deg;
   };
-  virtual void SetPose(const std::vector<Joint>&,
-                       boost::asio::yield_context) = 0;
+  virtual void SetPose(const std::vector<Joint>&, ErrorHandler) = 0;
 
   enum PowerState {
     kPowerFree,
@@ -30,27 +29,31 @@ class ServoInterface : boost::noncopyable {
     kPowerEnable,
   };
   virtual void EnablePower(PowerState power_state, const std::vector<int>&,
-                           boost::asio::yield_context) = 0;
+                           ErrorHandler) = 0;
 
-  virtual std::vector<Joint> GetPose(const std::vector<int>&,
-                                     boost::asio::yield_context) = 0;
+  typedef std::function<void (boost::system::error_code,
+                              std::vector<Joint>)> PoseHandler;
+
+  virtual void GetPose(const std::vector<int>&, PoseHandler) = 0;
 
   struct Temperature {
     int address;
     double temperature_C;
   };
-  
-  virtual std::vector<Temperature> GetTemperature(
-      const std::vector<int>&,
-      boost::asio::yield_context) = 0;
+
+  typedef std::function<void (boost::system::error_code,
+                              std::vector<Temperature>)> TemperatureHandler;
+  virtual void GetTemperature(const std::vector<int>&, TemperatureHandler) = 0;
 
   struct Voltage {
     int address;
     double voltage;
   };
-  
-  virtual std::vector<Voltage> GetVoltage(const std::vector<int>&,
-                                          boost::asio::yield_context) = 0;
+
+  typedef std::function<void (boost::system::error_code,
+                              std::vector<Voltage>)> VoltageHandler;
+
+  virtual void GetVoltage(const std::vector<int>&, VoltageHandler) = 0;
 };
 
 }
