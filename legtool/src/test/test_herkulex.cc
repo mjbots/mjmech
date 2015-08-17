@@ -30,7 +30,8 @@ class Fixture {
     stream_ = factory_.generator<PipeGenerator>()->GetStream(
         service_, "test", PipeGenerator::Mode::kDirectionB);
 
-    boost::asio::spawn(service_, ErrorWrap([=](boost::asio::yield_context yield) {
+    boost::asio::spawn(service_,
+                       ErrorWrap([=](boost::asio::yield_context yield) {
         char buf[4096] = {};
         while (true) {
           std::size_t bytes_read =
@@ -75,7 +76,8 @@ BOOST_FIXTURE_TEST_CASE(HerkuleXTest, Fixture) {
 
       // Start listening for a packet.
       boost::optional<Servo::Packet> listen;
-      boost::asio::spawn(service_, ErrorWrap([&](boost::asio::yield_context yield) {
+      boost::asio::spawn(service_,
+                         ErrorWrap([&](boost::asio::yield_context yield) {
           listen = herkulex_.ReceivePacket(yield);
           }));
 
@@ -120,7 +122,8 @@ BOOST_FIXTURE_TEST_CASE(HerkuleXMemRead, Fixture) {
 
           std::string response(
               "\xff\xff\x0c\xfd\x44\xc2\x3c\x35\x01\x01\x00\x42", 12);
-          boost::asio::async_write(*stream_, boost::asio::buffer(response), yield);
+          boost::asio::async_write(*stream_,
+                                   boost::asio::buffer(response), yield);
         }
       }));
 
@@ -131,7 +134,8 @@ BOOST_FIXTURE_TEST_CASE(HerkuleXMemRead, Fixture) {
   boost::asio::spawn(service_, ErrorWrap([&](boost::asio::yield_context yield) {
         herkulex_.AsyncStart(yield);
 
-        auto response = herkulex_.MemRead(herkulex_.RAM_READ, 0xfd, 0x35, 1, yield);
+        auto response = herkulex_.MemRead(herkulex_.RAM_READ, 0xfd, 0x35, 1,
+                                          yield);
         BOOST_CHECK_EQUAL(response.register_start, 0x35);
         BOOST_CHECK_EQUAL(response.length, 1);
         BOOST_CHECK_EQUAL(response.register_data, std::string("\x01"));
