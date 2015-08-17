@@ -106,7 +106,7 @@ class HerkuleXServoInterface : public ServoInterface {
                  PoseHandler handler) {
     if (ec) { handler(ec, {}); return; }
     if (ids.empty()) { handler(ec, current_result); return; }
-    std::vector<Joint> result;
+    auto result = current_result;
     if (address) {
       result.emplace_back(Joint{*address, CountsToAngleDeg(value)});
     }
@@ -124,25 +124,64 @@ class HerkuleXServoInterface : public ServoInterface {
 
   virtual void GetTemperature(
       const std::vector<int>& ids, TemperatureHandler handler) override {
-    throw std::runtime_error("not implemented");
-    // std::vector<Temperature> result;
-    // for (int address: ids) {
-    //   result.emplace_back(Temperature{address, CountsToTemperatureC(
-    //           servo_->RamRead(address, HC::temperature_c(), yield))});
-    // }
-    // return result;
+    DoGetTemperature(boost::system::error_code(), 0,
+                     boost::none,
+                     ids, std::vector<Temperature>{}, handler);
+  }
+
+  void DoGetTemperature(const boost::system::error_code& ec,
+                        int value,
+                        boost::optional<int> address,
+                        const std::vector<int>& ids,
+                        const std::vector<Temperature>& current_result,
+                        TemperatureHandler handler) {
+    if (ec) { handler(ec, {}); return; }
+    if (ids.empty()) { handler(ec, current_result); return; }
+    auto result = current_result;
+    if (address) {
+      result.emplace_back(Temperature{*address, CountsToTemperatureC(value)});
+    }
+
+    int to_send = ids.back();
+    std::vector<int> new_ids = ids;
+    new_ids.pop_back();
+    servo_->RamRead(to_send, HC::temperature_c(),
+                    std::bind(&HerkuleXServoInterface::DoGetTemperature, this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              to_send,
+                              new_ids, result, handler));
   }
 
   virtual void GetVoltage(
       const std::vector<int>& ids, VoltageHandler handler) override {
-    throw std::runtime_error("not implemented");
+    DoGetVoltage(boost::system::error_code(), 0,
+                 boost::none,
+                 ids, std::vector<Voltage>{}, handler);
+  }
 
-    // std::vector<Voltage> result;
-    // for (int address: ids) {
-    //   result.emplace_back(Voltage{address, CountsToVoltage(
-    //           servo_->RamRead(address, HC::voltage(), yield))});
-    // }
-    // return result;
+  void DoGetVoltage(const boost::system::error_code& ec,
+                        int value,
+                        boost::optional<int> address,
+                        const std::vector<int>& ids,
+                        const std::vector<Voltage>& current_result,
+                        VoltageHandler handler) {
+    if (ec) { handler(ec, {}); return; }
+    if (ids.empty()) { handler(ec, current_result); return; }
+    auto result = current_result;
+    if (address) {
+      result.emplace_back(Voltage{*address, CountsToVoltage(value)});
+    }
+
+    int to_send = ids.back();
+    std::vector<int> new_ids = ids;
+    new_ids.pop_back();
+    servo_->RamRead(to_send, HC::voltage(),
+                    std::bind(&HerkuleXServoInterface::DoGetVoltage, this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              to_send,
+                              new_ids, result, handler));
   }
 
   uint16_t AngleToCount(double angle_deg) const {

@@ -42,10 +42,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
   void EnablePower(ServoInterface::PowerState power_state,
                    bp::object py_addresses,
                    bp::object callback) {
-    std::vector<int> addresses;
-    for (int i = 0; i < bp::len(py_addresses); i++) {
-      addresses.push_back(bp::extract<int>(py_addresses[i]));
-    }
+    std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->EnablePower(
         power_state, addresses,
         [=](boost::system::error_code ec) {
@@ -54,7 +51,8 @@ class ServoInterfaceWrapper : boost::noncopyable {
         });
   }
 
-  void GetPose(const std::vector<int>& addresses, bp::object callback) {
+  void GetPose(bp::object py_addresses, bp::object callback) {
+    std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetPose(addresses, [=](
                         boost::system::error_code ec,
                         const std::vector<ServoInterface::Joint> joints) {
@@ -68,7 +66,45 @@ class ServoInterfaceWrapper : boost::noncopyable {
       });
   }
 
+  void GetTemperature(bp::object py_addresses, bp::object callback) {
+    std::vector<int> addresses = GetAddresses(py_addresses);
+    servo_->GetTemperature(
+        addresses, [=](const boost::system::error_code& ec,
+                       const std::vector<ServoInterface::Temperature>& temps) {
+          if (ec) { throw boost::system::system_error(ec); }
+          bp::dict result;
+          for (const auto& temp: temps) {
+            result[temp.address] = temp.temperature_C;
+          }
+
+          callback(result);
+        });
+  }
+
+  void GetVoltage(bp::object py_addresses, bp::object callback) {
+    std::vector<int> addresses = GetAddresses(py_addresses);
+    servo_->GetVoltage(
+        addresses, [=](const boost::system::error_code& ec,
+                       const std::vector<ServoInterface::Voltage>& temps) {
+          if (ec) { throw boost::system::system_error(ec); }
+          bp::dict result;
+          for (const auto& temp: temps) {
+            result[temp.address] = temp.voltage;
+          }
+
+          callback(result);
+        });
+  }
+
  private:
+  static std::vector<int> GetAddresses(bp::object py_addresses) {
+    std::vector<int> addresses;
+    for (int i = 0; i < bp::len(py_addresses); i++) {
+      addresses.push_back(bp::extract<int>(py_addresses[i]));
+    }
+    return addresses;
+  }
+
   ServoInterface* const servo_;
 };
 
@@ -95,7 +131,7 @@ class Selector : boost::noncopyable {
     params->stream.type = "serial";
     params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
 
-    servo_.AsyncStart([=](boost::system::error_code ec) mutable {
+    servo_.AsyncStart([=](boost::system::error_code ec) {
         if (ec) { throw boost::system::system_error(ec); }
         callback();
       });
@@ -132,6 +168,9 @@ BOOST_PYTHON_MODULE(_legtool) {
   class_<ServoInterfaceWrapper, boost::noncopyable>("ServoInterface", no_init)
       .def("SetPose", &ServoInterfaceWrapper::SetPose)
       .def("EnablePower", &ServoInterfaceWrapper::EnablePower)
+      .def("GetPose", &ServoInterfaceWrapper::GetPose)
+      .def("GetTemperature", &ServoInterfaceWrapper::GetTemperature)
+      .def("GetVoltage", &ServoInterfaceWrapper::GetVoltage)
       ;
 
   class_<Selector, boost::noncopyable>("Selector")
