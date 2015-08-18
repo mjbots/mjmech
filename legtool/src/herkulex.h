@@ -49,8 +49,8 @@ class HerkuleXProtocol : boost::noncopyable {
     StatusResponse(const Packet& packet,
                    const std::string& status_data)
         : Packet(packet),
-          reg48(status_data.at(0)),
-          reg49(status_data.at(1)) {}
+          reg48(status_data.size() > 0 ? status_data.at(0) : 0),
+          reg49(status_data.size() > 1 ? status_data.at(1) : 0) {}
 
     uint8_t reg48 = 0;
     uint8_t reg49 = 0;
