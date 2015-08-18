@@ -25,74 +25,93 @@ typedef StreamFactory<StdioGenerator,
 typedef HerkuleX<Factory> Servo;
 namespace bp = boost::python;
 
+namespace {
+bp::object g_runtime_error = bp::eval("RuntimeError");
+
+void HandleCallback(bp::object future,
+                    boost::system::error_code ec,
+                    bp::object result) {
+  if (ec) {
+    future.attr("set_exception")(
+        g_runtime_error(boost::lexical_cast<std::string>(ec)));
+  } else {
+    future.attr("set_result")(result);
+  }
+}
+}
+
 class ServoInterfaceWrapper : boost::noncopyable {
  public:
   ServoInterfaceWrapper(ServoInterface* servo) : servo_(servo) {}
   ServoInterfaceWrapper(const ServoInterfaceWrapper& rhs)
     : servo_(rhs.servo_) {}
 
-  void SetPose(const std::vector<ServoInterface::Joint>& joints,
-               bp::object callback) {
+  void set_pose(bp::object py_joints,
+                bp::object future) {
+    bp::list py_addresses = bp::list(py_joints.attr("keys")());
+    std::vector<ServoInterface::Joint> joints;
+    for (int i = 0; i < bp::len(py_addresses); i++) {
+      joints.emplace_back(ServoInterface::Joint{
+          bp::extract<int>(py_addresses[i]),
+              bp::extract<double>(py_joints[i])});
+    }
     servo_->SetPose(joints, [=](boost::system::error_code ec) {
-        if (ec) { throw boost::system::system_error(ec); }
-        callback();
+        HandleCallback(future, ec, bp::object());
       });
   }
 
-  void EnablePower(ServoInterface::PowerState power_state,
-                   bp::object py_addresses,
-                   bp::object callback) {
+  void enable_power(ServoInterface::PowerState power_state,
+                    bp::object py_addresses,
+                    bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->EnablePower(
         power_state, addresses,
         [=](boost::system::error_code ec) {
-          if (ec) { throw boost::system::system_error(ec); }
-          callback();
+          HandleCallback(future, ec, bp::object());
         });
   }
 
-  void GetPose(bp::object py_addresses, bp::object callback) {
+  void get_pose(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
-    servo_->GetPose(addresses, [=](
-                        boost::system::error_code ec,
-                        const std::vector<ServoInterface::Joint> joints) {
-        if (ec) { throw boost::system::system_error(ec); }
-        bp::dict result;
-        for (const auto& joint: joints) {
-          result[joint.address] = joint.angle_deg;
-        }
+    servo_->GetPose(
+        addresses,
+        [=](boost::system::error_code ec,
+            const std::vector<ServoInterface::Joint> joints) {
 
-        callback(result);
+          bp::dict result;
+          for (const auto& joint: joints) {
+            result[joint.address] = joint.angle_deg;
+          }
+
+          HandleCallback(future, ec, result);
       });
   }
 
-  void GetTemperature(bp::object py_addresses, bp::object callback) {
+  void get_temperature(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetTemperature(
         addresses, [=](const boost::system::error_code& ec,
                        const std::vector<ServoInterface::Temperature>& temps) {
-          if (ec) { throw boost::system::system_error(ec); }
           bp::dict result;
           for (const auto& temp: temps) {
             result[temp.address] = temp.temperature_C;
           }
 
-          callback(result);
+          HandleCallback(future, ec, result);
         });
   }
 
-  void GetVoltage(bp::object py_addresses, bp::object callback) {
+  void get_voltage(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetVoltage(
         addresses, [=](const boost::system::error_code& ec,
                        const std::vector<ServoInterface::Voltage>& temps) {
-          if (ec) { throw boost::system::system_error(ec); }
           bp::dict result;
           for (const auto& temp: temps) {
             result[temp.address] = temp.voltage;
           }
 
-          callback(result);
+          HandleCallback(future, ec, result);
         });
   }
 
@@ -118,7 +137,7 @@ class Selector : boost::noncopyable {
   void select_servo(
       const std::string& servo_type,
       const std::string& serial_port,
-      bp::object callback) {
+      bp::object future) {
 
     // TODO jpieper: Support gazebo.
     if (servo_type != "herkulex") {
@@ -131,9 +150,14 @@ class Selector : boost::noncopyable {
     params->stream.type = "serial";
     params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
 
+    std::cout << "about to async start\n";
     servo_.AsyncStart([=](boost::system::error_code ec) {
-        if (ec) { throw boost::system::system_error(ec); }
-        callback();
+        if (ec) {
+          future.attr("set_exception")(
+              std::runtime_error(boost::lexical_cast<std::string>(ec)));
+        } else {
+          future.attr("set_result")(bp::object());
+        }
       });
   }
 
@@ -166,11 +190,11 @@ BOOST_PYTHON_MODULE(_legtool) {
       ;
 
   class_<ServoInterfaceWrapper, boost::noncopyable>("ServoInterface", no_init)
-      .def("SetPose", &ServoInterfaceWrapper::SetPose)
-      .def("EnablePower", &ServoInterfaceWrapper::EnablePower)
-      .def("GetPose", &ServoInterfaceWrapper::GetPose)
-      .def("GetTemperature", &ServoInterfaceWrapper::GetTemperature)
-      .def("GetVoltage", &ServoInterfaceWrapper::GetVoltage)
+      .def("set_pose", &ServoInterfaceWrapper::set_pose)
+      .def("enable_power", &ServoInterfaceWrapper::enable_power)
+      .def("get_pose", &ServoInterfaceWrapper::get_pose)
+      .def("get_temperature", &ServoInterfaceWrapper::get_temperature)
+      .def("get_voltage", &ServoInterfaceWrapper::get_voltage)
       ;
 
   class_<Selector, boost::noncopyable>("Selector")
