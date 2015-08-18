@@ -15,36 +15,28 @@
 #pragma once
 
 #include "visitor.h"
+#include "visit_archive.h"
 
 namespace legtool {
-class ProgramOptionsArchive {
+class ProgramOptionsArchive : public VisitArchive<ProgramOptionsArchive> {
  public:
-  ProgramOptionsArchive(boost::program_options::options_description* description,
-                        std::string prefix = "")
+  ProgramOptionsArchive(
+      boost::program_options::options_description* description,
+      std::string prefix = "")
       : description_(description),
         prefix_(prefix) {}
 
-  template <typename Serializable>
-  void Accept(Serializable* serializable) {
-    serializable->Serialize(this);
+  template <typename NameValuePair>
+  auto VisitSerializable(const NameValuePair& pair) {
+    ProgramOptionsArchive sub(description_, prefix_ + pair.name() + ".");
+    sub.Accept(pair.value());
   }
 
   template <typename NameValuePair>
-  void Visit(const NameValuePair& pair) {
-    VisitHelper(pair.value(), pair.name(), 0);
-  }
-
-  template <typename Value>
-  auto VisitHelper(Value* value, const char* name, int) ->
-      decltype(value->Serialize((ProgramOptionsArchive*)nullptr)) {
-    ProgramOptionsArchive sub(description_, prefix_ + name + ".");
-    sub.Accept(value);
-  }
-
-  template <typename Value>
-  void VisitHelper(Value* value, const char* name, long) {
-    (*description_).add_options()((prefix_ + name).c_str(),
-                                  boost::program_options::value(value));
+  void VisitScalar(const NameValuePair& pair) {
+    (*description_).add_options()(
+        (prefix_ + pair.name()).c_str(),
+        boost::program_options::value(pair.value()));
   }
 
   boost::program_options::options_description* const description_;
