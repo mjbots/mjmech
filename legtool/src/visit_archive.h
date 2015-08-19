@@ -22,7 +22,7 @@ template <typename Derived>
 struct VisitArchive {
   template <typename Serializable>
   void Accept(Serializable* serializable) {
-    serializable->Serialize(this);
+    serializable->Serialize(static_cast<Derived*>(this));
   }
 
   template <typename NameValuePair>
@@ -30,6 +30,7 @@ struct VisitArchive {
     VisitHelper(pair, 0);
   }
 
+ private:
   template <typename NameValuePair>
   auto VisitHelper(const NameValuePair& pair, int) ->
       decltype(pair.value()->Serialize(
