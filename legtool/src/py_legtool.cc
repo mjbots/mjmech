@@ -60,8 +60,8 @@ class ServoInterfaceWrapper : boost::noncopyable {
       });
   }
 
-  void enable_power(ServoInterface::PowerState power_state,
-                    bp::object py_addresses,
+  void enable_power(bp::object py_addresses,
+                    ServoInterface::PowerState power_state,
                     bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->EnablePower(
