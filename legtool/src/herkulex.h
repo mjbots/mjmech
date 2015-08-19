@@ -244,9 +244,9 @@ class HerkuleXProtocol : boost::noncopyable {
   void ReadLoop3(boost::system::error_code ec, std::size_t) {
     if (ec) { throw boost::system::system_error(ec); }
 
-    char header[5] = {};
+    std::array<char, 5> header = {};
     std::istream istr(&rx_streambuf_);
-    istr.read(header, 5);
+    istr.read(&header[0], 5);
     if (istr.gcount() != 5) {
       throw std::runtime_error("inconsistent header");
     }
@@ -277,7 +277,7 @@ class HerkuleXProtocol : boost::noncopyable {
   }
 
   void ReadLoop4(boost::system::error_code ec, std::size_t,
-                 char header[5]) {
+                 std::array<char, 5> header) {
     if (ec) { throw boost::system::system_error(ec); }
 
     const uint8_t size = header[0];
