@@ -194,6 +194,9 @@ int work(int argc, char** argv) {
   Factory factory(service);
   Servo servo(service, factory);
 
+  // Default to something moderately useful.
+  servo.parameters()->stream.type = "serial";
+
   Options options;
 
   po::options_description desc("Allowable options");
