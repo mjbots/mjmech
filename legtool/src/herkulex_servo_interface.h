@@ -44,7 +44,7 @@ class HerkuleXServoInterface : public ServoInterface {
       uint16_t position;
       uint8_t leds;
     };
-    std::vector<Target> targets(joints.size());
+    std::vector<Target> targets;
     for (const auto& joint: joints) {
       targets.emplace_back(Target{
           MapAddress(joint.address), AngleToCount(joint.angle_deg), 0});
