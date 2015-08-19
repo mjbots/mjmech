@@ -212,7 +212,7 @@ int work(int argc, char** argv) {
         (pair.first.c_str(), new CommandValue(
             pair.first, pair.second.args, &command_sequence), "");
   }
-  
+
   ProgramOptionsArchive(&desc, "servo.").Accept(servo.parameters());
 
   po::variables_map vm;
@@ -221,13 +221,13 @@ int work(int argc, char** argv) {
 
   if (vm.count("help")) {
     std::cerr << desc;
-    return 1;
+    return 0;
   }
 
   boost::asio::spawn(service, ErrorWrap([&](boost::asio::yield_context yield) {
         servo.AsyncStart(yield);
 
-        for (const auto& command: command_sequence) { 
+        for (const auto& command: command_sequence) {
           CommandContext ctx{options, servo, command.args, yield};
           auto it = g_commands.find(command.name);
           BOOST_ASSERT(it != g_commands.end());
