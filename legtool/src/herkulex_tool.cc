@@ -21,6 +21,7 @@
 #include "comm_factory.h"
 #include "common.h"
 #include "herkulex.h"
+#include "herkulex_servo_interface.h"
 #include "program_options_archive.h"
 
 using namespace legtool;
@@ -40,6 +41,7 @@ typedef HerkuleXConstants HC;
 struct CommandContext {
   const Options& options;
   Servo& servo;
+  ServoInterface& servo_interface;
   std::string args;
   boost::asio::yield_context yield;
 };
@@ -158,6 +160,28 @@ const std::map<std::string, Command> g_commands = {
         }
         std::cout << "\n";
       } } },
+  { "set_pose", { kArg, [](CommandContext& ctx) {
+        std::vector<std::string> args;
+        boost::split(args, ctx.args, boost::is_any_of(","));
+
+        std::vector<ServoInterface::Joint> joints;
+        for (std::string jstr: args) {
+          std::vector<std::string> fields;
+          boost::split(fields, jstr, boost::is_any_of(":"));
+          joints.emplace_back(ServoInterface::Joint{
+              std::stoi(fields.at(0)),
+                  std::stod(fields.at(1))});
+        }
+
+        boost::asio::detail::async_result_init<
+          boost::asio::yield_context,
+          void (boost::system::error_code)> init(
+              BOOST_ASIO_MOVE_CAST(boost::asio::yield_context)(ctx.yield));
+
+        ctx.servo_interface.SetPose(joints, ErrorHandler(init.handler));
+
+        init.result.get();
+      } } },
 };
 
 class CommandValue : public boost::program_options::value_semantic {
@@ -193,6 +217,7 @@ int work(int argc, char** argv) {
   boost::asio::io_service service;
   Factory factory(service);
   Servo servo(service, factory);
+  HerkuleXServoInterface<Servo> servo_interface(&servo);
 
   // Default to something moderately useful.
   servo.parameters()->stream.type = "serial";
@@ -228,7 +253,9 @@ int work(int argc, char** argv) {
         servo.AsyncStart(yield);
 
         for (const auto& command: command_sequence) {
-          CommandContext ctx{options, servo, command.args, yield};
+          CommandContext ctx{
+            options, servo, servo_interface,
+                command.args, yield};
           auto it = g_commands.find(command.name);
           BOOST_ASSERT(it != g_commands.end());
           it->second.function(ctx);
