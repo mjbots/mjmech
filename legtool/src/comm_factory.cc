@@ -19,9 +19,11 @@
 #include "comm_factory.h"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/asio/buffers_iterator.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/asio/serial_port.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/format.hpp>
 
 namespace legtool {
@@ -366,6 +368,87 @@ SharedStream PipeGenerator::GetStream(
           parent,
           (mode == Mode::kDirectionA ?
            &parent->direction_a_ : &parent->direction_b_)));
+}
+
+namespace {
+class StdioDebugStream : public AsyncStream {
+ public:
+  StdioDebugStream(SharedStream base) : context_(new Context()) {
+    context_->base = base;
+  }
+
+  virtual ~StdioDebugStream() {}
+  virtual boost::asio::io_service& get_io_service() {
+    return context_->base->get_io_service();
+  }
+
+  virtual void cancel() { context_->base->cancel(); }
+
+  virtual void virtual_async_read_some(
+      MutableBufferSequence buffer, ReadHandler handler) {
+
+    context_->base->virtual_async_read_some(
+        buffer,
+        [context=this->context_, buffer, handler](
+            boost::system::error_code ec, std::size_t size) {
+
+          if (size != 0) {
+            if (context->last_write) {
+              std::cout << "\nREAD:";
+              context->last_write = false;
+            }
+
+            typedef boost::asio::buffers_iterator<
+              MutableBufferSequence> Iterator;
+            std::size_t count = 0;
+            for (auto it = Iterator::begin(buffer);
+                 count < size; ++it, ++count) {
+              std::cout << boost::format(" %02X") %
+                  static_cast<int>(static_cast<uint8_t>(*it));
+            }
+          }
+
+          handler(ec, size);
+        });
+  }
+
+  virtual void virtual_async_write_some(
+      ConstBufferSequence buffer, WriteHandler handler) {
+    context_->base->virtual_async_write_some(
+        buffer,
+        [context=this->context_, buffer, handler](
+            boost::system::error_code ec, std::size_t size) {
+          if (size != 0) {
+            if (!context->last_write) {
+              std::cout << "\nWRITE:";
+              context->last_write = true;
+            }
+
+            typedef boost::asio::buffers_iterator<
+              ConstBufferSequence> Iterator;
+            std::size_t count = 0;
+            for (auto it = Iterator::begin(buffer);
+                 count < size; ++it, ++count) {
+              std::cout << boost::format(" %02X") %
+                  static_cast<int>(static_cast<uint8_t>(*it));
+            }
+          }
+
+          handler(ec, size);
+        });
+  }
+
+ private:
+  struct Context {
+    SharedStream base;
+    bool last_write = false;
+  };
+  std::shared_ptr<Context> context_;
+};
+}
+
+SharedStream MakeStdioDebugStream(SharedStream stream) {
+  return SharedStream(new StdioDebugStream(stream));
 }
 
 }

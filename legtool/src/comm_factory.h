@@ -30,6 +30,8 @@ typedef std::shared_ptr<AsyncStream> SharedStream;
 typedef std::function<void (boost::system::error_code,
                             SharedStream)> StreamHandler;
 
+SharedStream MakeStdioDebugStream(SharedStream);
+
 /// This provides a dynamic mechanism for creating streams at
 /// run-time.  It can be instantiated with any number of unique
 /// Generators.  Each Generator must provide:
@@ -56,6 +58,7 @@ class StreamFactory : boost::noncopyable {
   // accessed programmatically through the "Get" member function.
   struct Parameters {
     std::string type;
+    bool stdio_debug = false;
 
     meta::apply_list<meta::quote<std::tuple>, GeneratorParameters> generators;
 
@@ -91,6 +94,7 @@ class StreamFactory : boost::noncopyable {
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(type));
+      a->Visit(LT_NVP(stdio_debug));
 
       VisitGenerator<Archive> visit_generator(a, this);
       meta::for_each(
@@ -136,6 +140,19 @@ class StreamFactory : boost::noncopyable {
   }
 
  private:
+  void HandleCreate(const boost::system::error_code& ec,
+                    SharedStream stream,
+                    const Parameters& parameters,
+                    StreamHandler handler) {
+    if (ec) {
+      handler(ec, SharedStream());
+    } else if (parameters.stdio_debug) {
+      handler(ec, MakeStdioDebugStream(stream));
+    } else {
+      handler(ec, stream);
+    }
+  }
+
   struct TryCreate {
     TryCreate(StreamFactory* f,
               const Parameters& p,
@@ -151,7 +168,9 @@ class StreamFactory : boost::noncopyable {
         std::get<Index{}>(factory->generators_).AsyncCreate(
             factory->service_,
             *parameters.template Get<Generator>(),
-            handler);
+            std::bind(&StreamFactory::HandleCreate, factory,
+                      std::placeholders::_1,
+                      std::placeholders::_2, parameters, handler));
       }
     }
     StreamFactory* const factory;

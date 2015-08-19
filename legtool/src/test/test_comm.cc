@@ -41,6 +41,7 @@ BOOST_AUTO_TEST_CASE(StreamFactoryTest) {
                  PropertyTreeWriteArchive().Accept(&params).tree());
   std::string expected = R"XX({
     "type": "stdio",
+    "stdio_debug": "false",
     "stdio":
     {
         "in": "0",
