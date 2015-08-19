@@ -29,12 +29,16 @@ crenv.Append(LIBS=['boost_coroutine',
 SOURCES = [
     'comm_factory.cc',
     'herkulex.cc',
+    'telemetry.cc',
     ]
 
 liblegtool = crenv.StaticLibrary('legtool', SOURCES)
 
 herkulex_tool = crenv.Program('herkulex_tool',
                             ['herkulex_tool.cc'] + liblegtool)
+
+telemetry_tool = crenv.Program('telemetry_tool',
+                               ['telemetry_tool.cc'])
 
 bpenv = env.Clone()
 bpenv.Append(LIBS=['boost_python'])
@@ -51,6 +55,7 @@ TESTS = ['test/' + x for x in [
         'test_quaternion.cc',
         'test_ripple.cc',
         'test_signal_result.cc',
+        'test_telemetry_archive.cc',
         'test_tf.cc',
         ]]
 

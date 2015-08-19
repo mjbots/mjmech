@@ -69,4 +69,37 @@ ConvertSecondsToDuration(double time_s) {
   return boost::posix_time::seconds(static_cast<int>(time_s)) +
       boost::posix_time::time_duration(0, 0, 0, counts);
 }
+
+inline int64_t
+ConvertPtimeToMicroseconds(boost::posix_time::ptime time) {
+  if (time.is_pos_infinity()) {
+    return std::numeric_limits<int64_t>::max();
+  } else if (time.is_neg_infinity()) {
+    return std::numeric_limits<int64_t>::min();
+  } else if (time.is_special()) {
+    return 0;
+  }
+
+  const boost::posix_time::ptime epoch(
+      boost::gregorian::date(1970, boost::gregorian::Jan, 1));
+  return (time - epoch).total_microseconds();
+}
+
+inline boost::posix_time::ptime
+ConvertMicrosecondsToPtime(int64_t value) {
+  if (value == std::numeric_limits<int64_t>::max()) {
+    return boost::posix_time::pos_infin;
+  } else if (value == std::numeric_limits<int64_t>::min()) {
+    return boost::posix_time::neg_infin;
+  } else if (value == 0) {
+    return boost::posix_time::ptime();
+  }
+
+  const boost::posix_time::ptime epoch(
+      boost::gregorian::date(1970, boost::gregorian::Jan, 1));
+  return epoch + boost::posix_time::time_duration(
+      0, 0, 0,
+      value *
+      boost::posix_time::time_duration::ticks_per_second() / 1000000);
+}
 }
