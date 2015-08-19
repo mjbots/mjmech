@@ -694,10 +694,10 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     for (const auto& target: targets) {
       uint8_t buf[] = {
-        target.address,
         static_cast<uint8_t>(target.position & 0xff),
         static_cast<uint8_t>((target.position >> 8) & 0xff),
         target.leds,
+        target.address,
       };
       data.write(reinterpret_cast<const char*>(buf), sizeof(buf));
     }
