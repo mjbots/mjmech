@@ -113,7 +113,7 @@ const std::map<std::string, Command> g_commands = {
             ctx.servo.RAM_READ, ctx.options.address,
             reg.position, reg.length, ctx.yield);
         std::cout << (boost::format("Servo %d: Address %d: ") %
-                      static_cast<int>(ctx.options.address),
+                      static_cast<int>(ctx.options.address) %
                       static_cast<int>(reg.position));
         for (char c: response.register_data) {
           std::cout << boost::format(" %02X") % static_cast<int>(c);
