@@ -26,12 +26,26 @@ struct JointAngles {
 
     Joint() {}
     Joint(int ident, double angle_deg) : ident(ident), angle_deg(angle_deg) {}
+    bool operator==(const Joint& rhs) {
+      return ident == rhs.ident && angle_deg == rhs.angle_deg;
+    }
   };
 
   std::vector<Joint> joints;
 
   static JointAngles Invalid() { return JointAngles(); }
   bool Valid() const { return !joints.empty(); }
+
+  double GetLargestChangeDeg(const JointAngles& other) const {
+    BOOST_ASSERT(joints.size() == other.joints.size());
+    double result = 0.0;
+    for (size_t i = 0; i < joints.size(); i++) {
+      BOOST_ASSERT(joints[i].ident == other.joints[i].ident);
+      result = std::max(
+          result, std::abs(joints[i].angle_deg - other.joints[i].angle_deg));
+    }
+    return result;
+  }
 };
 
 class IKSolver : boost::noncopyable {
@@ -76,7 +90,7 @@ class LizardIK : public IKSolver {
     Joint femur;
     Joint tibia;
 
-    double servo_speed_dps = 0;
+    double servo_speed_dps = 360.0;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -193,6 +207,8 @@ class LizardIK : public IKSolver {
         JointAngles::Joint{config_.tibia.ident, tibia_deg});
     return result;
   }
+
+  const Config& config() const { return config_; }
 
  private:
   Config config_;

@@ -13,10 +13,13 @@
 // limitations under the License.
 
 #include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include "comm_factory.h"
 #include "herkulex.h"
 #include "herkulex_servo_interface.h"
+#include "point3d.h"
+#include "leg_ik.h"
 
 using namespace legtool;
 typedef StreamFactory<StdioGenerator,
@@ -201,6 +204,63 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def("poll", &Selector::poll)
       .def("select_servo", &Selector::select_servo)
       .def("controller", &Selector::controller,
+           return_internal_reference<1>())
+      ;
+
+  class_<Point3D>("Point3D", init<double, double, double>())
+      .def(init<>())
+      .def_readwrite("x", &Point3D::x)
+      .def_readwrite("y", &Point3D::y)
+      .def_readwrite("z", &Point3D::z)
+      .def("__str_", &Point3D::str)
+      .def("length", &Point3D::length)
+      .def("length_squared", &Point3D::length_squared)
+      .def("scaled", &Point3D::scaled)
+      .def(self + self)
+      .def(self - self)
+      .def(self == self)
+      ;
+
+  class_<JointAngles::Joint>("JointAnglesJoint")
+      .def_readwrite("ident", &JointAngles::Joint::ident)
+      .def_readwrite("angle_deg", &JointAngles::Joint::angle_deg)
+      ;
+
+  class_<std::vector<JointAngles::Joint> >("JointAnglesList")
+      .def(vector_indexing_suite<std::vector<JointAngles::Joint> >())
+      ;
+
+  class_<JointAngles>("JointAngles")
+      .def_readwrite("joints", &JointAngles::joints)
+      .def("valid", &JointAngles::Valid)
+      .def("largest_change_deg", &JointAngles::GetLargestChangeDeg)
+      ;
+
+  class_<IKSolver, boost::noncopyable>("IKSolver", no_init)
+      .def("solve", &IKSolver::Solve)
+      .def("do_ik", &IKSolver::Solve)
+      ;
+
+  class_<LizardIK::Config::Joint>("LizardIKConfigJoint")
+      .def_readwrite("min_deg", &LizardIK::Config::Joint::min_deg)
+      .def_readwrite("idle_deg", &LizardIK::Config::Joint::idle_deg)
+      .def_readwrite("max_deg", &LizardIK::Config::Joint::max_deg)
+      .def_readwrite("length_mm", &LizardIK::Config::Joint::length_mm)
+      .def_readwrite("sign", &LizardIK::Config::Joint::sign)
+      .def_readwrite("ident", &LizardIK::Config::Joint::ident)
+      ;
+
+  class_<LizardIK::Config>("LizardIKConfig")
+      .def_readwrite("coxa", &LizardIK::Config::coxa)
+      .def_readwrite("femur", &LizardIK::Config::femur)
+      .def_readwrite("tibia", &LizardIK::Config::tibia)
+      .def_readwrite("servo_speed_dps", &LizardIK::Config::servo_speed_dps)
+      ;
+
+  class_<LizardIK, boost::noncopyable>("LizardIK", init<LizardIK::Config>())
+      .def("solve", &LizardIK::Solve)
+      .def("do_ik", &LizardIK::Solve)
+      .def("config", &LizardIK::config,
            return_internal_reference<1>())
       ;
 }
