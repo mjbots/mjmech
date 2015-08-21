@@ -17,6 +17,13 @@ grouping of legs.'''
 
 import bisect
 import math
+import os
+import sys
+
+sys.path.append(
+    os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), '../../src/build'))
+import _legtool
 
 from .common import (STANCE, SWING, UNKNOWN)
 from .common import (LegConfig, MechanicalConfig)
@@ -334,8 +341,11 @@ class RippleGait(object):
                         my_state.robot_frame, leg_robot_frame_point)
 
                     leg_config = self.config.mechanical.leg_config[leg_num]
-                    result = leg_config.leg_ik.do_ik(leg_shoulder_point)
-                    if result is None:
+                    result = leg_config.leg_ik.do_ik(
+                        _legtool.Point3D(leg_shoulder_point.x,
+                                         leg_shoulder_point.y,
+                                         leg_shoulder_point.z))
+                    if not result.valid():
                         # Break, so that we can take action knowing
                         # how far we can go.
                         end_time_s = time_s
@@ -345,8 +355,7 @@ class RippleGait(object):
                         this_old_result = old_ik_result[(direction, leg_num)]
 
                         largest_change_deg = \
-                            leg_config.leg_ik.largest_change_deg(
-                            result, this_old_result)
+                            result.largest_change_deg(this_old_result)
                         this_speed = largest_change_deg / dt
                         if (min_observed_speed is None or
                             this_speed < min_observed_speed):
@@ -374,7 +383,7 @@ class RippleGait(object):
         result.servo_speed_dps = min_swing_speed
 
         any_ik = self.config.mechanical.leg_config.values()[0].leg_ik
-        servo_speed_dps = any_ik.servo_speed_dps()
+        servo_speed_dps = any_ik.config().servo_speed_dps
 
         speed_margin = 0.01 * self.config.servo_speed_margin_percent
         if min_swing_speed > speed_margin * servo_speed_dps:

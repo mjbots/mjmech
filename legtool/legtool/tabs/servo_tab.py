@@ -14,6 +14,8 @@
 
 import functools
 import traceback
+import os
+import sys
 
 import trollius as asyncio
 from trollius import Task, From, Return
@@ -21,11 +23,14 @@ from trollius import Task, From, Return
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-from ..servo import selector
-
 from .common import BoolContext
 
 from . import gazebo_config_dialog
+
+sys.path.append(
+    os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), '../../src/build'))
+import _legtool
 
 def spawn(callback):
     def start():
@@ -77,8 +82,16 @@ class ServoTab(object):
         self.ui.poseList.currentItemChanged.connect(
             self.handle_poselist_current_changed)
 
+        self.selector = _legtool.Selector()
         self.controller = None
         self.servo_update = BoolContext()
+
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.handle_timer)
+        self.timer.start(50)
+
+    def handle_timer(self):
+        self.selector.poll()
 
     def resizeEvent(self, event):
         pass
@@ -99,12 +112,13 @@ class ServoTab(object):
     def handle_connect_clicked(self):
         val = self.ui.typeCombo.currentText().lower()
         try:
-            self.controller = yield From(
-                selector.select_servo(
-                    val,
-                    serial_port=self.ui.serialPortCombo.currentText(),
-                    model_name=self.servo_model,
-                    servo_name_map=self.servo_name_map))
+            future = asyncio.Future()
+            self.selector.select_servo(
+                val.encode('latin1'),
+                self.ui.serialPortCombo.currentText().encode('latin1'),
+                future)
+            yield From(future)
+            self.controller = self.selector.controller()
             self.ui.statusText.setText('connected')
             self.update_connected(True)
         except Exception as e:
@@ -201,17 +215,26 @@ class ServoTab(object):
     @asyncio.coroutine
     def handle_power(self):
         text = self.ui.powerCombo.currentText().lower()
+
+        yield From(set_power(text))
+
+    @asyncio.coroutine
+    def set_power(self, text):
+        if self.controller is None:
+            return
         value = None
         if text == 'free':
-            value = selector.POWER_FREE
+            value = _legtool.PowerState.kPowerFree
         elif text == 'brake':
-            value = selector.POWER_BRAKE
+            value = _legtool.PowerState.kPowerBrake
         elif text == 'drive':
-            value = selector.POWER_ENABLE
+            value = _legtool.PowerState.kPowerEnable
         else:
             raise NotImplementedError()
 
-        yield From(self.controller.enable_power(value))
+        future = asyncio.Future()
+        self.controller.enable_power([], value, future)
+        yield From(future)
 
     def update_connected(self, value):
         self.ui.controlGroup.setEnabled(value)
@@ -237,13 +260,14 @@ class ServoTab(object):
 
                     ident = (ident + 1) % len(self.servo_controls)
 
-                    this_voltage = yield From(
-                        self.controller.get_voltage([ident]))
-                    voltages.update(this_voltage)
+                    future = asyncio.Future()
+                    self.controller.get_voltage([ident], future)
+                    this_voltage = yield From(future)
 
                     # Get all temperatures.
-                    this_temp = yield From(
-                        self.controller.get_temperature([ident]))
+                    future = asyncio.Future()
+                    self.controller.get_temperature([ident], future)
+                    this_temp = yield From(future)
                     temperatures.update(this_temp)
 
                     def non_None(value):
@@ -269,8 +293,17 @@ class ServoTab(object):
 
     @asyncio.coroutine
     def set_single_pose(self, servo_id, value):
-        yield From(
-            self.controller.set_single_pose(servo_id, value, pose_time=0.2))
+        future = asyncio.Future()
+        self.controller.set_pose({servo_id: value}, future)
+        yield From(future)
+
+    @asyncio.coroutine
+    def set_pose(self, joints):
+        if self.controller is None:
+            return
+        future = asyncio.Future()
+        self.controller.set_pose(joints, future)
+        yield From(future)
 
     def handle_servo_slider(self, servo_id, event):
         if self.servo_update.value:
@@ -315,8 +348,9 @@ class ServoTab(object):
     @asyncio.coroutine
     def handle_capture_current(self):
         with self.servo_update:
-            results = yield From(
-                self.controller.get_pose(range(len(self.servo_controls))))
+            future = asyncio.Future()
+            self.controller.get_pose(range(len(self.servo_controls)), future)
+            results = yield From(future)
             for ident, angle in results.iteritems():
                 if angle is None:
                     continue
@@ -367,7 +401,9 @@ class ServoTab(object):
             return
 
         values = self.ui.poseList.currentItem().data(QtCore.Qt.UserRole)
-        yield From(self.controller.set_pose(values, pose_time=1.0))
+        future = asyncio.Future()
+        self.controller.set_pose(values, future)
+        yield From(future)
         with self.servo_update:
             for ident, angle_deg in values.iteritems():
                 control = self.servo_controls[ident]

@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
 from trollius import Task
 
-from ..servo import selector
-from ..gait import leg_ik
+sys.path.append(
+    os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), '../../src/build'))
+import _legtool
+from _legtool import Point3D
 
 from .common import BoolContext
 from . import settings
@@ -137,19 +142,44 @@ class IkTester(object):
         coord1 = coord[0] * self.length_scale
         coord2 = coord[1] * self.length_scale
 
-        point_mm = leg_ik.Point3D(self.x_offset_mm,
-                                  self.y_offset_mm,
-                                  self.z_offset_mm)
+        point_mm = Point3D(self.x_offset_mm,
+                           self.y_offset_mm,
+                           self.z_offset_mm)
         if self.plane == self.PLANE_XY:
-            point_mm += leg_ik.Point3D(coord1, coord2, 0.0)
+            point_mm += Point3D(coord1, coord2, 0.0)
         elif self.plane == self.PLANE_XZ:
-            point_mm += leg_ik.Point3D(coord1, 0.0, coord2)
+            point_mm += Point3D(coord1, 0.0, coord2)
         elif self.plane == self.PLANE_YZ:
-            point_mm += leg_ik.Point3D(0.0, coord1, coord2)
+            point_mm += Point3D(0.0, coord1, coord2)
         else:
             raise RuntimeError('invalid plane:' + str(self.plane))
 
         return point_mm
+
+    def find_worst_case_speed_mm_s(self, ik, point_mm, direction_mm):
+        step_mm = 0.01
+
+        nominal = ik.do_ik(point_mm)
+        if not nominal.valid():
+            return None
+
+        result = None
+        normalized = direction_mm.scaled(1.0 / direction_mm.length())
+        point_step_mm = direction_mm.scaled(step_mm)
+
+        advanced = ik.do_ik(point_mm + point_step_mm)
+
+        for (a, b) in zip(nominal.joints, advanced.joints):
+            assert(a.ident == b.ident)
+
+            if a.angle_deg == b.angle_deg:
+                continue
+
+            this_speed_mm_s = (ik.config().servo_speed_dps * step_mm /
+                               abs(a.angle_deg - b.angle_deg))
+            if result is None or this_speed_mm_s < result:
+                result = this_speed_mm_s
+        return result
 
     def update_scene(self):
         ik = self.leg_ik
@@ -160,10 +190,11 @@ class IkTester(object):
             point_mm = self.coord_to_point((float(x) / self.grid_count,
                                             float(y) / self.grid_count))
             result = ik.do_ik(point_mm)
-            if result is None:
+            if not result.valid():
                 rect.setBrush(QtGui.QBrush(QtCore.Qt.red))
             else:
-                speed = ik.worst_case_speed_mm_s(point_mm, axis)
+                speed = self.find_worst_case_speed_mm_s(
+                    ik, point_mm, axis)
                 if speed is None:
                     rect.setBrush(QtGui.QBrush())
                 else:
@@ -172,31 +203,22 @@ class IkTester(object):
                     rect.setBrush(QtGui.QBrush(color))
 
     def handle_mouse_press(self, cursor):
-        if self.servo_tab.controller is None:
-            return
-        Task(self.servo_tab.controller.enable_power(
-                selector.POWER_ENABLE))
+        Task(self.servo_tab.set_power('enable'))
 
         self.handle_mouse_move(cursor)
 
     def handle_mouse_release(self):
-        if self.servo_tab.controller is None:
-            return
-        Task(self.servo_tab.controller.enable_power(
-                selector.POWER_BRAKE))
+        Task(self.servo_tab.set_power('brake'))
 
     def handle_mouse_move(self, cursor):
-        if self.servo_tab.controller is None:
-            return
-
         point_mm = self.coord_to_point((cursor.x(), cursor.y()))
 
         result = self.leg_ik.do_ik(point_mm)
-        if result is None:
+        if not result.valid():
             # This option isn't possible
             return
 
-        Task(self.servo_tab.controller.set_pose(result.command_dict()))
+        Task(self.servo_tab.set_pose(result.command_dict()))
 
 
 class IkConfigTab(object):
@@ -276,7 +298,7 @@ class IkConfigTab(object):
 
     def get_leg_ik(self, leg_number):
         '''Return an IK solver for the given leg number.'''
-        result = leg_ik.Configuration()
+        result = _legtool.LizardIKConfig()
 
         idle_values = self.servo_tab.pose(
             self.ui.idleCombo.currentText())
@@ -288,33 +310,33 @@ class IkConfigTab(object):
         leg = self.legs.get(leg_number, LegConfig())
         coxa_servo = leg.coxa_ident
 
-        result.coxa_min_deg = minimum_values[coxa_servo]
-        result.coxa_idle_deg = idle_values[coxa_servo]
-        result.coxa_max_deg = maximum_values[coxa_servo]
-        result.coxa_length_mm = self.ui.coxaLengthSpin.value()
-        result.coxa_mass_kg = self.ui.coxaMassSpin.value()
-        result.coxa_sign = leg.coxa_sign
-        result.coxa_ident = coxa_servo
+        result.coxa.min_deg = minimum_values[coxa_servo]
+        result.coxa.idle_deg = idle_values[coxa_servo]
+        result.coxa.max_deg = maximum_values[coxa_servo]
+        result.coxa.length_mm = self.ui.coxaLengthSpin.value()
+        #result.coxa_mass_kg = self.ui.coxaMassSpin.value()
+        result.coxa.sign = leg.coxa_sign
+        result.coxa.ident = coxa_servo
 
         femur_servo = leg.femur_ident
-        result.femur_min_deg = minimum_values[femur_servo]
-        result.femur_idle_deg = idle_values[femur_servo]
-        result.femur_max_deg = maximum_values[femur_servo]
-        result.femur_length_mm = self.ui.femurLengthSpin.value()
-        result.femur_mass_kg = self.ui.femurMassSpin.value()
-        result.femur_sign = leg.femur_sign
-        result.femur_ident = femur_servo
+        result.femur.min_deg = minimum_values[femur_servo]
+        result.femur.idle_deg = idle_values[femur_servo]
+        result.femur.max_deg = maximum_values[femur_servo]
+        result.femur.length_mm = self.ui.femurLengthSpin.value()
+        #result.femur_mass_kg = self.ui.femurMassSpin.value()
+        result.femur.sign = leg.femur_sign
+        result.femur.ident = femur_servo
 
         tibia_servo = leg.tibia_ident
-        result.tibia_min_deg = minimum_values[tibia_servo]
-        result.tibia_idle_deg = idle_values[tibia_servo]
-        result.tibia_max_deg = maximum_values[tibia_servo]
-        result.tibia_length_mm = self.ui.tibiaLengthSpin.value()
-        result.tibia_mass_kg = self.ui.tibiaMassSpin.value()
-        result.tibia_sign = leg.tibia_sign
-        result.tibia_ident = tibia_servo
+        result.tibia.min_deg = minimum_values[tibia_servo]
+        result.tibia.idle_deg = idle_values[tibia_servo]
+        result.tibia.max_deg = maximum_values[tibia_servo]
+        result.tibia.length_mm = self.ui.tibiaLengthSpin.value()
+        #result.tibia_mass_kg = self.ui.tibiaMassSpin.value()
+        result.tibia.sign = leg.tibia_sign
+        result.tibia.ident = tibia_servo
 
-        return leg_ik.LizardIk(result)
+        return _legtool.LizardIK(result)
 
     def update_config_enable(self):
         enable = self.ui.legPresentCombo.currentIndex() == 0
@@ -412,11 +434,11 @@ class IkConfigTab(object):
     def _speed_axis(self):
         value = self.ui.speedAxisCombo.currentIndex()
         if value == 0:
-            return leg_ik.Point3D(1., 0., 0.)
+            return Point3D(1., 0., 0.)
         elif value == 1:
-            return leg_ik.Point3D(0., 1., 0.)
+            return Point3D(0., 1., 0.)
         elif value == 2:
-            return leg_ik.Point3D(0., 0., 1.)
+            return Point3D(0., 0., 1.)
         elif value == 3:
             return None
         else:

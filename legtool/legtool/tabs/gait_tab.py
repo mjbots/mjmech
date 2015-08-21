@@ -16,6 +16,7 @@
 import functools
 import numpy
 import time
+import os
 import sys
 
 import trollius as asyncio
@@ -24,8 +25,12 @@ from trollius import From, Task
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
+sys.path.append(
+    os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), '../../src/build'))
+import _legtool
+
 from ..tf import tf
-from ..servo import selector
 from ..gait import ripple
 
 from . import convexhull
@@ -187,9 +192,11 @@ class GaitGeometryDisplay(object):
 
             shoulder_point = leg.shoulder_frame.map_from_frame(
                 leg.frame, leg.point)
-            ik_result = leg.leg_ik.do_ik(shoulder_point)
+            ik_result = leg.leg_ik.do_ik(_legtool.Point3D(shoulder_point.x,
+                                                          shoulder_point.y,
+                                                          shoulder_point.z))
 
-            if ik_result is None:
+            if not ik_result.valid():
                 color = QtCore.Qt.red
             elif leg.mode == ripple.STANCE:
                 color = QtCore.Qt.green
@@ -779,13 +786,11 @@ class GaitTab(object):
             self.ui.playbackSlowRepeatButton.setChecked(False)
 
             if self.servo_tab.controller:
-                Task(self.servo_tab.controller.enable_power(
-                        selector.POWER_BRAKE))
+                Task(self.servo_tab.controller.set_power('brake'))
             return
 
         if self.servo_tab.controller:
-            Task(self.servo_tab.controller.enable_power(
-                    selector.POWER_ENABLE))
+            Task(self.servo_tab.controller.set_power('drive'))
 
         # Update the leg list widget.
         available_legs = self.ikconfig_tab.get_all_legs()
