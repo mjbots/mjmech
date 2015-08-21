@@ -16,6 +16,7 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include "comm_factory.h"
+#include "gait.h"
 #include "herkulex.h"
 #include "herkulex_servo_interface.h"
 #include "point3d.h"
@@ -216,6 +217,7 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def("length", &Point3D::length)
       .def("length_squared", &Point3D::length_squared)
       .def("scaled", &Point3D::scaled)
+      .def("__getitem__", &Point3D::operator[])
       .def(self + self)
       .def(self - self)
       .def(self == self)
@@ -263,4 +265,11 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def("config", &LizardIK::config,
            return_internal_reference<1>())
       ;
+
+  enum_<Leg::Mode>("LegMode")
+      .value("kStance", Leg::Mode::kStance)
+      .value("kSwing", Leg::Mode::kSwing)
+      .value("kUnknown", Leg::Mode::kUnknown)
+      ;
+
 }
