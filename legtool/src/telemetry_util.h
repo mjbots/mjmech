@@ -131,9 +131,6 @@ class TelemetrySchemaReader {
 
   void RenderVariableSize(int indent, uint32_t num_elements,
                           DataPolicy data_policy) {
-    // TODO jpieper: I was in the process of implementing and
-    // testing this, after which I need to refactor it to work
-    // with vectors and then make kObject do something sane.
     RecordingInputSource ris(stream_.stream());
     boost::iostreams::stream<
       RecordingInputSource> io_stream(ris, 1, 1);
