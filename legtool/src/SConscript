@@ -47,16 +47,16 @@ pylegtool = bpenv.SharedLibrary('_legtool', SOURCES + ['py_legtool.cc'],
                                 LIBPREFIX='')
 
 TESTS = ['test/' + x for x in [
-        'test_comm.cc',
-        'test_herkulex.cc',
-        'test_leg_ik.cc',
+        'comm_test.cc',
+        'herkulex_test.cc',
+        'leg_ik_test.cc',
         'test_main.cc',
-        'test_property_tree_archive.cc',
-        'test_quaternion.cc',
-        'test_ripple.cc',
-        'test_signal_result.cc',
-        'test_telemetry_archive.cc',
-        'test_tf.cc',
+        'property_tree_archive_test.cc',
+        'quaternion_test.cc',
+        'ripple_test.cc',
+        'signal_result_test.cc',
+        'telemetry_archive_test.cc',
+        'tf_test.cc',
         ]]
 
 testenv = crenv.Clone()
