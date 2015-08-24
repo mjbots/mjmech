@@ -54,7 +54,7 @@ void SanityCheckState(const T& state) {
   BOOST_CHECK_GE(stance_legs, 2);
 }
 
-std::shared_ptr<IKSolver> MakeIKSolver(int start_servo_num) {
+boost::shared_ptr<IKSolver> MakeIKSolver(int start_servo_num) {
   LizardIK::Config config;
   config.coxa.min_deg = -120.0;
   config.coxa.idle_deg = 0.0;
@@ -76,7 +76,7 @@ std::shared_ptr<IKSolver> MakeIKSolver(int start_servo_num) {
 
   config.servo_speed_dps = 360.0;
 
-  return std::shared_ptr<IKSolver>(new LizardIK(config));
+  return boost::shared_ptr<IKSolver>(new LizardIK(config));
 }
 
 RippleConfig MakeConfig() {

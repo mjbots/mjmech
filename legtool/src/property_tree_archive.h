@@ -18,18 +18,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "visit_archive.h"
 #include "visitor.h"
 
 namespace legtool {
-class PropertyTreeWriteArchive {
+class PropertyTreeWriteArchive
+    : public VisitArchive<PropertyTreeWriteArchive> {
  public:
   typedef boost::property_tree::ptree ptree;
-
-  template <typename Serializable>
-  PropertyTreeWriteArchive& Accept(Serializable* object) {
-    object->Serialize(this);
-    return *this;
-  }
 
   template <typename NameValuePair>
   void Visit(const NameValuePair& pair) {
@@ -62,6 +58,66 @@ class PropertyTreeWriteArchive {
   }
 
   boost::property_tree::ptree tree() const { return tree_; }
+
+ private:
+  boost::property_tree::ptree tree_;
+};
+
+class PropertyTreeReadArchive
+    : public VisitArchive<PropertyTreeReadArchive> {
+ public:
+  PropertyTreeReadArchive(const boost::property_tree::ptree& tree)
+      : tree_(tree) {}
+
+  template <typename NameValuePair>
+  void VisitSerializable(const NameValuePair& pair) {
+    if (!tree_.get_child_optional(pair.name())) { return; }
+    PropertyTreeReadArchive(tree_.get_child(pair.name())).
+        Accept(pair.value());
+  }
+
+  template <typename NameValuePair>
+  void VisitScalar(const NameValuePair& pair) {
+    VisitHelper(pair.name(), pair.value(), 0);
+  }
+
+  template <typename T>
+  class FakeNvp {
+   public:
+    FakeNvp(const char* name, T* value): name_(name), value_(value) {}
+
+    const char* name() const { return name_; }
+    T* value() const { return value_; }
+
+   private:
+    const char* const name_;
+    T* const value_;
+  };
+
+  template <typename T>
+  void VisitHelper(const char* name,
+                   std::vector<T>* value_vector,
+                   int) {
+    auto optional_child = tree_.get_child_optional(name);
+    if (!optional_child) { return; }
+    auto child = *optional_child;
+    value_vector->clear();
+    for (auto it = child.begin(); it != child.end(); ++it) {
+      value_vector->push_back(T());
+      PropertyTreeReadArchive(it->second).
+          Visit(FakeNvp<T>("", &value_vector->back()));
+    }
+  }
+
+  template <typename T>
+  void VisitHelper(const char* name,
+                   T* value,
+                   long) {
+    auto optional_child = tree_.get_child_optional(name);
+    if (!optional_child) { return; }
+    auto child = *optional_child;
+    *value = child.template get_value<T>();
+  }
 
  private:
   boost::property_tree::ptree tree_;

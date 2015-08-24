@@ -21,8 +21,9 @@ namespace legtool {
 template <typename Derived>
 struct VisitArchive {
   template <typename Serializable>
-  void Accept(Serializable* serializable) {
+  Derived& Accept(Serializable* serializable) {
     serializable->Serialize(static_cast<Derived*>(this));
+    return *static_cast<Derived*>(this);
   }
 
   template <typename NameValuePair>

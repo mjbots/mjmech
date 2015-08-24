@@ -30,13 +30,15 @@ struct Leg {
   struct Config {
     Point3D mount_mm;
     Point3D idle_mm;
-    std::shared_ptr<IKSolver> leg_ik;
+    boost::shared_ptr<IKSolver> leg_ik;
 
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(mount_mm));
       a->Visit(LT_NVP(idle_mm));
     }
+
+    bool operator==(const Config& rhs) const { return true; }
   };
 
   struct Result {

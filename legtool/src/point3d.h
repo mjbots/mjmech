@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "visitor.h"
+
 namespace legtool {
 struct Point3D {
   double x;
@@ -58,6 +60,13 @@ struct Point3D {
 
   Point3D scaled(double value) const {
     return Point3D{x * value, y * value, z * value};
+  }
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(x));
+    a->Visit(LT_NVP(y));
+    a->Visit(LT_NVP(z));
   }
 };
 }

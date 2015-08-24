@@ -89,6 +89,8 @@ struct RippleState : public CommonState {
   struct Leg : public legtool::Leg::State {
     boost::optional<Point3D> swing_start_pos;
     boost::optional<Point3D> swing_end_pos;
+
+    bool operator==(const Leg& rhs) const { return true; }
   };
 
   std::vector<Leg> legs;
@@ -134,6 +136,10 @@ class RippleGait : public Gait {
   }
 
   virtual ~RippleGait() {}
+
+  void SetState(const RippleState& state) {
+    state_ = state;
+  }
 
   virtual Result SetCommand(const Command& command) override {
     Command command_copy = command;
@@ -194,6 +200,49 @@ class RippleGait : public Gait {
   }
 
   const RippleState& state() const { return state_; }
+  const Options& options() const { return options_; }
+  const Command& command() const { return command_; }
+
+  RippleState GetIdleState() const {
+    RippleState result;
+
+    result.body_frame.transform.translation.z = config_.body_z_offset_mm;
+
+    for (const auto& leg_config: config_.mechanical.leg_config) {
+      Point3D point;
+
+      const double x_sign = GetSign(leg_config.mount_mm.x);
+      point.x = leg_config.mount_mm.x + leg_config.idle_mm.x * x_sign;
+
+      const double y_sign = GetSign(leg_config.mount_mm.y);
+      point.y = leg_config.mount_mm.y + leg_config.idle_mm.y * y_sign;
+
+      point.z = leg_config.mount_mm.z +
+          leg_config.idle_mm.z -
+          config_.body_z_offset_mm;
+
+      RippleState::Leg leg_state;
+      leg_state.point = result.world_frame.MapFromFrame(
+          &result.body_frame, point);
+      leg_state.frame = &result.world_frame;
+      leg_state.mode = Leg::Mode::kStance;
+
+      // For now, we are assuming that shoulders face away from the y
+      // axis.
+      const double rotation_rad = (leg_config.mount_mm.x > 0.0) ?
+                                  (0.5 * M_PI) : (-0.5 * M_PI);
+      leg_state.shoulder_frame.transform = Transform(
+          leg_config.mount_mm,
+          Quaternion::FromEuler(0, 0, rotation_rad));
+      leg_state.shoulder_frame.parent = &result.body_frame;
+
+      leg_state.leg_ik = leg_config.leg_ik.get();
+
+      result.legs.push_back(leg_state);
+    }
+
+    return result;
+  }
 
  private:
   struct Action;
@@ -461,47 +510,6 @@ class RippleGait : public Gait {
     // TODO jpieper: This should map from whatever frame the idle
     // state leg was actually in.
     return end_frame.MapToParent(idle_state_.legs.at(leg_num).point);
-  }
-
-  RippleState GetIdleState() const {
-    RippleState result;
-
-    result.body_frame.transform.translation.z = config_.body_z_offset_mm;
-
-    for (const auto& leg_config: config_.mechanical.leg_config) {
-      Point3D point;
-
-      const double x_sign = GetSign(leg_config.mount_mm.x);
-      point.x = leg_config.mount_mm.x + leg_config.idle_mm.x * x_sign;
-
-      const double y_sign = GetSign(leg_config.mount_mm.y);
-      point.y = leg_config.mount_mm.y + leg_config.idle_mm.y * y_sign;
-
-      point.z = leg_config.mount_mm.z +
-          leg_config.idle_mm.z -
-          config_.body_z_offset_mm;
-
-      RippleState::Leg leg_state;
-      leg_state.point = result.world_frame.MapFromFrame(
-          &result.body_frame, point);
-      leg_state.frame = &result.world_frame;
-      leg_state.mode = Leg::Mode::kStance;
-
-      // For now, we are assuming that shoulders face away from the y
-      // axis.
-      const double rotation_rad = (leg_config.mount_mm.x > 0.0) ?
-                                  (0.5 * M_PI) : (-0.5 * M_PI);
-      leg_state.shoulder_frame.transform = Transform(
-          leg_config.mount_mm,
-          Quaternion::FromEuler(0, 0, rotation_rad));
-      leg_state.shoulder_frame.parent = &result.body_frame;
-
-      leg_state.leg_ik = leg_config.leg_ik.get();
-
-      result.legs.push_back(leg_state);
-    }
-
-    return result;
   }
 
   std::vector<Action> GetActionList() const {

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -19,8 +20,10 @@
 #include "gait.h"
 #include "herkulex.h"
 #include "herkulex_servo_interface.h"
-#include "point3d.h"
 #include "leg_ik.h"
+#include "point3d.h"
+#include "property_tree_archive.h"
+#include "ripple.h"
 
 using namespace legtool;
 typedef StreamFactory<StdioGenerator,
@@ -41,7 +44,6 @@ void HandleCallback(bp::object future,
   } else {
     future.attr("set_result")(result);
   }
-}
 }
 
 class ServoInterfaceWrapper : boost::noncopyable {
@@ -179,6 +181,54 @@ class Selector : boost::noncopyable {
   bool started_{false};
 };
 
+template <typename Serializable>
+Serializable SerializableReadSettings(bp::object dict) {
+  Serializable object{};
+  bp::object json = bp::import("json");
+  bp::object json_data = json.attr("dumps")(dict);
+  std::string json_str = bp::extract<std::string>(bp::str(json_data));
+
+  boost::property_tree::ptree tree;
+  std::istringstream istr(json_str);
+  boost::property_tree::read_json(istr, tree);
+
+  PropertyTreeReadArchive(tree).Accept(&object);
+  return object;
+}
+
+void CopyPtreeToDict(const boost::property_tree::ptree& tree,
+                     bp::object out) {
+  for (auto it = tree.begin(); it != tree.end(); ++it) {
+    if (!it->second.empty()) {
+      bp::dict subdict;
+      CopyPtreeToDict(it->second, subdict);
+      out[it->first] = subdict;
+    } else {
+      out[it->first] = it->second.get_value<std::string>();
+    }
+  }
+}
+
+template <typename Serializable>
+void SerializableWriteSettings(const Serializable* object,
+                               bp::object out) {
+  auto tree = PropertyTreeWriteArchive().
+      Accept(const_cast<Serializable*>(object)).tree();
+  // Copy this property tree into the python output dict.
+  CopyPtreeToDict(tree, out);
+}
+
+boost::shared_ptr<IKSolver> MakeIKSolver(std::auto_ptr<LizardIK> lizard_ik) {
+  auto result = boost::shared_ptr<IKSolver>(lizard_ik.get());
+  lizard_ik.release();
+  return result;
+}
+
+LizardIK* MakeLizardIK(const LizardIK::Config& config) {
+  return new LizardIK(config);
+}
+}
+
 BOOST_PYTHON_MODULE(_legtool) {
   using namespace boost::python;
 
@@ -232,13 +282,23 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def(vector_indexing_suite<std::vector<JointAngles::Joint> >())
       ;
 
+  class_<std::vector<int> >("vector_int")
+      .def(vector_indexing_suite<std::vector<int> >())
+      ;
+
+  class_<std::vector<std::vector<int > > >("vector_vector_int")
+      .def(vector_indexing_suite<std::vector<std::vector<int> > >())
+      ;
+
   class_<JointAngles>("JointAngles")
       .def_readwrite("joints", &JointAngles::joints)
       .def("valid", &JointAngles::Valid)
       .def("largest_change_deg", &JointAngles::GetLargestChangeDeg)
       ;
 
-  class_<IKSolver, boost::noncopyable>("IKSolver", no_init)
+  class_<IKSolver,
+         boost::shared_ptr<IKSolver>,
+         boost::noncopyable>("IKSolver", no_init)
       .def("solve", &IKSolver::Solve)
       .def("do_ik", &IKSolver::Solve)
       ;
@@ -257,6 +317,7 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def_readwrite("femur", &LizardIK::Config::femur)
       .def_readwrite("tibia", &LizardIK::Config::tibia)
       .def_readwrite("servo_speed_dps", &LizardIK::Config::servo_speed_dps)
+      .def("write_settings", &SerializableWriteSettings<LizardIK::Config>)
       ;
 
   class_<LizardIK, boost::noncopyable>("LizardIK", init<LizardIK::Config>())
@@ -264,6 +325,9 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def("do_ik", &LizardIK::Solve)
       .def("config", &LizardIK::config,
            return_internal_reference<1>())
+      .def("create", &MakeLizardIK,
+           return_value_policy<manage_new_object>())
+      .staticmethod("create")
       ;
 
   enum_<Leg::Mode>("LegMode")
@@ -272,4 +336,123 @@ BOOST_PYTHON_MODULE(_legtool) {
       .value("kUnknown", Leg::Mode::kUnknown)
       ;
 
+  class_<Leg::Config>("LegConfig")
+      .def_readwrite("mount_mm", &Leg::Config::mount_mm)
+      .def_readwrite("idle_mm", &Leg::Config::idle_mm)
+      .def_readwrite("leg_ik", &Leg::Config::leg_ik)
+      ;
+
+  class_<std::vector<Leg::Config> >("LegConfigList")
+      .def(vector_indexing_suite<std::vector<Leg::Config> >())
+      ;
+
+  class_<MechanicalConfig>("MechanicalConfig")
+      .def_readwrite("leg_config", &MechanicalConfig::leg_config)
+      .def_readwrite("body_cog_mm", &MechanicalConfig::body_cog_mm)
+      ;
+
+  class_<RippleConfig>("RippleConfig")
+      .def(init<RippleConfig>())
+      .def_readwrite("mechanical", &RippleConfig::mechanical)
+      .def_readwrite("max_cycle_time_s", &RippleConfig::max_cycle_time_s)
+      .def_readwrite("lift_height_mm", &RippleConfig::lift_height_mm)
+      .def_readwrite("lift_percent", &RippleConfig::lift_percent)
+      .def_readwrite("swing_percent", &RippleConfig::swing_percent)
+      .def_readwrite("position_margin_percent",
+                     &RippleConfig::position_margin_percent)
+      .def_readwrite("leg_order", &RippleConfig::leg_order)
+      .def_readwrite("body_z_offset_mm", &RippleConfig::body_z_offset_mm)
+      .def_readwrite("servo_speed_margin_percent",
+                     &RippleConfig::servo_speed_margin_percent)
+      .def_readwrite("statically_stable", &RippleConfig::statically_stable)
+      .def_readwrite("static_center_factor",
+                     &RippleConfig::static_center_factor)
+      .def_readwrite("static_stable_factor",
+                     &RippleConfig::static_stable_factor)
+      .def_readwrite("static_margin_mm", &RippleConfig::static_margin_mm)
+      .def_readwrite("servo_speed_dps", &RippleConfig::servo_speed_dps)
+      .def("read_settings", &SerializableReadSettings<RippleConfig>)
+      .staticmethod("read_settings")
+      .def("write_settings", &SerializableWriteSettings<RippleConfig>)
+      ;
+
+  class_<JointCommand::Joint>("JointCommandJoint")
+      .def_readwrite("servo_number", &JointCommand::Joint::servo_number)
+      .def_readwrite("angle_deg", &JointCommand::Joint::angle_deg)
+      ;
+
+  class_<JointCommand>("JointCommand")
+      .def_readwrite("joints", &JointCommand::joints)
+      ;
+
+  enum_<RippleGait::Result>("RippleGaitResult")
+      .value("kValid", RippleGait::Result::kValid)
+      .value("kNotSupported", RippleGait::Result::kNotSupported)
+      ;
+
+  class_<Command>("Command")
+      .def(init<Command>())
+      .def_readwrite("translate_x_mm_s", &Command::translate_x_mm_s)
+      .def_readwrite("translate_y_mm_s", &Command::translate_y_mm_s)
+      .def_readwrite("rotate_deg_s", &Command::rotate_deg_s)
+      .def_readwrite("body_x_mm", &Command::body_x_mm)
+      .def_readwrite("body_y_mm", &Command::body_y_mm)
+      .def_readwrite("body_z_mm", &Command::body_z_mm)
+      .def_readwrite("body_pitch_deg", &Command::body_pitch_deg)
+      .def_readwrite("body_roll_deg", &Command::body_roll_deg)
+      .def_readwrite("body_yaw_deg", &Command::body_yaw_deg)
+      .def_readwrite("lift_height_percent", &Command::lift_height_percent)
+      ;
+
+  class_<Frame, boost::noncopyable>("Frame")
+      .def("map_to_frame", &Frame::MapToFrame<Point3D>)
+      .def("map_from_frame", &Frame::MapFromFrame<Point3D>)
+      .def("map_to_parent", &Frame::MapToParent<Point3D>)
+      .def("map_from_parent", &Frame::MapFromParent<Point3D>)
+      ;
+
+  class_<RippleState::Leg>("RippleStateLeg")
+      .def_readwrite("point", &RippleState::Leg::point)
+      .def_readwrite("mode", &RippleState::Leg::mode)
+      .def_readwrite("leg_ik", &RippleState::Leg::leg_ik)
+      .def_readwrite("frame", &RippleState::Leg::frame)
+      .def_readwrite("swing_start_pos", &RippleState::Leg::swing_start_pos)
+      .def_readwrite("swing_end_pos", &RippleState::Leg::swing_end_pos)
+      ;
+
+  class_<std::vector<RippleState::Leg> >("RippleStateLegList")
+      .def(vector_indexing_suite<std::vector<RippleState::Leg> >())
+      ;
+
+  class_<RippleState>("RippleState", init<>())
+      .def(init<RippleState>())
+      .def_readwrite("phase", &RippleState::phase)
+      .def_readwrite("action", &RippleState::action)
+      .def_readwrite("legs", &RippleState::legs)
+      .def_readwrite("world_frame", &RippleState::world_frame)
+      .def_readwrite("robot_frame", &RippleState::robot_frame)
+      .def_readwrite("body_frame", &RippleState::body_frame)
+      .def_readwrite("cog_frame", &RippleState::cog_frame)
+      ;
+
+  class_<Options>("Options")
+      .def_readwrite("cycle_time_s", &Options::cycle_time_s)
+      .def_readwrite("servo_speed_dps", &Options::servo_speed_dps)
+      ;
+
+  class_<RippleGait, boost::noncopyable>("RippleGait", init<RippleConfig>())
+      .def("advance_phase", &RippleGait::AdvancePhase)
+      .def("advance_time", &RippleGait::AdvanceTime)
+      .def("set_command", &RippleGait::SetCommand)
+      .def("get_idle_state", &RippleGait::GetIdleState)
+      .def("state", &RippleGait::state,
+           return_internal_reference<1>())
+      .def("set_state", &RippleGait::SetState)
+      .def("options", &RippleGait::options,
+           return_internal_reference<1>())
+      .def("command", &RippleGait::command,
+           return_internal_reference<1>())
+      ;
+
+  def("make_iksolver", &MakeIKSolver);
 }
