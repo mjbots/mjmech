@@ -97,6 +97,12 @@ struct RippleState : public CommonState {
 
   RippleState() {}
   RippleState(const RippleState& rhs) : CommonState(rhs) {
+    *this = rhs;
+  }
+
+  RippleState& operator=(const RippleState& rhs) {
+    *static_cast<CommonState*>(this) =
+        *(static_cast<const CommonState*>(&rhs));
     legs = rhs.legs;
 
     auto map_frame = [this, &rhs](const Frame* frame) {
@@ -118,6 +124,7 @@ struct RippleState : public CommonState {
       leg.frame = map_frame(leg.frame);
       leg.shoulder_frame.parent = &body_frame;
     }
+    return *this;
   }
 };
 

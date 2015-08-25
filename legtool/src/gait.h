@@ -106,11 +106,17 @@ struct CommonState {
       cog_frame({}, {}, &body_frame) {}
 
   CommonState(const CommonState& rhs) : CommonState() {
+    *this = rhs;
+  }
+
+  CommonState& operator=(const CommonState& rhs) {
     world_frame.transform = rhs.world_frame.transform;
     robot_frame.transform = rhs.robot_frame.transform;
     body_frame.transform = rhs.body_frame.transform;
     cog_frame.transform = rhs.cog_frame.transform;
+    return *this;
   };
+
 };
 
 struct JointCommand {
