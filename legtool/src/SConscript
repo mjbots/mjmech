@@ -29,6 +29,8 @@ crenv.Append(LIBS=['boost_coroutine',
 SOURCES = [
     'comm_factory.cc',
     'herkulex.cc',
+    'telemetry_log.cc',
+    'telemetry_registry.cc',
     ]
 
 liblegtool = crenv.StaticLibrary('legtool', SOURCES)
@@ -55,6 +57,8 @@ TESTS = ['test/' + x for x in [
         'ripple_test.cc',
         'signal_result_test.cc',
         'telemetry_archive_test.cc',
+        'telemetry_log_test.cc',
+        'telemetry_registry_test.cc',
         'tf_test.cc',
         ]]
 
@@ -67,3 +71,6 @@ testenv.Command('test_legtool.passed', test_legtool,
 
 comm_manual_test = crenv.Program('comm_manual_test',
                                  ['test/comm_manual_test.cc'] + liblegtool)
+telemetry_log_test = crenv.Program(
+    'telemetry_log_manual_test',
+    ['test/telemetry_log_manual_test.cc'] + liblegtool)

@@ -28,7 +28,7 @@
 ///      * all values are stored little-endian
 ///
 /// TelemetryLog:
-///   * TLOG0001
+///   * TLOG0002
 ///   * N Block s
 ///
 /// Block
@@ -41,6 +41,8 @@
 ///   2 - BlockData
 ///
 /// BlockSchema
+///  * BlockSchemaFlags
+///  * pstring name
 ///  * Schema
 ///
 /// BlockData
@@ -141,14 +143,23 @@
 namespace legtool {
 
 struct TelemetryFormat {
-  const char* TelemetryLogHeader = "TLOG0001";
+  static constexpr const char* kHeader = "TLOG0002";
 
   enum class BlockType {
     kBlockSchema = 1,
     kBlockData = 2,
   };
 
+  enum class BlockSchemaFlags {
+  };
+
   enum class BlockDataFlags {
+    // TODO jpieper: The following flags could be useful.
+    //
+    //  * SchemaCRC: Include a CRC of the schema which generated this
+    //    data block for consistency checking.
+    //  * Previous offset: Record an offset to the previous record of
+    //    this identifier.
   };
 
   enum class SchemaFlags {
@@ -191,11 +202,12 @@ struct TelemetryFormat {
   };
 };
 
+template <typename Stream>
 class TelemetryWriteStream {
  public:
   typedef TelemetryFormat TF;
 
-  TelemetryWriteStream(std::ostream& ostr) : ostr_(ostr) {}
+  TelemetryWriteStream(Stream& ostr) : ostr_(ostr) {}
 
   void Write(const std::string& data) {
     if (data.size() >
@@ -240,7 +252,7 @@ class TelemetryWriteStream {
     RawWrite(reinterpret_cast<const char*>(&value), sizeof(value));
   }
 
-  std::ostream& ostr_;
+  Stream& ostr_;
 };
 
 class TelemetryReadStream {
@@ -251,7 +263,7 @@ class TelemetryReadStream {
   std::istream& stream() { return istr_; }
 
   template <typename T>
-  T Read() {
+  inline T Read() {
     return ReadScalar<T>();
   }
 
@@ -274,14 +286,14 @@ class TelemetryReadStream {
 };
 
 template <>
-boost::posix_time::ptime
+inline boost::posix_time::ptime
 TelemetryReadStream::Read<boost::posix_time::ptime>() {
   int64_t value = Read<int64_t>();
   return ConvertMicrosecondsToPtime(value);
 }
 
 template <>
-std::string
+inline std::string
 TelemetryReadStream::Read<std::string>() {
   uint32_t size = Read<uint32_t>();
   if (size > static_cast<std::size_t>(TF::BlockOffsets::kMaxBlockSize)) {

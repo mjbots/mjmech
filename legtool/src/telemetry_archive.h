@@ -16,6 +16,7 @@
 
 #include <boost/assert.hpp>
 
+#include "fast_stream.h"
 #include "telemetry_format.h"
 #include "visit_archive.h"
 
@@ -32,16 +33,17 @@ class TelemetryWriteArchive {
   std::string schema() const { return schema_; }
 
   std::string Serialize(const RootSerializable* serializable) const {
-    std::ostringstream ostr;
-    TelemetryWriteStream stream(ostr);
-    DataVisitor visitor(stream);
+    FastOStringStream ostr;
+    TelemetryWriteStream<FastOStringStream> stream(ostr);
+
+    DataVisitor<TelemetryWriteStream<FastOStringStream> > visitor(stream);
     visitor.Accept(const_cast<RootSerializable*>(serializable));
     return ostr.str();
   }
 
   static std::string MakeSchema() {
-    std::ostringstream ostr;
-    TelemetryWriteStream stream(ostr);
+    FastOStringStream ostr;
+    TelemetryWriteStream<FastOStringStream> stream(ostr);
 
     stream.Write(static_cast<uint32_t>(0)); // SchemaFlags
 
@@ -51,10 +53,11 @@ class TelemetryWriteArchive {
   }
 
  private:
-  template <typename Serializable>
-  static void WriteSchemaObject(TelemetryWriteStream& stream,
+  template <typename WriteStream,
+            typename Serializable>
+  static void WriteSchemaObject(WriteStream& stream,
                                 Serializable* serializable) {
-    SchemaVisitor visitor(stream);
+    SchemaVisitor<WriteStream> visitor(stream);
     visitor.Accept(serializable);
 
     visitor.Finish();
@@ -68,9 +71,10 @@ class TelemetryWriteArchive {
     T* const value_;
   };
 
-  class SchemaVisitor : public VisitArchive<SchemaVisitor> {
+  template <typename WriteStream>
+  class SchemaVisitor : public VisitArchive<SchemaVisitor<WriteStream>> {
    public:
-    SchemaVisitor(TelemetryWriteStream& stream) : stream_(stream) {
+    SchemaVisitor(WriteStream& stream) : stream_(stream) {
       stream.Write(static_cast<uint32_t>(0)); // ObjectFlags
     }
 
@@ -159,12 +163,13 @@ class TelemetryWriteArchive {
     }
 
 
-    TelemetryWriteStream& stream_;
+    WriteStream& stream_;
   };
 
-  class DataVisitor : public VisitArchive<DataVisitor> {
+  template <typename WriteStream>
+  class DataVisitor : public VisitArchive<DataVisitor<WriteStream>> {
    public:
-    DataVisitor(TelemetryWriteStream& stream) : stream_(stream) {}
+    DataVisitor(WriteStream& stream) : stream_(stream) {}
 
     template <typename NameValuePair>
     void VisitSerializable(const NameValuePair& pair) {
@@ -232,7 +237,7 @@ class TelemetryWriteArchive {
       stream_.Write(*pair.value());
     }
 
-    TelemetryWriteStream& stream_;
+    WriteStream& stream_;
   };
 
   static TF::FieldType FindType(bool*) { return TF::FieldType::kBool; }
