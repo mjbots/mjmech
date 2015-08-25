@@ -196,16 +196,22 @@ Serializable SerializableReadSettings(bp::object dict) {
   return object;
 }
 
-void CopyPtreeToDict(const boost::property_tree::ptree& tree,
-                     bp::object out) {
-  for (auto it = tree.begin(); it != tree.end(); ++it) {
-    if (!it->second.empty()) {
-      bp::dict subdict;
-      CopyPtreeToDict(it->second, subdict);
-      out[it->first] = subdict;
-    } else {
-      out[it->first] = it->second.get_value<std::string>();
+bp::object ConvertPtree(const boost::property_tree::ptree& tree) {
+  if (tree.empty()) {
+    return bp::str(tree.get_value<std::string>());
+  } else if (tree.begin()->first.empty()) {
+    // This must be a list.
+    bp::list result;
+    for (auto it = tree.begin(); it != tree.end(); ++it) {
+      result.append(ConvertPtree(it->second));
     }
+    return result;
+  } else {
+    bp::dict result;
+    for (auto it = tree.begin(); it != tree.end(); ++it) {
+      result[it->first] = ConvertPtree(it->second);
+    }
+    return result;
   }
 }
 
@@ -215,7 +221,12 @@ void SerializableWriteSettings(const Serializable* object,
   auto tree = PropertyTreeWriteArchive().
       Accept(const_cast<Serializable*>(object)).tree();
   // Copy this property tree into the python output dict.
-  CopyPtreeToDict(tree, out);
+  bp::object result = ConvertPtree(tree);
+  bp::dict result_dict(result);
+  bp::list keys = result_dict.keys();
+  for (int i = 0; i < bp::len(keys); ++i) {
+    out[keys[i]] = result_dict[keys[i]];
+  }
 }
 
 boost::shared_ptr<IKSolver> MakeIKSolver(std::auto_ptr<LizardIK> lizard_ik) {
