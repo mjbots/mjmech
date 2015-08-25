@@ -29,7 +29,6 @@ crenv.Append(LIBS=['boost_coroutine',
 SOURCES = [
     'comm_factory.cc',
     'herkulex.cc',
-    'telemetry.cc',
     ]
 
 liblegtool = crenv.StaticLibrary('legtool', SOURCES)
