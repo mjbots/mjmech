@@ -32,12 +32,18 @@ class TelemetryWriteArchive {
 
   std::string schema() const { return schema_; }
 
-  std::string Serialize(const RootSerializable* serializable) const {
-    FastOStringStream ostr;
-    TelemetryWriteStream<FastOStringStream> stream(ostr);
+  template <typename OStream>
+  static void Serialize(const RootSerializable* serializable,
+                        OStream& stream_in) {
+    TelemetryWriteStream<OStream> stream(stream_in);
 
     DataVisitor<TelemetryWriteStream<FastOStringStream> > visitor(stream);
     visitor.Accept(const_cast<RootSerializable*>(serializable));
+  }
+
+  static std::string Serialize(const RootSerializable* serializable) {
+    FastOStringStream ostr;
+    Serialize(serializable, ostr);
     return ostr.str();
   }
 

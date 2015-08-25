@@ -51,9 +51,13 @@ int work(int argc, char** argv) {
   log.SetRealtime(realtime);
   log.Open(output);
 
+  std::string to_write(size, ' ');
+
   for (int i = 0; i < count; i++) {
+    auto buffer = log.GetBuffer();
+    buffer->write(to_write.data(), to_write.size());
     log.WriteBlock(TelemetryFormat::BlockType::kBlockData,
-                   std::string(size, ' '));
+                   std::move(buffer));
     ::usleep(delay_us);
   }
 

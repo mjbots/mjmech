@@ -18,19 +18,23 @@
 
 #include <cstdio>
 #include <list>
+#include <mutex>
 #include <thread>
 
 #include <boost/asio/deadline_timer.hpp>
 
-#include "fast_stream.h"
+#include "circular_buffer.h"
+#include "move_wrapper.h"
 
 namespace legtool {
 
 namespace {
 const int64_t kBlockSize = (1 << 20);
 const double kFlushTimeout_s = 1.0;
+const size_t kBufferStartPadding = 16;
+}
 
-class ThreadWriter : boost::noncopyable {
+class TelemetryLog::ThreadWriter : boost::noncopyable {
  public:
   ThreadWriter(const std::string& name, bool realtime)
       : ThreadWriter(OpenName(name), realtime) {}
@@ -60,9 +64,41 @@ class ThreadWriter : boost::noncopyable {
     service_.post(std::bind(&ThreadWriter::HandleFlush, this));
   }
 
-  void Write(const std::string& data) {
+  class WriteHandler {
+   public:
+    WriteHandler(WriteHandler&& rhs)
+      : parent_(rhs.parent_), ostr_(std::move(rhs.ostr_)) {}
+    WriteHandler(ThreadWriter* parent,
+                 std::unique_ptr<OStream> ostr)
+        : parent_(parent), ostr_(std::move(ostr)) {}
+
+    WriteHandler(const WriteHandler&) = delete;
+
+    void operator()() { parent_->HandleWrite(std::move(ostr_)); }
+
+   private:
+    ThreadWriter* const parent_;
+    std::unique_ptr<OStream> ostr_;
+  };
+
+  void Write(std::unique_ptr<OStream> buffer) {
     BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
-    service_.post(std::bind(&ThreadWriter::HandleWrite, this, data));
+    service_.post(move_handler(WriteHandler(this, std::move(buffer))));
+  }
+
+  std::unique_ptr<OStream> GetBuffer() {
+    std::lock_guard<std::mutex> guard(buffers_mutex_);
+
+    std::unique_ptr<OStream> result;
+    if (buffers_.empty()) {
+      result = std::unique_ptr<OStream>(new OStream());
+    } else {
+      result = std::move(buffers_.back());
+      buffers_.pop_back();
+    }
+    result->data()->resize(kBufferStartPadding);
+    result->set_start(kBufferStartPadding);
+    return result;
   }
 
  private:
@@ -120,10 +156,10 @@ class ThreadWriter : boost::noncopyable {
     ::fflush(fd_);
   }
 
-  void HandleWrite(const std::string& data) {
+  void HandleWrite(std::unique_ptr<OStream> buffer) {
     BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
 
-    data_.push_back(data);
+    data_.push_back(std::move(buffer));
 
     // If we're not already started, try to do so.
     if (!started_) { StartWrite(); }
@@ -182,15 +218,22 @@ class ThreadWriter : boost::noncopyable {
     // NOTE: This can only be called by the parent thread during the
     // final write-out, after the child thread has stopped.
 
-    size_t result =
-        ::fwrite(data_.front().data(), data_.front().size(), 1, fd_);
+    const OStream& stream = *data_.front();
+
+    const char* ptr = &(*stream.data())[stream.start()];
+    size_t size = stream.data()->size() - stream.start();
+    size_t result = ::fwrite(ptr, size, 1, fd_);
     if (result == 0) {
       throw boost::system::system_error(
           boost::system::error_code(
               errno, boost::system::generic_category()));
     }
 
-    child_offset_ += data_.front().size();
+    child_offset_ += size;
+    {
+      std::lock_guard<std::mutex> guard(buffers_mutex_);
+      buffers_.push_back(std::move(data_.front()));
+    }
     data_.pop_front();
   }
 
@@ -204,7 +247,7 @@ class ThreadWriter : boost::noncopyable {
   FILE* fd_;
 
   // Only accessed from child thread.
-  std::list<std::string> data_;
+  circular_buffer<std::unique_ptr<OStream> > data_;
   bool started_ = false;
   int64_t child_offset_ = 0;
   int64_t last_fadvise_ = 0;
@@ -212,9 +255,9 @@ class ThreadWriter : boost::noncopyable {
 
   // All threads.
   std::thread thread_;
+  std::mutex buffers_mutex_;
+  std::vector<std::unique_ptr<OStream> > buffers_;
 };
-
-}
 
 class TelemetryLog::Impl {
  public:
@@ -258,37 +301,97 @@ void TelemetryLog::WriteSchema(uint32_t identifier,
   stream_schema.Write(record_name);
   stream_schema.RawWrite(schema.data(), schema.size());
 
-  FastOStringStream ostr;
-  TelemetryWriteStream<FastOStringStream> stream(ostr);
+  auto buffer = GetBuffer();
+
+  TelemetryWriteStream<OStream> stream(*buffer);
   stream.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockSchema));
   stream.Write(static_cast<uint32_t>(ostr_schema.str().size()));
   stream.RawWrite(ostr_schema.str().data(), ostr_schema.str().size());
 
-  impl_->writer_->Write(ostr.str());
+  impl_->writer_->Write(std::move(buffer));
 }
 
 void TelemetryLog::WriteData(uint32_t identifier,
                              uint32_t block_data_flags,
                              const std::string& serialized_data) {
-  FastOStringStream ostr;
-  TelemetryWriteStream<FastOStringStream> stream(ostr);
+  auto buffer = GetBuffer();
+
+  TelemetryWriteStream<OStream> stream(*buffer);
   stream.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
   stream.Write(static_cast<uint32_t>(serialized_data.size() + 4));
   stream.Write(block_data_flags);
   stream.RawWrite(serialized_data.data(), serialized_data.size());
 
-  impl_->writer_->Write(ostr.str());
+  impl_->writer_->Write(std::move(buffer));
 }
 
 void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
                               const std::string& data) {
-  FastOStringStream ostr;
-  TelemetryWriteStream<FastOStringStream> stream(ostr);
+  auto buffer = GetBuffer();
+
+  TelemetryWriteStream<OStream> stream(*buffer);
   stream.Write(static_cast<uint16_t>(block_type));
   stream.Write(static_cast<uint32_t>(data.size()));
   stream.RawWrite(data.data(), data.size());
 
-  impl_->writer_->Write(ostr.str());
+  impl_->writer_->Write(std::move(buffer));
+}
+
+std::unique_ptr<TelemetryLog::OStream> TelemetryLog::GetBuffer() {
+  return impl_->writer_->GetBuffer();
+}
+
+namespace {
+class FakeStream : boost::noncopyable {
+ public:
+  FakeStream(char* data) : data_(data) {}
+
+  void write(const char* data, size_t size) {
+    std::memcpy(&data_[offset_], data, size);
+    offset_ += size;
+  }
+
+ private:
+  char* const data_;
+  size_t offset_ = 0;
+};
+}
+
+void TelemetryLog::WriteData(uint32_t identifier,
+                             uint32_t block_data_flags,
+                             std::unique_ptr<OStream> buffer) {
+  const size_t kBlockHeaderSize = 2 + 4 + 4;
+  BOOST_ASSERT(buffer->start() >= kBlockHeaderSize);
+
+  size_t data_size = buffer->data()->size() - buffer->start();
+
+  FakeStream stream(
+      &(*buffer->data())[0] + buffer->start() - kBlockHeaderSize);
+  TelemetryWriteStream<FakeStream> writer(stream);
+  writer.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
+  writer.Write(static_cast<uint32_t>(data_size + 4));
+  writer.Write(block_data_flags);
+
+  buffer->set_start(buffer->start() - kBlockHeaderSize);
+
+  impl_->writer_->Write(std::move(buffer));
+}
+
+void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
+                              std::unique_ptr<OStream> buffer) {
+  const size_t kBlockHeaderSize = 2 + 4;
+  BOOST_ASSERT(buffer->start() >= kBlockHeaderSize);
+
+  size_t data_size = buffer->data()->size() - buffer->start();
+
+  FakeStream stream(
+      &(*buffer->data())[0] + buffer->start() - kBlockHeaderSize);
+  TelemetryWriteStream<FakeStream> writer(stream);
+  writer.Write(static_cast<uint16_t>(block_type));
+  writer.Write(static_cast<uint32_t>(data_size));
+  buffer->set_start(buffer->start() - kBlockHeaderSize);
+
+  impl_->writer_->Write(std::move(buffer));
 }
 
 }

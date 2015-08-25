@@ -14,25 +14,22 @@
 
 #pragma once
 
-#include <cstring>
-#include <vector>
-
 namespace legtool {
-/// A very simple std::ostringstream replacement for binary data only.
-class FastOStringStream {
- public:
-  void write(const char* data, size_t amount) {
-    std::size_t old_size = data_.size();
-    data_.resize(data_.size() + amount);
-    std::memcpy(&data_[old_size], data, amount);
-  }
+template <typename F>
+struct move_wrapper : F
+{
+  move_wrapper(F&& f) : F(std::move(f)) {}
 
-  std::string str() const { return std::string(&data_[0], data_.size()); }
+  move_wrapper(move_wrapper&&) = default;
+  move_wrapper& operator=(move_wrapper&&) = default;
 
-  std::vector<char>* data() { return &data_; }
-  const std::vector<char>* data() const { return &data_; }
-
- private:
-  std::vector<char> data_;
+  move_wrapper(const move_wrapper&);
+  move_wrapper& operator=(const move_wrapper&);
 };
+
+template <typename T>
+auto move_handler(T&& t) -> move_wrapper<typename std::decay<T>::type>
+{
+  return std::move(t);
+}
 }

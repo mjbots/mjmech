@@ -238,6 +238,10 @@ boost::shared_ptr<IKSolver> MakeIKSolver(std::auto_ptr<LizardIK> lizard_ik) {
 LizardIK* MakeLizardIK(const LizardIK::Config& config) {
   return new LizardIK(config);
 }
+
+Frame* GetRippleStateLegFrame(const RippleState::Leg* leg) {
+  return leg->frame;
+}
 }
 
 BOOST_PYTHON_MODULE(_legtool) {
@@ -426,9 +430,11 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def_readwrite("point", &RippleState::Leg::point)
       .def_readwrite("mode", &RippleState::Leg::mode)
       .def_readwrite("leg_ik", &RippleState::Leg::leg_ik)
-      .def_readwrite("frame", &RippleState::Leg::frame)
+      .def_readwrite("shoulder_frame", &RippleState::Leg::shoulder_frame)
       .def_readwrite("swing_start_pos", &RippleState::Leg::swing_start_pos)
       .def_readwrite("swing_end_pos", &RippleState::Leg::swing_end_pos)
+      .def("get_frame", &GetRippleStateLegFrame,
+           return_internal_reference<1>())
       ;
 
   class_<std::vector<RippleState::Leg> >("RippleStateLegList")

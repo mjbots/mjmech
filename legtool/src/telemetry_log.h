@@ -19,12 +19,16 @@
 #include <cstdint>
 #include <string>
 
+#include "fast_stream.h"
 #include "telemetry_format.h"
 
 namespace legtool {
 
 /// Write log files with a format as described in telemetry_format.h.
 class TelemetryLog : boost::noncopyable {
+ private:
+  class ThreadWriter;
+
  public:
   TelemetryLog();
   ~TelemetryLog();
@@ -67,6 +71,41 @@ class TelemetryLog : boost::noncopyable {
   /// ensure that the block is properly formatted.
   void WriteBlock(TelemetryFormat::BlockType block_type,
                   const std::string& data);
+
+  /// The following APIs are mimics which can be used to implement
+  /// high-performance writing where no additional copies are
+  /// necessary.
+
+  class OStream : public FastOStringStream {
+   private:
+    OStream() {};
+
+    void set_start(size_t start) { start_ = start; }
+    size_t start() const { return start_; }
+
+    void clear() {
+      data()->clear();
+      start_ = 0;
+    }
+
+    size_t start_ = 0;
+
+    friend class ThreadWriter;
+    friend class TelemetryLog;
+  };
+
+  /// Get a buffer which can be used to send data.
+  std::unique_ptr<OStream> GetBuffer();
+
+  // These variants of Write take a buffer, (which must have been
+  // obtained by "GetBuffer" above), and returns ownership of the
+  // buffer to the TelemetryLog class.
+
+  void WriteData(uint32_t identifier,
+                 uint32_t block_data_flags,
+                 std::unique_ptr<OStream> buffer);
+  void WriteBlock(TelemetryFormat::BlockType block_type,
+                  std::unique_ptr<OStream> buffer);
 
  private:
   class Impl;
