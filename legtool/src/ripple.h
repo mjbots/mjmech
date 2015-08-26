@@ -103,6 +103,8 @@ struct RippleState : public CommonState {
   RippleState& operator=(const RippleState& rhs) {
     *static_cast<CommonState*>(this) =
         *(static_cast<const CommonState*>(&rhs));
+    phase = rhs.phase;
+    action = rhs.action;
     legs = rhs.legs;
 
     auto map_frame = [this, &rhs](const Frame* frame) {
