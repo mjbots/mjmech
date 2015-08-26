@@ -321,7 +321,9 @@ class RippleGait : public Gait {
             break;
           }
 
-          double largest_change_deg = 0.0;
+          boost::optional<double> largest_change_deg = 0.0;
+          largest_change_deg = boost::none;
+
           for (const auto& joint: result.joints) {
             auto old_result_it =
                 old_joint_angle_deg.find(
@@ -330,22 +332,27 @@ class RippleGait : public Gait {
               const double old_angle_deg = old_result_it->second;
               const double new_angle_deg = joint.angle_deg;
               const double delta_deg = std::abs(old_angle_deg - new_angle_deg);
-              if (delta_deg > largest_change_deg) {
+              if (!largest_change_deg ||
+                  delta_deg > *largest_change_deg) {
                 largest_change_deg = delta_deg;
               }
             }
 
             old_joint_angle_deg.insert(
                 std::make_pair(
-                    std::make_pair(direction, leg_num),
+                    std::make_pair(direction, joint.ident),
                     joint.angle_deg));
           }
-          const double this_speed_deg_s = largest_change_deg / dt;
 
-          if (!min_observed_speed ||
-              this_speed_deg_s < *min_observed_speed) {
-            min_observed_speed = this_speed_deg_s;
+          if (largest_change_deg) {
+            const double this_speed_deg_s = *largest_change_deg / dt;
+
+            if (!min_observed_speed ||
+                this_speed_deg_s < *min_observed_speed) {
+              min_observed_speed = this_speed_deg_s;
+            }
           }
+          leg_num++;
         }
       }
     }
