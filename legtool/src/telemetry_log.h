@@ -26,10 +26,9 @@ namespace legtool {
 
 /// Write log files with a format as described in telemetry_format.h.
 class TelemetryLog : boost::noncopyable {
- private:
+ public:
   class ThreadWriter;
 
- public:
   TelemetryLog();
   ~TelemetryLog();
 

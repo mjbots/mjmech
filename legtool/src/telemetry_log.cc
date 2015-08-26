@@ -15,13 +15,13 @@
 #include "telemetry_log.h"
 
 #include <fcntl.h>
+#include <signal.h>
+#include <time.h>
 
 #include <cstdio>
 #include <list>
 #include <mutex>
 #include <thread>
-
-#include <boost/asio/deadline_timer.hpp>
 
 #include "circular_buffer.h"
 #include "move_wrapper.h"
@@ -32,7 +32,24 @@ namespace {
 const int64_t kBlockSize = (1 << 20);
 const double kFlushTimeout_s = 1.0;
 const size_t kBufferStartPadding = 16;
+const int kTelemetryLogSignal = SIGRTMIN + 10;
+
+struct Pipe {
+  int read = 0;
+  int write = 0;
+};
+
+int Errwrap(int value) {
+  if (value < 0) {
+    throw boost::system::system_error(
+        boost::system::error_code(
+            errno, boost::system::generic_category()));
+  }
+  return value;
 }
+}
+
+static void timer_handler(int signum, siginfo_t* si, void *);
 
 class TelemetryLog::ThreadWriter : boost::noncopyable {
  public:
@@ -43,50 +60,51 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
       : ThreadWriter(OpenFd(fd), realtime) {}
 
   ThreadWriter(FILE* fd, bool realtime)
-      : service_(),
-        timer_(service_),
-        parent_id_(std::this_thread::get_id()),
+      : parent_id_(std::this_thread::get_id()),
         realtime_(realtime),
         fd_(fd),
+        pipe_(MakePipe()),
         thread_(std::bind(&ThreadWriter::Run, this)) {
     BOOST_ASSERT(fd >= 0);
   }
 
   ~ThreadWriter() {
-    service_.post([this]() { this->service_.stop(); });
+    BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
+    {
+      std::lock_guard<std::mutex> lock(command_mutex_);
+      done_ = true;
+    }
+    SignalThread();
+
     thread_.join();
     WriteAll();
+
     ::fclose(fd_);
+    ::close(pipe_.read);
+    ::close(pipe_.write);
   }
 
   void Flush() {
     BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
-    service_.post(std::bind(&ThreadWriter::HandleFlush, this));
+    {
+      std::lock_guard<std::mutex> lock(command_mutex_);
+      flush_ = true;
+    }
+    SignalThread();
   }
-
-  class WriteHandler {
-   public:
-    WriteHandler(WriteHandler&& rhs)
-      : parent_(rhs.parent_), ostr_(std::move(rhs.ostr_)) {}
-    WriteHandler(ThreadWriter* parent,
-                 std::unique_ptr<OStream> ostr)
-        : parent_(parent), ostr_(std::move(ostr)) {}
-
-    WriteHandler(const WriteHandler&) = delete;
-
-    void operator()() { parent_->HandleWrite(std::move(ostr_)); }
-
-   private:
-    ThreadWriter* const parent_;
-    std::unique_ptr<OStream> ostr_;
-  };
 
   void Write(std::unique_ptr<OStream> buffer) {
     BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
-    service_.post(move_handler(WriteHandler(this, std::move(buffer))));
+    {
+      std::lock_guard<std::mutex> lock(data_mutex_);
+      data_.push_back(std::move(buffer));
+    }
+    SignalThread();
   }
 
   std::unique_ptr<OStream> GetBuffer() {
+    BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
+
     std::lock_guard<std::mutex> guard(buffers_mutex_);
 
     std::unique_ptr<OStream> result;
@@ -101,6 +119,13 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     return result;
   }
 
+  void DoTimer() {
+    // This will be invoked from a signal handler, so it could be in a
+    // random thread.
+    timer_fired_ = true;
+    SignalThread();
+  }
+
  private:
   static FILE* OpenName(const std::string& name) {
     FILE* result = ::fopen(name.c_str(), "wb");
@@ -112,6 +137,19 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     return result;
   }
 
+  static Pipe MakePipe() {
+    int fds[2] = {};
+    Errwrap(::pipe(fds));
+
+    // We make the writing side non-blocking.
+    ::fcntl(fds[1], F_SETFL, O_NONBLOCK);
+
+    Pipe result;
+    result.read = fds[0];
+    result.write = fds[1];
+    return result;
+  }
+
   static FILE* OpenFd(int fd) {
     FILE* result = ::fdopen(fd, "wb");
     if (result == nullptr) {
@@ -120,6 +158,28 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
               errno, boost::system::generic_category()));
     }
     return result;
+  }
+
+  void SignalThread() {
+    // This can be called from the parent thread, or a signal handler
+    // (which could be in a random thread.
+
+    char c = 0;
+    while (true) {
+      int err = ::write(pipe_.write, &c, 1);
+      if (err == 1) { return; }
+      if (errno == EAGAIN ||
+          errno == EWOULDBLOCK) {
+        // Yikes, I guess we are backed up.  Just return, because
+        // apparently the receiver is plenty well signaled.
+        return;
+      }
+      if (errno != EINTR) {
+        // Hmmm, we might be inside of a POSIX signal handler.  Just
+        // abort.
+        ::raise(SIGABRT);
+      }
+    }
   }
 
   void Run() {
@@ -134,50 +194,78 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     size_t result = ::fwrite(TelemetryFormat::kHeader,
              ::strlen(TelemetryFormat::kHeader), 1, fd_);
     if (result == 0) {
-      throw boost::system::system_error(
-          boost::system::error_code(
-              errno, boost::system::generic_category()));
+      Errwrap(-1);
     }
 
-    service_.run();
+    while (true) {
+      char c = {};
+      int err = ::read(pipe_.read, &c, 1);
+      if (err < 0 && errno != EINTR) {
+        Errwrap(-1);
+      }
+
+      {
+        std::lock_guard<std::mutex> lock(command_mutex_);
+        if (done_) { return; }
+        if (flush_) { HandleFlush(); }
+      }
+
+      if (timer_fired_) {
+        HandleTimer();
+      }
+
+      RunWork();
+    }
+  }
+
+  void RunWork() {
+    BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
+
+    while (true) {
+      {
+        std::lock_guard<std::mutex> lock(data_mutex_);
+        if (data_.empty()) { return; }
+      }
+
+      // No one can remove things from data but us, so we don't need
+      // to check again.
+      StartWrite();
+    }
   }
 
   void StartTimer() {
-    timer_.expires_from_now(ConvertSecondsToDuration(kFlushTimeout_s));
-    timer_.async_wait(std::bind(&ThreadWriter::HandleTimer, this,
-                                std::placeholders::_1));
+    BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
+
+    struct sigaction act;
+    std::memset(&act, 0, sizeof(act));
+    act.sa_sigaction = timer_handler;
+    act.sa_flags = SA_SIGINFO;
+    Errwrap(sigaction(kTelemetryLogSignal, &act, nullptr));
+
+    struct sigevent sevp;
+    std::memset(&sevp, 0, sizeof(sevp));
+    sevp.sigev_notify = SIGEV_SIGNAL;
+    sevp.sigev_value.sival_ptr = this;
+    sevp.sigev_signo = kTelemetryLogSignal;
+
+    Errwrap(::timer_create(CLOCK_MONOTONIC, &sevp, &timer_id_));
+
+    struct itimerspec value;
+    std::memset(&value, 0, sizeof(value));
+    value.it_interval.tv_sec = static_cast<int>(kFlushTimeout_s);
+    value.it_interval.tv_nsec =
+        static_cast<long>((kFlushTimeout_s - value.it_interval.tv_sec) * 1e9);
+    value.it_value = value.it_interval;
+    Errwrap(::timer_settime(timer_id_, 0, &value, nullptr));
   }
 
-  void HandleTimer(boost::system::error_code ec) {
-    if (ec == boost::asio::error::operation_aborted) { return; }
-
-    StartTimer();
-
+  void HandleTimer() {
+    BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
     ::fflush(fd_);
-  }
-
-  void HandleWrite(std::unique_ptr<OStream> buffer) {
-    BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
-
-    data_.push_back(std::move(buffer));
-
-    // If we're not already started, try to do so.
-    if (!started_) { StartWrite(); }
-  }
-
-  void MaybeStart() {
-    BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
-
-    if (started_) { return; }
-    started_ = true;
-    service_.post(std::bind(&ThreadWriter::StartWrite, this));
   }
 
   void StartWrite() {
     BOOST_ASSERT(std::this_thread::get_id() == thread_.get_id());
-
-    started_ = false;
-    if (data_.empty()) { return; }
 
     WriteFront();
 
@@ -198,8 +286,6 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
         last_fadvise_ = next_fadvise;
       }
     }
-
-    MaybeStart();
   }
 
   void WriteAll() {
@@ -218,46 +304,65 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     // NOTE: This can only be called by the parent thread during the
     // final write-out, after the child thread has stopped.
 
-    const OStream& stream = *data_.front();
+    std::unique_ptr<OStream> buffer;
+    {
+      std::lock_guard<std::mutex> lock(data_mutex_);
+      buffer = std::move(data_.front());
+      data_.pop_front();
+    }
+
+    const OStream& stream = *buffer;
 
     const char* ptr = &(*stream.data())[stream.start()];
     size_t size = stream.data()->size() - stream.start();
     size_t result = ::fwrite(ptr, size, 1, fd_);
     if (result == 0) {
-      throw boost::system::system_error(
-          boost::system::error_code(
-              errno, boost::system::generic_category()));
+      Errwrap(-1);
     }
 
     child_offset_ += size;
     {
       std::lock_guard<std::mutex> guard(buffers_mutex_);
-      buffers_.push_back(std::move(data_.front()));
+      buffers_.push_back(std::move(buffer));
     }
-    data_.pop_front();
   }
 
   // Parent items.
-  boost::asio::io_service service_;
-  boost::asio::deadline_timer timer_;
   std::thread::id parent_id_;
   const bool realtime_;
+  timer_t timer_id_ = {};
 
   // Initialized from parent, then only accessed from child.
   FILE* fd_;
+  const Pipe pipe_;
 
   // Only accessed from child thread.
-  circular_buffer<std::unique_ptr<OStream> > data_;
-  bool started_ = false;
   int64_t child_offset_ = 0;
   int64_t last_fadvise_ = 0;
   char buf_[65536] = {};
 
   // All threads.
   std::thread thread_;
+
+  std::mutex data_mutex_;
+  circular_buffer<std::unique_ptr<OStream> > data_;
+
   std::mutex buffers_mutex_;
   std::vector<std::unique_ptr<OStream> > buffers_;
+
+  std::mutex command_mutex_;
+  bool flush_ = false;
+  bool done_ = false;
+
+  bool timer_fired_ = false;
+
 };
+
+void timer_handler(int signum, siginfo_t* si, void *) {
+  auto writer =
+      static_cast<TelemetryLog::ThreadWriter*>(si->si_value.sival_ptr);
+  writer->DoTimer();
+}
 
 class TelemetryLog::Impl {
  public:
