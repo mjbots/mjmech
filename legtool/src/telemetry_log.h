@@ -36,11 +36,16 @@ class TelemetryLog : boost::noncopyable {
   /// be flushed to disk.  This must be called before any Open.
   void SetRealtime(bool);
 
-  /// Open the given file for writing.
+  /// Open the given file for writing.  It will write any queued
+  /// schema blocks.  It may be called multiple times.
   void Open(const std::string& filename);
 
-  /// Open a file descriptor for writing.
+  /// Identical semantics to Open(std::string), but takes a file
+  /// descriptor instead.
   void Open(int fd);
+
+  /// Return true if any file is open for writing.
+  bool IsOpen() const;
 
   /// Close the log, this is implicit at destruction time.
   void Close();
@@ -50,9 +55,8 @@ class TelemetryLog : boost::noncopyable {
   /// backing store.
   void Flush();
 
-  /// Start a new log with the given file name.  All schema blocks
-  /// written so far will be re-written to the start of this log.
-  void Split(const std::string& name);
+  /// Allocate a unique identifier for the given name.
+  uint32_t AllocateIdentifier(const std::string& record_name);
 
   /// Write a schema block to the log file.
   void WriteSchema(uint32_t identifier,

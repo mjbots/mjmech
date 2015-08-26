@@ -18,127 +18,97 @@
 
 #include <boost/signals2/signal.hpp>
 
-#include "telemetry_archive.h"
+#include "meta/meta.hpp"
 
 namespace legtool {
-/// Maintain a local publish-subscribe model used for writing data to
-/// log files or publishing them over the network.
-///
-/// Data is serialized using TelemetryWriteArchive, using the format
-/// found in telemetry_format.h.
+/// Maintain a local publish-subscribe model used for data objects.
+template <typename... Registrars>
 class TelemetryRegistry : boost::noncopyable {
  public:
+  using RegistrarList = meta::list<Registrars...>;
+
+  template <typename... Arg>
+  TelemetryRegistry(Arg&&... args)
+      : registrars_(std::forward<Arg>(args)...) {}
+
   /// Register a serializable object, and return a function object
-  /// which when called will disseminate serialized versions of the
+  /// which when called will disseminate the
   /// object to any observers.
-  template <typename Serializable>
-  std::function<void (const Serializable*)>
-  Register(const std::string& record_name,
-           boost::signals2::signal<void (const Serializable)>* = 0) {
-    auto* ptr = new Concrete<Serializable>();
-    auto result =
-        std::bind(&Concrete<Serializable>::Invoke, ptr,
-                  std::placeholders::_1);
-    RegisterImpl(record_name, std::move(std::unique_ptr<Base>(ptr)));
+  template <typename DataObject>
+  std::function<void (const DataObject*)>
+  Register(const std::string& record_name) {
+    // NOTE jpieper: Ideally this would return auto, and just let the
+    // compiler sort out what type the lambda is.  But since C++11
+    // doesn't support that yet, we return the type erasing
+    // std::function.
+
+    auto* ptr = new Concrete<DataObject>();
+    auto result = [ptr](const DataObject* object) { ptr->signal(object); };
+
+    records_.insert(
+        std::make_pair(
+            record_name, std::move(std::unique_ptr<Base>(ptr))));
+
+    VisitRegistrar<DataObject> visit_registrant(this, record_name, ptr);
+    meta::for_each(
+        meta::as_list<meta::make_index_sequence<RegistrarList::size()> >{},
+        visit_registrant);
+
     return result;
   };
 
-  /// Register a record, and return a callable which when invoked
-  /// requires pre-serialized data.
-  std::function<void (const std::string&)>
-  RegisterPreSerialized(const std::string& schema,
-                        const std::string& record_name) {
-    auto* ptr = new PreSerialized(schema);
-    auto result =
-        std::bind(&PreSerialized::Invoke, ptr,
-                  std::placeholders::_1);
-    RegisterImpl(record_name, std::move(std::unique_ptr<Base>(ptr)));
-    return result;
+  template <typename DataObject>
+  void Register(const std::string& record_name,
+                boost::signals2::signal<void (const DataObject*)>* signal) {
+    signal->connect(Register(record_name));
   }
 
-  struct RecordProperties {
-    std::string name;
-    std::string schema;
-    boost::signals2::signal<
-      void (const std::string&)>* serialized_data_signal = nullptr;
-  };
+  template <typename Registrar>
+  Registrar* registrar() {
+    using Index = meta::find_index<RegistrarList, Registrar>;
+    return &std::get<Index{}>(registrars_);
+  }
 
-  typedef std::function<void (const RecordProperties&)> SchemaHandler;
-
-  /// Indicate that the caller wants to be informed when new records
-  /// have been registered.  If records have already been registered
-  /// at the time of call, the handler will be invoked with all
-  /// records currently present.
-  void ObserveSchema(SchemaHandler handler);
-
-  /// If the named record has been registered, return a signal that
-  /// emits serialized data anytime that record is emitted.
-  boost::signals2::signal<
-    void (const std::string&)>* GetSerializedSignal(const std::string& name);
-
-  /// If the named signal of the appropriate type has already been
-  /// registered, return a correctly typed signal for it.
-  template <typename T>
-  boost::signals2::signal<void (const T*)>*
-  GetConcreteSignal(const std::string& name) {
-    auto it = records_.find(name);
-    if (it == records_.end()) { return nullptr; }
-    Concrete<T>* concrete = dynamic_cast<Concrete<T>*>(it->second.get());
-    if (!concrete) { return nullptr; }
-    return concrete->concrete_signal();
+  template <typename Registrar>
+  const Registrar* registrar() const {
+    using Index = meta::find_index<RegistrarList, Registrar>;
+    return &std::get<Index{}>(registrars_);
   }
 
  private:
-  class Base {
-   public:
-    Base() {}
+  struct Base {
     virtual ~Base() {}
-
-    boost::signals2::signal<
-      void (const std::string&)>* signal() { return &signal_; }
-    const std::string& schema() const { return schema_; }
-
-   protected:
-    boost::signals2::signal<void (const std::string&)> signal_;
-    std::string schema_;
   };
 
   template <typename Serializable>
-  class Concrete : public Base {
-   public:
-    Concrete() {
-      schema_ = archive_.schema();
-    }
+  struct Concrete : public Base {
+    virtual ~Concrete() {}
 
-    void Invoke(const Serializable* object) {
-      concrete_signal_(object);
-      signal_(archive_.Serialize(object));
-    }
-
-    boost::signals2::signal<void (const Serializable*)>* concrete_signal() {
-      return &concrete_signal_;
-    }
-
-   private:
-    TelemetryWriteArchive<Serializable> archive_;
-    boost::signals2::signal<void (const Serializable*)> concrete_signal_;
+    boost::signals2::signal<void (const Serializable*)> signal;
   };
 
-  class PreSerialized : public Base {
-   public:
-    PreSerialized(const std::string& schema) {
-      schema_ = schema;
+  template <typename DataObject>
+  struct VisitRegistrar {
+    VisitRegistrar(TelemetryRegistry* registry,
+                   const std::string& name,
+                   Concrete<DataObject>* concrete)
+        : registry_(registry),
+          name_(name),
+          concrete_(concrete) {}
+
+    template <typename RegistrarIndex>
+    void operator()(const RegistrarIndex&) {
+      std::get<RegistrarIndex::value>(registry_->registrars_).
+          Register(name_, &concrete_->signal);
     }
 
-    void Invoke(const std::string& data) {
-      signal_(data);
-    }
+    TelemetryRegistry* const registry_;
+    const std::string name_;
+    Concrete<DataObject>* const concrete_;
   };
-
-  void RegisterImpl(const std::string& name, std::unique_ptr<Base>&& record);
 
   std::map<std::string, std::unique_ptr<Base> > records_;
-  std::list<SchemaHandler> observers_;
+  std::tuple<Registrars...> registrars_;
 };
 
 }

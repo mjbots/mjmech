@@ -28,16 +28,16 @@ class TelemetryWriteArchive {
  public:
   typedef TelemetryFormat TF;
 
-  TelemetryWriteArchive() : schema_(MakeSchema()) {}
+  TelemetryWriteArchive() {}
 
-  std::string schema() const { return schema_; }
+  static std::string schema() { return MakeSchema(); }
 
   template <typename OStream>
   static void Serialize(const RootSerializable* serializable,
                         OStream& stream_in) {
     TelemetryWriteStream<OStream> stream(stream_in);
 
-    DataVisitor<TelemetryWriteStream<FastOStringStream> > visitor(stream);
+    DataVisitor<TelemetryWriteStream<OStream> > visitor(stream);
     visitor.Accept(const_cast<RootSerializable*>(serializable));
   }
 
@@ -261,7 +261,5 @@ class TelemetryWriteArchive {
   static TF::FieldType FindType(boost::posix_time::ptime*) {
     return TF::FieldType::kPtime;
   }
-
-  const std::string schema_;
 };
 }

@@ -31,7 +31,6 @@ SOURCES = [
     'comm_factory.cc',
     'herkulex.cc',
     'telemetry_log.cc',
-    'telemetry_registry.cc',
     ]
 
 liblegtool = crenv.StaticLibrary('legtool', SOURCES)
@@ -59,6 +58,7 @@ TESTS = ['test/' + x for x in [
         'signal_result_test.cc',
         'telemetry_archive_test.cc',
         'telemetry_log_test.cc',
+        'telemetry_log_registrar_test.cc',
         'telemetry_registry_test.cc',
         'tf_test.cc',
         ]]

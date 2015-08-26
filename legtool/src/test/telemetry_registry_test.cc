@@ -16,6 +16,7 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
+#include "telemetry_archive.h"
 #include "visitor.h"
 
 using namespace legtool;
@@ -29,53 +30,42 @@ struct TestData {
     a->Visit(LT_NVP(foo));
   }
 };
+
+class TestRegistrar {
+ public:
+  template <typename T>
+  void Register(const std::string& name,
+                boost::signals2::signal<void (const T*)>* signal) {
+    names_.push_back(name);
+    signal->connect(std::bind(&TestRegistrar::HandleData<T>, this,
+                              std::placeholders::_1));
+  }
+
+  template <typename T>
+  void HandleData(const T* data) {
+    data_.push_back(TelemetryWriteArchive<T>{}.Serialize(data));
+  }
+
+  std::vector<std::string> names_;
+  std::list<std::string> data_;
+};
 }
 
 BOOST_AUTO_TEST_CASE(TelemetryBasicTest) {
-  TelemetryRegistry registry;
+  TelemetryRegistry<TestRegistrar> registry;
   auto callable = registry.Register<TestData>("data1");
+
+  // Our name should appear in the registrar's list of names.
+  TestRegistrar* registrar = registry.registrar<TestRegistrar>();
+
+  BOOST_REQUIRE_EQUAL(registrar->names_.size(), 1u);
+  BOOST_CHECK_EQUAL(registrar->names_[0], "data1");
+  BOOST_CHECK_EQUAL(registrar->data_.size(), 0u);
+
   TestData data;
-
-  // Nothing much should happen.
   callable(&data);
 
-  std::vector<TelemetryRegistry::RecordProperties> properties;
-
-  // Now we can register a schema observer.
-  registry.ObserveSchema(
-      [&](const TelemetryRegistry::RecordProperties& p) {
-        properties.push_back(p);
-      });
-
-  // And we should get the one that we've already registered.
-  BOOST_REQUIRE_EQUAL(properties.size(), 1);
-  BOOST_CHECK_EQUAL(properties[0].name, "data1");
-  BOOST_CHECK(properties[0].serialized_data_signal != nullptr);
-
-  std::string bin;
-  properties[0].serialized_data_signal->connect(
-      [&](const std::string& d) { bin = d; });
-  BOOST_CHECK_EQUAL(bin, "");
-
-  callable(&data);
-  BOOST_CHECK(!bin.empty());
-
-  // And if we register something new, the schema observer should see
-  // it.
-  registry.Register<TestData>("data2");
-
-  BOOST_REQUIRE_EQUAL(properties.size(), 2);
-  BOOST_CHECK_EQUAL(properties[1].name, "data2");
-
-  // We can get a hold of a correctly typed signal when we want one.
-  auto signal = registry.GetConcreteSignal<TestData>("data1");
-  BOOST_CHECK(signal != nullptr);
-  data.foo = 30;
-
-  TestData input;
-  signal->connect([&](const TestData* value) { input = *value; });
-
-  BOOST_CHECK_EQUAL(input.foo, 0);
-  callable(&data);
-  BOOST_CHECK_EQUAL(input.foo, 30);
+  // Now some data should appear.
+  BOOST_REQUIRE_EQUAL(registrar->names_.size(), 1u);
+  BOOST_CHECK_EQUAL(registrar->data_.size(), 1u);
 }

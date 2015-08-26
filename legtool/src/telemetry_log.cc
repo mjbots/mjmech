@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO jpieper:
+//  * Support calling Open multiple times.
+
 #include "telemetry_log.h"
 
 #include <fcntl.h>
@@ -47,20 +50,59 @@ int Errwrap(int value) {
   }
   return value;
 }
+
+struct SchemaRecord {
+  std::string name;
+  uint32_t identifier = 0;
+  uint32_t block_schema_flags = 0;
+  std::string schema;
+
+  SchemaRecord(const std::string& name,
+               uint32_t identifier,
+               uint32_t block_schema_flags,
+               const std::string& schema)
+      : name(name),
+        identifier(identifier),
+        block_schema_flags(block_schema_flags),
+        schema(schema) {}
+  SchemaRecord() {}
+};
 }
 
 static void timer_handler(int signum, siginfo_t* si, void *);
 
+class TelemetryLog::Impl {
+ public:
+  Impl(TelemetryLog* parent) : parent_(parent) {}
+  void Write(std::unique_ptr<OStream> buffer);
+  void PostOpen();
+
+  TelemetryLog* const parent_;
+  bool realtime_ = false;
+  std::unique_ptr<ThreadWriter> writer_;
+
+  std::map<std::string, uint32_t> identifier_map_;
+  std::map<uint32_t, std::string> reverse_identifier_map_;
+
+  uint32_t next_id_ = 1;
+
+  std::mutex buffers_mutex_;
+  std::vector<std::unique_ptr<OStream> > buffers_;
+
+  std::map<uint32_t, SchemaRecord> schema_;
+};
+
 class TelemetryLog::ThreadWriter : boost::noncopyable {
  public:
-  ThreadWriter(const std::string& name, bool realtime)
-      : ThreadWriter(OpenName(name), realtime) {}
+  ThreadWriter(Impl* impl, const std::string& name, bool realtime)
+      : ThreadWriter(impl, OpenName(name), realtime) {}
 
-  ThreadWriter(int fd, bool realtime)
-      : ThreadWriter(OpenFd(fd), realtime) {}
+  ThreadWriter(Impl* impl, int fd, bool realtime)
+      : ThreadWriter(impl, OpenFd(fd), realtime) {}
 
-  ThreadWriter(FILE* fd, bool realtime)
-      : parent_id_(std::this_thread::get_id()),
+  ThreadWriter(Impl* impl, FILE* fd, bool realtime)
+      : impl_(impl),
+        parent_id_(std::this_thread::get_id()),
         realtime_(realtime),
         fd_(fd),
         pipe_(MakePipe()),
@@ -100,23 +142,6 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
       data_.push_back(std::move(buffer));
     }
     SignalThread();
-  }
-
-  std::unique_ptr<OStream> GetBuffer() {
-    BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
-
-    std::lock_guard<std::mutex> guard(buffers_mutex_);
-
-    std::unique_ptr<OStream> result;
-    if (buffers_.empty()) {
-      result = std::unique_ptr<OStream>(new OStream());
-    } else {
-      result = std::move(buffers_.back());
-      buffers_.pop_back();
-    }
-    result->data()->resize(kBufferStartPadding);
-    result->set_start(kBufferStartPadding);
-    return result;
   }
 
   void DoTimer() {
@@ -322,12 +347,13 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
 
     child_offset_ += size;
     {
-      std::lock_guard<std::mutex> guard(buffers_mutex_);
-      buffers_.push_back(std::move(buffer));
+      std::lock_guard<std::mutex> guard(impl_->buffers_mutex_);
+      impl_->buffers_.push_back(std::move(buffer));
     }
   }
 
   // Parent items.
+  Impl* const impl_;
   std::thread::id parent_id_;
   const bool realtime_;
   timer_t timer_id_ = {};
@@ -347,16 +373,30 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
   std::mutex data_mutex_;
   circular_buffer<std::unique_ptr<OStream> > data_;
 
-  std::mutex buffers_mutex_;
-  std::vector<std::unique_ptr<OStream> > buffers_;
-
   std::mutex command_mutex_;
   bool flush_ = false;
   bool done_ = false;
 
   bool timer_fired_ = false;
-
 };
+
+void TelemetryLog::Impl::Write(std::unique_ptr<OStream> buffer) {
+  if (writer_) {
+    writer_->Write(std::move(buffer));
+  } else {
+    std::lock_guard<std::mutex> lock(buffers_mutex_);
+    buffers_.push_back(std::move(buffer));
+  }
+}
+
+void TelemetryLog::Impl::PostOpen() {
+  for (const auto& pair: schema_) {
+    parent_->WriteSchema(pair.second.identifier,
+                         pair.second.block_schema_flags,
+                         pair.second.name,
+                         pair.second.schema);
+  }
+}
 
 void timer_handler(int signum, siginfo_t* si, void *) {
   auto writer =
@@ -364,24 +404,27 @@ void timer_handler(int signum, siginfo_t* si, void *) {
   writer->DoTimer();
 }
 
-class TelemetryLog::Impl {
- public:
-
-  bool realtime_ = false;
-  std::unique_ptr<ThreadWriter> writer_;
-};
-
-TelemetryLog::TelemetryLog() : impl_(new Impl()) {}
+TelemetryLog::TelemetryLog() : impl_(new Impl(this)) {}
 TelemetryLog::~TelemetryLog() {}
 
 void TelemetryLog::SetRealtime(bool value) { impl_->realtime_ = value; }
 
 void TelemetryLog::Open(const std::string& filename) {
-  impl_->writer_.reset(new ThreadWriter(filename, impl_->realtime_));
+  BOOST_ASSERT(!impl_->writer_);
+  impl_->writer_.reset(
+      new ThreadWriter(impl_.get(), filename, impl_->realtime_));
+  impl_->PostOpen();
 }
 
 void TelemetryLog::Open(int fd) {
-  impl_->writer_.reset(new ThreadWriter(fd, impl_->realtime_));
+  BOOST_ASSERT(!impl_->writer_);
+  impl_->writer_.reset(
+      new ThreadWriter(impl_.get(), fd, impl_->realtime_));
+  impl_->PostOpen();
+}
+
+bool TelemetryLog::IsOpen() const {
+  return !!impl_->writer_;
 }
 
 void TelemetryLog::Close() {
@@ -389,17 +432,60 @@ void TelemetryLog::Close() {
 }
 
 void TelemetryLog::Flush() {
-  impl_->writer_->Flush();
+  if (impl_->writer_) {
+    impl_->writer_->Flush();
+  }
 }
 
-void TelemetryLog::Split(const std::string& name) {
-  throw std::runtime_error("not implemented");
+uint32_t TelemetryLog::AllocateIdentifier(const std::string& record_name) {
+  auto it = impl_->identifier_map_.find(record_name);
+  if (it != impl_->identifier_map_.end()) { return it->second; }
+
+  // Find one that isn't used yet.
+  while (impl_->reverse_identifier_map_.count(impl_->next_id_)) {
+    impl_->next_id_++;
+  }
+
+  uint32_t result = impl_->next_id_;
+  impl_->next_id_ ++;
+
+  impl_->identifier_map_[record_name] = result;
+  impl_->reverse_identifier_map_[result] = record_name;
+
+  return result;
 }
 
 void TelemetryLog::WriteSchema(uint32_t identifier,
                                uint32_t block_schema_flags,
                                const std::string& record_name,
                                const std::string& schema) {
+  auto it = impl_->identifier_map_.find(record_name);
+  if (it != impl_->identifier_map_.end()) {
+    if (identifier != it->second) {
+      throw std::runtime_error(
+          (boost::format(
+              "Attempt to write schema for '%s' with identifier %d "
+              "but already allocated as %d") %
+           record_name % identifier % it->second).str());
+    }
+  } else {
+    auto rit = impl_->reverse_identifier_map_.find(identifier);
+    if (rit != impl_->reverse_identifier_map_.end()) {
+      throw std::runtime_error(
+          (boost::format(
+              "Attempt to write schema for '%s' but identifier %d "
+              "already used for '%s'") %
+           record_name % identifier % it->second).str());
+    } else {
+      // Guess we might as well mark this identifier as being used.
+      impl_->identifier_map_[record_name] = identifier;
+      impl_->reverse_identifier_map_[identifier] = record_name;
+    }
+  }
+
+  impl_->schema_[identifier] = SchemaRecord(
+      record_name, identifier, block_schema_flags, schema);
+
   FastOStringStream ostr_schema;
   TelemetryWriteStream<FastOStringStream> stream_schema(ostr_schema);
   stream_schema.Write(block_schema_flags);
@@ -413,7 +499,7 @@ void TelemetryLog::WriteSchema(uint32_t identifier,
   stream.Write(static_cast<uint32_t>(ostr_schema.str().size()));
   stream.RawWrite(ostr_schema.str().data(), ostr_schema.str().size());
 
-  impl_->writer_->Write(std::move(buffer));
+  impl_->Write(std::move(buffer));
 }
 
 void TelemetryLog::WriteData(uint32_t identifier,
@@ -427,7 +513,7 @@ void TelemetryLog::WriteData(uint32_t identifier,
   stream.Write(block_data_flags);
   stream.RawWrite(serialized_data.data(), serialized_data.size());
 
-  impl_->writer_->Write(std::move(buffer));
+  impl_->Write(std::move(buffer));
 }
 
 void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
@@ -439,11 +525,22 @@ void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
   stream.Write(static_cast<uint32_t>(data.size()));
   stream.RawWrite(data.data(), data.size());
 
-  impl_->writer_->Write(std::move(buffer));
+  impl_->Write(std::move(buffer));
 }
 
 std::unique_ptr<TelemetryLog::OStream> TelemetryLog::GetBuffer() {
-  return impl_->writer_->GetBuffer();
+  std::lock_guard<std::mutex> guard(impl_->buffers_mutex_);
+
+  std::unique_ptr<OStream> result;
+  if (impl_->buffers_.empty()) {
+    result = std::unique_ptr<OStream>(new OStream());
+  } else {
+    result = std::move(impl_->buffers_.back());
+    impl_->buffers_.pop_back();
+  }
+  result->data()->resize(kBufferStartPadding);
+  result->set_start(kBufferStartPadding);
+  return result;
 }
 
 namespace {
@@ -479,7 +576,7 @@ void TelemetryLog::WriteData(uint32_t identifier,
 
   buffer->set_start(buffer->start() - kBlockHeaderSize);
 
-  impl_->writer_->Write(std::move(buffer));
+  impl_->Write(std::move(buffer));
 }
 
 void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
@@ -496,7 +593,7 @@ void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
   writer.Write(static_cast<uint32_t>(data_size));
   buffer->set_start(buffer->start() - kBlockHeaderSize);
 
-  impl_->writer_->Write(std::move(buffer));
+  impl_->Write(std::move(buffer));
 }
 
 }
