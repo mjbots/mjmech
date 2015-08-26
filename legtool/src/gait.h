@@ -76,7 +76,7 @@ struct Command {
   double body_pitch_deg = 0;
   double body_roll_deg = 0;
   double body_yaw_deg = 0;
-  double lift_height_percent = 0;
+  double lift_height_percent = 100;
 
   template <typename Archive>
   void Serialize(Archive* a) {
