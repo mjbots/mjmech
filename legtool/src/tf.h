@@ -145,8 +145,10 @@ struct Frame {
       for (const Frame* node: source_parents_list_) {
         result = node->MapToParent(result);
       }
-      for (const Frame* node: destination_parents_list_) {
-        result = node->MapFromParent(result);
+      for (auto it = destination_parents_list_.rbegin();
+           it != destination_parents_list_.rend();
+           ++it) {
+        result = (*it)->MapFromParent(result);
       }
       return result;
     }
