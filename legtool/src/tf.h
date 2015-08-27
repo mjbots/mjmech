@@ -74,7 +74,7 @@ struct Transform {
 ///
 /// Defined as non-copyable, because FrameRelationships rely on
 /// object references, and copying them around would foil that.
-struct Frame {
+struct Frame : boost::noncopyable {
   Transform transform;
   const Frame* parent;
 

@@ -51,7 +51,6 @@ struct Leg {
     Mode mode = Mode::kUnknown;
     IKSolver* leg_ik = nullptr;
     Frame* frame = nullptr;
-    Frame shoulder_frame;
   };
 };
 
@@ -116,6 +115,18 @@ struct CommonState {
     cog_frame.transform = rhs.cog_frame.transform;
     return *this;
   };
+
+  void MakeShoulder(const Leg::Config& leg_config,
+                    Frame* frame) const {
+    // For now, we are assuming that shoulders face away from the y
+    // axis.
+    const double rotation_rad = (leg_config.mount_mm.x > 0.0) ?
+        (0.5 * M_PI) : (-0.5 * M_PI);
+    frame->transform = Transform(
+        leg_config.mount_mm,
+        Quaternion::FromEuler(0, 0, rotation_rad));
+    frame->parent = &body_frame;
+  }
 
 };
 

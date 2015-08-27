@@ -242,6 +242,26 @@ LizardIK* MakeLizardIK(const LizardIK::Config& config) {
 Frame* GetRippleStateLegFrame(const RippleState::Leg* leg) {
   return leg->frame;
 }
+
+const Frame* GetFrameParent(const Frame* frame) {
+  return frame->parent;
+}
+
+const Frame* GetRippleStateWorld(const RippleState* state) {
+  return &state->world_frame;
+}
+
+const Frame* GetRippleStateRobot(const RippleState* state) {
+  return &state->robot_frame;
+}
+
+const Frame* GetRippleStateBody(const RippleState* state) {
+  return &state->body_frame;
+}
+
+const Frame* GetRippleStateCog(const RippleState* state) {
+  return &state->cog_frame;
+}
 }
 
 BOOST_PYTHON_MODULE(_legtool) {
@@ -419,7 +439,30 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def_readwrite("lift_height_percent", &Command::lift_height_percent)
       ;
 
+  class_<Quaternion::Euler>("QuaternionEuler")
+      .def_readwrite("roll_rad", &Quaternion::Euler::roll_rad)
+      .def_readwrite("pitch_rad", &Quaternion::Euler::pitch_rad)
+      .def_readwrite("yaw_rad", &Quaternion::Euler::yaw_rad)
+      ;
+
+  class_<Quaternion>("Quaternion")
+      .def_readwrite("w", &Quaternion::w)
+      .def_readwrite("x", &Quaternion::x)
+      .def_readwrite("y", &Quaternion::y)
+      .def_readwrite("z", &Quaternion::z)
+      .def("euler", &Quaternion::euler)
+      ;
+
+  class_<Transform>("Transform")
+      .def_readwrite("translation", &Transform::translation)
+      .def_readwrite("rotation", &Transform::rotation)
+      ;
+
   class_<Frame, boost::noncopyable>("Frame")
+      .def_readwrite("transform", &Frame::transform)
+      .add_property("parent",
+                    make_function(&GetFrameParent,
+                                  return_internal_reference<1>()))
       .def("map_to_frame", &Frame::MapToFrame<Point3D>)
       .def("map_from_frame", &Frame::MapFromFrame<Point3D>)
       .def("map_to_parent", &Frame::MapToParent<Point3D>)
@@ -430,11 +473,11 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def_readwrite("point", &RippleState::Leg::point)
       .def_readwrite("mode", &RippleState::Leg::mode)
       .def_readwrite("leg_ik", &RippleState::Leg::leg_ik)
-      .def_readwrite("shoulder_frame", &RippleState::Leg::shoulder_frame)
       .def_readwrite("swing_start_pos", &RippleState::Leg::swing_start_pos)
       .def_readwrite("swing_end_pos", &RippleState::Leg::swing_end_pos)
-      .def("get_frame", &GetRippleStateLegFrame,
-           return_internal_reference<1>())
+      .add_property("frame",
+                    make_function(&GetRippleStateLegFrame,
+                                  return_internal_reference<1>()))
       ;
 
   class_<std::vector<RippleState::Leg> >("RippleStateLegList")
@@ -446,10 +489,19 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def_readwrite("phase", &RippleState::phase)
       .def_readwrite("action", &RippleState::action)
       .def_readwrite("legs", &RippleState::legs)
-      .def_readwrite("world_frame", &RippleState::world_frame)
-      .def_readwrite("robot_frame", &RippleState::robot_frame)
-      .def_readwrite("body_frame", &RippleState::body_frame)
-      .def_readwrite("cog_frame", &RippleState::cog_frame)
+      .def("make_shoulder", &RippleState::MakeShoulder)
+      .add_property("world_frame",
+                    make_function(&GetRippleStateWorld,
+                                  return_internal_reference<1>()))
+      .add_property("robot_frame",
+                    make_function(&GetRippleStateRobot,
+                                  return_internal_reference<1>()))
+      .add_property("body_frame",
+                    make_function(&GetRippleStateBody,
+                                  return_internal_reference<1>()))
+      .add_property("cog_frame",
+                    make_function(&GetRippleStateCog,
+                                  return_internal_reference<1>()))
       ;
 
   class_<Options>("Options")

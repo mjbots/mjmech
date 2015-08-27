@@ -124,7 +124,6 @@ struct RippleState : public CommonState {
 
     for (auto& leg: legs) {
       leg.frame = map_frame(leg.frame);
-      leg.shoulder_frame.parent = &body_frame;
     }
     return *this;
   }
@@ -230,42 +229,49 @@ class RippleGait : public Gait {
           leg_config.idle_mm.z -
           config_.body_z_offset_mm;
 
-      RippleState::Leg leg_state;
+      result.legs.emplace_back();
+      RippleState::Leg& leg_state = result.legs.back();
+
       leg_state.point = result.world_frame.MapFromFrame(
           &result.body_frame, point);
       leg_state.frame = &result.world_frame;
       leg_state.mode = Leg::Mode::kStance;
 
-      // For now, we are assuming that shoulders face away from the y
-      // axis.
-      const double rotation_rad = (leg_config.mount_mm.x > 0.0) ?
-                                  (0.5 * M_PI) : (-0.5 * M_PI);
-      leg_state.shoulder_frame.transform = Transform(
-          leg_config.mount_mm,
-          Quaternion::FromEuler(0, 0, rotation_rad));
-      leg_state.shoulder_frame.parent = &result.body_frame;
+      Frame shoulder_frame;
+      MakeShoulderFrame(leg_config, &result, &shoulder_frame);
 
       leg_state.leg_ik = leg_config.leg_ik.get();
-
-      result.legs.push_back(leg_state);
     }
 
     return result;
   }
 
  private:
+  void MakeShoulderFrame(const Leg::Config& leg_config,
+                         const RippleState* state,
+                         Frame* shoulder_frame) const {
+    state->MakeShoulder(leg_config, shoulder_frame);
+  }
+
   struct Action;
 
   JointCommand MakeJointCommand() const {
     JointCommand result;
+    int index = 0;
     for (const auto& leg: state_.legs) {
+      Frame shoulder_frame;
+      MakeShoulderFrame(config_.mechanical.leg_config.at(index),
+                        &state_, &shoulder_frame);
+
       Point3D shoulder_point =
-          leg.shoulder_frame.MapFromFrame(leg.frame, leg.point);
+          shoulder_frame.MapFromFrame(leg.frame, leg.point);
       auto joints = leg.leg_ik->Solve(shoulder_point);
       for (const auto& joint: joints.joints) {
         result.joints.emplace_back(
             JointCommand::Joint(joint.ident, joint.angle_deg));
       }
+
+      index += 1;
     }
 
     return result;
@@ -300,7 +306,8 @@ class RippleGait : public Gait {
       time_s += dt;
 
       for (const double direction: std::vector<double>{-1, 1}) {
-        auto frame = GetUpdateFrameCommand(direction * time_s, *command);
+        Frame frame;
+        GetUpdateFrameCommand(direction * time_s, *command, &frame);
 
         if (!!end_time_s) { break; }
 
@@ -308,7 +315,12 @@ class RippleGait : public Gait {
         for (const auto& leg: my_state.legs) {
           // TODO: Need to do this for the lifted leg as well.
           auto leg_robot_frame_point = frame.MapToParent(leg.point);
-          auto leg_shoulder_point = leg.shoulder_frame.MapFromFrame(
+          Frame shoulder_frame;
+          MakeShoulderFrame(
+              config_.mechanical.leg_config.at(leg_num),
+              &my_state, &shoulder_frame);
+
+          auto leg_shoulder_point = shoulder_frame.MapFromFrame(
               &my_state.robot_frame, leg_robot_frame_point);
 
           const auto& leg_config = config_.mechanical.leg_config.at(leg_num);
@@ -419,7 +431,8 @@ class RippleGait : public Gait {
   void AdvancePhaseNoaction(double delta_phase, double final_phase) {
     const double dt = delta_phase * phase_time_s();
 
-    const auto update_frame = GetUpdateFrame(dt);
+    Frame update_frame;
+    GetUpdateFrame(dt, &update_frame);
 
     auto new_transform = update_frame.TransformToFrame(&state_.world_frame);
     state_.robot_frame.transform = new_transform;
@@ -482,13 +495,13 @@ class RippleGait : public Gait {
     }
   }
 
-  Frame GetUpdateFrame(double dt) const {
-    return GetUpdateFrameCommand(dt, command_);
+  void GetUpdateFrame(double dt, Frame* frame) const {
+    return GetUpdateFrameCommand(dt, command_, frame);
   }
 
-  Frame GetUpdateFrameCommand(double dt, const Command& command) const {
-    Frame result;
-    result.parent = &state_.robot_frame;
+  void GetUpdateFrameCommand(
+      double dt, const Command& command, Frame* result) const {
+    result->parent = &state_.robot_frame;
 
     const double vx = command.translate_x_mm_s;
     const double vy = command.translate_y_mm_s;
@@ -503,14 +516,12 @@ class RippleGait : public Gait {
             std::sin(dt * vyaw) * vx) / vyaw;
       dy = ((std::cos(dt * vyaw) - 1) * vx +
              std::sin(dt * vyaw) * vy) / vyaw;
-      result.transform.rotation =
+      result->transform.rotation =
           Quaternion::FromEuler(0, 0, dt * vyaw);
     }
 
-    result.transform.translation.x = dx;
-    result.transform.translation.y = dy;
-
-    return result;
+    result->transform.translation.x = dx;
+    result->transform.translation.y = dy;
   }
 
   Point3D GetSwingEndPos(int leg_num) const {
@@ -521,7 +532,8 @@ class RippleGait : public Gait {
     const double stance_phase_time = 1.0 - swing_phase_time();
     const double dt = 0.5 * stance_phase_time * phase_time_s();
 
-    Frame end_frame = GetUpdateFrame(dt);
+    Frame end_frame;
+    GetUpdateFrame(dt, &end_frame);
 
     // TODO jpieper: This should map from whatever frame the idle
     // state leg was actually in.
