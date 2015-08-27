@@ -41,11 +41,13 @@
 ///   2 - BlockData
 ///
 /// BlockSchema
+///  * uint32_t identifier
 ///  * BlockSchemaFlags
 ///  * pstring name
 ///  * Schema
 ///
 /// BlockData
+///  * uint32_t identifier
 ///  * BlockDataFlags
 ///  * DataObject
 ///

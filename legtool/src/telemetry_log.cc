@@ -488,6 +488,7 @@ void TelemetryLog::WriteSchema(uint32_t identifier,
 
   FastOStringStream ostr_schema;
   TelemetryWriteStream<FastOStringStream> stream_schema(ostr_schema);
+  stream_schema.Write(identifier);
   stream_schema.Write(block_schema_flags);
   stream_schema.Write(record_name);
   stream_schema.RawWrite(schema.data(), schema.size());
@@ -509,7 +510,8 @@ void TelemetryLog::WriteData(uint32_t identifier,
 
   TelemetryWriteStream<OStream> stream(*buffer);
   stream.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
-  stream.Write(static_cast<uint32_t>(serialized_data.size() + 4));
+  stream.Write(static_cast<uint32_t>(serialized_data.size() + 8));
+  stream.Write(identifier);
   stream.Write(block_data_flags);
   stream.RawWrite(serialized_data.data(), serialized_data.size());
 
@@ -562,7 +564,7 @@ class FakeStream : boost::noncopyable {
 void TelemetryLog::WriteData(uint32_t identifier,
                              uint32_t block_data_flags,
                              std::unique_ptr<OStream> buffer) {
-  const size_t kBlockHeaderSize = 2 + 4 + 4;
+  const size_t kBlockHeaderSize = 2 + 4 + 4 + 4;
   BOOST_ASSERT(buffer->start() >= kBlockHeaderSize);
 
   size_t data_size = buffer->data()->size() - buffer->start();
@@ -572,6 +574,7 @@ void TelemetryLog::WriteData(uint32_t identifier,
   TelemetryWriteStream<FakeStream> writer(stream);
   writer.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
   writer.Write(static_cast<uint32_t>(data_size + 4));
+  writer.Write(identifier);
   writer.Write(block_data_flags);
 
   buffer->set_start(buffer->start() - kBlockHeaderSize);
