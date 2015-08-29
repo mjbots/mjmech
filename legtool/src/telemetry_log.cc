@@ -573,7 +573,7 @@ void TelemetryLog::WriteData(uint32_t identifier,
       &(*buffer->data())[0] + buffer->start() - kBlockHeaderSize);
   TelemetryWriteStream<FakeStream> writer(stream);
   writer.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
-  writer.Write(static_cast<uint32_t>(data_size + 4));
+  writer.Write(static_cast<uint32_t>(data_size + 8));
   writer.Write(identifier);
   writer.Write(block_data_flags);
 
