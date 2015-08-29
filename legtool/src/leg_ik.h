@@ -319,7 +319,9 @@ class MammalIK : public IKSolver {
 
     // Now we project the femur attachment and the point into the leg
     // plane.
-    const double femur_x = config_.femur_attachment_mm.x; // TODO jpieper: What sign?
+    //
+    // TODO jpieper: What sign?
+    const double femur_x = config_.femur_attachment_mm.x;
     const double femur_y = config_.femur_attachment_mm.z;
 
     const double point_x = point_mm.x; // TODO jpieper: What sign?

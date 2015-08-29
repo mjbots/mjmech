@@ -229,16 +229,6 @@ void SerializableWriteSettings(const Serializable* object,
   }
 }
 
-boost::shared_ptr<IKSolver> MakeIKSolver(std::auto_ptr<LizardIK> lizard_ik) {
-  auto result = boost::shared_ptr<IKSolver>(lizard_ik.get());
-  lizard_ik.release();
-  return result;
-}
-
-LizardIK* MakeLizardIK(const LizardIK::Config& config) {
-  return new LizardIK(config);
-}
-
 Frame* GetRippleStateLegFrame(const RippleState::Leg* leg) {
   return leg->frame;
 }
@@ -355,14 +345,14 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def("write_settings", &SerializableWriteSettings<LizardIK::Config>)
       ;
 
-  class_<LizardIK, boost::noncopyable>("LizardIK", init<LizardIK::Config>())
+  class_<LizardIK,
+         boost::shared_ptr<LizardIK>,
+         bases<IKSolver>,
+         boost::noncopyable>("LizardIK", init<LizardIK::Config>())
       .def("solve", &LizardIK::Solve)
       .def("do_ik", &LizardIK::Solve)
       .def("config", &LizardIK::config,
            return_internal_reference<1>())
-      .def("create", &MakeLizardIK,
-           return_value_policy<manage_new_object>())
-      .staticmethod("create")
       ;
 
   enum_<Leg::Mode>("LegMode")
@@ -472,7 +462,7 @@ BOOST_PYTHON_MODULE(_legtool) {
   class_<RippleState::Leg>("RippleStateLeg")
       .def_readwrite("point", &RippleState::Leg::point)
       .def_readwrite("mode", &RippleState::Leg::mode)
-      .def_readwrite("leg_ik", &RippleState::Leg::leg_ik)
+      .add_property("leg_ik", &RippleState::Leg::leg_ik)
       .def_readwrite("swing_start_pos", &RippleState::Leg::swing_start_pos)
       .def_readwrite("swing_end_pos", &RippleState::Leg::swing_end_pos)
       .add_property("frame",
@@ -522,6 +512,4 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def("command", &RippleGait::command,
            return_internal_reference<1>())
       ;
-
-  def("make_iksolver", &MakeIKSolver);
 }

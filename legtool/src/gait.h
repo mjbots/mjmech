@@ -49,7 +49,7 @@ struct Leg {
   struct State {
     Point3D point;
     Mode mode = Mode::kUnknown;
-    IKSolver* leg_ik = nullptr;
+    boost::shared_ptr<IKSolver> leg_ik;
     Frame* frame = nullptr;
   };
 };

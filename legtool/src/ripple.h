@@ -240,7 +240,7 @@ class RippleGait : public Gait {
       Frame shoulder_frame;
       MakeShoulderFrame(leg_config, &result, &shoulder_frame);
 
-      leg_state.leg_ik = leg_config.leg_ik.get();
+      leg_state.leg_ik = leg_config.leg_ik;
     }
 
     return result;
