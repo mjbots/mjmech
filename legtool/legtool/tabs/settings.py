@@ -14,10 +14,10 @@
 
 
 def restore_combo(config, group, combo, name):
-    if not config.has_option(group, name):
+    if group not in config or name not in config[group]:
         return
 
-    value = config.get(group, name)
+    value = config[group][name]
     for i in range(combo.count()):
         if combo.itemText(i) == value:
             combo.setCurrentIndex(i)

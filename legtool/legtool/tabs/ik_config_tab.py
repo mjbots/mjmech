@@ -458,33 +458,35 @@ class IkConfigTab(object):
     def read_settings(self, config):
         self.handle_current_changed()
 
-        if config.has_section('ikconfig'):
-            def set_combo(combo, name):
-                settings.restore_combo(config, 'ikconfig', combo, name)
+        if 'ikconfig' not in config:
+            return
 
-            set_combo(self.ui.idleCombo, 'idle_pose')
-            set_combo(self.ui.minimumCombo, 'minimum_pose')
-            set_combo(self.ui.maximumCombo, 'maximum_pose')
+        ikconfig = config['ikconfig']
 
-            for spin, name in self.get_float_configs():
-                if config.has_option('ikconfig', name):
-                    spin.setValue(config.getfloat('ikconfig', name))
+        def set_combo(combo, name):
+            settings.restore_combo(config, 'ikconfig', combo, name)
 
-        if config.has_option('ikconfig', 'plane'):
-            self.ui.planeCombo.setCurrentIndex(
-                config.getint('ikconfig', 'plane'))
-        if config.has_option('ikconfig', 'scale'):
-            self.ui.lengthScaleSpin.setValue(
-                config.getfloat('ikconfig', 'scale'))
-        if config.has_option('ikconfig', 'speed_scale'):
-            self.ui.speedScaleSpin.setValue(
-                config.getfloat('ikconfig', 'speed_scale'))
-        if config.has_option('ikconfig', 'speed_axis'):
-            self.ui.speedAxisCombo.setCurrentIndex(
-                config.getint('ikconfig', 'speed_axis'))
+        set_combo(self.ui.idleCombo, 'idle_pose')
+        set_combo(self.ui.minimumCombo, 'minimum_pose')
+        set_combo(self.ui.maximumCombo, 'maximum_pose')
 
-        if config.has_section('ikconfig.legs'):
-            for leg_name, value in config.items('ikconfig.legs'):
+        for spin, name in self.get_float_configs():
+            if name in ikconfig:
+                spin.setValue(ikconfig[name])
+
+        if 'plane' in ikconfig:
+            self.ui.planeCombo.setCurrentIndex(ikconfig['plane'])
+        if 'scale' in ikconfig:
+            self.ui.lengthScaleSpin.setValue(ikconfig['scale'])
+        if 'speed_scale' in ikconfig:
+            self.ui.speedScaleSpin.setValue(ikconfig['speed_scale'])
+        if 'speed_axis' in ikconfig:
+            self.ui.speedAxisCombo.setCurrentIndex(ikconfig['speed_axis'])
+
+        if 'legs' in ikconfig:
+            legs = ikconfig['legs']
+
+            for leg_name, value in legs.iteritems():
                 leg_num = int(leg_name.split('.')[1])
                 self.legs[leg_num] = LegConfig.from_string(value)
 
@@ -496,27 +498,26 @@ class IkConfigTab(object):
         self.handle_ik_config_change()
 
     def write_settings(self, config):
-        config.add_section('ikconfig')
+        ikconfig = config.setdefault('ikconfig', {})
 
-        config.set('ikconfig', 'idle_pose', self.ui.idleCombo.currentText())
-        config.set('ikconfig', 'minimum_pose',
-                   self.ui.minimumCombo.currentText())
-        config.set('ikconfig', 'maximum_pose',
-                   self.ui.maximumCombo.currentText())
+        ikconfig['idle_pose'] =  self.ui.idleCombo.currentText()
+        ikconfig['minimum_pose'] = self.ui.minimumCombo.currentText()
+        ikconfig['maximum_pose'] = self.ui.maximumCombo.currentText()
 
         for spin, name in self.get_float_configs():
-            config.set('ikconfig', name, spin.value())
+            ikconfig[name] = spin.value()
 
-        config.set('ikconfig', 'plane', self.ui.planeCombo.currentIndex())
-        config.set('ikconfig', 'scale', self.ui.lengthScaleSpin.value())
-        config.set('ikconfig', 'speed_scale', self.ui.speedScaleSpin.value())
-        config.set('ikconfig', 'speed_axis',
-                   self.ui.speedAxisCombo.currentIndex())
+        ikconfig['plane'] = self.ui.planeCombo.currentIndex()
+        ikconfig['scale'] = self.ui.lengthScaleSpin.value()
+        ikconfig['speed_scale'] = self.ui.speedScaleSpin.value()
+        ikconfig['speed_axis'] = self.ui.speedAxisCombo.currentIndex()
 
-        config.add_section('ikconfig.legs')
+        legs = ikconfig.setdefault('legs', {})
+
         for leg_num, leg_config in self.legs.iteritems():
-            config.set('ikconfig.legs', 'leg.%d' % leg_num, str(leg_config))
+            legs['leg.%d' % leg_num] = str(leg_config)
 
             if leg_config.present:
-                self.get_leg_ik(leg_num).config.write_settings(
-                    config, 'ikconfig.leg.%d' % leg_num)
+                leg = ikconfig.setdefault('leg', {})
+                this_leg = leg.setdefault(leg_num, {})
+                self.get_leg_ik(leg_num).config().write_settings(this_leg)

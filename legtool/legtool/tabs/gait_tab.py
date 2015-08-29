@@ -30,9 +30,6 @@ sys.path.append(
             os.path.realpath(__file__)), '../../src/build'))
 import _legtool
 
-from ..tf import tf
-from ..gait import ripple
-
 from . import convexhull
 from . import settings
 
@@ -40,6 +37,22 @@ from .common import BoolContext
 from . import graphics_scene
 
 PLAYBACK_TIMEOUT_MS = 40
+
+class GaitGraphLeg(object):
+    def __init__(self):
+        self.sequence = []
+        '''A list of tuples (phase, mode)
+        phase - the gait phase where this mode starts
+        mode - a leg mode describing what the leg starts doing
+        at this time
+        '''
+
+
+class GaitGraph(object):
+    def __init__(self):
+        # This is a mapping of leg numbers to GaitGraphLeg instances.
+        self.leg = {}
+
 
 class GaitGeometryDisplay(object):
     FRAME_ROBOT, FRAME_WORLD, FRAME_BODY = range(3)
@@ -132,7 +145,7 @@ class GaitGeometryDisplay(object):
                 QtCore.QPointF(0, 10),
                 QtCore.QPointF(10, 0),
                 QtCore.QPointF(0, -10)])
-        for leg_num, leg in config.mechanical.leg_config.iteritems():
+        for leg_num, leg in enumerate(config.mechanical.leg_config):
             this_shoulder = self.graphics_scene.addPolygon(
                 shoulder_poly, QtGui.QPen(QtCore.Qt.black),
                 QtGui.QBrush(QtCore.Qt.blue))
@@ -173,35 +186,41 @@ class GaitGeometryDisplay(object):
 
         stance_points = []
 
-        self.body.setPos(*self._project(tf.Point3D(), state.body_frame))
-        self.cog.setPos(*self._project(tf.Point3D(), state.cog_frame))
+        self.body.setPos(*self._project(_legtool.Point3D(), state.body_frame))
+        self.cog.setPos(*self._project(_legtool.Point3D(), state.cog_frame))
 
         for leg_num, shoulder in self.shoulders.iteritems():
-            if leg_num not in state.legs:
+            if leg_num >= len(state.legs):
                 continue
-            shoulder.setPos(*self._project(tf.Point3D(),
-                                           state.legs[leg_num].shoulder_frame))
+            shoulder_frame = _legtool.Frame()
+            self.state.make_shoulder(self.config.mechanical.leg_config[leg_num],
+                                     shoulder_frame)
+            shoulder.setPos(*self._project(_legtool.Point3D(), shoulder_frame))
 
         for leg_num, leg_item in self.legs.iteritems():
-            if leg_num not in state.legs:
+            if leg_num >= len(state.legs):
                 continue
             leg = state.legs[leg_num]
 
             point = self._project(leg.point, leg.frame)
             leg_item.setPos(*point)
 
-            shoulder_point = leg.shoulder_frame.map_from_frame(
+            shoulder_frame = _legtool.Frame()
+            self.state.make_shoulder(self.config.mechanical.leg_config[leg_num],
+                                     shoulder_frame)
+            shoulder_point = shoulder_frame.map_from_frame(
                 leg.frame, leg.point)
+
             ik_result = leg.leg_ik.do_ik(_legtool.Point3D(shoulder_point.x,
                                                           shoulder_point.y,
                                                           shoulder_point.z))
 
             if not ik_result.valid():
                 color = QtCore.Qt.red
-            elif leg.mode == ripple.STANCE:
+            elif leg.mode == _legtool.LegMode.kStance:
                 color = QtCore.Qt.green
                 stance_points.append(point)
-            elif leg.mode == ripple.SWING:
+            elif leg.mode == _legtool.LegMode.kSwing:
                 color = QtCore.Qt.yellow
             else:
                 assert False, 'unknown leg mode %d' % leg.mode
@@ -266,7 +285,7 @@ class GaitGraphDisplay(object):
             old_phase = 0.0
             old_swing = False
             for phase, mode in graph.leg[leg_number].sequence:
-                if mode == ripple.STANCE and old_swing:
+                if mode == _legtool.LegMode.kStance and old_swing:
                     # Render a black bar for this swing phase.
                     self.graphics_scene.addRect(
                         old_phase, y_offset + 0.1 * y_size,
@@ -275,7 +294,7 @@ class GaitGraphDisplay(object):
                         QtGui.QBrush(QtCore.Qt.black))
 
                 old_phase = phase
-                old_swing = True if mode == ripple.SWING else False
+                old_swing = True if mode == _legtool.LegMode.kSwing else False
 
             y_offset += y_size
 
@@ -358,27 +377,30 @@ class CommandWidget(object):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
 
     def read_settings(self, config):
+        if 'gaitconfig' not in config:
+            return
+
         def set_combo(combo, name):
             settings.restore_combo(config, 'gaitconfig', combo, name)
 
         set_combo(self.ui.commandXCombo, 'command_x_axis')
         set_combo(self.ui.commandYCombo, 'command_y_axis')
 
+        gaitconfig = config['gaitconfig']
         for index in range(len(self.scales)):
             name = 'command_axis_scale_%d' % index
-            if config.has_option('gaitconfig', name):
-                self.scales[index] = config.getfloat('gaitconfig', name)
+            if name in gaitconfig:
+                self.scales[index] = gaitconfig[name]
 
         self.handle_axis_change()
 
     def write_settings(self, config):
-        config.set('gaitconfig', 'command_x_axis',
-                   self.ui.commandXCombo.currentText())
-        config.set('gaitconfig', 'command_y_axis',
-                   self.ui.commandYCombo.currentText())
+        gaitconfig = config.setdefault('gaitconfig', {})
+        gaitconfig['command_x_axis'] = self.ui.commandXCombo.currentText()
+        gaitconfig['command_y_axis'] = self.ui.commandYCombo.currentText()
 
         for index, value in enumerate(self.scales):
-            config.set('gaitconfig', 'command_axis_scale_%d' % index, value)
+            gaitconfig['command_axis_scale_%d' % index] = value
 
     def handle_axis_change(self):
         with self.in_scale_changed:
@@ -444,8 +466,8 @@ class CommandWidget(object):
         self.handle_mouse_move(cursor)
 
     def update_allowable(self, config, command):
-        self.next_config = config.copy()
-        self.next_command = command.copy()
+        self.next_config = _legtool.RippleConfig(config)
+        self.next_command = _legtool.Command(command)
 
         for (x, y), rect in self.usable_rects.iteritems():
             old_brush = rect.brush()
@@ -476,8 +498,8 @@ class CommandWidget(object):
         self.config = self.next_config
         self.command = self.next_command
 
-        my_gait = ripple.RippleGait(self.next_config)
-        my_command = self.next_command.copy()
+        my_gait = _legtool.RippleGait(self.next_config)
+        my_command = _legtool.Command(self.next_command)
 
         self.next_config = None
         self.next_command = None
@@ -492,16 +514,18 @@ class CommandWidget(object):
             setattr(my_command, self.ATTR_NAMES[self.y_axis()], y_value)
 
             color = (0, 255, 0)
-            try:
-                my_gait.set_command(my_command)
-                actual_command = my_gait.command
+
+
+            result = my_gait.set_command(my_command)
+            if result == _legtool.RippleGaitResult.kValid:
+                actual_command = my_gait.command()
                 actual_x_value = getattr(
                     actual_command, self.ATTR_NAMES[self.x_axis()])
                 actual_y_value = getattr(
                     actual_command, self.ATTR_NAMES[self.y_axis()])
                 if actual_x_value != x_value or actual_y_value != y_value:
                     color = (255, 255, 0)
-            except ripple.NotSupported:
+            else:
                 color = (255, 0, 0)
 
             rect.setBrush(QtGui.QBrush(QtGui.QColor(*color)))
@@ -532,10 +556,10 @@ class GaitTab(object):
         self.in_number_changed = BoolContext()
         self.in_command_changed = BoolContext()
 
-        self.ripple_config = ripple.RippleConfig()
-        self.ripple = ripple.RippleGait(self.ripple_config)
+        self.ripple_config = _legtool.RippleConfig()
+        self.ripple = _legtool.RippleGait(self.ripple_config)
 
-        self.command = ripple.Command()
+        self.command = _legtool.Command()
 
         self.command_widget = CommandWidget(
             ui, self.command, self.handle_widget_set_command)
@@ -638,44 +662,24 @@ class GaitTab(object):
                 (self.ui.commandYawSpin, 'command_body_yaw_deg'),
                 ]
 
-    def string_to_leg_config(self, value):
-        assert isinstance(value, str)
-        fields = [float(x) for x in value.split(',')]
-        assert len(fields) >= 3
-
-        result = ripple.LegConfig()
-        result.mount_x_mm = fields[0]
-        result.mount_y_mm = fields[1]
-        result.mount_z_mm = fields[2]
-
-        return result
-
-    def leg_config_to_string(self, leg_config):
-        assert isinstance(leg_config, ripple.LegConfig)
-        return '%.2f,%.2f,%.2f' % (
-            leg_config.mount_x_mm,
-            leg_config.mount_y_mm,
-            leg_config.mount_z_mm)
-
     def read_settings(self, config):
-        if not config.has_section('gaitconfig'):
+        if 'gaitconfig' not in config:
             return
 
-        class IkGetter(object):
-            def __init__(self, parent):
-                self.parent = parent
+        gaitconfig = config['gaitconfig']
 
-            def __getitem__(self, index):
-                return self.parent.ikconfig_tab.get_leg_ik(index)
-
-        self.ripple_config = \
-            ripple.RippleConfig.read_settings(config, 'gaitconfig',
-                                              IkGetter(self))
+        if 'ripple' in gaitconfig:
+            self.ripple_config = \
+                _legtool.RippleConfig.read_settings(gaitconfig['ripple'])
+        leg_config_list = self.ripple_config.mechanical.leg_config
+        for leg_number, leg_config in enumerate(leg_config_list):
+            ik = self.ikconfig_tab.get_leg_ik(leg_number)
+            leg_config.leg_ik = ik
 
         with self.in_command_changed:
             for spin, name in self.get_float_configs():
-                if config.has_option('gaitconfig', name):
-                    spin.setValue(config.getfloat('gaitconfig', name))
+                if name in gaitconfig:
+                    spin.setValue(gaitconfig[name])
 
         def set_combo(combo, name):
             settings.restore_combo(config, 'gaitconfig', combo, name)
@@ -695,17 +699,17 @@ class GaitTab(object):
         with self.in_gait_changed:
             c = self.ripple_config
             m = c.mechanical
-            legs = m.leg_config.values()
-            l = legs[0] if len(legs) > 0 else ripple.LegConfig()
+            legs = m.leg_config
+            l = legs[0] if len(legs) > 0 else _legtool.LegConfig()
 
             spins = [
-                (self.ui.bodyCogXSpin, m.body_cog_x_mm),
-                (self.ui.bodyCogYSpin, m.body_cog_y_mm),
-                (self.ui.bodyCogZSpin, m.body_cog_z_mm),
-                (self.ui.bodyMassSpin, m.body_mass_kg),
-                (self.ui.idlePositionXSpin, l.idle_x_mm),
-                (self.ui.idlePositionYSpin, l.idle_y_mm),
-                (self.ui.idlePositionZSpin, l.idle_z_mm),
+                (self.ui.bodyCogXSpin, m.body_cog_mm.x),
+                (self.ui.bodyCogYSpin, m.body_cog_mm.y),
+                (self.ui.bodyCogZSpin, m.body_cog_mm.z),
+                #(self.ui.bodyMassSpin, m.body_mass_kg),
+                (self.ui.idlePositionXSpin, l.idle_mm.x),
+                (self.ui.idlePositionYSpin, l.idle_mm.y),
+                (self.ui.idlePositionZSpin, l.idle_mm.z),
                 (self.ui.maxCycleTimeSpin, c.max_cycle_time_s),
                 (self.ui.liftHeightSpin, c.lift_height_mm),
                 (self.ui.swingPercentSpin, c.swing_percent),
@@ -720,26 +724,74 @@ class GaitTab(object):
                 spin.setValue(value)
 
             self.ui.staticEnableCheck.setChecked(c.statically_stable)
-            self.ui.accurateCogCheck.setChecked(c.accurate_cog)
-            self.ui.legOrderEdit.setText(c.str_leg_order(c.leg_order))
+            # self.ui.accurateCogCheck.setChecked(c.accurate_cog)
+            self.ui.legOrderEdit.setText(self.stringify_leg_order(c.leg_order))
 
             self.handle_leg_change(self.ui.gaitLegList.currentItem())
 
     def write_settings(self, config):
-        self.ripple_config.write_settings(config, 'gaitconfig')
+        gaitconfig = config.setdefault('gaitconfig', {})
+        ripple_config = gaitconfig.setdefault('ripple', {})
+        self.ripple_config.write_settings(ripple_config)
 
         for spin, name in self.get_float_configs():
-            config.set('gaitconfig', name, spin.value())
+            gaitconfig[name] = spin.value()
 
-        config.set('gaitconfig', 'geometry_frame',
-                   self.ui.geometryFrameCombo.currentText())
-        config.set('gaitconfig', 'geometry_projection',
-                   self.ui.geometryProjectionCombo.currentText())
+        gaitconfig['geometry_frame'] = self.ui.geometryFrameCombo.currentText()
+        gaitconfig['geometry_projection'] = (
+            self.ui.geometryProjectionCombo.currentText())
 
         self.command_widget.write_settings(config)
 
     def stringify_leg_order(self, data):
-        return ripple.RippleConfig.str_leg_order(data)
+        result = ''
+
+        for index, outer in enumerate(data):
+            if len(outer) == 1:
+                result += str(outer[0])
+            else:
+                result += '(' + ','.join(str(x) for x in outer) + ')'
+            if index + 1 != len(data):
+                result += ','
+        return result
+
+    def parse_leg_order(self, data):
+        in_tuple = False
+        result = _legtool.vector_vector_int()
+        current_tuple = _legtool.vector_int()
+        current_item = ''
+
+        for x in data:
+            if x == '(':
+                if in_tuple:
+                    return result
+                in_tuple = True
+            if x >= '0' and x <= '9':
+                current_item += x
+            else:
+                if len(current_item):
+                    value = int(current_item)
+                    current_item = ''
+                    if in_tuple:
+                        current_tuple.append(value)
+                    else:
+                        this_tuple = _legtool.vector_int()
+                        this_tuple.append(value)
+                        result.append(this_tuple)
+                if x == ')':
+                    if not in_tuple:
+                        return result
+                    result.append(current_tuple)
+                    current_tuple = _legtool.vector_int()
+                    in_tuple = False
+
+        if len(current_item):
+            value = int(current_item)
+            this_tuple = _legtool.vector_int()
+            this_tuple.append(value)
+            result.append(this_tuple)
+
+        return result
 
     def validate_leg_order(self, data):
         """Accept data that is human entered.  Return a string
@@ -747,36 +799,24 @@ class GaitTab(object):
         separate list of leg numbers, or tuples of leg numbers."""
         entered_values = []
         try:
-            entered_values = ripple.RippleConfig.parse_leg_order(data)
+            entered_values = self.parse_leg_order(data)
         except:
             pass
 
-        required_legs = self.ripple_config.mechanical.leg_config.keys()
+        required_legs = set(self.ikconfig_tab.get_enabled_legs())
 
         used_legs = {}
         actual_legs = []
         for group in entered_values:
-            if isinstance(group, int):
-                x = group
-                if x in required_legs and not x in used_legs:
-                    actual_legs.append(x)
-                    used_legs[x] = True
-            else:
-                next_tuple = ()
-                for x in group:
-                    if x in required_legs and not x in used_legs:
-                        next_tuple += (x,)
-                        used_legs[x] = True
-                if len(next_tuple) > 1:
-                    actual_legs.append(next_tuple)
-                elif len(next_tuple) == 1:
-                    actual_legs.append(next_tuple[0])
+            for leg in group:
+                required_legs -= set([leg])
 
         for x in required_legs:
-            if not x in used_legs:
-                actual_legs.append(x)
+            this_group = _legtool.vector_int()
+            this_group.append(x)
+            entered_values.append(this_group)
 
-        return self.stringify_leg_order(actual_legs)
+        return self.stringify_leg_order(entered_values)
 
     def handle_current_changed(self, index=2):
         if index != 2:
@@ -831,14 +871,10 @@ class GaitTab(object):
         with self.in_number_changed:
             number = int(current_item.text())
 
-            leg_config = self.ripple_config.mechanical.leg_config.get(
-                number, ripple.LegConfig())
-            if leg_config.mount_x_mm is not None:
-                self.ui.mountingLegXSpin.setValue(leg_config.mount_x_mm)
-            if leg_config.mount_y_mm is not None:
-                self.ui.mountingLegYSpin.setValue(leg_config.mount_y_mm)
-            if leg_config.mount_z_mm is not None:
-                self.ui.mountingLegZSpin.setValue(leg_config.mount_z_mm)
+            leg_config = self.ripple_config.mechanical.leg_config[number]
+            self.ui.mountingLegXSpin.setValue(leg_config.mount_mm.x)
+            self.ui.mountingLegYSpin.setValue(leg_config.mount_mm.y)
+            self.ui.mountingLegZSpin.setValue(leg_config.mount_mm.z)
 
         self.handle_leg_data_change()
 
@@ -852,12 +888,11 @@ class GaitTab(object):
 
         number = int(number_item.text())
 
-        leg_config = self.ripple_config.mechanical.leg_config.get(
-            number, ripple.LegConfig())
+        leg_config = self.ripple_config.mechanical.leg_config[number]
 
-        leg_config.mount_x_mm = self.ui.mountingLegXSpin.value()
-        leg_config.mount_y_mm = self.ui.mountingLegYSpin.value()
-        leg_config.mount_z_mm = self.ui.mountingLegZSpin.value()
+        leg_config.mount_mm.x = self.ui.mountingLegXSpin.value()
+        leg_config.mount_mm.y = self.ui.mountingLegYSpin.value()
+        leg_config.mount_mm.z = self.ui.mountingLegZSpin.value()
 
         self.ripple_config.mechanical.leg_config[number] = leg_config
 
@@ -872,21 +907,21 @@ class GaitTab(object):
 
         mechanical = self.ripple_config.mechanical
 
-        for item_num in range(self.ui.gaitLegList.count()):
-            item = self.ui.gaitLegList.item(item_num)
-            leg_number = int(item.text())
-            if not (item.flags() & QtCore.Qt.ItemIsEnabled):
-                if leg_number in mechanical.leg_config:
-                    del mechanical.leg_config[leg_number]
-            elif leg_number not in mechanical.leg_config:
-                mechanical.leg_config[leg_number] = ripple.LegConfig()
+        enabled_legs = self.ikconfig_tab.get_enabled_legs()
+        biggest_leg_number = max(enabled_legs)
+        assert range(biggest_leg_number + 1) == enabled_legs
 
-        for leg_data in self.ripple_config.mechanical.leg_config.iteritems():
+        while biggest_leg_number > len(mechanical.leg_config):
+            mechanical.leg_config.append(_legtool.LegConfig())
+        while len(mechanical.leg_config) > (biggest_leg_number + 1):
+            del mechanical.leg_config[-1]
+
+        for leg_data in enumerate(self.ripple_config.mechanical.leg_config):
             leg_number, leg_config = leg_data
 
-            leg_config.idle_x_mm = self.ui.idlePositionXSpin.value()
-            leg_config.idle_y_mm = self.ui.idlePositionYSpin.value()
-            leg_config.idle_z_mm = self.ui.idlePositionZSpin.value()
+            leg_config.idle_mm.x = self.ui.idlePositionXSpin.value()
+            leg_config.idle_mm.y = self.ui.idlePositionYSpin.value()
+            leg_config.idle_mm.z = self.ui.idlePositionZSpin.value()
 
             leg_config.leg_ik = self.ikconfig_tab.get_leg_ik(leg_number)
 
@@ -906,9 +941,8 @@ class GaitTab(object):
         self.ripple_config.position_margin_percent = \
             self.ui.positionMarginSpin.value()
 
-        self.ripple_config.leg_order = \
-            ripple.RippleConfig.parse_leg_order(
-                self.validate_leg_order(self.ui.legOrderEdit.text()))
+        self.ripple_config.leg_order = self.parse_leg_order(
+            self.validate_leg_order(self.ui.legOrderEdit.text()))
 
         self.ripple_config.body_z_offset_mm = self.ui.bodyZOffsetSpin.value()
 
@@ -923,10 +957,9 @@ class GaitTab(object):
         self.ripple_config.static_margin_mm = \
             self.ui.staticMarginSpin.value()
 
-        self.ripple = ripple.RippleGait(self.ripple_config)
+        self.ripple = _legtool.RippleGait(self.ripple_config)
         self.gait_geometry_display.set_gait_config(self.ripple_config)
 
-        self.update_gait_graph()
         self.handle_playback_config_change()
         self.update_allowable_commands()
 
@@ -935,21 +968,20 @@ class GaitTab(object):
                 self.ui.legOrderEdit.text()))
         self.handle_gait_config_change()
 
-    def update_gait_graph(self):
-        self.gait_graph_display.set_gait_graph(self.ripple.get_gait_graph())
-
     def get_start_state(self):
         begin_index = self.ui.playbackBeginCombo.currentIndex()
-        this_ripple = ripple.RippleGait(self.ripple_config)
+        this_ripple = _legtool.RippleGait(self.ripple_config)
 
         if begin_index == 0: # Idle
             begin_state = this_ripple.get_idle_state()
         else:
             begin_state = this_ripple.get_idle_state()
-            this_ripple.set_state(begin_state, self.command)
+            this_ripple.set_state(begin_state)
+            this_ripple.set_command(self.command)
             for x in range(int(1.0 / self.phase_step)):
-                begin_state = this_ripple.advance_phase(self.phase_step)
+                this_ripple.advance_phase(self.phase_step)
 
+            begin_state = this_ripple.state()
             # When setting a state, we are required to be exactly
             # zero.  Verify that we are close enough to zero from a
             # numerical perspective, then force it to be exactly zero.
@@ -963,26 +995,41 @@ class GaitTab(object):
         # phase.  Then make sure that the graphic state is current for
         # the phase that is selected now.
 
-        try:
-            begin_state = self.get_start_state()
-            begin_state = self.ripple.set_state(begin_state, self.command)
-        except ripple.NotSupported:
+        begin_state = self.get_start_state()
+        self.ripple.set_state(begin_state)
+        result = self.ripple.set_command(self.command)
+        if result != _legtool.RippleGaitResult.kValid:
             # guess we can't change anything
             self.ui.gaitOptionsBrowser.setText('command not possible')
             return
 
         self.current_states = (
-            [begin_state.copy()] +
-            [self.ripple.advance_phase(self.phase_step).copy()
+            [_legtool.RippleState(self.ripple.state())] +
+            [_legtool.RippleState(
+                    (self.ripple.advance_phase(self.phase_step),
+                     self.ripple)[1].state())
              for x in range(self.ui.playbackPhaseSlider.maximum())])
 
         self.handle_playback_phase_change()
 
-        options = self.ripple.options
+        options = self.ripple.options()
         text = 'cycle_time: %.2fs\nservo_speed: %.1fdps' % (
             options.cycle_time_s,
             options.servo_speed_dps)
         self.ui.gaitOptionsBrowser.setText(text)
+
+        graph = GaitGraph()
+        for leg_number in range(len(self.current_states[0].legs)):
+            graph.leg[leg_number] = GaitGraphLeg()
+
+        for state in self.current_states:
+            for leg_number, leg_item in enumerate(state.legs):
+                graph_seq = graph.leg[leg_number].sequence
+                if (len(graph_seq) == 0 or
+                    graph_seq[-1][1] != leg_item.mode):
+                    graph_seq.append((state.phase, leg_item.mode))
+
+        self.gait_graph_display.set_gait_graph(graph)
 
     def handle_playback_phase_change(self):
         if self.playback_mode != self.PLAYBACK_IDLE:
@@ -1082,7 +1129,8 @@ class GaitTab(object):
             self.ui.playbackSlowRepeatButton.setChecked(False)
 
         # Otherwise, start the appropriate playback mode.
-        self.ripple.set_state(self.get_start_state(), self.command)
+        self.ripple.set_state(self.get_start_state())
+        self.ripple.set_command(self.command)
         self.playback_mode = state
         self.playback_timer.start(PLAYBACK_TIMEOUT_MS)
 
@@ -1091,12 +1139,13 @@ class GaitTab(object):
             print "WARNING: Playback timer fired when idle."
             return
 
-        old_phase = self.ripple.state.phase
+        old_phase = self.ripple.state().phase
 
         advance = PLAYBACK_TIMEOUT_MS / 1000.0
         if self.playback_mode == self.PLAYBACK_SLOW_REPEAT:
             advance *= 0.1
-        state = self.ripple.advance_time(advance)
+        self.ripple.advance_time(advance)
+        state = self.ripple.state()
 
         if (self.playback_mode == self.PLAYBACK_SINGLE and
             state.phase < 0.5 and old_phase > 0.5):

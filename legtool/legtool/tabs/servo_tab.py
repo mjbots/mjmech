@@ -427,22 +427,24 @@ class ServoTab(object):
             control['current'].setText('%.1f' % data[i])
 
     def read_settings(self, config):
-        if not config.has_section('servo'):
+        if 'servo' not in config:
             return
 
-        self.ui.typeCombo.setCurrentIndex(config.getint('servo', 'type'))
-        self.ui.serialPortCombo.setEditText(config.get('servo', 'port'))
-        self.ui.servoCountSpin.setValue(config.getint('servo', 'count'))
+        servo = config['servo']
+        self.ui.typeCombo.setCurrentIndex(servo['type'])
+        self.ui.serialPortCombo.setEditText(servo['port'])
+        self.ui.servoCountSpin.setValue(servo['count'])
 
-        self.servo_model = config.get('servo', 'model')
+        self.servo_model = servo['model']
 
-        if config.has_section('servo.names'):
+        if 'names' in servo:
             self.servo_name_map = {}
-            for name, value in config.items('servo.names'):
+            for name, value in servo['names'].iteritems():
                 self.servo_name_map[int(name)] = value
 
-        if config.has_section('servo.poses'):
-            for name, value in config.items('servo.poses'):
+        if 'poses' in servo:
+            poses = servo['poses']
+            for name, value in poses.iteritems():
                 this_data = {}
                 for element in value.split(','):
                     ident, angle_deg = element.split('=')
@@ -452,24 +454,22 @@ class ServoTab(object):
 
 
     def write_settings(self, config):
-        config.add_section('servo')
-        config.add_section('servo.poses')
-        config.add_section('servo.names')
+        servo = config.setdefault('servo', {})
+        poses = servo.setdefault('poses', {})
+        names = servo.setdefault('names', {})
 
-        config.set('servo', 'type', self.ui.typeCombo.currentIndex())
-        config.set('servo', 'port', self.ui.serialPortCombo.currentText())
-        config.set('servo', 'count', self.ui.servoCountSpin.value())
-
-        config.set('servo', 'model', self.servo_model)
+        servo['type'] = self.ui.typeCombo.currentIndex()
+        servo['port'] = self.ui.serialPortCombo.currentText()
+        servo['count'] =  self.ui.servoCountSpin.value()
+        servo['model'] = self.servo_model
 
         for key, value in self.servo_name_map.iteritems():
-            config.set('servo.names', str(key), value)
+            names[str(key)] = value
 
         for row in range(self.ui.poseList.count()):
             item = self.ui.poseList.item(row)
             pose_name = item.text()
             values = item.data(QtCore.Qt.UserRole)
-            config.set(
-                'servo.poses', pose_name,
+            poses[pose_name] = (
                 ','.join(['%d=%.2f' % (ident, angle_deg)
                           for ident, angle_deg in values.iteritems()]))

@@ -18,11 +18,10 @@
 walking mech robots.'''
 
 import argparse
-import os
+import json
 import logging
+import os
 import sys
-
-import ConfigParser
 
 import trollius
 import trollius as asyncio
@@ -65,14 +64,16 @@ class LegTool(QtGui.QMainWindow):
         event.accept()
 
     def read_settings(self):
-        config = ConfigParser.ConfigParser()
-        config.read(self.config_file)
+        try:
+            config = json.load(open(self.config_file))
 
-        for tab in self.tabs:
-            tab.read_settings(config)
+            for tab in self.tabs:
+                tab.read_settings(config)
+        except ValueError as e:
+            print "Could not read config file, starting with no config:", e
 
     def write_settings(self):
-        config = ConfigParser.ConfigParser()
+        config = {}
 
         for tab in self.tabs:
             tab.write_settings(config)
@@ -80,7 +81,8 @@ class LegTool(QtGui.QMainWindow):
         config_dir = os.path.dirname(self.config_file)
         if config_dir != '' and not os.path.exists(config_dir):
             os.mkdir(config_dir)
-        config.write(open(self.config_file, 'w'))
+        json.dump(config, open(self.config_file, 'w'),
+                  indent=4)
 
     def resizeEvent(self, event):
         for tab in self.tabs:
