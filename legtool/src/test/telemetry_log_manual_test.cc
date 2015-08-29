@@ -13,11 +13,43 @@
 // limitations under the License.
 
 #include "telemetry_log.h"
+#include "telemetry_log_registrar.h"
+#include "telemetry_registry.h"
+#include "visitor.h"
 
 #include <boost/program_options.hpp>
 
 namespace {
 using namespace legtool;
+
+struct SampleStruct {
+  boost::posix_time::ptime timestamp;
+  double value1 = 1;
+  double value2 = 2;
+  double value3 = 3;
+  std::array<uint8_t, 20> array = {};
+  int32_t value4 = 4;
+  int64_t value5 = 5;
+  int64_t value6 = 6;
+  uint64_t value7 = 7;
+  uint64_t value8 = 8;
+  std::array<double, 6> value9 = {};
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(timestamp));
+    a->Visit(LT_NVP(value1));
+    a->Visit(LT_NVP(value2));
+    a->Visit(LT_NVP(value3));
+    a->Visit(LT_NVP(array));
+    a->Visit(LT_NVP(value4));
+    a->Visit(LT_NVP(value5));
+    a->Visit(LT_NVP(value6));
+    a->Visit(LT_NVP(value7));
+    a->Visit(LT_NVP(value8));
+    a->Visit(LT_NVP(value9));
+  }
+};
 
 int work(int argc, char** argv) {
   namespace po = boost::program_options;
@@ -29,12 +61,14 @@ int work(int argc, char** argv) {
   int count = 1;
   int delay_us = 10000;
   int size = 100;
+  bool structure = false;
   desc.add_options()
       ("output,o", po::value(&output), "output file")
       ("realtime,r", po::bool_switch(&realtime), "realtime mode")
       ("count,c", po::value(&count), "blocks to write")
       ("delay_us,d", po::value(&delay_us), "delay between blocks")
       ("size,s", po::value(&size), "size of blocks")
+      ("struct", po::bool_switch(&structure), "serialize structure")
       ("help,h", "display usage message")
       ;
 
@@ -48,16 +82,25 @@ int work(int argc, char** argv) {
   }
 
   TelemetryLog log;
+  TelemetryRegistry<TelemetryLogRegistrar> registry(&log);
+  auto callable = registry.Register<SampleStruct>("sample");
+
   log.SetRealtime(realtime);
   log.Open(output);
 
   std::string to_write(size, ' ');
 
   for (int i = 0; i < count; i++) {
-    auto buffer = log.GetBuffer();
-    buffer->write(to_write.data(), to_write.size());
-    log.WriteBlock(TelemetryFormat::BlockType::kBlockData,
-                   std::move(buffer));
+    if (!structure) {
+      auto buffer = log.GetBuffer();
+      buffer->write(to_write.data(), to_write.size());
+      log.WriteBlock(TelemetryFormat::BlockType::kBlockData,
+                     std::move(buffer));
+    } else {
+      SampleStruct to_log;
+      to_log.timestamp = boost::posix_time::microsec_clock::universal_time();
+      callable(&to_log);
+    }
     ::usleep(delay_us);
   }
 
