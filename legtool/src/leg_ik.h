@@ -199,12 +199,201 @@ class LizardIK : public IKSolver {
     }
 
     JointAngles result;
-    result.joints.emplace_back(
-        JointAngles::Joint{config_.coxa.ident, coxa_deg});
-    result.joints.emplace_back(
-        JointAngles::Joint{config_.femur.ident, femur_deg});
-    result.joints.emplace_back(
-        JointAngles::Joint{config_.tibia.ident, tibia_deg});
+    result.joints.emplace_back(config_.coxa.ident, coxa_deg);
+    result.joints.emplace_back(config_.femur.ident, femur_deg);
+    result.joints.emplace_back(config_.tibia.ident, tibia_deg);
+    return result;
+  }
+
+  const Config& config() const { return config_; }
+
+ private:
+  Config config_;
+};
+
+/// Inverse kinematics for mammal style 3-dof legs.
+///
+/// The "idle" position has the leg plane being perfectly vertical
+/// with the femur and tibia both pointing directly down for full
+/// extension.
+class MammalIK : public IKSolver {
+ public:
+  struct Config {
+    /// In the "idle" position, where the femur center of rotation is
+    /// relative to the shoulder center of rotation.  Since the leg
+    /// plane must be vertical, the shoulder leg plane separation is
+    /// purely the y component.
+    Point3D femur_attachment_mm;
+
+    struct Joint {
+      double min_deg = 0;
+      double idle_deg = 0;
+      double max_deg = 0;
+      double sign = 1;
+      double length_mm = 0; // ignored for shoulder
+      int ident = 0;
+
+      template <typename Archive>
+      void Serialize(Archive* a) {
+        a->Visit(LT_NVP(min_deg));
+        a->Visit(LT_NVP(idle_deg));
+        a->Visit(LT_NVP(max_deg));
+        a->Visit(LT_NVP(sign));
+        a->Visit(LT_NVP(ident));
+      }
+    };
+
+    Joint shoulder;
+    Joint femur;
+    Joint tibia;
+
+    double servo_speed_dps = 360.0;
+
+    template <typename Archive>
+    void Serialize(Archive* a) {
+      a->Visit(LT_NVP(femur_attachment_mm));
+      a->Visit(LT_NVP(shoulder));
+      a->Visit(LT_NVP(femur));
+      a->Visit(LT_NVP(tibia));
+      a->Visit(LT_NVP(servo_speed_dps));
+    }
+  };
+
+  MammalIK(const Config& config) : config_(config) {}
+
+  virtual JointAngles Solve(const Point3D& point_mm) const {
+    // Find the angle of the shoulder joint.  This will be tangent
+    // angle between the point and the circle with radius
+    // femur_attachment_mm.y.
+
+    // From: http://mathworld.wolfram.com/CircleTangentLine.html
+    const double x0 = -point_mm.y;
+    const double y0 = -point_mm.z;
+    const double r = config_.femur_attachment_mm.y;
+
+    const double squared =
+        std::pow(x0, 2) + std::pow(y0, 2) - std::pow(r, 2);
+    if (squared <= 0.0) {
+      // The point is inside our shoulder's rotating radius.  Clearly,
+      // we cannot position ourselves here.
+      return JointAngles::Invalid();
+    }
+
+    const double denom = (std::pow(x0, 2) + std::pow(y0, 2));
+    const double subexp = y0 * std::sqrt(squared) / denom;
+
+    auto lim = [](double value) {
+      return std::max(-1.0, std::min(1.0, value));
+    };
+    const double t1 = std::acos(lim(-r * x0 / denom + subexp)); // and +-
+    const double t2 = std::acos(lim(-r * x0 / denom - subexp)); // and +-
+
+    // We only are about the tangent line which lies in the right
+    // semi-plane.
+    const double t0 = (std::abs(t1) <= 0.5 * M_PI) ? t1 : t2;
+
+    // The sign is based on which quadrant the point is in relative to
+    // the rightmost point of the circle.
+    //
+    //          positive   |    negative
+    //          ------------------------
+    //          negative   |    positive
+    const double rx = point_mm.y - r;
+    const double ry = point_mm.z;
+    // TODO jpieper: I don't think this sign calculation is correct
+    // when abs(y) < radius.
+    const double sign = GetSign(-rx * ry);
+    const double shoulder_deg =
+        config_.shoulder.sign * Degrees(sign * t0) + config_.shoulder.idle_deg;
+
+    if (shoulder_deg < config_.shoulder.min_deg ||
+        shoulder_deg > config_.shoulder.max_deg) {
+      return JointAngles::Invalid();
+    }
+
+    // Given this shoulder angle, find the center of the leg plane in
+    // the joint reference system.
+    const double leg_frame_y = r * std::cos(Radians(shoulder_deg));
+    const double leg_frame_z = r * std::sin(Radians(shoulder_deg));
+
+
+    // Now we project the femur attachment and the point into the leg
+    // plane.
+    const double femur_x = config_.femur_attachment_mm.x; // TODO jpieper: What sign?
+    const double femur_y = config_.femur_attachment_mm.z;
+
+    const double point_x = point_mm.x; // TODO jpieper: What sign?
+    // TODO jpieper: This sign correction is probably not correct for
+    // all quadrants of operation.
+    const double point_y =
+        std::sqrt(std::pow(point_mm.y - leg_frame_y, 2) +
+                  std::pow(point_mm.z - leg_frame_z, 2)) *
+        GetSign(point_mm.z - leg_frame_z);
+
+    const double prx = -(point_x - femur_x);
+    const double pry = point_y - femur_y;
+
+    // Now we have a simple triangle, with the femur attachment point
+    // at the origin, and the two sides being the femur and tibia.
+    //
+    //                      O
+    //                     /  <-- femur
+    //                    /
+    //                   /
+    //                   -------P
+    //
+    //                      ^tibia
+    //
+    // We know the length of all three sides, which means we can find
+    // all three angles.
+
+    // Use the law of cosines to find the tibia angle first.
+    const double op_sq = prx * prx + pry * pry;
+    const double cos_tibia_sub =
+        std::pow(config_.femur.length_mm, 2) +
+        std::pow(config_.tibia.length_mm, 2) -
+        op_sq;
+
+    if (std::sqrt(op_sq) >
+        (config_.femur.length_mm + config_.tibia.length_mm)) {
+      return JointAngles::Invalid();
+    }
+
+    const double cos_tibiainv =
+        cos_tibia_sub /
+        (2 * config_.femur.length_mm * config_.tibia.length_mm);
+    const double tibiainv_rad = std::acos(lim(cos_tibiainv));
+    const double tibia_deg =
+        config_.tibia.sign * (180 - Degrees(tibiainv_rad)) +
+        config_.tibia.idle_deg;
+    if (tibia_deg < config_.tibia.min_deg ||
+        tibia_deg > config_.tibia.max_deg) {
+      return JointAngles::Invalid();
+    }
+
+    // Now we can solve for the femur.
+    const double cos_femur_sub =
+        op_sq + std::pow(config_.femur.length_mm, 2) -
+        std::pow(config_.tibia.length_mm, 2);
+
+    const double cos_femur_1 = cos_femur_sub /
+        (2 * std::sqrt(op_sq ) * config_.femur.length_mm);
+    const double femur_1_rad = std::acos(lim(cos_femur_1));
+
+    const double femur_rad = (std::atan2(pry, prx) - femur_1_rad) + 0.5 * M_PI;
+
+    const double femur_deg = config_.femur.sign * Degrees(femur_rad) +
+        config_.femur.idle_deg;
+    if (femur_deg < config_.femur.min_deg ||
+        femur_deg > config_.femur.max_deg) {
+      return JointAngles::Invalid();
+    }
+
+    JointAngles result;
+    result.joints.emplace_back(config_.shoulder.ident, shoulder_deg);
+    result.joints.emplace_back(config_.femur.ident, femur_deg);
+    result.joints.emplace_back(config_.tibia.ident, tibia_deg);
+
     return result;
   }
 

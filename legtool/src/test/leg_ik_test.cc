@@ -23,7 +23,17 @@ const int kCoxaIdent = 0;
 const int kFemurIdent = 1;
 const int kTibiaIdent = 2;
 
-LizardIK::Config MakeConfig() {
+struct Test {
+  double x_mm;
+  double y_mm;
+  double z_mm;
+
+  double expected_coxa_deg;
+  double expected_femur_deg;
+  double expected_tibia_deg;
+};
+
+LizardIK::Config MakeLizardConfig() {
   LizardIK::Config r;
 
   r.coxa.ident = kCoxaIdent;
@@ -64,19 +74,11 @@ void CheckJoints(T joints, double coxa_deg, double femur_deg, double tibia_deg) 
 }
 
 BOOST_AUTO_TEST_CASE(TestLizard3Dof) {
-  auto config = MakeConfig();
+  auto config = MakeLizardConfig();
 
   LizardIK ik(config);
 
-  struct Test {
-    double x_mm;
-    double y_mm;
-    double z_mm;
-
-    double expected_coxa_deg;
-    double expected_femur_deg;
-    double expected_tibia_deg;
-  } tests[] = {
+  Test tests[] = {
     { 0,  90,    -30,    0,     0,    0 },
     { 0,  90,    -25,    0,     7.18, -6.58 },
     { 0,  90,    -35,    0,    -7.18, 7.78 },
@@ -121,4 +123,61 @@ BOOST_AUTO_TEST_CASE(TestLizard3Dof) {
   config.femur.max_deg = 10.0;
   result = LizardIK(config).Solve(point);
   BOOST_CHECK(!result.Valid());
+}
+
+namespace {
+MammalIK::Config MakeMammalConfig() {
+  MammalIK::Config r;
+
+  r.shoulder.ident = kCoxaIdent;
+  r.femur.ident = kFemurIdent;
+  r.tibia.ident = kTibiaIdent;
+
+  r.femur_attachment_mm.x = 0;
+  r.femur_attachment_mm.y = 30;
+  r.femur_attachment_mm.z = -40;
+
+  r.shoulder.min_deg = -90.0;
+  r.shoulder.idle_deg = 0.0;
+  r.shoulder.max_deg = 90.0;
+
+  r.femur.min_deg = -170.0;
+  r.femur.idle_deg = 0.0;
+  r.femur.max_deg = 170.0;
+  r.femur.length_mm = 100.0;
+
+  r.tibia.min_deg = -170.0;
+  r.tibia.idle_deg = 0.0;
+  r.tibia.max_deg = 170.0;
+  r.tibia.length_mm = 110.0;
+
+  return r;
+}
+}
+
+BOOST_AUTO_TEST_CASE(TestMammal3DoF) {
+  auto config = MakeMammalConfig();
+
+  MammalIK ik(config);
+
+  Test tests[] = {
+    {   0, 30, -250,    0.00,   0,   0 },
+    {   0, 30, -240,    0.00,  -18.65, 35.55 },
+    {   0, 30, -230,    0.00,  -26.52, 50.48 },
+    {   0, 30, -210,    0.00,  -37.97, 72.00 },
+    {   0, 30, -190,    0.00,  -47.16, 88.96 },
+    {   0, 30, -150,    0.00,  -62.96, 117.04 },
+    {   0, 30, -90,     0.00,  -87.71, 152.98 },
+    {  20, 30, -190,    0.00,  -54.18, 87.92 },
+    { -20, 30, -190,    0.00,  -39.00, 87.92 },
+    {   0, 40, -190,    3.00,  -46.37, 87.52 },
+    {   0, 20, -190,   -3.02,  -47.72, 89.98 },
+  };
+
+  for (const Test& test: tests) {
+    Point3D point(test.x_mm, test.y_mm, test.z_mm);
+    auto result = ik.Solve(point);
+    CheckJoints(result, test.expected_coxa_deg, test.expected_femur_deg,
+                test.expected_tibia_deg);
+  }
 }
