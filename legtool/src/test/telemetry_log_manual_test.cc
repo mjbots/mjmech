@@ -62,6 +62,7 @@ int work(int argc, char** argv) {
   int delay_us = 10000;
   int size = 100;
   bool structure = false;
+  bool disable_compression = false;
   desc.add_options()
       ("output,o", po::value(&output), "output file")
       ("realtime,r", po::bool_switch(&realtime), "realtime mode")
@@ -69,6 +70,8 @@ int work(int argc, char** argv) {
       ("delay_us,d", po::value(&delay_us), "delay between blocks")
       ("size,s", po::value(&size), "size of blocks")
       ("struct", po::bool_switch(&structure), "serialize structure")
+      ("disable-compression", po::bool_switch(&disable_compression),
+       "disable compression")
       ("help,h", "display usage message")
       ;
 
@@ -81,7 +84,11 @@ int work(int argc, char** argv) {
     return 0;
   }
 
-  TelemetryLog log;
+  int flags = TelemetryLog::kDefaultFlags;
+  if (disable_compression) {
+    flags &= ~TelemetryLog::LogFlags::kDefaultCompression;
+  }
+  TelemetryLog log(static_cast<TelemetryLog::LogFlags>(flags));
   TelemetryRegistry<TelemetryLogRegistrar> registry(&log);
   auto callable = registry.Register<SampleStruct>("sample");
 

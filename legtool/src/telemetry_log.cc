@@ -26,6 +26,9 @@
 #include <mutex>
 #include <thread>
 
+#include <snappy.h>
+#include <snappy-sinksource.h>
+
 #include "circular_buffer.h"
 #include "move_wrapper.h"
 
@@ -34,7 +37,7 @@ namespace legtool {
 namespace {
 const int64_t kBlockSize = (1 << 20);
 const double kFlushTimeout_s = 1.0;
-const size_t kBufferStartPadding = 16;
+const size_t kBufferStartPadding = 32;
 const int kTelemetryLogSignal = SIGRTMIN + 10;
 
 struct Pipe {
@@ -56,15 +59,19 @@ struct SchemaRecord {
   uint32_t identifier = 0;
   uint32_t block_schema_flags = 0;
   std::string schema;
+  int64_t schema_position;
+  int64_t last_position = -1;
 
   SchemaRecord(const std::string& name,
                uint32_t identifier,
                uint32_t block_schema_flags,
-               const std::string& schema)
+               const std::string& schema,
+               int64_t schema_position)
       : name(name),
         identifier(identifier),
         block_schema_flags(block_schema_flags),
-        schema(schema) {}
+        schema(schema),
+        schema_position(schema_position) {}
   SchemaRecord() {}
 };
 }
@@ -73,11 +80,22 @@ static void timer_handler(int signum, siginfo_t* si, void *);
 
 class TelemetryLog::Impl {
  public:
-  Impl(TelemetryLog* parent) : parent_(parent) {}
+  Impl(TelemetryLog* parent, TelemetryLog::LogFlags flags)
+      : parent_(parent), flags_(flags) {}
   void Write(std::unique_ptr<OStream> buffer);
   void PostOpen();
 
+  void ReclaimBuffer(std::unique_ptr<OStream> buffer) {
+    std::lock_guard<std::mutex> guard(buffers_mutex_);
+    buffers_.push_back(std::move(buffer));
+  }
+
+  uint64_t GetPreviousOffset(uint32_t identifier) const;
+  uint64_t position() const;
+  void WriteIndex();
+
   TelemetryLog* const parent_;
+  const TelemetryLog::LogFlags flags_;
   bool realtime_ = false;
   std::unique_ptr<ThreadWriter> writer_;
 
@@ -137,6 +155,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
 
   void Write(std::unique_ptr<OStream> buffer) {
     BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
+    position_ += buffer->size();
     {
       std::lock_guard<std::mutex> lock(data_mutex_);
       data_.push_back(std::move(buffer));
@@ -149,6 +168,11 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     // random thread.
     timer_fired_ = true;
     SignalThread();
+  }
+
+  uint64_t position() const {
+    BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
+    return position_;
   }
 
  private:
@@ -339,17 +363,14 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     const OStream& stream = *buffer;
 
     const char* ptr = &(*stream.data())[stream.start()];
-    size_t size = stream.data()->size() - stream.start();
+    size_t size = stream.size();
     size_t result = ::fwrite(ptr, size, 1, fd_);
     if (result == 0) {
       Errwrap(-1);
     }
 
     child_offset_ += size;
-    {
-      std::lock_guard<std::mutex> guard(impl_->buffers_mutex_);
-      impl_->buffers_.push_back(std::move(buffer));
-    }
+    impl_->ReclaimBuffer(std::move(buffer));
   }
 
   // Parent items.
@@ -357,6 +378,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
   std::thread::id parent_id_;
   const bool realtime_;
   timer_t timer_id_ = {};
+  uint64_t position_ = 8;
 
   // Initialized from parent, then only accessed from child.
   FILE* fd_;
@@ -398,14 +420,63 @@ void TelemetryLog::Impl::PostOpen() {
   }
 }
 
+uint64_t TelemetryLog::Impl::GetPreviousOffset(uint32_t identifier) const {
+  if (!writer_) { return 0; }
+  auto it = schema_.find(identifier);
+  if (it == schema_.end() || it->second.last_position < 0) { return 0; }
+
+  uint64_t position = writer_->position();
+  return position - it->second.last_position;
+}
+
+uint64_t TelemetryLog::Impl::position() const {
+  if (!writer_) { return 0; }
+  return writer_->position();
+}
+
+void TelemetryLog::Impl::WriteIndex() {
+  auto buffer = parent_->GetBuffer();
+  TelemetryWriteStream<OStream> stream(*buffer);
+
+  uint32_t flags = 0;
+  stream.Write(flags);
+  uint32_t num_elements = schema_.size();
+  stream.Write(num_elements);
+
+  for (const auto& pair: schema_) {
+    // Write out the BlockIndexRecord for each.
+    uint32_t identifier = pair.first;
+    stream.Write(identifier);
+    const auto& record = pair.second;
+
+    uint64_t schema_position = record.schema_position;
+    stream.Write(schema_position);
+
+    uint64_t last_data_position = record.last_position;
+    stream.Write(last_data_position);
+  }
+
+  uint32_t trailing_size = buffer->size() +
+      6 + // block type and block size
+      4 + // this element itself
+      8; // the final 8 byte constant
+
+  stream.Write(trailing_size);
+  stream.RawWrite("TLOGIDEX", 8);
+
+  parent_->WriteBlock(TelemetryFormat::BlockType::kBlockIndex, std::move(buffer));
+}
+
 void timer_handler(int signum, siginfo_t* si, void *) {
   auto writer =
       static_cast<TelemetryLog::ThreadWriter*>(si->si_value.sival_ptr);
   writer->DoTimer();
 }
 
-TelemetryLog::TelemetryLog() : impl_(new Impl(this)) {}
-TelemetryLog::~TelemetryLog() {}
+TelemetryLog::TelemetryLog(LogFlags flags) : impl_(new Impl(this, flags)) {}
+TelemetryLog::~TelemetryLog() {
+  Close();
+}
 
 void TelemetryLog::SetRealtime(bool value) { impl_->realtime_ = value; }
 
@@ -428,7 +499,10 @@ bool TelemetryLog::IsOpen() const {
 }
 
 void TelemetryLog::Close() {
-  impl_->writer_.reset();
+  if (impl_->writer_) {
+    impl_->WriteIndex();
+    impl_->writer_.reset();
+  }
 }
 
 void TelemetryLog::Flush() {
@@ -484,7 +558,8 @@ void TelemetryLog::WriteSchema(uint32_t identifier,
   }
 
   impl_->schema_[identifier] = SchemaRecord(
-      record_name, identifier, block_schema_flags, schema);
+      record_name, identifier, block_schema_flags,
+      schema, impl_->position());
 
   FastOStringStream ostr_schema;
   TelemetryWriteStream<FastOStringStream> stream_schema(ostr_schema);
@@ -504,18 +579,15 @@ void TelemetryLog::WriteSchema(uint32_t identifier,
 }
 
 void TelemetryLog::WriteData(uint32_t identifier,
-                             uint32_t block_data_flags,
+                             WriteFlags flags,
                              const std::string& serialized_data) {
   auto buffer = GetBuffer();
 
-  TelemetryWriteStream<OStream> stream(*buffer);
-  stream.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
-  stream.Write(static_cast<uint32_t>(serialized_data.size() + 8));
-  stream.Write(identifier);
-  stream.Write(block_data_flags);
-  stream.RawWrite(serialized_data.data(), serialized_data.size());
+  // If you're using this API, we'll assume you don't care about
+  // performance or the number of copies too much.
+  buffer->write(serialized_data.data(), serialized_data.size());
 
-  impl_->Write(std::move(buffer));
+  WriteData(identifier, flags, std::move(buffer));
 }
 
 void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
@@ -559,26 +631,94 @@ class FakeStream : boost::noncopyable {
   char* const data_;
   size_t offset_ = 0;
 };
+
+int GetVarintSize(uint64_t value) {
+  int result = 0;
+  do {
+    result += 4;
+    value >>= 31;
+  } while (value);
+  return result;
+}
+
+class OStreamSink : public snappy::Sink {
+ public:
+  OStreamSink(TelemetryLog::OStream* ostream) : ostream_(ostream) {}
+  virtual ~OStreamSink() {}
+
+  virtual void Append(const char* bytes, size_t n) {
+    if (!ostream_->data()->empty() &&
+        (&ostream_->data()->back() + 1) == bytes) {
+      BOOST_ASSERT(
+          (ostream_->data()->capacity() - ostream_->data()->size()) >= n);
+      // We can take the short-cut.
+      ostream_->data()->resize(ostream_->data()->size() + n);
+    } else {
+      ostream_->write(bytes, n);
+    }
+  }
+
+  virtual char* GetAppendBuffer(size_t length, char* scratch) {
+    // Ensure that we are big enough.
+    ostream_->data()->reserve(ostream_->data()->size() + length);
+    return (&ostream_->data()->back()) + 1;
+  }
+
+ private:
+  TelemetryLog::OStream* const ostream_;
+};
 }
 
 void TelemetryLog::WriteData(uint32_t identifier,
-                             uint32_t block_data_flags,
+                             WriteFlags flags,
                              std::unique_ptr<OStream> buffer) {
-  const size_t kBlockHeaderSize = 2 + 4 + 4 + 4;
-  BOOST_ASSERT(buffer->start() >= kBlockHeaderSize);
+  uint32_t header_size = 2 + 4 + 4 + 2;
 
-  size_t data_size = buffer->data()->size() - buffer->start();
+  uint16_t block_data_flags = 0;
+  uint64_t previous_offset = 0;
+  if (impl_->flags_ & LogFlags::kWritePreviousOffsets) {
+    block_data_flags |= TelemetryFormat::BlockDataFlags::kPreviousOffset;
+    previous_offset = impl_->GetPreviousOffset(identifier);
+    header_size += GetVarintSize(previous_offset);
+  }
+
+  if ((impl_->flags_ & LogFlags::kDefaultCompression ||
+       flags & WriteFlags::kTryCompression) &&
+      !(flags & WriteFlags::kDisableCompression)) {
+    // Try to compress and see if it makes things better.
+    std::unique_ptr<OStream> compressed_buffer = GetBuffer();
+
+    snappy::ByteArraySource source(
+        &(*buffer->data())[buffer->start()], buffer->size());
+    OStreamSink sink(compressed_buffer.get());
+    snappy::Compress(&source, &sink);
+    if (compressed_buffer->size() < buffer->size()) {
+      // Yes, we have a win.
+      std::swap(buffer, compressed_buffer);
+      impl_->ReclaimBuffer(std::move(compressed_buffer));
+      block_data_flags |= TelemetryFormat::BlockDataFlags::kSnappy;
+    }
+  }
+
+  const size_t data_size = buffer->size();
+
+  BOOST_ASSERT(buffer->start() >= header_size);
 
   FakeStream stream(
-      &(*buffer->data())[0] + buffer->start() - kBlockHeaderSize);
+      &(*buffer->data())[0] + buffer->start() - header_size);
   TelemetryWriteStream<FakeStream> writer(stream);
   writer.Write(static_cast<uint16_t>(TelemetryFormat::BlockType::kBlockData));
-  writer.Write(static_cast<uint32_t>(data_size + 8));
+  writer.Write(static_cast<uint32_t>(data_size + header_size - 6));
   writer.Write(identifier);
   writer.Write(block_data_flags);
 
-  buffer->set_start(buffer->start() - kBlockHeaderSize);
+  if (block_data_flags & TelemetryFormat::BlockDataFlags::kPreviousOffset) {
+    writer.WriteVarint(previous_offset);
+  }
 
+  buffer->set_start(buffer->start() - header_size);
+
+  impl_->schema_[identifier].last_position = impl_->writer_->position();
   impl_->Write(std::move(buffer));
 }
 
@@ -587,7 +727,7 @@ void TelemetryLog::WriteBlock(TelemetryFormat::BlockType block_type,
   const size_t kBlockHeaderSize = 2 + 4;
   BOOST_ASSERT(buffer->start() >= kBlockHeaderSize);
 
-  size_t data_size = buffer->data()->size() - buffer->start();
+  size_t data_size = buffer->size();
 
   FakeStream stream(
       &(*buffer->data())[0] + buffer->start() - kBlockHeaderSize);

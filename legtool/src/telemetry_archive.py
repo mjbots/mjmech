@@ -319,6 +319,18 @@ class ReadStream(object):
         size = self.read_uint32()
         return self.stream.read(size)
 
+    def read_varint(self):
+        result = 0
+        position = 0
+        while True:
+            value = self.read_uint32()
+            result |= (value & 0x7fffffff) << position
+            position += 31
+
+            if value < 0x80000000:
+                break;
+        return result
+
 
 class RecordingStream(object):
     '''Approximates the interface of a stream, but records everything

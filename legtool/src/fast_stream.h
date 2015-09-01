@@ -29,10 +29,39 @@ class FastOStringStream {
 
   std::string str() const { return std::string(&data_[0], data_.size()); }
 
-  std::vector<char>* data() { return &data_; }
-  const std::vector<char>* data() const { return &data_; }
+  class vector {
+   public:
+    void resize(std::size_t new_size) {
+      size_ = new_size;
+      if (new_size > base_.size()) { base_.resize(new_size); }
+    }
+
+    void reserve(std::size_t new_size) {
+      if (new_size > base_.size()) { base_.resize(new_size); }
+    }
+
+    void clear() { size_ = 0; }
+
+    char& back() { return base_[size_ - 1]; }
+    const char& back() const { return base_[size_ - 1]; }
+    char& operator[](size_t index) { return base_[index]; }
+    const char& operator[](size_t index) const { return base_[index]; }
+
+    bool empty() const { return size_ == 0; }
+    std::size_t size() const { return size_; }
+    std::size_t capacity() const { return base_.size(); }
+    char* data() { return base_.data(); }
+    const char* data() const { return base_.data(); }
+
+    private:
+    std::size_t size_ = 0;
+    std::vector<char> base_;
+  };
+
+  vector* data() { return &data_; }
+  const vector* data() const { return &data_; }
 
  private:
-  std::vector<char> data_;
+  vector data_;
 };
 }

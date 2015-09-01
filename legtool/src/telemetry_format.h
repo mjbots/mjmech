@@ -24,6 +24,11 @@
 ///    pstring
 ///      * uint32_t length
 ///      * length bytes of binary data
+///    varint
+///      * N uint32_t items
+///        * if a value is >= 0x80000000, that means that it should be
+///          treated as a 31 bit uint and that a subsequent uint32_t
+///          has more significant bits
 ///    endian-ness
 ///      * all values are stored little-endian
 ///
@@ -39,17 +44,30 @@
 /// BlockType
 ///   1 - BlockSchema
 ///   2 - BlockData
+///   3 - BlockIndex
 ///
 /// BlockSchema
 ///  * uint32_t identifier
-///  * BlockSchemaFlags
+///  * uint32_t BlockSchemaFlags
 ///  * pstring name
 ///  * Schema
 ///
 /// BlockData
 ///  * uint32_t identifier
-///  * BlockDataFlags
+///  * uint16_t BlockDataFlags
 ///  * DataObject
+///
+/// BlockIndex
+///  * uint32_t BlockIndexFlags
+///  * uint32_t num_elements
+///  * N BlockIndexRecord s
+///  * uint32_t size of this BlockIndex
+///  * 8 byte constant TLOGIDEX
+///
+/// BlockIndexRecord
+///  * uint32_t identifier
+///  * uint64_t schema position
+///  * uint64_t last data position
 ///
 /// Schema
 ///  * uint32_t SchemaFlags
@@ -150,27 +168,43 @@ struct TelemetryFormat {
   enum class BlockType {
     kBlockSchema = 1,
     kBlockData = 2,
+    kBlockIndex = 3,
   };
 
-  enum class BlockSchemaFlags {
+  enum BlockSchemaFlags {
   };
 
-  enum class BlockDataFlags {
-    // TODO jpieper: The following flags could be useful.
-    //
-    //  * SchemaCRC: Include a CRC of the schema which generated this
-    //    data block for consistency checking.
-    //  * Previous offset: Record an offset to the previous record of
-    //    this identifier.
+  enum BlockDataFlags {
+    // The following flags define optional fields which will be
+    // present after the flags field and before the data itself.  If
+    // multiple flags are present, the optional data is present in the
+    // order the flags are defined here.
+
+    /// The number of bytes prior to the start of this block where the
+    /// previous data block of the same identifier can be found.  0 if
+    /// no such block exists.
+    ///
+    ///   * varint
+    kPreviousOffset = 1 << 0,
+
+    /// The CRC32 of the schema associated with this data record.
+    ///   * uint32_t
+    kSchemaCRC = 1 << 1,
+
+
+    // The following flags do not require that additional data be stored.
+
+    /// The DataObject is compressed with the "snappy" compression algorithm.
+    kSnappy = 1 << 8,
   };
 
-  enum class SchemaFlags {
+  enum SchemaFlags {
   };
 
-  enum class ObjectFlags {
+  enum ObjectFlags {
   };
 
-  enum class FieldFlags {
+  enum FieldFlags {
   };
 
   enum class FieldType {
@@ -239,6 +273,15 @@ class TelemetryWriteStream {
     int64_t value = ConvertPtimeToMicroseconds(time);
     Write(value);
   }
+  void WriteVarint(uint64_t value) {
+    do {
+      uint32_t word = value & 0x7fffffff;
+      bool more = value > 0x7fffffff;
+      if (more) { word |= 0x80000000; }
+      Write(word);
+      value >>= 31;
+    } while (value);
+  }
 
   void RawWrite(const char* data, uint32_t size) {
     ostr_.write(data, size);
@@ -267,6 +310,19 @@ class TelemetryReadStream {
   template <typename T>
   inline T Read() {
     return ReadScalar<T>();
+  }
+
+  uint64_t ReadVarint() {
+    uint64_t result = 0;
+    int position = 0;
+    uint32_t value = 0;
+    do {
+      value = Read<uint32_t>();
+      result |= (value & 0x7fffffff) << position;
+      position += 31;
+    } while (value >= 0x80000000);
+
+    return result;
   }
 
  private:

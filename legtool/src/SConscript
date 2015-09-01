@@ -17,7 +17,8 @@ env = canonenv.Clone()
 
 env.Append(CPPPATH=['.'])
 env.ParseConfig('pkg-config --cflags --libs eigen3')
-env.Append(LIBS=['boost_system',
+env.Append(LIBS=['snappy',
+                 'boost_system',
                  'boost_program_options',
                  'pthread',
                  'rt'])

@@ -15,6 +15,7 @@
 '''Read files stored in the format as described in
 telemetry_format.h.'''
 
+import snappy
 import cStringIO as stringio
 import struct
 
@@ -25,6 +26,12 @@ _BLOCK_STRUCT = struct.Struct('<HI')
 _HEADER = 'TLOG0002'
 _BLOCK_SCHEMA = 1
 _BLOCK_DATA = 2
+
+
+class BlockDataFlags(object):
+    kPreviousOffset = 1 << 0
+    kSchemaCRC = 1 << 1
+    kSnappy = 1 << 8
 
 
 class BulkReader(object):
@@ -106,10 +113,22 @@ class BulkReader(object):
                 stream = telemetry_archive.ReadStream(
                     stringio.StringIO(block_data))
                 identifier = stream.read_uint32()
-                flags = stream.read_uint32()
+                flags = stream.read_uint16()
 
                 if identifier not in records:
                     continue
+
+                if flags & BlockDataFlags.kPreviousOffset:
+                    flags &= ~(BlockDataFlags.kPreviousOffset)
+                    _ = stream.read_varint()
+                if flags & BlockDataFlags.kSchemaCRC:
+                    assert False  # not supported yet
+                if flags & BlockDataFlags.kSnappy:
+                    flags &= ~(BlockDataFlags.kSnappy)
+                    rest = stream.stream.read()
+                    stream = telemetry_archive.ReadStream(
+                        stringio.StringIO(snappy.uncompress(rest)))
+                assert flags == 0  # no unknown flags
 
                 rest = stream.stream.read()
                 records[identifier].add(rest)

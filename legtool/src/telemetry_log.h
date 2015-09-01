@@ -29,7 +29,21 @@ class TelemetryLog : boost::noncopyable {
  public:
   class ThreadWriter;
 
-  TelemetryLog();
+  enum LogFlags {
+    /// Write previous offsets (BlockDataFlags::kPreviousOffset) for
+    /// all data records.
+    kWritePreviousOffsets = 1 << 0,
+
+    /// Use (BlockDataFlags::kSnappy) for all data records by default.
+    kDefaultCompression = 1 << 1,
+
+    /// Write a trailing index block
+    kIndexBlock = 1 << 2,
+
+    kDefaultFlags = (kWritePreviousOffsets | kDefaultCompression | kIndexBlock),
+  };
+
+  TelemetryLog(LogFlags flags = LogFlags::kDefaultFlags);
   ~TelemetryLog();
 
   /// If true, then error if data is being written faster than it can
@@ -43,6 +57,9 @@ class TelemetryLog : boost::noncopyable {
   /// Identical semantics to Open(std::string), but takes a file
   /// descriptor instead.
   void Open(int fd);
+
+  /// TODO jpieper: Make a std::ostream variant.
+  // void Open(std::ostream*);
 
   /// Return true if any file is open for writing.
   bool IsOpen() const;
@@ -64,9 +81,14 @@ class TelemetryLog : boost::noncopyable {
                    const std::string& record_name,
                    const std::string& schema);
 
+  enum WriteFlags {
+    kNoWriteFlags = 0,
+    kTryCompression = 1 << 0,
+    kDisableCompression = 1 << 1,
+  };
   /// Write a data block to the log file.
   void WriteData(uint32_t identifier,
-                 uint32_t block_data_flags,
+                 WriteFlags flags,
                  const std::string& serialized_data);
 
   /// This raw API should only be used if you know what you are doing.
@@ -91,6 +113,8 @@ class TelemetryLog : boost::noncopyable {
       start_ = 0;
     }
 
+    size_t size() const { return data()->size() - start_; }
+
     size_t start_ = 0;
 
     friend class ThreadWriter;
@@ -105,7 +129,7 @@ class TelemetryLog : boost::noncopyable {
   // buffer to the TelemetryLog class.
 
   void WriteData(uint32_t identifier,
-                 uint32_t block_data_flags,
+                 WriteFlags flags,
                  std::unique_ptr<OStream> buffer);
   void WriteBlock(TelemetryFormat::BlockType block_type,
                   std::unique_ptr<OStream> buffer);

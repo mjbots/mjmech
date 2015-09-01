@@ -53,7 +53,8 @@ class TelemetryLogRegistrar {
     std::unique_ptr<TelemetryLog::OStream> buffer =
         telemetry_log_->GetBuffer();
     TelemetryWriteArchive<T>::Serialize(data, *buffer);
-    telemetry_log_->WriteData(identifier, 0, std::move(buffer));
+    telemetry_log_->WriteData(identifier, TelemetryLog::kNoWriteFlags,
+                              std::move(buffer));
   }
 
   TelemetryLog* const telemetry_log_;
