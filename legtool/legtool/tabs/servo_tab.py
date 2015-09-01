@@ -216,7 +216,7 @@ class ServoTab(object):
     def handle_power(self):
         text = self.ui.powerCombo.currentText().lower()
 
-        yield From(set_power(text))
+        yield From(self.set_power(text))
 
     @asyncio.coroutine
     def set_power(self, text):
@@ -263,6 +263,7 @@ class ServoTab(object):
                     future = asyncio.Future()
                     self.controller.get_voltage([ident], future)
                     this_voltage = yield From(future)
+                    voltages.update(this_voltage)
 
                     # Get all temperatures.
                     future = asyncio.Future()
@@ -294,7 +295,12 @@ class ServoTab(object):
     @asyncio.coroutine
     def set_single_pose(self, servo_id, value):
         future = asyncio.Future()
-        self.controller.set_pose({servo_id: value}, future)
+        try:
+            write_dict = {servo_id: value}
+            self.controller.set_pose(write_dict, future)
+        except Exception as e:
+            print "Got exception writing pose:", e
+            raise
         yield From(future)
 
     @asyncio.coroutine

@@ -596,152 +596,305 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox_4">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>300</height>
+             </size>
+            </property>
             <property name="title">
              <string>Geometry</string>
             </property>
-            <layout class="QFormLayout" name="formLayout_2">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-             </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="coxaLengthLabel">
-               <property name="text">
-                <string>Coxa Length (mm):</string>
-               </property>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <widget class="QComboBox" name="iktypeCombo">
+               <item>
+                <property name="text">
+                 <string>Lizard</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Mammal</string>
+                </property>
+               </item>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="coxaLengthSpin">
-               <property name="decimals">
+             <item>
+              <widget class="QStackedWidget" name="geometryStack">
+               <property name="currentIndex">
                 <number>0</number>
                </property>
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>200.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>50.000000000000000</double>
-               </property>
+               <widget class="QWidget" name="lizard">
+                <layout class="QFormLayout" name="formLayout_2">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="coxaLengthLabel">
+                   <property name="text">
+                    <string>Coxa Length (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QDoubleSpinBox" name="coxaLengthSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>50.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_33">
+                   <property name="text">
+                    <string>Coxa Mass (kg):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QDoubleSpinBox" name="coxaMassSpin">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="maximum">
+                    <double>2.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.060000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="femurLengthLabel">
+                   <property name="text">
+                    <string>Femur Length (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QDoubleSpinBox" name="femurLengthSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>50.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_34">
+                   <property name="text">
+                    <string>Femur Mass (kg):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QDoubleSpinBox" name="femurMassSpin">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="maximum">
+                    <double>2.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.060000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="tibiaLengthLabel">
+                   <property name="text">
+                    <string>Tibia Length (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                  <widget class="QDoubleSpinBox" name="tibiaLengthSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>50.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="0">
+                  <widget class="QLabel" name="label_35">
+                   <property name="text">
+                    <string>Tibia Mass (kg):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="1">
+                  <widget class="QDoubleSpinBox" name="tibiaMassSpin">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="maximum">
+                    <double>2.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.060000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="mammal">
+                <layout class="QFormLayout" name="formLayout_10">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="femurOutLabel">
+                   <property name="text">
+                    <string>Femur Out (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QDoubleSpinBox" name="mammalFemurOutSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>30.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="femurCwLabel">
+                   <property name="text">
+                    <string>Femur CW (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QDoubleSpinBox" name="mammalFemurCwSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-200.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="femurUpLabel">
+                   <property name="text">
+                    <string>Femur Up (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QDoubleSpinBox" name="mammalFemurUpSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-200.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="femurMammalLengthLabel">
+                   <property name="text">
+                    <string>Femur Length (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QDoubleSpinBox" name="mammalFemurLengthSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>100.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="tibiaMammalLengthLabel">
+                   <property name="text">
+                    <string>Tibia Length (mm):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                  <widget class="QDoubleSpinBox" name="mammalTibiaLengthSpin">
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>100.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_33">
-               <property name="text">
-                <string>Coxa Mass (kg):</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="coxaMassSpin">
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="maximum">
-                <double>2.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.060000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="femurLengthLabel">
-               <property name="text">
-                <string>Femur Length (mm):</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="femurLengthSpin">
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>200.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>50.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>Femur Mass (kg):</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="femurMassSpin">
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="maximum">
-                <double>2.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.060000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="tibiaLengthLabel">
-               <property name="text">
-                <string>Tibia Length (mm):</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="tibiaLengthSpin">
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>200.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>50.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_35">
-               <property name="text">
-                <string>Tibia Mass (kg):</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="tibiaMassSpin">
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="maximum">
-                <double>2.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.060000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
+             <item>
               <spacer name="verticalSpacer_5">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -1303,8 +1456,8 @@ QScrollBar:vertical {
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>220</width>
-                  <height>182</height>
+                  <width>209</width>
+                  <height>145</height>
                  </rect>
                 </property>
                 <attribute name="label">

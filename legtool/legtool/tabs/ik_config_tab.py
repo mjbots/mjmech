@@ -247,6 +247,9 @@ class IkConfigTab(object):
                      self.ui.tibiaServoSpin]:
             spin.valueChanged.connect(self.handle_leg_data_change)
 
+        self.ui.iktypeCombo.currentIndexChanged.connect(
+            self.handle_iktype_change)
+
         for combo in [self.ui.idleCombo,
                       self.ui.minimumCombo,
                       self.ui.maximumCombo,
@@ -261,7 +264,12 @@ class IkConfigTab(object):
                      self.ui.femurLengthSpin,
                      self.ui.tibiaLengthSpin,
                      self.ui.lengthScaleSpin,
-                     self.ui.speedScaleSpin]:
+                     self.ui.speedScaleSpin,
+                     self.ui.mammalFemurOutSpin,
+                     self.ui.mammalFemurCwSpin,
+                     self.ui.mammalFemurUpSpin,
+                     self.ui.mammalFemurLengthSpin,
+                     self.ui.mammalTibiaLengthSpin]:
             spin.valueChanged.connect(self.handle_ik_config_change)
 
         self.handle_ik_config_change()
@@ -298,8 +306,6 @@ class IkConfigTab(object):
 
     def get_leg_ik(self, leg_number):
         '''Return an IK solver for the given leg number.'''
-        result = _legtool.LizardIKConfig()
-
         idle_values = self.servo_tab.pose(
             self.ui.idleCombo.currentText())
         minimum_values = self.servo_tab.pose(
@@ -308,35 +314,66 @@ class IkConfigTab(object):
             self.ui.maximumCombo.currentText())
 
         leg = self.legs.get(leg_number, LegConfig())
-        coxa_servo = leg.coxa_ident
 
-        result.coxa.min_deg = minimum_values[coxa_servo]
-        result.coxa.idle_deg = idle_values[coxa_servo]
-        result.coxa.max_deg = maximum_values[coxa_servo]
-        result.coxa.length_mm = self.ui.coxaLengthSpin.value()
-        #result.coxa_mass_kg = self.ui.coxaMassSpin.value()
-        result.coxa.sign = leg.coxa_sign
-        result.coxa.ident = coxa_servo
+        def set_joints(joint1, ident1, joint2, ident2, joint3, ident3):
+            joint1.min_deg = minimum_values[ident1]
+            joint1.idle_deg = idle_values[ident1]
+            joint1.max_deg = maximum_values[ident1]
+            #result.coxa_mass_kg = self.ui.coxaMassSpin.value()
+            joint1.ident = ident1
 
-        femur_servo = leg.femur_ident
-        result.femur.min_deg = minimum_values[femur_servo]
-        result.femur.idle_deg = idle_values[femur_servo]
-        result.femur.max_deg = maximum_values[femur_servo]
-        result.femur.length_mm = self.ui.femurLengthSpin.value()
-        #result.femur_mass_kg = self.ui.femurMassSpin.value()
-        result.femur.sign = leg.femur_sign
-        result.femur.ident = femur_servo
+            joint2.min_deg = minimum_values[ident2]
+            joint2.idle_deg = idle_values[ident2]
+            joint2.max_deg = maximum_values[ident2]
+            #result.femur_mass_kg = self.ui.femurMassSpin.value()
+            joint2.ident = ident2
 
-        tibia_servo = leg.tibia_ident
-        result.tibia.min_deg = minimum_values[tibia_servo]
-        result.tibia.idle_deg = idle_values[tibia_servo]
-        result.tibia.max_deg = maximum_values[tibia_servo]
-        result.tibia.length_mm = self.ui.tibiaLengthSpin.value()
-        #result.tibia_mass_kg = self.ui.tibiaMassSpin.value()
-        result.tibia.sign = leg.tibia_sign
-        result.tibia.ident = tibia_servo
+            joint3.min_deg = minimum_values[ident3]
+            joint3.idle_deg = idle_values[ident3]
+            joint3.max_deg = maximum_values[ident3]
+            #result.tibia_mass_kg = self.ui.tibiaMassSpin.value()
+            joint3.ident = ident3
 
-        return _legtool.LizardIK(result)
+        if self.ui.iktypeCombo.currentIndex() == 0:
+            # Lizard.
+            result = _legtool.LizardIKConfig()
+
+            set_joints(result.coxa, leg.coxa_ident,
+                       result.femur, leg.femur_ident,
+                       result.tibia, leg.tibia_ident)
+
+            result.coxa.length_mm = self.ui.coxaLengthSpin.value()
+            result.coxa.sign = leg.coxa_sign
+
+            result.femur.length_mm = self.ui.femurLengthSpin.value()
+            result.femur.sign = leg.femur_sign
+
+            result.tibia.length_mm = self.ui.tibiaLengthSpin.value()
+            result.tibia.sign = leg.tibia_sign
+
+            return _legtool.LizardIK(result)
+
+        elif self.ui.iktypeCombo.currentIndex() == 1:
+            # Mammal.
+            result = _legtool.MammalIKConfig()
+
+            set_joints(result.shoulder, leg.coxa_ident,
+                       result.femur, leg.femur_ident,
+                       result.tibia, leg.tibia_ident)
+
+            result.femur_attachment_mm.y = self.ui.mammalFemurOutSpin.value()
+            result.femur_attachment_mm.x = self.ui.mammalFemurCwSpin.value()
+            result.femur_attachment_mm.z = self.ui.mammalFemurUpSpin.value()
+
+            result.shoulder.sign = leg.coxa_sign
+
+            result.femur.length_mm = self.ui.mammalFemurLengthSpin.value()
+            result.femur.sign = leg.femur_sign
+
+            result.tibia.length_mm = self.ui.mammalTibiaLengthSpin.value()
+            result.tibia.sign = leg.tibia_sign
+
+            return _legtool.MammalIK(result)
 
     def update_config_enable(self):
         enable = self.ui.legPresentCombo.currentIndex() == 0
@@ -409,6 +446,11 @@ class IkConfigTab(object):
             raise RuntimeError('invalid plane:' + str(value))
         return result
 
+    def handle_iktype_change(self):
+        self.ui.geometryStack.setCurrentIndex(
+            self.ui.iktypeCombo.currentIndex())
+        self.handle_ik_config_change()
+
     def handle_ik_config_change(self):
         # Update the visualization and the IK solver with our new
         # configuration.
@@ -453,7 +495,13 @@ class IkConfigTab(object):
                 (self.ui.tibiaLengthSpin, 'tibia_length'),
                 (self.ui.coxaMassSpin, 'coxa_mass'),
                 (self.ui.femurMassSpin, 'femur_mass'),
-                (self.ui.tibiaMassSpin, 'tibia_mass'),]
+                (self.ui.tibiaMassSpin, 'tibia_mass'),
+                (self.ui.mammalFemurOutSpin, 'mammal_femur_out'),
+                (self.ui.mammalFemurCwSpin, 'mammal_femur_cw'),
+                (self.ui.mammalFemurUpSpin, 'mammal_femur_up'),
+                (self.ui.mammalFemurLengthSpin, 'mammal_femur_length'),
+                (self.ui.mammalTibiaLengthSpin, 'mammal_tibia_length'),
+                ]
 
     def read_settings(self, config):
         self.handle_current_changed()
@@ -469,6 +517,7 @@ class IkConfigTab(object):
         set_combo(self.ui.idleCombo, 'idle_pose')
         set_combo(self.ui.minimumCombo, 'minimum_pose')
         set_combo(self.ui.maximumCombo, 'maximum_pose')
+        set_combo(self.ui.iktypeCombo, 'iktype')
 
         for spin, name in self.get_float_configs():
             if name in ikconfig:
@@ -503,6 +552,7 @@ class IkConfigTab(object):
         ikconfig['idle_pose'] =  self.ui.idleCombo.currentText()
         ikconfig['minimum_pose'] = self.ui.minimumCombo.currentText()
         ikconfig['maximum_pose'] = self.ui.maximumCombo.currentText()
+        ikconfig['iktype'] = self.ui.iktypeCombo.currentText()
 
         for spin, name in self.get_float_configs():
             ikconfig[name] = spin.value()
