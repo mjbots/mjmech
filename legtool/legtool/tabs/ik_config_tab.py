@@ -203,7 +203,7 @@ class IkTester(object):
                     rect.setBrush(QtGui.QBrush(color))
 
     def handle_mouse_press(self, cursor):
-        Task(self.servo_tab.set_power('enable'))
+        Task(self.servo_tab.set_power('drive'))
 
         self.handle_mouse_move(cursor)
 
@@ -218,7 +218,11 @@ class IkTester(object):
             # This option isn't possible
             return
 
-        Task(self.servo_tab.set_pose(result.command_dict()))
+        command = {}
+        for joint in result.joints:
+            command[joint.ident] = joint.angle_deg
+
+        Task(self.servo_tab.set_pose(command))
 
 
 class IkConfigTab(object):
