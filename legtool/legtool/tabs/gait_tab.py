@@ -826,11 +826,11 @@ class GaitTab(object):
             self.ui.playbackSlowRepeatButton.setChecked(False)
 
             if self.servo_tab.controller:
-                Task(self.servo_tab.controller.set_power('brake'))
+                Task(self.servo_tab.set_power('brake'))
             return
 
         if self.servo_tab.controller:
-            Task(self.servo_tab.controller.set_power('drive'))
+            Task(self.servo_tab.set_power('drive'))
 
         # Update the leg list widget.
         available_legs = self.ikconfig_tab.get_all_legs()
