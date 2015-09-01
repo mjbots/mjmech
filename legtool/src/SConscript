@@ -41,10 +41,17 @@ herkulex_tool = crenv.Program('herkulex_tool',
 telemetry_tool = crenv.Program('telemetry_tool',
                                ['telemetry_tool.cc'])
 
+PY_SOURCES = [
+    'py_legtool.cc',
+    'py_legtool_servo.cc',
+    'py_legtool_tf.cc',
+    'py_legtool_legik.cc',
+    ]
+
 bpenv = env.Clone()
 bpenv.Append(LIBS=['boost_python'])
 bpenv.ParseConfig('pkg-config --cflags --libs python')
-pylegtool = bpenv.SharedLibrary('_legtool', SOURCES + ['py_legtool.cc'],
+pylegtool = bpenv.SharedLibrary('_legtool', SOURCES + PY_SOURCES,
                                 LIBPREFIX='')
 
 TESTS = ['test/' + x for x in [
