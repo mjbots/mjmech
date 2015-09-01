@@ -66,6 +66,12 @@ struct Transform {
   Transform() {}
   Transform(const Point3D& translation, const Quaternion& rotation)
       : translation(translation), rotation(rotation) {}
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(translation));
+    a->Visit(LT_NVP(rotation));
+  }
 };
 
 

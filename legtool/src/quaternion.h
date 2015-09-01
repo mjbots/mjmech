@@ -152,6 +152,14 @@ class Quaternion {
   double y() const { return y_; }
   double z() const { return z_; }
 
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(w));
+    a->Visit(LT_NVP(x));
+    a->Visit(LT_NVP(y));
+    a->Visit(LT_NVP(z));
+  }
+
  private:
   double w_;
   double x_;
