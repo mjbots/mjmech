@@ -104,12 +104,16 @@ class HerkuleXServoInterface : public ServoInterface {
                  const std::vector<int>& ids,
                  const std::vector<Joint>& current_result,
                  PoseHandler handler) {
-    if (ec) { handler(ec, {}); return; }
-    if (ids.empty()) { handler(ec, current_result); return; }
+    if (ec && ec != boost::asio::error::operation_aborted) {
+      handler(ec, {});
+      return;
+    }
+
     auto result = current_result;
-    if (address) {
+    if (!ec && address) {
       result.emplace_back(Joint{*address, CountsToAngleDeg(value)});
     }
+    if (ids.empty()) { handler(ec, result); return; }
 
     int to_send = ids.back();
     std::vector<int> new_ids = ids;
@@ -135,12 +139,16 @@ class HerkuleXServoInterface : public ServoInterface {
                         const std::vector<int>& ids,
                         const std::vector<Temperature>& current_result,
                         TemperatureHandler handler) {
-    if (ec) { handler(ec, {}); return; }
-    if (ids.empty()) { handler(ec, current_result); return; }
+    if (ec && ec != boost::asio::error::operation_aborted) {
+      handler(ec, {});
+      return;
+    }
+
     auto result = current_result;
-    if (address) {
+    if (!ec && address) {
       result.emplace_back(Temperature{*address, CountsToTemperatureC(value)});
     }
+    if (ids.empty()) { handler(ec, result); return; }
 
     int to_send = ids.back();
     std::vector<int> new_ids = ids;
@@ -160,18 +168,31 @@ class HerkuleXServoInterface : public ServoInterface {
                  ids, std::vector<Voltage>{}, handler);
   }
 
+  static std::string FormatIDs(const std::vector<int>& ids) {
+    std::string result;
+    result += "[";
+    for (int id: ids) { result += (boost::format("%d,") % id).str(); }
+    result += "]";
+    return result;
+  }
+
   void DoGetVoltage(const boost::system::error_code& ec,
-                        int value,
-                        boost::optional<int> address,
-                        const std::vector<int>& ids,
-                        const std::vector<Voltage>& current_result,
-                        VoltageHandler handler) {
-    if (ec) { handler(ec, {}); return; }
-    if (ids.empty()) { handler(ec, current_result); return; }
+                    int value,
+                    boost::optional<int> address,
+                    const std::vector<int>& ids,
+                    const std::vector<Voltage>& current_result,
+                    VoltageHandler handler) {
+    if (ec && ec != boost::asio::error::operation_aborted) {
+      handler(ec, {});
+      return;
+    }
+
     auto result = current_result;
-    if (address) {
+    if (!ec && address) {
       result.emplace_back(Voltage{*address, CountsToVoltage(value)});
     }
+
+    if (ids.empty()) { handler(ec, result); return; }
 
     int to_send = ids.back();
     std::vector<int> new_ids = ids;

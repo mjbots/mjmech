@@ -22,6 +22,7 @@
 #include <boost/signals2/signal.hpp>
 
 #include "comm.h"
+#include "command_sequencer.h"
 #include "common.h"
 #include "signal_result.h"
 #include "visitor.h"
@@ -75,11 +76,12 @@ class HerkuleXProtocol : boost::noncopyable {
   HerkuleXProtocol(boost::asio::io_service& service,
                    Factory& factory)
       : service_(service),
-        factory_(factory) {}
+        factory_(factory),
+        sequencer_(service) {}
 
   struct Parameters {
     typename Factory::Parameters stream;
-    double packet_timeout_s = 0.2;
+    double packet_timeout_s = 0.05;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -118,27 +120,12 @@ class HerkuleXProtocol : boost::noncopyable {
         void (boost::system::error_code)> init(
             BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    BOOST_ASSERT(packet.data.size() < (216 - 7));
-    BOOST_ASSERT(packet.servo >= 0 && packet.servo <= 0xfe);
-    BOOST_ASSERT(packet.command >= 0 && packet.command <= 0xff);
-
-    const uint8_t packet_size = 7 + packet.data.size();
-
-    const uint8_t cksum1 =
-        Checksum1(packet_size, packet.servo, packet.command, packet.data);
-
-    buffer_[0] = 0xff;
-    buffer_[1] = 0xff;
-    buffer_[2] = packet_size;
-    buffer_[3] = packet.servo;
-    buffer_[4] = packet.command;
-    buffer_[5] = cksum1 & 0xfe;
-    buffer_[6] = (cksum1 ^ 0xff) & 0xfe;
-    std::memcpy(&buffer_[7], packet.data.data(), packet.data.size());
-
-    boost::asio::async_write(
-        *stream_, boost::asio::buffer(buffer_, 7 + packet.data.size()),
-        std::bind(init.handler, std::placeholders::_1));
+    sequencer_.Invoke(
+        std::bind(&HerkuleXProtocol::RawSendPacket,
+                  this,
+                  packet,
+                  std::placeholders::_1),
+        init.handler);
 
     return init.result.get();
   }
@@ -163,28 +150,56 @@ class HerkuleXProtocol : boost::noncopyable {
         void (boost::system::error_code, Packet)> init(
             BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    SendPacket(to_send, [=](const boost::system::error_code& ec) mutable {
-        if (ec) {
-          init.handler(ec, Packet());
-          return;
-        }
+    typedef std::function<void (const boost::system::error_code& ec,
+                                const Packet& packet)> PacketHandler;
+    sequencer_.Invoke(
+        [=](PacketHandler packet_handler) {
+          RawSendPacket(
+              to_send,
+              [=](const boost::system::error_code& ec) {
+                if (ec) {
+                  packet_handler(ec, Packet());
+                  return;
+                }
 
-        // We can't directly pass init.handler to SignalResult::Wait
-        // here, or the asio auto-coroutine magic gets confused and
-        // thinks we are in a coroutine if SendReceivePacket was
-        // called from a coroutine.
-        SignalResult::Wait(
-            service_, &read_signal_,
-            parameters_.packet_timeout_s,
-            [=](const boost::system::error_code& ec, Packet packet) mutable {
-              init.handler(ec, packet);
-            });
-      });
+                SignalResult::Wait(
+                    service_, &read_signal_,
+                    parameters_.packet_timeout_s, packet_handler);
+              });
+        },
+        init.handler);
 
     return init.result.get();
   }
 
  private:
+  void RawSendPacket(const Packet& packet, ErrorHandler handler) {
+    BOOST_ASSERT(packet.data.size() < (216 - 7));
+    BOOST_ASSERT(packet.servo >= 0 && packet.servo <= 0xfe);
+    BOOST_ASSERT(packet.command >= 0 && packet.command <= 0xff);
+
+    const uint8_t packet_size = 7 + packet.data.size();
+
+    const uint8_t cksum1 =
+        Checksum1(packet_size, packet.servo, packet.command, packet.data);
+
+    buffer_[0] = 0xff;
+    buffer_[1] = 0xff;
+    buffer_[2] = packet_size;
+    buffer_[3] = packet.servo;
+    buffer_[4] = packet.command;
+    buffer_[5] = cksum1 & 0xfe;
+    buffer_[6] = (cksum1 ^ 0xff) & 0xfe;
+    std::memcpy(&buffer_[7], packet.data.data(), packet.data.size());
+
+    boost::asio::async_write(
+        *stream_,
+        boost::asio::buffer(buffer_, 7 + packet.data.size()),
+        [handler](const boost::system::error_code& ec, size_t written) mutable {
+          handler(ec);
+        });
+  }
+
   void HandleStart(ErrorHandler handler,
                    const boost::system::error_code& ec,
                    SharedStream stream) {
@@ -316,6 +331,7 @@ class HerkuleXProtocol : boost::noncopyable {
   boost::asio::io_service& service_;
   Factory& factory_;
   Parameters parameters_;
+  CommandSequencer sequencer_;
   SharedStream stream_;
   boost::signals2::signal<void (const Packet*)> read_signal_;
   char buffer_[256] = {};
@@ -647,12 +663,8 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
           int result = 0;
           BOOST_ASSERT(response.register_data.size() >= field.length);
           for (int i = 0; i < field.length; i++) {
-            result |= (static_cast<int>(
+            result |= (static_cast<uint8_t>(
                            response.register_data[i]) << (i * 8));
-          }
-
-          if (result >= (0x80 << ((field.length - 1) * 8))) {
-            result = result - (1 << (field.length * 8));
           }
 
           init.handler(boost::system::error_code(), result);
