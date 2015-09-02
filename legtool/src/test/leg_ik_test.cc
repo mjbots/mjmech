@@ -153,6 +153,35 @@ MammalIK::Config MakeMammalConfig() {
 
   return r;
 }
+
+void CheckVectorsClose(const Point3D& p1,
+                       const Point3D& p2) {
+  BOOST_CHECK_SMALL(p1.x - p2.x, 1e-3);
+  BOOST_CHECK_SMALL(p1.y - p2.y, 1e-3);
+  BOOST_CHECK_SMALL(p1.z - p2.z, 1e-3);
+}
+
+void TestMammalForward(const JointAngles& joints,
+                       const MammalIK::Config& config,
+                       const Point3D& expected_point) {
+  Frame shoulder_frame;
+  Frame shoulder_joint(Point3D(), Quaternion(), &shoulder_frame);
+  Frame femur_joint(config.femur_attachment_mm, Quaternion(), &shoulder_joint);
+  Frame tibia_joint(Point3D(0, 0, -config.femur.length_mm), Quaternion(),
+                    &femur_joint);
+  Frame end_frame(Point3D(0, 0, -config.tibia.length_mm), Quaternion(),
+                  &tibia_joint);
+
+  shoulder_joint.transform.rotation = Quaternion::FromEuler(
+      0, Radians(GetAngle(joints, kCoxaIdent)), 0);
+  femur_joint.transform.rotation = Quaternion::FromEuler(
+      Radians(GetAngle(joints, kFemurIdent)), 0, 0);
+  tibia_joint.transform.rotation = Quaternion::FromEuler(
+      Radians(GetAngle(joints, kTibiaIdent)), 0, 0);
+
+  Point3D result = shoulder_frame.MapFromFrame(&end_frame, Point3D());
+  CheckVectorsClose(result, expected_point);
+}
 }
 
 BOOST_AUTO_TEST_CASE(TestMammal3DoF) {
@@ -179,5 +208,6 @@ BOOST_AUTO_TEST_CASE(TestMammal3DoF) {
     auto result = ik.Solve(point);
     CheckJoints(result, test.expected_coxa_deg, test.expected_femur_deg,
                 test.expected_tibia_deg);
+    TestMammalForward(result, config, point);
   }
 }
