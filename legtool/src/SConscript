@@ -17,6 +17,7 @@ env = canonenv.Clone()
 
 env.Append(CPPPATH=['.'])
 env.ParseConfig('pkg-config --cflags --libs eigen3')
+env.Append(LINKFLAGS=['-rdynamic'])
 env.Append(LIBS=['snappy',
                  'boost_system',
                  'boost_program_options',
@@ -30,6 +31,7 @@ crenv.Append(LIBS=['boost_coroutine',
 
 SOURCES = [
     'comm_factory.cc',
+    'fail.cc',
     'herkulex.cc',
     'telemetry_log.cc',
     ]
