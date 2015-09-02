@@ -33,6 +33,7 @@ SOURCES = [
     'comm_factory.cc',
     'fail.cc',
     'herkulex.cc',
+    'mjmech_imu_driver.cc',
     'telemetry_log.cc',
     ]
 
@@ -85,3 +86,8 @@ comm_manual_test = crenv.Program('comm_manual_test',
 telemetry_log_test = crenv.Program(
     'telemetry_log_manual_test',
     ['test/telemetry_log_manual_test.cc'] + liblegtool)
+
+mjmech_main = crenv.Object('mjmech_imu_driver_main.o', 'module_main.cc',
+             CPPDEFINES={'MODULE_HEADER_FILE':'\\"mjmech_imu_driver.h\\"',
+                         'MODULE_CLASS_NAME':'MjmechImuDriver'})
+crenv.Program('mjmech_imu_driver', mjmech_main + liblegtool)
