@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <boost/format.hpp>
+
 #include "visitor.h"
 
 namespace legtool {
