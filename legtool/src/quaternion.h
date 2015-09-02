@@ -154,10 +154,10 @@ class Quaternion {
 
   template <typename Archive>
   void Serialize(Archive* a) {
-    a->Visit(LT_NVP(w));
-    a->Visit(LT_NVP(x));
-    a->Visit(LT_NVP(y));
-    a->Visit(LT_NVP(z));
+    a->Visit(MakeNameValuePair(&w_, "w"));
+    a->Visit(MakeNameValuePair(&x_, "x"));
+    a->Visit(MakeNameValuePair(&y_, "y"));
+    a->Visit(MakeNameValuePair(&z_, "z"));
   }
 
  private:
