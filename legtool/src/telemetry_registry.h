@@ -60,7 +60,7 @@ class TelemetryRegistry : boost::noncopyable {
   template <typename DataObject>
   void Register(const std::string& record_name,
                 boost::signals2::signal<void (const DataObject*)>* signal) {
-    signal->connect(Register(record_name));
+    signal->connect(Register<DataObject>(record_name));
   }
 
   template <typename Registrar>
