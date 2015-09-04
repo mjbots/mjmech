@@ -65,8 +65,9 @@ class IkTester(object):
      PLANE_XZ,
      PLANE_YZ) = range(3)
 
-    def __init__(self, servo_tab, graphics_view):
+    def __init__(self, servo_tab, ikconfig_tab, graphics_view):
         self.servo_tab = servo_tab
+        self.ikconfig_tab = ikconfig_tab
         self.graphics_scene = graphics_scene.GraphicsScene()
         self.graphics_scene.sceneMouseMoveEvent.connect(
             self.handle_mouse_move)
@@ -111,23 +112,17 @@ class IkTester(object):
         self.graphics_view.fitInView(QtCore.QRectF(-1, -1, 2, 2))
 
     def set_config(self,
+                   leg_number,
                    x_offset_mm, y_offset_mm, z_offset_mm,
-                   coxa_length_mm, femur_length_mm, tibia_length_mm,
-                   coxa_mass_kg, femur_mass_kg, tibia_mass_kg,
                    leg_ik,
                    plane,
                    length_scale,
                    speed_scale,
                    speed_axis):
+        self.leg_number = leg_number
         self.x_offset_mm = x_offset_mm
         self.y_offset_mm = y_offset_mm
         self.z_offset_mm = z_offset_mm
-        self.coxa_length_mm = coxa_length_mm
-        self.femur_length_mm = femur_length_mm
-        self.tibia_length_mm = tibia_length_mm
-        self.coxa_mass_kg = coxa_mass_kg
-        self.femur_mass_kg = femur_mass_kg
-        self.tibia_mass_kg = tibia_mass_kg
         self.leg_ik = leg_ik
         self.plane = plane
         self.length_scale = length_scale
@@ -213,14 +208,30 @@ class IkTester(object):
     def handle_mouse_move(self, cursor):
         point_mm = self.coord_to_point((cursor.x(), cursor.y()))
 
+        self.servo_tab.ui.resultsEdit.setText('')
+
         result = self.leg_ik.do_ik(point_mm)
         if not result.valid():
             # This option isn't possible
             return
 
+        message = ''
+
         command = {}
         for joint in result.joints:
             command[joint.ident] = joint.angle_deg
+            message += '%d: %f\n' % (joint.ident, joint.angle_deg)
+
+        if hasattr(self.leg_ik, 'forward'):
+            forward = self.leg_ik.forward(result)
+
+            message += '\nshoulder: %.1f,%.1f,%.1f\n' % (
+                forward.shoulder.x, forward.shoulder.y, forward.shoulder.z)
+            message += 'femur: %.1f,%.1f,%.1f\n' % (
+                forward.femur.x, forward.femur.y, forward.femur.z)
+            message += 'tibia: %.1f,%.1f,%.1f\n' % (
+                forward.tibia.x, forward.tibia.y, forward.tibia.z)
+        self.servo_tab.ui.resultsEdit.setText(message)
 
         Task(self.servo_tab.set_pose(command))
 
@@ -232,7 +243,7 @@ class IkConfigTab(object):
         self.legs = {}
         self.in_number_changed = BoolContext()
 
-        self.ik_tester = IkTester(servo_tab, self.ui.ikTestView)
+        self.ik_tester = IkTester(servo_tab, self, self.ui.ikTestView)
 
         self.ui.tabWidget.currentChanged.connect(self.handle_current_changed)
         self.handle_current_changed()
@@ -461,15 +472,10 @@ class IkConfigTab(object):
         leg_ik = self.get_leg_ik(self.ui.legSpin.value())
 
         self.ik_tester.set_config(
+            leg_number=self.ui.legSpin.value(),
             x_offset_mm=self.ui.xOffsetSpin.value(),
             y_offset_mm=self.ui.yOffsetSpin.value(),
             z_offset_mm=self.ui.zOffsetSpin.value(),
-            coxa_length_mm=self.ui.coxaLengthSpin.value(),
-            femur_length_mm=self.ui.femurLengthSpin.value(),
-            tibia_length_mm=self.ui.tibiaLengthSpin.value(),
-            coxa_mass_kg=self.ui.coxaMassSpin.value(),
-            femur_mass_kg=self.ui.femurMassSpin.value(),
-            tibia_mass_kg=self.ui.tibiaMassSpin.value(),
             leg_ik=leg_ik,
             plane=self.get_plane(),
             length_scale=self.ui.lengthScaleSpin.value(),
