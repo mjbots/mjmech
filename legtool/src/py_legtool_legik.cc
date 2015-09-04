@@ -101,12 +101,20 @@ void ExportLegIK() {
       .def("write_settings", &SerializableWriteSettings<MammalIK::Config>)
       ;
 
+  class_<MammalIK::ForwardResult>("MammalIKForwardResult")
+      .def_readonly("shoulder", &MammalIK::ForwardResult::shoulder)
+      .def_readonly("femur", &MammalIK::ForwardResult::femur)
+      .def_readonly("tibia", &MammalIK::ForwardResult::tibia)
+      .def_readonly("end", &MammalIK::ForwardResult::end)
+      ;
+
   class_<MammalIK,
          boost::shared_ptr<MammalIK>,
          bases<IKSolver>,
          boost::noncopyable>("MammalIK", init<MammalIK::Config>())
       .def("solve", &MammalIK::Solve)
       .def("do_ik", &MammalIK::Solve)
+      .def("forward", &MammalIK::Forward)
       .def("config", &MammalIK::config,
            return_internal_reference<1>())
          ;

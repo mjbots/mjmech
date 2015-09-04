@@ -164,30 +164,14 @@ void CheckVectorsClose(const Point3D& p1,
 void TestMammalForward(const JointAngles& joints,
                        const MammalIK::Config& config,
                        const Point3D& expected_point) {
-  Frame shoulder_frame;
-  Frame shoulder_joint(Point3D(), Quaternion(), &shoulder_frame);
-  Frame femur_joint(config.femur_attachment_mm, Quaternion(), &shoulder_joint);
-  Frame tibia_joint(Point3D(0, 0, -config.femur.length_mm), Quaternion(),
-                    &femur_joint);
-  Frame end_frame(Point3D(0, 0, -config.tibia.length_mm), Quaternion(),
-                  &tibia_joint);
+  auto result = MammalIK(config).Forward(joints);
 
-  shoulder_joint.transform.rotation = Quaternion::FromEuler(
-      0, Radians(GetAngle(joints, kCoxaIdent)), 0);
-  femur_joint.transform.rotation = Quaternion::FromEuler(
-      Radians(GetAngle(joints, kFemurIdent)), 0, 0);
-  tibia_joint.transform.rotation = Quaternion::FromEuler(
-      Radians(GetAngle(joints, kTibiaIdent)), 0, 0);
-
-  Point3D result = shoulder_frame.MapFromFrame(&end_frame, Point3D());
-  CheckVectorsClose(result, expected_point);
+  CheckVectorsClose(result.end, expected_point);
 }
 }
 
 BOOST_AUTO_TEST_CASE(TestMammal3DoF) {
   auto config = MakeMammalConfig();
-
-  MammalIK ik(config);
 
   Test tests[] = {
     {   0, 30, -250,    0.00,   0,   0 },
@@ -204,10 +188,25 @@ BOOST_AUTO_TEST_CASE(TestMammal3DoF) {
   };
 
   for (const Test& test: tests) {
-    Point3D point(test.x_mm, test.y_mm, test.z_mm);
-    auto result = ik.Solve(point);
-    CheckJoints(result, test.expected_coxa_deg, test.expected_femur_deg,
-                test.expected_tibia_deg);
-    TestMammalForward(result, config, point);
+    auto run_test = [](const MammalIK::Config& config,
+                       const Test& test) {
+      MammalIK ik(config);
+      Point3D point(test.x_mm, test.y_mm, test.z_mm);
+      auto result = ik.Solve(point);
+      CheckJoints(result, test.expected_coxa_deg, test.expected_femur_deg,
+                  test.expected_tibia_deg);
+      TestMammalForward(result, config, point);
+    };
+
+    run_test(config, test);
+
+    {
+      Test sign_test = test;
+      MammalIK::Config sign_config = config;
+      sign_config.shoulder.sign *= -1;
+      sign_test.expected_coxa_deg *= -1;
+
+      run_test(sign_config, sign_test);
+    }
   }
 }

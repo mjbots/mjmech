@@ -303,8 +303,10 @@ class MammalIK : public IKSolver {
     // TODO jpieper: I don't think this sign calculation is correct
     // when abs(y) < radius.
     const double sign = GetSign(-rx * ry);
+    const double logical_shoulder_rad = sign * t0;
     const double shoulder_deg =
-        config_.shoulder.sign * Degrees(sign * t0) + config_.shoulder.idle_deg;
+        config_.shoulder.sign * Degrees(logical_shoulder_rad) +
+        config_.shoulder.idle_deg;
 
     if (shoulder_deg < config_.shoulder.min_deg ||
         shoulder_deg > config_.shoulder.max_deg) {
@@ -313,8 +315,8 @@ class MammalIK : public IKSolver {
 
     // Given this shoulder angle, find the center of the leg plane in
     // the joint reference system.
-    const double leg_frame_y = r * std::cos(Radians(shoulder_deg));
-    const double leg_frame_z = r * std::sin(Radians(shoulder_deg));
+    const double leg_frame_y = r * std::cos(logical_shoulder_rad);
+    const double leg_frame_z = r * std::sin(logical_shoulder_rad);
 
 
     // Now we project the femur attachment and the point into the leg
@@ -395,6 +397,80 @@ class MammalIK : public IKSolver {
     result.joints.emplace_back(config_.shoulder.ident, shoulder_deg);
     result.joints.emplace_back(config_.femur.ident, femur_deg);
     result.joints.emplace_back(config_.tibia.ident, tibia_deg);
+
+    return result;
+  }
+
+  struct ForwardResult {
+    Frame shoulder_frame;
+    Frame shoulder_joint{Point3D(), Quaternion(), &shoulder_frame};
+    Point3D shoulder;
+    Frame femur_joint{Point3D(), Quaternion(), &shoulder_joint};
+    Point3D femur;
+    Frame tibia_joint{Point3D(), Quaternion(), &femur_joint};
+    Point3D tibia;
+    Frame end_frame{Point3D(), Quaternion(), &tibia_joint};
+    Point3D end;
+
+    ForwardResult() {}
+
+    ForwardResult(const ForwardResult& rhs) {
+      *this = rhs;
+    }
+
+    ForwardResult& operator=(const ForwardResult& rhs) {
+      shoulder_frame.transform = rhs.shoulder_frame.transform;
+      shoulder_joint.transform = rhs.shoulder_joint.transform;
+      shoulder = rhs.shoulder;
+      femur_joint.transform = rhs.femur_joint.transform;
+      femur = rhs.femur;
+      tibia_joint.transform = rhs.tibia_joint.transform;
+      tibia = rhs.tibia;
+      end_frame.transform = rhs.end_frame.transform;
+      end = rhs.end;
+      return *this;
+    }
+  };
+
+  ForwardResult Forward(const JointAngles& joints) const {
+    ForwardResult result;
+
+    result.femur_joint.transform.translation = config_.femur_attachment_mm;
+    result.tibia_joint.transform.translation.z = -config_.femur.length_mm;
+    result.end_frame.transform.translation.z = -config_.tibia.length_mm;
+
+    auto GetAngle = [](const JointAngles& joints, int ident) {
+      for (const auto& joint: joints.joints) {
+        if (joint.ident == ident) { return joint.angle_deg; }
+      }
+      BOOST_ASSERT(false);
+    };
+
+    const double shoulder_deg =
+        config_.shoulder.sign * (GetAngle(joints, config_.shoulder.ident) -
+                                 config_.shoulder.idle_deg);
+    result.shoulder_joint.transform.rotation = Quaternion::FromEuler(
+        0, Radians(shoulder_deg), 0);
+
+    const double femur_deg =
+        config_.femur.sign * (GetAngle(joints, config_.femur.ident) -
+                              config_.femur.idle_deg);
+    result.femur_joint.transform.rotation = Quaternion::FromEuler(
+        Radians(femur_deg), 0, 0);
+
+    const double tibia_deg =
+        config_.tibia.sign * (GetAngle(joints, config_.tibia.ident) -
+                              config_.tibia.idle_deg);
+    result.tibia_joint.transform.rotation = Quaternion::FromEuler(
+        Radians(tibia_deg), 0, 0);
+
+    result.shoulder = result.shoulder_frame.MapFromFrame(
+        &result.femur_joint, Point3D());
+    result.femur = result.shoulder_frame.MapFromFrame(
+        &result.tibia_joint, Point3D());
+    result.end = result.shoulder_frame.MapFromFrame(
+        &result.end_frame, Point3D());
+    result.tibia = result.end;
 
     return result;
   }
