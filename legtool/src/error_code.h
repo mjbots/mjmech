@@ -62,14 +62,14 @@ class ErrorCode {
   const boost::system::error_code& error_code() const { return ec_; }
 
   operator boost::system::error_code() const { return ec_; }
-  operator bool() const { return !!ec_; }
+  explicit operator bool() const { return !!ec_; }
 
-  bool operator==(const boost::system::error_condition& ec) const {
-    return ec_ == ec;
+  bool operator==(const ErrorCode& rhs) const {
+    return ec_ == rhs.ec_;
   }
 
-  bool operator==(const boost::system::error_code& ec) const {
-    return ec_ == ec;
+  bool operator!=(const ErrorCode& rhs) const {
+    return ec_ != rhs.ec_;
   }
 
   // Append context to this error.  These all boil down to adding

@@ -157,7 +157,7 @@ class Selector : boost::noncopyable {
     servo_.AsyncStart([=](ErrorCode ec) {
         if (ec) {
           future.attr("set_exception")(
-              std::runtime_error(boost::lexical_cast<std::string>(ec)));
+              std::runtime_error(ec.message()));
         } else {
           future.attr("set_result")(bp::object());
         }

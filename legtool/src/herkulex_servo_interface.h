@@ -107,7 +107,7 @@ class HerkuleXServoInterface : public ServoInterface {
                  PoseHandler handler) {
     if (ec && ec != boost::asio::error::operation_aborted) {
       if (address) {
-        ec.Append(boost::format("when querying %d") % *address);
+        ec.Append(boost::format("when getting pose from servo %d") % *address);
       }
       handler(ec, {});
       return;
@@ -117,7 +117,7 @@ class HerkuleXServoInterface : public ServoInterface {
     if (!ec && address) {
       result.emplace_back(Joint{*address, CountsToAngleDeg(value)});
     }
-    if (ids.empty()) { handler(ec, result); return; }
+    if (ids.empty()) { handler(ErrorCode(), result); return; }
 
     int to_send = ids.back();
     std::vector<int> new_ids = ids;
@@ -145,7 +145,7 @@ class HerkuleXServoInterface : public ServoInterface {
                         TemperatureHandler handler) {
     if (ec && ec != boost::asio::error::operation_aborted) {
       if (address) {
-        ec.Append(boost::format("when querying %d") % *address);
+        ec.Append(boost::format("when getting temp from servo %d") % *address);
       }
       handler(ec, {});
       return;
@@ -155,7 +155,7 @@ class HerkuleXServoInterface : public ServoInterface {
     if (!ec && address) {
       result.emplace_back(Temperature{*address, CountsToTemperatureC(value)});
     }
-    if (ids.empty()) { handler(ec, result); return; }
+    if (ids.empty()) { handler(ErrorCode(), result); return; }
 
     int to_send = ids.back();
     std::vector<int> new_ids = ids;
@@ -191,7 +191,8 @@ class HerkuleXServoInterface : public ServoInterface {
                     VoltageHandler handler) {
     if (ec && ec != boost::asio::error::operation_aborted) {
       if (address) {
-        ec.Append(boost::format("when querying %d") % *address);
+        ec.Append(boost::format("when getting voltage from servo  %d") %
+                  *address);
       }
       handler(ec, {});
       return;
@@ -202,7 +203,7 @@ class HerkuleXServoInterface : public ServoInterface {
       result.emplace_back(Voltage{*address, CountsToVoltage(value)});
     }
 
-    if (ids.empty()) { handler(ec, result); return; }
+    if (ids.empty()) { handler(ErrorCode(), result); return; }
 
     int to_send = ids.back();
     std::vector<int> new_ids = ids;
