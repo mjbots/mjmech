@@ -31,6 +31,7 @@ crenv.Append(LIBS=['boost_coroutine',
 
 SOURCES = [
     'comm_factory.cc',
+    'error_code.cc',
     'fail.cc',
     'herkulex.cc',
     'mjmech_imu_driver.cc',
