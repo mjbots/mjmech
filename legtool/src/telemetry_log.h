@@ -40,7 +40,9 @@ class TelemetryLog : boost::noncopyable {
     /// Write a trailing index block
     kIndexBlock = 1 << 2,
 
-    kDefaultFlags = (kWritePreviousOffsets | kDefaultCompression | kIndexBlock),
+    kDefaultFlags = (kWritePreviousOffsets |
+                     kDefaultCompression |
+                     kIndexBlock),
   };
 
   TelemetryLog(LogFlags flags = LogFlags::kDefaultFlags);
