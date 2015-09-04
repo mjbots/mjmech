@@ -24,6 +24,7 @@
 #include "comm.h"
 #include "command_sequencer.h"
 #include "common.h"
+#include "fail.h"
 #include "signal_result.h"
 #include "visitor.h"
 
@@ -156,7 +157,7 @@ class HerkuleXProtocol : boost::noncopyable {
         [=](PacketHandler packet_handler) {
           RawSendPacket(
               to_send,
-              [=](const boost::system::error_code& ec) {
+              [=](ErrorCode ec) {
                 if (ec) {
                   packet_handler(ec, Packet());
                   return;
@@ -195,13 +196,14 @@ class HerkuleXProtocol : boost::noncopyable {
     boost::asio::async_write(
         *stream_,
         boost::asio::buffer(buffer_, 7 + packet.data.size()),
-        [handler](const boost::system::error_code& ec, size_t written) mutable {
+        [handler](const boost::system::error_code& ec,
+                  size_t written) mutable {
           handler(ec);
         });
   }
 
   void HandleStart(ErrorHandler handler,
-                   const boost::system::error_code& ec,
+                   ErrorCode ec,
                    SharedStream stream) {
     if (ec) {
       service_.post(std::bind(handler, ec));
@@ -211,14 +213,12 @@ class HerkuleXProtocol : boost::noncopyable {
     BOOST_ASSERT(!stream_);
     stream_ = stream;
 
-    ReadLoop1(boost::system::error_code());
+    ReadLoop1();
 
-    service_.post(std::bind(handler, boost::system::error_code()));
+    service_.post(std::bind(handler, ErrorCode()));
   }
 
-  void ReadLoop1(boost::system::error_code ec) {
-    if (ec) { throw boost::system::system_error(ec); }
-
+  void ReadLoop1() {
     // Read until we get a frame header.
     boost::asio::async_read_until(
         *stream_, rx_streambuf_, "\xff\xff",
@@ -227,7 +227,9 @@ class HerkuleXProtocol : boost::noncopyable {
                   std::placeholders::_2));
   }
 
-  void ReadLoop2(boost::system::error_code ec, std::size_t) {
+  void ReadLoop2(ErrorCode ec, std::size_t) {
+    FailIf(ec);
+
     // Clear out the streambuf until we have our delimeter.
     std::istream istr(&rx_streambuf_);
     std::string buf;
@@ -252,18 +254,18 @@ class HerkuleXProtocol : boost::noncopyable {
                     std::placeholders::_1,
                     std::placeholders::_2));
     } else {
-      ReadLoop3(boost::system::error_code(), 0);
+      ReadLoop3(ErrorCode(), 0);
     }
   }
 
-  void ReadLoop3(boost::system::error_code ec, std::size_t) {
-    if (ec) { throw boost::system::system_error(ec); }
+  void ReadLoop3(ErrorCode ec, std::size_t) {
+    FailIf(ec);
 
     std::array<char, 5> header = {};
     std::istream istr(&rx_streambuf_);
     istr.read(&header[0], 5);
     if (istr.gcount() != 5) {
-      throw std::runtime_error("inconsistent header");
+      Fail("inconsistent header");
     }
 
     const uint8_t size = header[0];
@@ -273,7 +275,7 @@ class HerkuleXProtocol : boost::noncopyable {
       // synchronization.  Probably should log?
 
       // TODO jpieper: Think about logging.
-      ReadLoop1(boost::system::error_code());
+      ReadLoop1();
       return;
     }
 
@@ -287,13 +289,13 @@ class HerkuleXProtocol : boost::noncopyable {
                     std::placeholders::_1,
                     std::placeholders::_2, header));
     } else {
-      ReadLoop4(boost::system::error_code(), 0, header);
+      ReadLoop4(ErrorCode(), 0, header);
     }
   }
 
-  void ReadLoop4(boost::system::error_code ec, std::size_t,
+  void ReadLoop4(ErrorCode ec, std::size_t,
                  std::array<char, 5> header) {
-    if (ec) { throw boost::system::system_error(ec); }
+    FailIf(ec);
 
     const uint8_t size = header[0];
     const uint8_t servo = header[1];
@@ -318,7 +320,7 @@ class HerkuleXProtocol : boost::noncopyable {
 
     read_signal_(&result);
 
-    ReadLoop1(boost::system::error_code());
+    ReadLoop1();
   }
 
   static uint8_t Checksum1(uint8_t size, uint8_t servo, uint8_t cmd,
@@ -443,57 +445,62 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
     return init.result.get();
   }
 
-  void MemReadHandler(const boost::system::error_code& ec,
+  void MemReadHandler(ErrorCode ec,
                       typename Base::Packet result,
                       uint8_t reg,
                       uint8_t length,
                       typename Base::Packet to_send,
-                      std::function<void (boost::system::error_code,
+                      std::function<void (ErrorCode,
                                           MemReadResponse)> handler) {
-    if (ec) {
-      handler(ec, MemReadResponse());
-      return;
+    try {
+      if (ec) {
+        ec.Append(boost::format("when reading register %d") %
+                  static_cast<int>(reg));
+        throw SystemError(ec);
+      }
+
+      if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
+        throw SystemError::einval(
+            (boost::format("Synchronization error, sent request for servo "
+                           "0x%02x, response from 0x%02x") %
+             static_cast<int>(to_send.servo) %
+             static_cast<int>(result.servo)).str());
+      }
+
+      if (result.command != (0x40 | to_send.command)) {
+        throw SystemError::einval(
+            (boost::format(
+                "Expected response command 0x%02x, received 0x%02x") %
+             static_cast<int>(0x40 | to_send.command) %
+             static_cast<int>(result.command)).str());
+      }
+
+      if (result.data.size() != length + 4) {
+        throw SystemError::einval(
+            (boost::format("Expected length response %d, received %d") %
+             static_cast<int>(length + 4) %
+             result.data.size()).str());
+      }
+
+      MemReadResponse response = result;
+
+      if (response.register_start != reg) {
+        throw SystemError::einval(
+            (boost::format("Expected register 0x%02x, received 0x%02x") %
+             static_cast<int>(reg) %
+             static_cast<int>(response.register_start)).str());
+      }
+
+      if (response.length != length) {
+        throw SystemError::einval(
+            (boost::format("Expected length %d, received %d") %
+             static_cast<int>(length) %
+             static_cast<int>(response.length)).str());
+      }
+      handler(ErrorCode(), response);
+    } catch (SystemError& se) {
+      handler(se.error_code(), MemReadResponse());
     }
-
-    if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
-      throw std::runtime_error(
-          (boost::format("Synchronization error, sent request for servo "
-                         "0x%02x, response from 0x%02x") %
-           static_cast<int>(to_send.servo) %
-           static_cast<int>(result.servo)).str());
-    }
-
-    if (result.command != (0x40 | to_send.command)) {
-      throw std::runtime_error(
-          (boost::format("Expected response command 0x%02x, received 0x%02x") %
-           static_cast<int>(0x40 | to_send.command) %
-           static_cast<int>(result.command)).str());
-    }
-
-    if (result.data.size() != length + 4) {
-      throw std::runtime_error(
-          (boost::format("Expected length response %d, received %d") %
-           static_cast<int>(length + 4) %
-           result.data.size()).str());
-    }
-
-    MemReadResponse response = result;
-
-    if (response.register_start != reg) {
-      throw std::runtime_error(
-          (boost::format("Expected register 0x%02x, received 0x%02x") %
-           static_cast<int>(reg) %
-           static_cast<int>(response.register_start)).str());
-    }
-
-    if (response.length != length) {
-      throw std::runtime_error(
-          (boost::format("Expected length %d, received %d") %
-           static_cast<int>(length) %
-           static_cast<int>(response.length)).str());
-    }
-
-    handler(boost::system::error_code(), response);
   }
 
   typedef std::function<void (const boost::system::error_code&,
@@ -522,39 +529,40 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
   }
 
   void HandleStatusResponse(
-      const boost::system::error_code& ec,
+      ErrorCode ec,
       typename Base::StatusResponse result,
       typename Base::Packet to_send,
       StatusHandler handler) {
-    if (ec) {
-      handler(ec, typename Base::StatusResponse());
-      return;
-    }
+    try {
+      if (ec) { throw SystemError(ec); }
 
-    if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
-      throw std::runtime_error(
-          (boost::format("Synchronization error, send status to servo 0x%02x, "
-                         "response from 0x%02x") %
-           static_cast<int>(to_send.servo) %
-           static_cast<int>(result.servo)).str());
-    }
+      if (result.servo != to_send.servo && to_send.servo != BROADCAST) {
+        throw SystemError::einval(
+            (boost::format(
+                "Synchronization error, send status to servo 0x%02x, "
+                "response from 0x%02x") %
+             static_cast<int>(to_send.servo) %
+             static_cast<int>(result.servo)).str());
+      }
 
-    if (result.command != ACK_STAT) {
-      throw std::runtime_error(
-          (boost::format("Expected response command 0x%02x, received 0x%02x") %
-           static_cast<int>(ACK_STAT) %
-           static_cast<int>(result.command)).str());
-    }
+      if (result.command != ACK_STAT) {
+        throw SystemError::einval(
+            (boost::format(
+                "Expected response command 0x%02x, received 0x%02x") %
+             static_cast<int>(ACK_STAT) %
+             static_cast<int>(result.command)).str());
+      }
 
-    if (result.data.size() != 2) {
-      throw std::runtime_error(
-          (boost::format("Received status of incorrect size, expected 2, "
-                         "got %d") %
-           result.data.size()).str());
+      if (result.data.size() != 2) {
+        throw SystemError::einval(
+            (boost::format("Received status of incorrect size, expected 2, "
+                           "got %d") %
+             result.data.size()).str());
+      }
+      handler(ErrorCode(), typename Base::StatusResponse(result));
+    } catch (SystemError& se) {
+      handler(se.error_code(), typename Base::StatusResponse());
     }
-
-    handler(boost::system::error_code(),
-            typename Base::StatusResponse(result));
   }
 
   template <typename Handler>
@@ -639,7 +647,7 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
     MemWriteValue(EEP_WRITE, servo, field, value, handler);
   }
 
-  typedef std::function<void (boost::system::error_code, int)> IntHandler;
+  typedef std::function<void (ErrorCode, int)> IntHandler;
 
   template <typename T, typename Handler>
   BOOST_ASIO_INITFN_RESULT_TYPE(
@@ -653,8 +661,7 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
 
     MemRead(
         command, servo, field.position, field.length,
-        [=](const boost::system::error_code& ec,
-            MemReadResponse response) mutable {
+        [=](ErrorCode ec, MemReadResponse response) mutable {
           if (ec) {
             init.handler(ec, 0);
             return;
@@ -667,7 +674,7 @@ class HerkuleX : public HerkuleXProtocol<Factory> {
                            response.register_data[i]) << (i * 8));
           }
 
-          init.handler(boost::system::error_code(), result);
+          init.handler(ErrorCode(), result);
         });
 
     return init.result.get();

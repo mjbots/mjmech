@@ -14,6 +14,11 @@
 
 #pragma once
 
+#include <vector>
+
+#include "comm.h"
+#include "error_code.h"
+
 namespace legtool {
 class ServoInterface : boost::noncopyable {
  public:
@@ -31,8 +36,8 @@ class ServoInterface : boost::noncopyable {
   virtual void EnablePower(PowerState power_state, const std::vector<int>&,
                            ErrorHandler) = 0;
 
-  typedef std::function<void (boost::system::error_code,
-                              std::vector<Joint>)> PoseHandler;
+  typedef std::function<
+    void (ErrorCode, std::vector<Joint>)> PoseHandler;
 
   virtual void GetPose(const std::vector<int>&, PoseHandler) = 0;
 
@@ -41,8 +46,8 @@ class ServoInterface : boost::noncopyable {
     double temperature_C;
   };
 
-  typedef std::function<void (boost::system::error_code,
-                              std::vector<Temperature>)> TemperatureHandler;
+  typedef std::function<
+    void (ErrorCode, std::vector<Temperature>)> TemperatureHandler;
   virtual void GetTemperature(const std::vector<int>&, TemperatureHandler) = 0;
 
   struct Voltage {
@@ -50,8 +55,8 @@ class ServoInterface : boost::noncopyable {
     double voltage;
   };
 
-  typedef std::function<void (boost::system::error_code,
-                              std::vector<Voltage>)> VoltageHandler;
+  typedef std::function<void (
+      ErrorCode, std::vector<Voltage>)> VoltageHandler;
 
   virtual void GetVoltage(const std::vector<int>&, VoltageHandler) = 0;
 };

@@ -30,6 +30,7 @@
 #include <snappy-sinksource.h>
 
 #include "circular_buffer.h"
+#include "fail.h"
 #include "move_wrapper.h"
 
 namespace legtool {
@@ -44,15 +45,6 @@ struct Pipe {
   int read = 0;
   int write = 0;
 };
-
-int Errwrap(int value) {
-  if (value < 0) {
-    throw boost::system::system_error(
-        boost::system::error_code(
-            errno, boost::system::generic_category()));
-  }
-  return value;
-}
 
 struct SchemaRecord {
   std::string name;
@@ -178,17 +170,13 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
  private:
   static FILE* OpenName(const std::string& name) {
     FILE* result = ::fopen(name.c_str(), "wb");
-    if (result == nullptr) {
-      throw boost::system::system_error(
-          boost::system::error_code(
-              errno, boost::system::generic_category()));
-    }
+    FailIfErrno(result == nullptr);
     return result;
   }
 
   static Pipe MakePipe() {
     int fds[2] = {};
-    Errwrap(::pipe(fds));
+    FailIfErrno(::pipe(fds) < 0);
 
     // We make the writing side non-blocking.
     ::fcntl(fds[1], F_SETFL, O_NONBLOCK);
@@ -201,11 +189,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
 
   static FILE* OpenFd(int fd) {
     FILE* result = ::fdopen(fd, "wb");
-    if (result == nullptr) {
-      throw boost::system::system_error(
-          boost::system::error_code(
-              errno, boost::system::generic_category()));
-    }
+    FailIfErrno(result == nullptr);
     return result;
   }
 
@@ -242,15 +226,13 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
 
     size_t result = ::fwrite(TelemetryFormat::kHeader,
              ::strlen(TelemetryFormat::kHeader), 1, fd_);
-    if (result == 0) {
-      Errwrap(-1);
-    }
+    FailIfErrno(result == 0);
 
     while (true) {
       char c = {};
       int err = ::read(pipe_.read, &c, 1);
       if (err < 0 && errno != EINTR) {
-        Errwrap(-1);
+        FailIfErrno(true);
       }
 
       {
@@ -289,7 +271,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     std::memset(&act, 0, sizeof(act));
     act.sa_sigaction = timer_handler;
     act.sa_flags = SA_SIGINFO;
-    Errwrap(sigaction(kTelemetryLogSignal, &act, nullptr));
+    FailIfErrno(sigaction(kTelemetryLogSignal, &act, nullptr) < 0);
 
     struct sigevent sevp;
     std::memset(&sevp, 0, sizeof(sevp));
@@ -297,7 +279,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     sevp.sigev_value.sival_ptr = this;
     sevp.sigev_signo = kTelemetryLogSignal;
 
-    Errwrap(::timer_create(CLOCK_MONOTONIC, &sevp, &timer_id_));
+    FailIfErrno(::timer_create(CLOCK_MONOTONIC, &sevp, &timer_id_) < 0);
 
     struct itimerspec value;
     std::memset(&value, 0, sizeof(value));
@@ -305,7 +287,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     value.it_interval.tv_nsec =
         static_cast<long>((kFlushTimeout_s - value.it_interval.tv_sec) * 1e9);
     value.it_value = value.it_interval;
-    Errwrap(::timer_settime(timer_id_, 0, &value, nullptr));
+    FailIfErrno(::timer_settime(timer_id_, 0, &value, nullptr) < 0);
   }
 
   void HandleTimer() {
@@ -365,9 +347,7 @@ class TelemetryLog::ThreadWriter : boost::noncopyable {
     const char* ptr = &(*stream.data())[stream.start()];
     size_t size = stream.size();
     size_t result = ::fwrite(ptr, size, 1, fd_);
-    if (result == 0) {
-      Errwrap(-1);
-    }
+    FailIfErrno(result == 0);
 
     child_offset_ += size;
     impl_->ReclaimBuffer(std::move(buffer));
@@ -536,20 +516,18 @@ void TelemetryLog::WriteSchema(uint32_t identifier,
   auto it = impl_->identifier_map_.find(record_name);
   if (it != impl_->identifier_map_.end()) {
     if (identifier != it->second) {
-      throw std::runtime_error(
-          (boost::format(
-              "Attempt to write schema for '%s' with identifier %d "
-              "but already allocated as %d") %
-           record_name % identifier % it->second).str());
+      Fail(boost::format(
+               "Attempt to write schema for '%s' with identifier %d "
+               "but already allocated as %d") %
+           record_name % identifier % it->second);
     }
   } else {
     auto rit = impl_->reverse_identifier_map_.find(identifier);
     if (rit != impl_->reverse_identifier_map_.end()) {
-      throw std::runtime_error(
-          (boost::format(
-              "Attempt to write schema for '%s' but identifier %d "
-              "already used for '%s'") %
-           record_name % identifier % it->second).str());
+      Fail(boost::format(
+               "Attempt to write schema for '%s' but identifier %d "
+               "already used for '%s'") %
+           record_name % identifier % it->second);
     } else {
       // Guess we might as well mark this identifier as being used.
       impl_->identifier_map_[record_name] = identifier;

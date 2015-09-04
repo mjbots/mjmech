@@ -16,6 +16,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "fail.h"
 #include "program_options_archive.h"
 #include "telemetry_log.h"
 #include "telemetry_log_registrar.h"
@@ -31,10 +32,8 @@ struct Context {
 };
 
 struct FailWrapper {
-  void operator()(const boost::system::error_code& ec) const {
-    if (ec) {
-      throw boost::system::system_error(ec);
-    }
+  void operator()(ErrorCode ec) const {
+    FailIf(ec);
   }
 };
 

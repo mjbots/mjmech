@@ -67,7 +67,7 @@ void StdioGenerator::AsyncCreate(
     const Parameters& parameters,
     StreamHandler handler) {
   service.post(
-      std::bind(handler, boost::system::error_code(),
+      std::bind(handler, ErrorCode(),
                 std::shared_ptr<AsyncStream>(
                     new StdioStream(service, parameters))));
 }
@@ -92,7 +92,7 @@ class SerialStream : public AsyncStream {
       } else if (string == "o" || string == "odd") {
         return boost::asio::serial_port_base::parity::odd;
       }
-      throw std::runtime_error("unknown parity: " + string);
+      throw SystemError::einval("unknown parity: " + string);
     };
     port_.set_option(
         boost::asio::serial_port_base::parity(make_parity(parameters.parity)));
@@ -124,10 +124,8 @@ void SerialPortGenerator::AsyncCreate(
     boost::asio::io_service& service,
     const Parameters& parameters,
     StreamHandler handler) {
-  service.post(
-      std::bind(handler, boost::system::error_code(),
-                std::shared_ptr<AsyncStream>(
-                    new SerialStream(service, parameters))));
+  auto stream = SharedStream(new SerialStream(service, parameters));
+  service.post(std::bind(handler, ErrorCode(), stream));
 }
 
 namespace {
@@ -138,6 +136,7 @@ class TcpStream : public AsyncStream {
   TcpStream(boost::asio::io_service& service,
             const TcpClientGenerator::Parameters& parameters)
       : service_(service),
+        parameters_(parameters),
         resolver_(service),
         socket_(service) {
     tcp::resolver::query query(parameters.host,
@@ -166,9 +165,11 @@ class TcpStream : public AsyncStream {
   ErrorHandler start_handler_;
 
  private:
-  void HandleResolve(const boost::system::error_code& ec,
+  void HandleResolve(ErrorCode ec,
                      tcp::resolver::iterator it) {
     if (ec) {
+      ec.Append(boost::format("when resolving: %s:%d") %
+                parameters_.host % parameters_.port);
       service_.post(std::bind(start_handler_, ec));
       return;
     }
@@ -176,11 +177,16 @@ class TcpStream : public AsyncStream {
     socket_.async_connect(*it, std::bind(&TcpStream::HandleConnect, this, _1));
   }
 
-  void HandleConnect(const boost::system::error_code& ec) {
+  void HandleConnect(ErrorCode ec) {
+    if (ec) {
+      ec.Append(boost::format("when connecting to: %s:%d") %
+                parameters_.host % parameters_.port);
+    }
     service_.post(std::bind(start_handler_, ec));
   }
 
   boost::asio::io_service& service_;
+  const TcpClientGenerator::Parameters parameters_;
   tcp::resolver resolver_;
   tcp::socket socket_;
 };
@@ -214,7 +220,7 @@ class HalfPipe : public AsyncStream {
     if (boost::asio::buffer_size(buffers) == 0) {
       // Post immediately.
       service_.post(
-          std::bind(handler, boost::system::error_code(), 0));
+          std::bind(handler, ErrorCode(), 0));
       return;
     }
 
@@ -222,9 +228,9 @@ class HalfPipe : public AsyncStream {
       const std::size_t written =
           boost::asio::buffer_copy(buffers, *other_->write_buffers_);
       service_.post(
-          std::bind(*other_->write_handler_, boost::system::error_code(), written));
+          std::bind(*other_->write_handler_, ErrorCode(), written));
       service_.post(
-          std::bind(handler, boost::system::error_code(), written));
+          std::bind(handler, ErrorCode(), written));
 
       other_->write_handler_ = boost::none;
       other_->write_buffers_ = boost::none;
@@ -242,7 +248,7 @@ class HalfPipe : public AsyncStream {
     if (boost::asio::buffer_size(buffers) == 0) {
       // Post immediately.
       service_.post(
-          std::bind(handler, boost::system::error_code(), 0));
+          std::bind(handler, ErrorCode(), 0));
       return;
     }
 
@@ -250,9 +256,9 @@ class HalfPipe : public AsyncStream {
       const std::size_t written =
           boost::asio::buffer_copy(*other_->read_buffers_, buffers);
       service_.post(
-          std::bind(*other_->read_handler_, boost::system::error_code(), written));
+          std::bind(*other_->read_handler_, ErrorCode(), written));
       service_.post(
-          std::bind(handler, boost::system::error_code(), written));
+          std::bind(handler, ErrorCode(), written));
 
       other_->read_handler_ = boost::none;
       other_->read_buffers_ = boost::none;
@@ -348,7 +354,7 @@ void PipeGenerator::AsyncCreate(boost::asio::io_service& service,
                                 const Parameters& parameters,
                                 StreamHandler handler) {
   SharedStream stream = GetStream(service, parameters.key, Mode::kDirectionA);
-  service.post(std::bind(handler, boost::system::error_code(), stream));
+  service.post(std::bind(handler, ErrorCode(), stream));
 }
 
 SharedStream PipeGenerator::GetStream(
@@ -390,7 +396,7 @@ class StdioDebugStream : public AsyncStream {
     context_->base->virtual_async_read_some(
         buffer,
         [context=this->context_, buffer, handler](
-            boost::system::error_code ec, std::size_t size) {
+            ErrorCode ec, std::size_t size) {
 
           if (size != 0) {
             if (context->last_write) {
@@ -417,7 +423,7 @@ class StdioDebugStream : public AsyncStream {
     context_->base->virtual_async_write_some(
         buffer,
         [context=this->context_, buffer, handler](
-            boost::system::error_code ec, std::size_t size) {
+            ErrorCode ec, std::size_t size) {
           if (size != 0) {
             if (!context->last_write) {
               std::cout << "\nWRITE:";

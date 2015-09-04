@@ -21,10 +21,11 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "error_code.h"
+
 namespace legtool {
-typedef std::function<void (const boost::system::error_code&)> ErrorHandler;
-typedef std::function<void (const boost::system::error_code&,
-                            std::size_t)> SizeHandler;
+typedef std::function<void (ErrorCode)> ErrorHandler;
+typedef std::function<void (ErrorCode, std::size_t)> SizeHandler;
 typedef SizeHandler ReadHandler;
 typedef SizeHandler WriteHandler;
 
@@ -79,7 +80,11 @@ class AsyncStream : boost::noncopyable {
       void (boost::system::error_code, std::size_t)> init(
           BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    this->virtual_async_read_some(buffers, init.handler);
+    this->virtual_async_read_some(
+        buffers,
+        [init](ErrorCode ec, std::size_t size) mutable {
+          init.handler(ec.error_code(), size);
+        });
 
     return init.result.get();
   }
@@ -93,7 +98,10 @@ class AsyncStream : boost::noncopyable {
       void (boost::system::error_code, std::size_t)> init(
           BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    this->virtual_async_write_some(buffers, init.handler);
+    this->virtual_async_write_some(
+        buffers, [init](ErrorCode ec, std::size_t size) mutable {
+          init.handler(ec.error_code(), size);
+        });
 
     return init.result.get();
   }
@@ -105,7 +113,6 @@ class AsyncStream : boost::noncopyable {
 };
 
 typedef std::shared_ptr<AsyncStream> SharedStream;
-typedef std::function<void (boost::system::error_code,
-                            SharedStream)> StreamHandler;
+typedef std::function<void (ErrorCode, SharedStream)> StreamHandler;
 
 }

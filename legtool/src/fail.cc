@@ -61,12 +61,14 @@ void Fail(const std::string& message) {
   void *buffer[kMaxFrames] = {};
   int frames = ::backtrace(buffer, kMaxFrames);
 
-  std::cerr << "Fatal error: " << message << "\n";
+  std::cerr << "Fatal error:\n";
   char **strings = ::backtrace_symbols(buffer, frames);
 
   for (int i = 0; i < frames; i++) {
     std::cerr << FormatFrame(strings[i]) << "\n";
   }
+
+  std::cerr << "\n" << message << "\n\n";
 
   ::abort();
 }
@@ -75,7 +77,7 @@ void Fail(const boost::format& fmt) {
   Fail(fmt.str());
 }
 
-void FailIf(const boost::system::error_code& ec) {
+void FailIf(const ErrorCode& ec) {
   if (ec) { Fail(ec.message()); }
 }
 

@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "fail.h"
 #include "servo_interface.h"
 
 namespace legtool {
@@ -67,17 +68,17 @@ class HerkuleXServoInterface : public ServoInterface {
     std::vector<int> ids(ids_in);
     if (ids.empty()) { ids.push_back(Servo::BROADCAST); }
 
-    HandlePowerAck(boost::system::error_code(), ids, value, handler);
+    HandlePowerAck(ErrorCode(), ids, value, handler);
   }
 
-  void HandlePowerAck(const boost::system::error_code& ec,
+  void HandlePowerAck(ErrorCode ec,
                       const std::vector<int>& ids,
                       uint8_t value,
                       ErrorHandler handler) {
     if (ec) { handler(ec); return; }
 
     if (ids.empty()) {
-      handler(boost::system::error_code());
+      handler(ErrorCode());
       return;
     }
 
@@ -93,18 +94,21 @@ class HerkuleXServoInterface : public ServoInterface {
 
   virtual void GetPose(
       const std::vector<int>& ids, PoseHandler handler) override {
-    DoGetPose(boost::system::error_code(), 0,
+    DoGetPose(ErrorCode(), 0,
               boost::none,
               ids, std::vector<Joint>{}, handler);
   }
 
-  void DoGetPose(const boost::system::error_code& ec,
+  void DoGetPose(ErrorCode ec,
                  int value,
                  boost::optional<int> address,
                  const std::vector<int>& ids,
                  const std::vector<Joint>& current_result,
                  PoseHandler handler) {
     if (ec && ec != boost::asio::error::operation_aborted) {
+      if (address) {
+        ec.Append(boost::format("when querying %d") % *address);
+      }
       handler(ec, {});
       return;
     }
@@ -128,18 +132,21 @@ class HerkuleXServoInterface : public ServoInterface {
 
   virtual void GetTemperature(
       const std::vector<int>& ids, TemperatureHandler handler) override {
-    DoGetTemperature(boost::system::error_code(), 0,
+    DoGetTemperature(ErrorCode(), 0,
                      boost::none,
                      ids, std::vector<Temperature>{}, handler);
   }
 
-  void DoGetTemperature(const boost::system::error_code& ec,
+  void DoGetTemperature(ErrorCode ec,
                         int value,
                         boost::optional<int> address,
                         const std::vector<int>& ids,
                         const std::vector<Temperature>& current_result,
                         TemperatureHandler handler) {
     if (ec && ec != boost::asio::error::operation_aborted) {
+      if (address) {
+        ec.Append(boost::format("when querying %d") % *address);
+      }
       handler(ec, {});
       return;
     }
@@ -163,7 +170,7 @@ class HerkuleXServoInterface : public ServoInterface {
 
   virtual void GetVoltage(
       const std::vector<int>& ids, VoltageHandler handler) override {
-    DoGetVoltage(boost::system::error_code(), 0,
+    DoGetVoltage(ErrorCode(), 0,
                  boost::none,
                  ids, std::vector<Voltage>{}, handler);
   }
@@ -176,13 +183,16 @@ class HerkuleXServoInterface : public ServoInterface {
     return result;
   }
 
-  void DoGetVoltage(const boost::system::error_code& ec,
+  void DoGetVoltage(ErrorCode ec,
                     int value,
                     boost::optional<int> address,
                     const std::vector<int>& ids,
                     const std::vector<Voltage>& current_result,
                     VoltageHandler handler) {
     if (ec && ec != boost::asio::error::operation_aborted) {
+      if (address) {
+        ec.Append(boost::format("when querying %d") % *address);
+      }
       handler(ec, {});
       return;
     }
@@ -227,7 +237,7 @@ class HerkuleXServoInterface : public ServoInterface {
  private:
   static uint8_t MapAddress(int address) {
     if (address < 0 || address > 0xfe) {
-      throw std::runtime_error("invalid address");
+      Fail("invalid address");
     }
     return static_cast<uint8_t>(address);
   }

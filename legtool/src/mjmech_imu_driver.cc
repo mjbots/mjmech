@@ -20,14 +20,16 @@
 
 #include "fail.h"
 
+namespace legtool {
+
 namespace {
 int ErrWrap(int value) {
-  legtool::FailIfErrno(value < 0);
+  if (value < 0) {
+    throw SystemError(errno, boost::system::generic_category());
+  }
   return value;
 }
 }
-
-namespace legtool {
 
 class MjmechImuDriver::Impl : boost::noncopyable {
  public:
@@ -55,19 +57,23 @@ class MjmechImuDriver::Impl : boost::noncopyable {
   void Run(ErrorHandler handler) {
     BOOST_ASSERT(std::this_thread::get_id() == child_.get_id());
 
-    // Open the I2C device and configure it.
-    fd_ = ErrWrap(::open(parameters_.i2c_device.c_str(), O_RDWR));
-
     // TODO jpieper: Set the bit rate of the I2C device.
 
     try {
+      // Open the I2C device and configure it.
+      fd_ = ::open(parameters_.i2c_device.c_str(), O_RDWR);
+      if (fd_ < 0) {
+        throw SystemError(errno, boost::system::generic_category(),
+                          "error opening '" + parameters_.i2c_device + "'");
+      }
+
       uint8_t whoami[1] = {};
 
       ReadGyro(0x0f, 1, whoami, sizeof(whoami));
       if (whoami[0] != 0xd7) {
-        // Incorrect part.
-        Fail(boost::format("Incorrect whoami got 0x%02X expected 0xd7") %
-             static_cast<int>(whoami[0]));
+        throw SystemError::einval(
+            (boost::format("Incorrect whoami got 0x%02X expected 0xd7") %
+             static_cast<int>(whoami[0])).str());
       }
 
       uint8_t ignored[1] = {};
@@ -80,14 +86,21 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       // Configure the accelerometer.
       WriteAccel(0x20, {0b01010111}); // ODR=100Hz, low_power=off all enabled
       WriteAccel(0x23, {0b10101000}); // BDU=(block) BLE=off FS=11 (8g) HR=1
-    } catch (boost::system::system_error& e) {
-      service_.post(std::bind(handler, e.code()));
+    } catch (SystemError& e) {
+      e.error_code().Append("when initializing IMU");
+      service_.post(std::bind(handler, e.error_code()));
       return;
     }
 
-    service_.post(std::bind(handler, boost::system::error_code()));
+    service_.post(std::bind(handler, ErrorCode()));
 
-    DataLoop();
+    try {
+      DataLoop();
+    } catch (SystemError& e) {
+      // TODO jpieper: We should somehow log this or do something
+      // useful.  For now, just re-raise.
+      throw;
+    }
   }
 
   void DataLoop() {
@@ -195,9 +208,10 @@ class MjmechImuDriver::Impl : boost::noncopyable {
                                I2C_SMBUS_BLOCK_DATA, &data));
 
     if (data.block[0] != length) {
-      throw boost::system::system_error(
-          boost::system::error_code(EINVAL,
-                                    boost::system::generic_category()));
+      throw SystemError(
+          EINVAL, boost::system::generic_category(),
+          (boost::format("asked for length %d got %d") %
+           length % static_cast<int>(data.block[0])).str());
     }
     std::memcpy(buffer, &data.block[1], length);
   }

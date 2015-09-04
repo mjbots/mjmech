@@ -16,7 +16,8 @@
 
 #include <string>
 #include <boost/format/format_fwd.hpp>
-#include <boost/system/error_code.hpp>
+
+#include "error_code.h"
 
 namespace legtool {
 
@@ -27,7 +28,7 @@ void Fail(const std::string& message);
 void Fail(const boost::format&);
 
 /// Terminate a program if the given error code is set.
-void FailIf(const boost::system::error_code& ec);
+void FailIf(const ErrorCode&);
 
 /// Terminate the program if @p terminate is true, formatting the
 /// current errno as part of the message.

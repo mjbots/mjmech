@@ -31,11 +31,11 @@ namespace {
 bp::object g_runtime_error = bp::eval("RuntimeError");
 
 void HandleCallback(bp::object future,
-                    boost::system::error_code ec,
+                    ErrorCode ec,
                     bp::object result) {
   if (ec) {
     future.attr("set_exception")(
-        g_runtime_error(boost::lexical_cast<std::string>(ec)));
+        g_runtime_error(ec.message()));
   } else {
     future.attr("set_result")(result);
   }
@@ -57,7 +57,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
           address,
               bp::extract<double>(py_joints[address])});
     }
-    servo_->SetPose(joints, [=](boost::system::error_code ec) {
+    servo_->SetPose(joints, [=](ErrorCode ec) {
         HandleCallback(future, ec, bp::object());
       });
   }
@@ -68,7 +68,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->EnablePower(
         power_state, addresses,
-        [=](boost::system::error_code ec) {
+        [=](ErrorCode ec) {
           HandleCallback(future, ec, bp::object());
         });
   }
@@ -77,7 +77,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetPose(
         addresses,
-        [=](boost::system::error_code ec,
+        [=](ErrorCode ec,
             const std::vector<ServoInterface::Joint> joints) {
 
           bp::dict result;
@@ -92,7 +92,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
   void get_temperature(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetTemperature(
-        addresses, [=](const boost::system::error_code& ec,
+        addresses, [=](ErrorCode ec,
                        const std::vector<ServoInterface::Temperature>& temps) {
           bp::dict result;
           for (const auto& temp: temps) {
@@ -106,7 +106,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
   void get_voltage(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetVoltage(
-        addresses, [=](const boost::system::error_code& ec,
+        addresses, [=](ErrorCode ec,
                        const std::vector<ServoInterface::Voltage>& temps) {
           bp::dict result;
           for (const auto& temp: temps) {
@@ -143,7 +143,9 @@ class Selector : boost::noncopyable {
 
     // TODO jpieper: Support gazebo.
     if (servo_type != "herkulex") {
-      throw std::runtime_error("we only support herkulex servos for now");
+      future.attr("set_exception")(
+          std::runtime_error("we only support herkulex servos for now"));
+      return;
     }
 
     auto params = servo_.parameters();
@@ -152,7 +154,7 @@ class Selector : boost::noncopyable {
     params->stream.type = "serial";
     params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
 
-    servo_.AsyncStart([=](boost::system::error_code ec) {
+    servo_.AsyncStart([=](ErrorCode ec) {
         if (ec) {
           future.attr("set_exception")(
               std::runtime_error(boost::lexical_cast<std::string>(ec)));

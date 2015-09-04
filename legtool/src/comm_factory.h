@@ -26,10 +26,6 @@
 
 namespace legtool {
 
-typedef std::shared_ptr<AsyncStream> SharedStream;
-typedef std::function<void (boost::system::error_code,
-                            SharedStream)> StreamHandler;
-
 SharedStream MakeStdioDebugStream(SharedStream);
 
 /// This provides a dynamic mechanism for creating streams at
@@ -123,24 +119,33 @@ class StreamFactory : boost::noncopyable {
   AsyncCreate(const Parameters& parameters,
               Handler handler) {
     boost::asio::detail::async_result_init<
-        Handler,
-        void (boost::system::error_code, SharedStream)> init(
-            BOOST_ASIO_MOVE_CAST(Handler)(handler));
+      Handler,
+      void (boost::system::error_code, SharedStream)> init(
+          BOOST_ASIO_MOVE_CAST(Handler)(handler));
 
-    bool visited = false;
-    TryCreate try_create(this, parameters, StreamHandler(init.handler),
-                         &visited);
-    meta::for_each(Types{}, try_create);
-    if (!visited) {
-      throw std::runtime_error(
-          "Unknown stream type: '" + parameters.type + "'");
+    try {
+      bool visited = false;
+      TryCreate try_create(
+          this,
+          parameters,
+          [init](ErrorCode ec, SharedStream stream) mutable {
+            init.handler(ec.error_code(), stream);
+          },
+          &visited);
+      meta::for_each(Types{}, try_create);
+      if (!visited) {
+        throw SystemError::einval(
+            "Unknown stream type: '" + parameters.type + "'");
+      }
+    } catch (SystemError& e) {
+      init.handler(e.error_code(), SharedStream());
     }
 
     return init.result.get();
   }
 
  private:
-  void HandleCreate(const boost::system::error_code& ec,
+  void HandleCreate(ErrorCode ec,
                     SharedStream stream,
                     const Parameters& parameters,
                     StreamHandler handler) {
