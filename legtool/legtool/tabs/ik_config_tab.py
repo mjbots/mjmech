@@ -44,7 +44,7 @@ class LegConfig(object):
             self.present,
             self.coxa_ident, self.coxa_sign,
             self.femur_ident, self.femur_sign,
-            self.tibia_ident, self.femur_sign)
+            self.tibia_ident, self.tibia_sign)
 
     @staticmethod
     def from_string(data):
