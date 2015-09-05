@@ -165,7 +165,7 @@ class RippleGait : public Gait {
   virtual JointCommand AdvancePhase(double delta_phase) override {
     if (config_.leg_order.empty()) {
       state_.phase = std::fmod(state_.phase + delta_phase, 1.0);
-      return MakeJointCommand();
+      return MakeJointCommand(state_);
     }
 
     double cur_phase = state_.phase;
@@ -200,7 +200,7 @@ class RippleGait : public Gait {
     AdvancePhaseNoaction(next_phase - cur_phase, next_phase);
     state_.phase = next_phase;
 
-    return MakeJointCommand();
+    return MakeJointCommand(state_);
   }
 
   virtual JointCommand AdvanceTime(double delta_s) override {
@@ -246,22 +246,13 @@ class RippleGait : public Gait {
     return result;
   }
 
- private:
-  void MakeShoulderFrame(const Leg::Config& leg_config,
-                         const RippleState* state,
-                         Frame* shoulder_frame) const {
-    state->MakeShoulder(leg_config, shoulder_frame);
-  }
-
-  struct Action;
-
-  JointCommand MakeJointCommand() const {
+  JointCommand MakeJointCommand(const RippleState& state) const {
     JointCommand result;
     int index = 0;
-    for (const auto& leg: state_.legs) {
+    for (const auto& leg: state.legs) {
       Frame shoulder_frame;
       MakeShoulderFrame(config_.mechanical.leg_config.at(index),
-                        &state_, &shoulder_frame);
+                        &state, &shoulder_frame);
 
       Point3D shoulder_point =
           shoulder_frame.MapFromFrame(leg.frame, leg.point);
@@ -276,6 +267,15 @@ class RippleGait : public Gait {
 
     return result;
   }
+
+ private:
+  void MakeShoulderFrame(const Leg::Config& leg_config,
+                         const RippleState* state,
+                         Frame* shoulder_frame) const {
+    state->MakeShoulder(leg_config, shoulder_frame);
+  }
+
+  struct Action;
 
   boost::optional<Options> SelectCommandOptions(Command* command) const {
     if (config_.leg_order.empty()) { return Options(); }

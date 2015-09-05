@@ -197,5 +197,6 @@ BOOST_PYTHON_MODULE(_legtool) {
            return_internal_reference<1>())
       .def("command", &RippleGait::command,
            return_internal_reference<1>())
+      .def("make_joint_command", &RippleGait::MakeJointCommand)
       ;
 }
