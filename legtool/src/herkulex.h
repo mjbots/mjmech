@@ -175,6 +175,11 @@ class HerkuleXProtocol : boost::noncopyable {
 
  private:
   void RawSendPacket(const Packet& packet, ErrorHandler handler) {
+    if (!stream_) {
+      service_.post(std::bind(handler, ErrorCode()));
+      return;
+    }
+
     BOOST_ASSERT(packet.data.size() < (216 - 7));
     BOOST_ASSERT(packet.servo >= 0 && packet.servo <= 0xfe);
     BOOST_ASSERT(packet.command >= 0 && packet.command <= 0xff);
