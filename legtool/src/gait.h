@@ -138,6 +138,11 @@ struct JointCommand {
     Joint() {}
     Joint(int servo_number, double angle_deg)
         : servo_number(servo_number), angle_deg(angle_deg) {}
+
+    bool operator==(const Joint& rhs) const {
+      return servo_number == rhs.servo_number &&
+          angle_deg == rhs.angle_deg;
+    }
   };
 
   std::vector<Joint> joints;
