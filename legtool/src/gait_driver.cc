@@ -49,6 +49,8 @@ class GaitDriver::Impl : boost::noncopyable {
     data.timestamp = boost::posix_time::microsec_clock::universal_time();
     data.command = command;
 
+    last_command_timestamp_ = data.timestamp;
+
     parent_->command_data_signal_(&data);
 
     if (state_ != kActive) {
@@ -75,13 +77,22 @@ class GaitDriver::Impl : boost::noncopyable {
   void StartTimer() {
     timer_.expires_at(
         timer_.expires_at() +
-        ConvertSecondsToDuration(parent_->parameters_.command_timeout_s));
+        ConvertSecondsToDuration(parent_->parameters_.period_s));
     timer_.async_wait(std::bind(&Impl::HandleTimer, this,
                                 std::placeholders::_1));
   }
 
   void HandleTimer(const boost::system::error_code& ec) {
     if (ec == boost::asio::error::operation_aborted) { return; }
+
+    auto now = boost::posix_time::microsec_clock::universal_time();
+    auto elapsed = now - last_command_timestamp_;
+    if (elapsed > ConvertSecondsToDuration(
+            parent_->parameters_.command_timeout_s)) {
+      timer_started_ = false;
+      SetFree();
+      return;
+    }
 
     StartTimer();
 
@@ -122,6 +133,7 @@ class GaitDriver::Impl : boost::noncopyable {
   boost::asio::deadline_timer timer_;
   bool timer_started_ = false;
   State state_ = kUnpowered;
+  boost::posix_time::ptime last_command_timestamp_;
 };
 
 GaitDriver::GaitDriver(boost::asio::io_service& service,
