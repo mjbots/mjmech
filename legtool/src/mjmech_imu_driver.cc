@@ -184,16 +184,22 @@ class MjmechImuDriver::Impl : boost::noncopyable {
                  const std::vector<uint8_t>& data) {
     BOOST_ASSERT(std::this_thread::get_id() == child_.get_id());
 
-    ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
+    try {
+      ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
 
-    union i2c_smbus_data i2c_data;
-    i2c_data.block[0] = data.size();
-    for (size_t i = 0; i < data.size(); ++i) {
-      i2c_data.block[i + 1] = data[i];
+      union i2c_smbus_data i2c_data;
+      i2c_data.block[0] = data.size();
+      for (size_t i = 0; i < data.size(); ++i) {
+        i2c_data.block[i + 1] = data[i];
+      }
+      ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_WRITE, reg,
+                                 I2C_SMBUS_BLOCK_DATA, &i2c_data));
+    } catch (SystemError& se) {
+      se.error_code().Append(boost::format("WriteData(0x%02x, 0x%02x, ...)") %
+                             static_cast<int>(address) %
+                             static_cast<int>(reg));
+      throw;
     }
-    ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_WRITE, reg,
-                               I2C_SMBUS_BLOCK_DATA, &i2c_data));
-
   }
 
   void ReadData(uint8_t address, uint8_t reg, std::size_t length,
@@ -201,19 +207,27 @@ class MjmechImuDriver::Impl : boost::noncopyable {
     BOOST_ASSERT(std::this_thread::get_id() == child_.get_id());
     BOOST_ASSERT(buffer_length >= length);
 
-    ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
+    try {
+      ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
 
-    union i2c_smbus_data data;
-    ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_READ, reg,
-                               I2C_SMBUS_BLOCK_DATA, &data));
+      union i2c_smbus_data data;
+      ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_READ, reg,
+                                 I2C_SMBUS_BLOCK_DATA, &data));
 
-    if (data.block[0] != length) {
-      throw SystemError(
-          EINVAL, boost::system::generic_category(),
-          (boost::format("asked for length %d got %d") %
-           length % static_cast<int>(data.block[0])).str());
+      if (data.block[0] != length) {
+        throw SystemError(
+            EINVAL, boost::system::generic_category(),
+            (boost::format("asked for length %d got %d") %
+             length % static_cast<int>(data.block[0])).str());
+      }
+      std::memcpy(buffer, &data.block[1], length);
+    } catch (SystemError& se) {
+      se.error_code().Append(boost::format("ReadData(0x%02x, 0x%02x, %d)") %
+                             static_cast<int>(address) %
+                             static_cast<int>(reg) %
+                             length);
+      throw;
     }
-    std::memcpy(buffer, &data.block[1], length);
   }
 
 
