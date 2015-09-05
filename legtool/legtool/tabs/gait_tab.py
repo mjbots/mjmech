@@ -1047,10 +1047,10 @@ class GaitTab(object):
         self.gait_geometry_display.set_state(state)
 
         if self.servo_tab.controller:
-            try:
-                command = state.command_dict()
-            except ripple.NotSupported:
-                return
+            joint_command = self.ripple.make_joint_command(state)
+            command = {}
+            for joint in joint_command.joints:
+                command[joint.servo_number] = joint.angle_deg
 
             self.next_command = command
 
@@ -1067,9 +1067,7 @@ class GaitTab(object):
             count += 1
             command, self.next_command = self.next_command, None
 
-            yield From(self.servo_tab.controller.set_pose(
-                    command,
-                    pose_time=2 * 0.001 * PLAYBACK_TIMEOUT_MS))
+            yield From(self.servo_tab.set_pose(command))
 
     def handle_geometry_change(self):
         frame = [GaitGeometryDisplay.FRAME_ROBOT,
