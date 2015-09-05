@@ -97,6 +97,7 @@ void ExportLegIK() {
       .def_readwrite("shoulder", &MammalIK::Config::shoulder)
       .def_readwrite("femur", &MammalIK::Config::femur)
       .def_readwrite("tibia", &MammalIK::Config::tibia)
+      .def_readwrite("invert", &MammalIK::Config::invert)
       .def_readwrite("servo_speed_dps", &MammalIK::Config::servo_speed_dps)
       .def("write_settings", &SerializableWriteSettings<MammalIK::Config>)
       ;

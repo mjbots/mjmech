@@ -246,6 +246,7 @@ class MammalIK : public IKSolver {
     Joint shoulder;
     Joint femur;
     Joint tibia;
+    bool invert = false;
 
     double servo_speed_dps = 360.0;
 
@@ -255,6 +256,7 @@ class MammalIK : public IKSolver {
       a->Visit(LT_NVP(shoulder));
       a->Visit(LT_NVP(femur));
       a->Visit(LT_NVP(tibia));
+      a->Visit(LT_NVP(invert));
       a->Visit(LT_NVP(servo_speed_dps));
     }
   };
@@ -367,8 +369,11 @@ class MammalIK : public IKSolver {
         cos_tibia_sub /
         (2 * config_.femur.length_mm * config_.tibia.length_mm);
     const double tibiainv_rad = std::acos(lim(cos_tibiainv));
+    const double tibia_sign = config_.invert ? -1.0 : 1.0;
+    const double logical_tibia_rad = tibia_sign * (M_PI - tibiainv_rad);
+
     const double tibia_deg =
-        config_.tibia.sign * (180 - Degrees(tibiainv_rad)) +
+        config_.tibia.sign * Degrees(logical_tibia_rad) +
         config_.tibia.idle_deg;
     if (tibia_deg < config_.tibia.min_deg ||
         tibia_deg > config_.tibia.max_deg) {
@@ -384,7 +389,9 @@ class MammalIK : public IKSolver {
         (2 * std::sqrt(op_sq ) * config_.femur.length_mm);
     const double femur_1_rad = std::acos(lim(cos_femur_1));
 
-    const double femur_rad = (std::atan2(pry, prx) - femur_1_rad) + 0.5 * M_PI;
+    const double femur_sign = config_.invert ? 1 : -1;
+    const double femur_rad =
+        (std::atan2(pry, prx) + femur_sign * femur_1_rad) + 0.5 * M_PI;
 
     const double femur_deg = config_.femur.sign * Degrees(femur_rad) +
         config_.femur.idle_deg;
