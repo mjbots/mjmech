@@ -14,11 +14,16 @@
 
 #pragma once
 
+#include <boost/asio/ip/udp.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 #include "comm_factory.h"
 #include "gait_driver.h"
+#include "handler_util.h"
 #include "herkulex.h"
 #include "herkulex_servo_interface.h"
 #include "mjmech_imu_driver.h"
+#include "parameters_archive.h"
 #include "ripple.h"
 
 namespace legtool {
@@ -37,98 +42,72 @@ class MechWarfare : boost::noncopyable {
   typedef HerkuleXServoInterface<ServoBase> Servo;
 
   template <typename Context>
-  MechWarfare(Context& context)
-      : service_(context.service),
-        factory_(context.service) {
-
-    servo_base_.reset(new ServoBase(context.service, factory_));
-    servo_.reset(new Servo(servo_base_.get()));
-    gait_driver_.reset(new GaitDriver(service_,
-                                      &context.telemetry_registry,
-                                      servo_.get()));
-    imu_.reset(new MjmechImuDriver(context));
-
-    parameters_.reset(new Parameters(*servo_base_->parameters(),
-                                     *servo_->parameters(),
-                                     *gait_driver_->parameters(),
-                                     *imu_->parameters()));
+  MechWarfare(Context& context) : MechWarfare(context.service) {
+    m_.imu.reset(new MjmechImuDriver(context));
+    m_.gait_driver.reset(new GaitDriver(service_,
+                                        &context.telemetry_registry,
+                                        m_.servo.get()));
   }
 
+  MechWarfare(boost::asio::io_service&);
   ~MechWarfare() {}
 
-  void AsyncStart(ErrorHandler handler) {
-    try {
-      RippleConfig ripple_config;
-      try {
-        ripple_config = LoadRippleConfig();
-      } catch (SystemError& se) {
-        handler(se.error_code());
-        return;
-      }
-
-      gait_driver_->SetGait(std::unique_ptr<RippleGait>(
-                                new RippleGait(ripple_config)));
-    } catch (SystemError& se) {
-      handler(se.error_code());
-      return;
-    }
-
-    // TODO jpieper: Actually start up a network service.
-
-    // TODO jpieper: Make up a class that lets us call our handler on
-    // the union of all children starts.
-
-    // TODO jpieper: Make it not so obnoxious to add more children.
-    // Currently each child is listed in 6 separate places.
-
-    servo_base_->AsyncStart(handler);
-    imu_->AsyncStart([](ErrorCode ec) { FailIf(ec); });
-  }
+  void AsyncStart(ErrorHandler handler);
 
   struct Parameters {
     int port = 13356;
+    std::map<std::string, bool> enabled;
 
     std::string gait_config;
-
-    ServoBase::Parameters& herkulex;
-    Servo::Parameters& servo;
-    GaitDriver::Parameters& gait_driver;
-    MjmechImuDriver::Parameters& imu;
 
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(port));
       a->Visit(LT_NVP(gait_config));
-      a->Visit(LT_NVP(herkulex));
-      a->Visit(LT_NVP(servo));
-      a->Visit(LT_NVP(gait_driver));
-      a->Visit(LT_NVP(imu));
+      for (auto& pair: enabled) {
+        a->Visit(MakeNameValuePair(
+                     &pair.second, (pair.first + "_enable").c_str()));
+      }
+      ParametersArchive<Archive>(a).Accept(&parent->m_);
     }
 
-    Parameters(ServoBase::Parameters& a,
-               Servo::Parameters& b,
-               GaitDriver::Parameters& c,
-               MjmechImuDriver::Parameters& d)
-        : herkulex(a),
-          servo(b),
-          gait_driver(c),
-          imu(d) {}
+    Parameters(MechWarfare* mw) : parent(mw) {}
+
+    MechWarfare* const parent;
   };
 
-  Parameters* parameters() { return parameters_.get(); }
+  Parameters* parameters() { return &parameters_; }
 
  private:
   RippleConfig LoadRippleConfig();
+  void NetworkListen();
+  void StartRead();
+  void HandleRead(ErrorCode, std::size_t);
+  void HandleMessage(const boost::property_tree::ptree&);
+  void HandleMessageGait(const boost::property_tree::ptree&);
 
   boost::asio::io_service& service_;
 
   Factory factory_;
 
-  std::unique_ptr<ServoBase> servo_base_;
-  std::unique_ptr<Servo> servo_;
-  std::unique_ptr<GaitDriver> gait_driver_;
-  std::unique_ptr<MjmechImuDriver> imu_;
+  struct Members {
+    std::unique_ptr<ServoBase> servo_base;
+    std::unique_ptr<Servo> servo;
+    std::unique_ptr<GaitDriver> gait_driver;
+    std::unique_ptr<MjmechImuDriver> imu;
 
-  std::unique_ptr<Parameters> parameters_;
+    template <typename Archive>
+    void Serialize(Archive* a) {
+      a->Visit(LT_NVP(servo_base));
+      a->Visit(LT_NVP(servo));
+      a->Visit(LT_NVP(gait_driver));
+      a->Visit(LT_NVP(imu));
+    }
+  } m_;
+
+  Parameters parameters_{this};
+  boost::asio::ip::udp::socket server_;
+  char receive_buffer_[3000] = {};
+  boost::asio::ip::udp::endpoint receive_endpoint_;
 };
 }
