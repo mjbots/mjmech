@@ -126,6 +126,10 @@ BOOST_PYTHON_MODULE(_legtool) {
       .def_readwrite("joints", &JointCommand::joints)
       ;
 
+  class_<std::vector<JointCommand::Joint> >("JointCommandJointList")
+      .def(vector_indexing_suite<std::vector<JointCommand::Joint> >())
+      ;
+
   enum_<RippleGait::Result>("RippleGaitResult")
       .value("kValid", RippleGait::Result::kValid)
       .value("kNotSupported", RippleGait::Result::kNotSupported)
