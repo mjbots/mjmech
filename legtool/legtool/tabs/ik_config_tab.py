@@ -38,13 +38,15 @@ class LegConfig(object):
     femur_sign = 1
     tibia_ident = 0
     tibia_sign = 1
+    invert = False
 
     def __str__(self):
-        return '%s,%d,%d,%d,%d,%d,%d' % (
+        return '%s,%d,%d,%d,%d,%d,%d,%s' % (
             self.present,
             self.coxa_ident, self.coxa_sign,
             self.femur_ident, self.femur_sign,
-            self.tibia_ident, self.tibia_sign)
+            self.tibia_ident, self.tibia_sign,
+            self.invert)
 
     @staticmethod
     def from_string(data):
@@ -55,7 +57,9 @@ class LegConfig(object):
         result.present = True if fields[0].lower() == 'true' else False
         (result.coxa_ident, result.coxa_sign,
          result.femur_ident, result.femur_sign,
-         result.tibia_ident, result.tibia_sign) = [int(x) for x in fields[1:]]
+         result.tibia_ident, result.tibia_sign) = [int(x) for x in fields[1:7]]
+        if len(fields) > 7:
+            result.invert = True if fields[7].lower() == 'true' else False
 
         return result
 
@@ -254,7 +258,8 @@ class IkConfigTab(object):
         for combo in [self.ui.legPresentCombo,
                       self.ui.coxaSignCombo,
                       self.ui.femurSignCombo,
-                      self.ui.tibiaSignCombo]:
+                      self.ui.tibiaSignCombo,
+                      self.ui.legInvertCombo]:
             combo.currentIndexChanged.connect(self.handle_leg_data_change)
 
         for spin in [self.ui.coxaServoSpin,
@@ -388,6 +393,8 @@ class IkConfigTab(object):
             result.tibia.length_mm = self.ui.mammalTibiaLengthSpin.value()
             result.tibia.sign = leg.tibia_sign
 
+            result.invert = leg.invert
+
             return _legtool.MammalIK(result)
 
     def update_config_enable(self):
@@ -418,6 +425,9 @@ class IkConfigTab(object):
         leg_config.femur_sign = self.combo_sign(self.ui.femurSignCombo)
         leg_config.tibia_ident = self.ui.tibiaServoSpin.value()
         leg_config.tibia_sign = self.combo_sign(self.ui.tibiaSignCombo)
+        leg_config.invert = (True
+                             if self.ui.legInvertCombo.currentIndex() == 1
+                             else False)
 
         self.update_config_enable()
 
@@ -444,6 +454,9 @@ class IkConfigTab(object):
             self.ui.tibiaServoSpin.setValue(leg_config.tibia_ident)
             self.ui.tibiaSignCombo.setCurrentIndex(
                 0 if leg_config.tibia_sign > 0 else 1)
+
+            self.ui.legInvertCombo.setCurrentIndex(
+                1 if leg_config.invert else 0)
 
             self.update_config_enable()
 

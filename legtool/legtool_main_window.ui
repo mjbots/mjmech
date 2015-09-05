@@ -303,20 +303,6 @@
              <string>Configuration</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="4" column="2">
-              <widget class="QComboBox" name="femurSignCombo">
-               <item>
-                <property name="text">
-                 <string>+ Up</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>- Up</string>
-                </property>
-               </item>
-              </widget>
-             </item>
              <item row="0" column="0">
               <widget class="QLabel" name="legLabel">
                <property name="text">
@@ -392,6 +378,20 @@
              <item row="4" column="1">
               <widget class="QSpinBox" name="femurServoSpin"/>
              </item>
+             <item row="4" column="2">
+              <widget class="QComboBox" name="femurSignCombo">
+               <item>
+                <property name="text">
+                 <string>+ Up</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>- Up</string>
+                </property>
+               </item>
+              </widget>
+             </item>
              <item row="5" column="0">
               <widget class="QLabel" name="tibiaLabel">
                <property name="text">
@@ -417,6 +417,20 @@
               </widget>
              </item>
              <item row="6" column="2">
+              <widget class="QComboBox" name="legInvertCombo">
+               <item>
+                <property name="text">
+                 <string>Non-inverted</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Inverted</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="7" column="2">
               <spacer name="verticalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -1618,6 +1632,9 @@ QScrollBar:vertical {
              </item>
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="idlePositionXSpin">
+               <property name="minimum">
+                <double>-1000.000000000000000</double>
+               </property>
                <property name="maximum">
                 <double>1000.000000000000000</double>
                </property>
