@@ -1,0 +1,40 @@
+The device shares the serial bus with herculex, so the protocol
+is fulley herculex compatible.
+
+AVR listens at 115200 (divisor 16 in high-speed mode, 2.1% error)
+
+It does not handle broadcasts because this it too much pain.
+
+The device sits on address 99, and supports the following commands:
+  CMD_STAT
+  CMD_REBOOT -- does not reboot, just clears outputs and error flags.
+  CMD_RAMWRITE/CMD_RAMREAD -- limited addresses
+    - read address and status
+
+    - read/write LEDS (53):
+      GREEN is green LED pin (nothing is there yet)
+      RED   is laser output
+      BLUE  is blue LED on the board
+      unlike real servo, if no LED commands are given for few
+      seconds, all LEDs are turned off
+
+    - read/write FIRE TIME (80, reserved)
+      This is 1-byte register which can be read and written.
+      As long as it is non-zero:
+       - FIRE PWM may be non-zero
+       - Value decreases by 1 every 10 mS
+
+    - read/write FIRE PWM (81, reserved)
+      This is 1-byte register which sets PWM value for fire motor.
+      (0 = off, 255 = continious high)
+      It is continously forced to zero unless FIRE CONTROL is set.
+
+    - read/write AGITATOR PWM (82, reserved)
+      This is 1-byte register which sets PWM value for agitator motor.
+      (0 = off, 255 = continious high)
+      It is bound to LED activity -- if LEDs are not updated for a while,
+      then this value is forced to zero. Thus, you will want to write
+      to LED register at the same time as to this register.
+
+    - LEDS alias: (83, reserved) -- exactly the same as 53
+      allows one-command access to agitator pwm
