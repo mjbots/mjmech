@@ -3,7 +3,7 @@
 #
 
 # MCU TYPE
-MCUTYPE=atmega328p
+MCUTYPE=atmega644p
 F_CPU=16000000
 
 PROG=arduino

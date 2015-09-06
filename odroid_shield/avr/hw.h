@@ -1,38 +1,54 @@
+// Copyright 2012-2015 Josh Pieper, Mikhail Afanasyev.  All rights
+// reserved.
+
 #ifndef HW_H
 #define HW_H
 
 /****
   AVR Pinout
 
-  Odroid I/O shield with ATMEGA328
+  Odroid I/O shield with ATMEGA644P
   5VCC, 16MHz crystal
-  (x) is a pin number of JP5 connector
+
+  Port A:
+   A0 I - MP33926 FB (analog in)
+   A1 ? -
+   A2 ? -
+   A3 ? -
+   A4 ? -
+   A5 ? -
+   A6 ? -
+   A7 ? -
 
   Port B:
-   B0 ? D8(6)  -
-   B1 O D9(5)  - Fire motor output (OC1A)
-   B2 O D10(4) - Agitator output (OC1B)
-   B3 ? D11(3) -
-   B4 ? D12(2) -
-   B5 O D13(1) - Blue LED
+   B0 ? -
+   B1 ? -
+   B2 ? -
+   B3 ? -
+   B4 ? -
+   B5 X - ISP
+   B6 X - ISP
+   B7 X - ISP
 
   Port C:
-   C0 ? A0(12) -
-   C1 ? A1(11) -
-   C2 ? A2     -
-   C3 ? A3     -
-   C4 X A4(6)  - SDA
-   C5 X A5(7)  - SCL
+   C0 X - SCL
+   C1 X - SDA
+   C2 O - MP33926 D1
+   C3 ? -
+   C4 O - MP33926 EN
+   C5 I - MP33926 SF
+   C6 O - Laser output
+   C7 O - Red indicator LED
 
   Port D:
-   D0 I D0(20) - Serial from odroid, serial mux to servo
-   D1 O D1(19) - Serial to odroid, serial mux from servo
-   D2 O D2(18) - /Serial mux enable (0 to connect serial to servo)
-   D3 ? D3     - connected to servo pin header
-   D4 O D4(16) - LASER FET
-   D5 ? D5     - connected to servo pin header
-   D6 O D6(14) - GREEN LED (reserved for future fancy lights)
-   D7 ? D7(13)
+   D0 I - Serial from odroid (RX)
+   D1 O - Serial to odroid (TX)
+   D2 ? - Serial from JSER2 (RX)
+   D3 ? - Serial to JSER2 (TX)
+   D4 O - Fire motor output (OC1B)
+   D5 O - Agitator output (OC1A)
+   D6 ? -
+   D7 ? -
 
 */
 
@@ -44,11 +60,10 @@
 #define HWUART_TX_CONTROL  1
 #define HWUART_RX_INTERRUPT 1
 
-#define TX_BYPASS_nEN    BITVAR(PORTD, 2)
 #define SERIAL_TX_DDR    BITVAR(DDRD, 1)
 
-#define LASER_EN         BITVAR(PORTD, 4)
-#define LED_BLUE         BITVAR(PORTB, 5)
-#define LED_GREEN        BITVAR(PORTD, 6)
+#define LASER_EN         BITVAR(PORTC, 6)
+#define LED_BLUE         BITVAR(PORTC, 7)
+#define LED_GREEN        BITVAR(PORTC, 3)
 
 #endif

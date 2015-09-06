@@ -71,6 +71,7 @@ uint8_t hwuart_recv();
 #if defined (__AVR_ATmega88__)  || \
   defined (__AVR_ATmega168__)  ||  \
   defined (__AVR_ATmega328P__) ||  \
+  defined (__AVR_ATmega644P__) ||  \
   defined (__AVR_ATmega1281__) ||  \
   defined (__AVR_ATmega128__)
 # define HWUART_ZERO
@@ -80,7 +81,7 @@ uint8_t hwuart_recv();
 #if defined(__AVR_ATmega163__)
 # define HWUART_RX_VECT()    SIGNAL(UART_RX_vect)
 # define HWUART_UDRE_VECT()  SIGNAL(UART_UDRE_vect)
-#elif defined(__AVR_ATmega128__)
+#elif defined(__AVR_ATmega128__) || defined(__AVR_ATmega644P__)
 # define HWUART_RX_VECT()    SIGNAL(USART0_RX_vect)
 # define HWUART_UDRE_VECT()  SIGNAL(USART0_UDRE_vect)
 #elif defined(__AVR_ATmega8__)

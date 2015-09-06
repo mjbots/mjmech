@@ -1,4 +1,5 @@
-// Copyright 2012-2014 Josh Pieper.  All rights reserved.
+// Copyright 2012-2015 Josh Pieper, Mikhail Afanasyev.  All rights
+// reserved.
 
 #include <avr/eeprom.h>
 #include <avr/io.h>
@@ -17,7 +18,6 @@
 
 // disconnect hercules, allow serial sending
 void enable_tx() {
-  TX_BYPASS_nEN = 1;
   SERIAL_TX_DDR = 1;
   hwuart_tx_enable(1);
 }
@@ -26,7 +26,6 @@ void enable_tx() {
 void disable_tx() {
   hwuart_tx_enable(0);
   SERIAL_TX_DDR = 0;
-  TX_BYPASS_nEN = 0;
 }
 
 // We are pretending to be a servo at this addr
@@ -256,8 +255,8 @@ static void apply_servo_values() {
     LASER_EN  = !!(servo_leds & 4); // RED bit
 
     // Apply PWM values
-    OCR1A = servo_fire_pwm;
-    OCR1B = servo_agitator_pwm;
+    OCR1B = servo_fire_pwm;
+    OCR1A = servo_agitator_pwm;
 }
 
 
@@ -265,14 +264,11 @@ int main(void) {
   INIT_SYSTEM_CLOCK();
 
   // Set up ports. Enable pullups on all unused inputs.
-  DDRB = (1<<1) | (1<<2) | (1<<5);
-  PORTB = ~DDRB;
-
-  DDRC = 0;
+  DDRC = (1 << 2) | (1 << 4) | (1 << 6) | (1<< 7);
   PORTC = ~DDRC;
 
-  // Do not enable TX for now, enable serial bypass.
-  DDRD = (1<<2) | (1<<4) | (1<<6);
+  // Do not enable TX for now.
+  DDRD = (1<<4) | (1<<5);
   // No pullups on serial RX, pullups on all other inputs
   PORTD = ~(DDRD | (1<<0));
 
@@ -288,7 +284,9 @@ int main(void) {
 
   // set up t/c 1 as phase-correct 8-bit non-inverted PWM on both channels
   // prescaler is 4, which works out to 4kHz  @ 16 MHz clock
-  // (as motor boards can only take up to 10kHz PWM frequency)
+  // The old motor boards could only handle up to 10kHz PWM.  The new
+  // ones should be capable of up to 20kHz, but I don't see a need to
+  // push it yet.
   OCR1A = 0;
   OCR1B = 0;
   TCCR1A = (1<<COM1A1) | (1<<COM1B1) | (1<<WGM10);
