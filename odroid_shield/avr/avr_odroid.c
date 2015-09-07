@@ -254,6 +254,12 @@ static void apply_servo_values() {
     LED_BLUE  = !!(servo_leds & 2); // BLUE bit
     LASER_EN  = !!(servo_leds & 4); // RED bit
 
+    if (servo_fire_pwm || servo_agitator_pwm) {
+      MC33926_EN = 1;
+    } else {
+      MC33926_EN = 0;
+    }
+
     // Apply PWM values
     OCR1B = servo_fire_pwm;
     OCR1A = servo_agitator_pwm;
@@ -296,6 +302,10 @@ int main(void) {
   hwuart_connect_stdout();
 
   disable_tx();
+
+  // Enable the MC33926
+  MC33926_EN = 1;
+  MC33926_D1 = 0;
 
   sei();
   uint16_t step = 0;

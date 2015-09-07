@@ -33,10 +33,10 @@
   Port C:
    C0 X - SCL
    C1 X - SDA
-   C2 O - MP33926 D1
+   C2 O - MC33926 D1
    C3 ? -
-   C4 O - MP33926 EN
-   C5 I - MP33926 SF
+   C4 O - MC33926 EN
+   C5 I - MC33926 SF
    C6 O - Laser output
    C7 O - Red indicator LED
 
@@ -49,6 +49,13 @@
    D5 O - Agitator output (OC1A)
    D6 ? -
    D7 ? -
+
+  Fuses
+   HFUSE: 0xd9 0b11011001
+     * JTAGEN = 0 (JTAG blocks PORTC)
+     (note avrdude sometimes mis-reports this as EFUSE, be careful!)
+   LFUSE: 0x67 0b01100111
+     * CKSEL = 7 (Full power crystal oscillator)
 
 */
 
@@ -65,5 +72,9 @@
 #define LASER_EN         BITVAR(PORTC, 6)
 #define LED_BLUE         BITVAR(PORTC, 7)
 #define LED_GREEN        BITVAR(PORTC, 3)
+
+#define MC33926_EN       BITVAR(PORTC, 4)
+#define MC33926_D1       BITVAR(PORTC, 2)
+#define MC33926_SF       BITVAR(PINC, 5)
 
 #endif

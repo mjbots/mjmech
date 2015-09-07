@@ -6,10 +6,10 @@
 MCUTYPE=atmega644p
 F_CPU=16000000
 
-PROG=arduino
-AD_PORT=/dev/ttyACM99
-AD_BAUD=115200
-RSH_COMMAND=ssh odroid@odroid -t
+PROG=avrispmkII
+#AD_PORT=/dev/ttyACM99
+#AD_BAUD=115200
+RSH_COMMAND=
 
 # library files used
 MLIB2=hwuart.c enter-stk500.py
