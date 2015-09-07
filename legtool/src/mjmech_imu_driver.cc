@@ -69,10 +69,10 @@ class MjmechImuDriver::Impl : boost::noncopyable {
 
       uint8_t whoami[1] = {};
 
-      ReadGyro(0x0f, 1, whoami, sizeof(whoami));
-      if (whoami[0] != 0xd7) {
+      ReadGyro(0x20, 1, whoami, sizeof(whoami));
+      if (whoami[0] != 0xb1) {
         throw SystemError::einval(
-            (boost::format("Incorrect whoami got 0x%02X expected 0xd7") %
+            (boost::format("Incorrect whoami got 0x%02X expected 0xb1") %
              static_cast<int>(whoami[0])).str());
       }
 
@@ -80,8 +80,9 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       ReadAccel(0x20, 1, ignored, sizeof(ignored));
 
       // Configure the gyroscope.
-      WriteGyro(0x20, {0x3f}); // ODR=95Hz, Cut-off = 25Hz
-      WriteGyro(0x23, {0x80}); // BDU=1, BLE=0, FS=0
+      WriteGyro(0x00, {0xff}); // FS=250dps PWR=Normal XYZ=EN
+      WriteGyro(0x01, {0x18}); // BW=22Hz
+      WriteGyro(0x02, {99}); // ODR=100Hz
 
       // Configure the accelerometer.
       WriteAccel(0x20, {0b01010111}); // ODR=100Hz, low_power=off all enabled
@@ -117,8 +118,8 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       // Read gyro values until we get a new one.
       uint8_t data[10] = {};
       for (int i = 0; i < 15; i++) {
-        ReadGyro(0xa7, 1, data, sizeof(data));
-        if ((data[0] & 0x08) != 0) { break; }
+        ReadGyro(0x22, 1, data, sizeof(data));
+        if ((data[0] & 0x01) != 0) { break; }
       }
 
       ImuData imu_data;
@@ -126,7 +127,7 @@ class MjmechImuDriver::Impl : boost::noncopyable {
           boost::posix_time::microsec_clock::universal_time();
 
       uint8_t gdata[10] = {};
-      ReadGyro(0xa7, 7, gdata, sizeof(gdata));
+      ReadGyro(0xa2, 7, gdata, sizeof(gdata));
 
       uint8_t adata[10] = {};
       ReadAccel(0xa7, 7, adata, sizeof(adata));
@@ -188,12 +189,13 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
 
       union i2c_smbus_data i2c_data;
+      BOOST_ASSERT(data.size() <= 32);
       i2c_data.block[0] = data.size();
       for (size_t i = 0; i < data.size(); ++i) {
         i2c_data.block[i + 1] = data[i];
       }
       ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_WRITE, reg,
-                                 I2C_SMBUS_BLOCK_DATA, &i2c_data));
+                                 I2C_SMBUS_I2C_BLOCK_BROKEN, &i2c_data));
     } catch (SystemError& se) {
       se.error_code().Append(boost::format("WriteData(0x%02x, 0x%02x, ...)") %
                              static_cast<int>(address) %
@@ -208,11 +210,23 @@ class MjmechImuDriver::Impl : boost::noncopyable {
     BOOST_ASSERT(buffer_length >= length);
 
     try {
-      ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
+      try {
+        ErrWrap(::ioctl(fd_, I2C_SLAVE, static_cast<int>(address)));
+      } catch (SystemError& se) {
+        se.error_code().Append("when setting address");
+        throw;
+      }
 
       union i2c_smbus_data data;
-      ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_READ, reg,
-                                 I2C_SMBUS_BLOCK_DATA, &data));
+      BOOST_ASSERT(length <= 255);
+      data.block[0] = length;
+      try {
+        ErrWrap(::i2c_smbus_access(fd_, I2C_SMBUS_READ, reg,
+                                   I2C_SMBUS_I2C_BLOCK_DATA, &data));
+      } catch (SystemError& se) {
+        se.error_code().Append("during transfer");
+        throw;
+      }
 
       if (data.block[0] != length) {
         throw SystemError(

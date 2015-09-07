@@ -46,7 +46,7 @@ class MjmechImuDriver : boost::noncopyable {
 
   struct Parameters {
     std::string i2c_device;
-    int gyro_address = 0x6b;
+    int gyro_address = 0x59;
     int accel_address = 0x1d;
 
     template <typename Archive>
