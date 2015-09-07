@@ -68,6 +68,7 @@ int safe_main(int argc, char**argv) {
   }
 
   if (!log_file.empty()) {
+    context.telemetry_log.SetRealtime(true);
     context.telemetry_log.Open(log_file);
   }
 
