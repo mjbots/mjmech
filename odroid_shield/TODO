@@ -1,16 +1,16 @@
 r1 defects
   * JD connectors on bottom have incorrect part number
   * Master fuse pads are on top of board instead of bottom
+  * It would be nice to have silks for the odroid IO connector so that
+    I can remember which is which for bringup and test
+  * shore power connector seems to have the switch pin connected up as
+    ground rather than the ground pin
+  * would be nice to have sensing for 5V, 1.8V, and battery rail
+    voltage
+  * silk screen for top facing JST XH connectors is backwards
 
 
-
-   * autoroute
-   * ensure leadless parts have moderately accessible test points for
-     all pins
-   * pick part numbers for everything (including macrofab numbers)
-   * do design DRC
-   * fix up silks
-
+ * update all part numbers based on macrofab run
 
  * odroid shield for mech
    * accessible from top
