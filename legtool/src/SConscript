@@ -90,6 +90,9 @@ telemetry_log_test = crenv.Program(
     'telemetry_log_manual_test',
     ['test/telemetry_log_manual_test.cc'] + liblegtool)
 
+mech_warfare_command = crenv.Program('mw_command',
+                                     ['mech_warfare_command.cc'] + liblegtool)
+
 def ModuleMain(root, cname):
     mjmech_main = crenv.Object(
         root + '_main.o', 'module_main.cc',
