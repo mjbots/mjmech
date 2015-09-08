@@ -30,6 +30,11 @@ typedef HerkuleX<Factory> Servo;
 namespace {
 bp::object g_runtime_error = bp::eval("RuntimeError");
 
+bool StartsWith(const std::string& data,
+                const std::string& maybe_prefix) {
+  return data.substr(0, maybe_prefix.size()) == maybe_prefix;
+}
+
 void HandleCallback(bp::object future,
                     ErrorCode ec,
                     bp::object result) {
@@ -150,9 +155,22 @@ class Selector : boost::noncopyable {
 
     auto params = servo_.parameters();
 
-    // TODO jpieper: Support TCP with a magic prefix.
-    params->stream.type = "serial";
-    params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
+    if (StartsWith(serial_port, "tcp:")) {
+      params->stream.type = "tcp";
+      auto tcp = params->stream.Get<TcpClientGenerator>();
+      std::string host_target = serial_port.substr(4);
+      size_t colon = host_target.find_first_of(':');
+      if (colon == std::string::npos) {
+        future.attr("set_exception")(
+            std::runtime_error("missing colon in tcp host:target"));
+        return;
+      }
+      tcp->host = host_target.substr(0, colon);
+      tcp->port = boost::lexical_cast<int>(host_target.substr(colon + 1));
+    } else {
+      params->stream.type = "serial";
+      params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
+    }
 
     servo_.AsyncStart([=](ErrorCode ec) {
         if (ec) {
