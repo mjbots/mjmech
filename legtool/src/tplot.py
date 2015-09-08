@@ -200,6 +200,8 @@ class Tplot(QtGui.QMainWindow):
 
             exemplar = self.log.records[name]
             def add_item(parent, element):
+                if 'fields' not in element:
+                    return
                 for field in element['fields']:
                     name = field['name']
 
@@ -221,6 +223,8 @@ class Tplot(QtGui.QMainWindow):
         index = [0, None]
 
         def add_item(index, parent, element):
+            if 'fields' not in element:
+                return
             for field in element['fields']:
                 name = field['name']
                 this_name = parent
