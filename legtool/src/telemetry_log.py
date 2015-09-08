@@ -77,8 +77,8 @@ class BulkReader(object):
         return identifier, _BulkRecord(identifier, flags, name, schema)
 
     def records(self):
-        '''Return a dictionary mapping record names to an empty
-        element of each record type.'''
+        '''Return a dictionary mapping record names to an metadata
+        description of each element.'''
 
         result = {}
 
@@ -87,7 +87,7 @@ class BulkReader(object):
                 continue
 
             identifier, bulk_record = self._parse_schema(block_data)
-            result[bulk_record.name] = bulk_record.make_empty()
+            result[bulk_record.name] = bulk_record.make_meta()
 
         return result
 
@@ -148,5 +148,5 @@ class _BulkRecord(object):
     def add(self, data):
         self.elements.append(self.archive.deserialize(data))
 
-    def make_empty(self):
-        return self.archive.root.tuple()
+    def make_meta(self):
+        return self.archive.root

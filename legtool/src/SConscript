@@ -100,3 +100,6 @@ def ModuleMain(root, cname):
 
 ModuleMain('mjmech_imu_driver', 'MjmechImuDriver')
 ModuleMain('mech_warfare', 'MechWarfare')
+
+env.Command('ui_tplot_main_window.py', 'tplot_main_window.ui',
+            'pyside-uic $SOURCE -o $TARGET')
