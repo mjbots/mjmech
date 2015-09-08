@@ -18,6 +18,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "error_code.h"
 #include "visit_archive.h"
 #include "visitor.h"
 
@@ -66,12 +67,20 @@ class PropertyTreeWriteArchive
 class PropertyTreeReadArchive
     : public VisitArchive<PropertyTreeReadArchive> {
  public:
-  PropertyTreeReadArchive(const boost::property_tree::ptree& tree)
-      : tree_(tree) {}
+  enum {
+    kErrorOnMissing = 1 << 0,
+  };
+  PropertyTreeReadArchive(const boost::property_tree::ptree& tree,
+                          int flags=0)
+      : tree_(tree),
+        flags_(flags) {}
 
   template <typename NameValuePair>
   void VisitSerializable(const NameValuePair& pair) {
-    if (!tree_.get_child_optional(pair.name())) { return; }
+    if (!tree_.get_child_optional(pair.name())) {
+      HandleMissing(pair.name());
+      return;
+    }
     PropertyTreeReadArchive(tree_.get_child(pair.name())).
         Accept(pair.value());
   }
@@ -99,7 +108,7 @@ class PropertyTreeReadArchive
                    std::vector<T>* value_vector,
                    int) {
     auto optional_child = tree_.get_child_optional(name);
-    if (!optional_child) { return; }
+    if (!optional_child) { HandleMissing(name); return; }
     auto child = *optional_child;
     value_vector->clear();
     for (auto it = child.begin(); it != child.end(); ++it) {
@@ -114,12 +123,20 @@ class PropertyTreeReadArchive
                    T* value,
                    long) {
     auto optional_child = tree_.get_child_optional(name);
-    if (!optional_child) { return; }
+    if (!optional_child) { HandleMissing(name); return; }
     auto child = *optional_child;
     *value = child.template get_value<T>();
   }
 
  private:
-  boost::property_tree::ptree tree_;
+  void HandleMissing(const char* name) {
+    if (flags_ & kErrorOnMissing) {
+      throw SystemError::einval(
+          std::string("missing field: '") + name + "'");
+    }
+  }
+
+  const boost::property_tree::ptree tree_;
+  const int flags_;
 };
 }
