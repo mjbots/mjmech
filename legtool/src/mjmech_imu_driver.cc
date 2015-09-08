@@ -80,13 +80,20 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       ReadAccel(0x20, 1, ignored, sizeof(ignored));
 
       // Configure the gyroscope.
-      WriteGyro(0x00, {0xff}); // FS=250dps PWR=Normal XYZ=EN
+      WriteGyro(0x00, {0xcf}); // FS=250dps PWR=Normal XYZ=EN
       WriteGyro(0x01, {0x18}); // BW=22Hz
       WriteGyro(0x02, {99}); // ODR=100Hz
 
       // Configure the accelerometer.
-      WriteAccel(0x20, {0b01010111}); // ODR=100Hz, low_power=off all enabled
-      WriteAccel(0x23, {0b10101000}); // BDU=(block) BLE=off FS=11 (8g) HR=1
+      WriteAccel(0x2a, {0x18}); // Turn it off so we can change settings.
+      WriteAccel(0x0e, {0}); // FS=2G
+      // 2A 0b00011000 ASLP=0 ODR=100Hz LNOISE=0 F_READ=0 ACTIVE=0
+      // 2B 0b00000010 ST=0 RST=0 SMODS=0 SLPE=0 MODS=2
+      WriteAccel(0x2a, {0x18, 0x02});
+
+      // Turn it back on.
+      WriteAccel(0x2a, {0x19});
+
     } catch (SystemError& e) {
       e.error_code().Append("when initializing IMU");
       service_.post(std::bind(handler, e.error_code()));
@@ -127,29 +134,30 @@ class MjmechImuDriver::Impl : boost::noncopyable {
           boost::posix_time::microsec_clock::universal_time();
 
       uint8_t gdata[10] = {};
-      ReadGyro(0xa2, 7, gdata, sizeof(gdata));
+      ReadGyro(0x22, 7, gdata, sizeof(gdata));
 
       uint8_t adata[10] = {};
-      ReadAccel(0xa7, 7, adata, sizeof(adata));
+      ReadAccel(0x00, 7, adata, sizeof(adata));
 
-      const double kAccelSensitivity = 0.004 / 64;
+      const double kAccelSensitivity = 1.0 / 4096 / 4;
       const double kGravity = 9.80665;
 
       imu_data.accel_mps2.x =
-          to_int16(adata[2], adata[1]) * kAccelSensitivity * kGravity;
+          to_int16(adata[1], adata[2]) * kAccelSensitivity * kGravity;
       imu_data.accel_mps2.y =
-          to_int16(adata[4], adata[3]) * kAccelSensitivity * kGravity;
+          to_int16(adata[3], adata[4]) * kAccelSensitivity * kGravity;
       imu_data.accel_mps2.z =
-          to_int16(adata[6], adata[5]) * kAccelSensitivity * kGravity;
+          to_int16(adata[5], adata[6]) * kAccelSensitivity * kGravity;
 
-      const double kGyroSensitivity = 0.00875; // For 250dps full scale range
+      const double kGyroSensitivity =
+          1.0 / 120.0; // For 250dps full scale range
 
       imu_data.body_rate_deg_s.x =
-          to_int16(gdata[2], gdata[1]) * kGyroSensitivity;
+          to_int16(gdata[1], gdata[2]) * kGyroSensitivity;
       imu_data.body_rate_deg_s.y =
-          to_int16(gdata[4], gdata[3]) * kGyroSensitivity;
+          to_int16(gdata[3], gdata[4]) * kGyroSensitivity;
       imu_data.body_rate_deg_s.z =
-          to_int16(gdata[6], gdata[5]) * kGyroSensitivity;
+          to_int16(gdata[5], gdata[6]) * kGyroSensitivity;
 
       service_.post(std::bind(&Impl::SendData, this, imu_data));
     }
