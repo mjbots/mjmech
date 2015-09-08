@@ -45,12 +45,15 @@ int safe_main(int argc, char**argv) {
 
   std::string config_file;
   std::string log_file;
+  bool debug = false;
 
   po::options_description desc("Allowable options");
   desc.add_options()
       ("help,h", "display usage message")
       ("config,c", po::value(&config_file), "read options from file")
       ("log,l", po::value(&log_file), "write to log file")
+      ("debug,d", po::value(&debug),
+       "disable real-time signals and other debugging hindrances")
       ;
 
   ProgramOptionsArchive(&desc).Accept(module.parameters());
@@ -68,7 +71,7 @@ int safe_main(int argc, char**argv) {
   }
 
   if (!log_file.empty()) {
-    context.telemetry_log.SetRealtime(true);
+    context.telemetry_log.SetRealtime(!debug);
     context.telemetry_log.Open(log_file);
   }
 
