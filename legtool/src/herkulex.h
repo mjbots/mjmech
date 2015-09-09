@@ -233,6 +233,13 @@ class HerkuleXProtocol : boost::noncopyable {
   }
 
   void ReadLoop2(ErrorCode ec, std::size_t) {
+    if (ec == boost::asio::error::not_found) {
+      // We're just seeing junk.  It would be nice to log, but for
+      // now, just go back and read some more.
+      rx_streambuf_.consume(rx_streambuf_.size());
+      ReadLoop1();
+      return;
+    }
     FailIf(ec);
 
     // Clear out the streambuf until we have our delimeter.
