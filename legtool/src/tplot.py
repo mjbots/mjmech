@@ -87,7 +87,8 @@ def _clear_tree_widget(item):
         _clear_tree_widget(child)
 
 
-def _set_tree_widget_data(item, struct):
+def _set_tree_widget_data(item, struct,
+                          getter=lambda x, y: getattr(x, y)):
     for i in range(item.childCount()):
         child = item.child(i)
         name = child.text(0)
@@ -95,9 +96,11 @@ def _set_tree_widget_data(item, struct):
         if name.startswith('_'):
             continue
 
-        field = getattr(struct, name)
+        field = getter(struct, name)
         if isinstance(field, tuple):
             _set_tree_widget_data(child, field)
+        elif isinstance(field, list):
+            _set_tree_widget_data(child, field, getter=lambda x, y: x[int(y)])
         else:
             child.setText(1, str(field))
 
@@ -105,7 +108,10 @@ def _set_tree_widget_data(item, struct):
 def _get_data(value, name):
     fields = name.split('.')
     for field in fields:
-        value = getattr(value, field)
+        if isinstance(value, list):
+            value = value[int(field)]
+        else:
+            value = getattr(value, field)
     return value
 
 
@@ -208,7 +214,13 @@ class Tplot(QtGui.QMainWindow):
                     item = QtGui.QTreeWidgetItem(parent)
                     item.setText(0, name)
 
-                    if 'children' in field:
+                    if 'nelements' in field:
+                        child = field['children'][0]['children'][0]
+                        for i in range(field['nelements']):
+                            subitem = QtGui.QTreeWidgetItem(item)
+                            subitem.setText(0, str(i))
+                            add_item(subitem, child)
+                    elif 'children' in field:
                         for child in field['children']:
                             add_item(item, child)
             add_item(item, exemplar)
@@ -232,7 +244,11 @@ class Tplot(QtGui.QMainWindow):
                     this_name += '.'
                 this_name += name
 
-                if 'children' in field:
+                if 'nelements' in field:
+                    child = field['children'][0]['children'][0]
+                    for i in range(field['nelements']):
+                        add_item(index, this_name + "." + str(i), child)
+                elif 'children' in field:
                     for child in field['children']:
                         add_item(index, this_name, child)
                 else:
