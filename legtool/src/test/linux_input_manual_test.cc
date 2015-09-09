@@ -36,7 +36,7 @@ class Reader {
   void HandleRead(ErrorCode ec) {
     FailIf(ec);
 
-    std::cout << event_;
+    std::cout << event_ << "\n";
 
     StartRead();
   }
