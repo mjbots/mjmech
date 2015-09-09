@@ -101,18 +101,50 @@ void MechWarfare::AsyncStart(ErrorHandler handler) {
 }
 
 RippleConfig MechWarfare::LoadRippleConfig() {
-  std::ifstream inf(parameters_.gait_config);
-  if (!inf.is_open()) {
-    throw SystemError::syserrno(
-        "while opening gait config: '" + parameters_.gait_config + "'");
-  }
-
-  boost::property_tree::ptree tree;
-  boost::property_tree::read_json(inf, tree);
   RippleConfig ripple_config;
-  PropertyTreeReadArchive(tree).Accept(&ripple_config);
+  try {
+    std::ifstream inf(parameters_.gait_config);
+    if (!inf.is_open()) {
+      throw SystemError::syserrno("error opening config");
+    }
 
-  // TODO jpieper: Load each leg's IK settings.
+    boost::property_tree::ptree tree;
+    boost::property_tree::read_json(inf, tree);
+    auto optional_child = tree.get_child_optional("gaitconfig.ripple");
+    if (!optional_child) {
+      throw SystemError::einval("could not find ripple config in file");
+    }
+
+    PropertyTreeReadArchive(
+        *optional_child,
+        PropertyTreeReadArchive::kErrorOnMissing).Accept(&ripple_config);
+
+    std::string type = tree.get<std::string>("ikconfig.iktype");
+    auto& leg_configs = ripple_config.mechanical.leg_config;
+    for (size_t i = 0; i < leg_configs.size(); i++) {
+      if (type == "Mammal") {
+        MammalIK::Config config;
+
+        std::string field = (boost::format("ikconfig.leg.%d") % i).str();
+        auto optional_child = tree.get_child_optional(field);
+        if (!optional_child) {
+          throw SystemError::einval("could not locate field: " + field);
+        }
+
+        PropertyTreeReadArchive(
+            *optional_child,
+            PropertyTreeReadArchive::kErrorOnMissing).Accept(&config);
+        leg_configs[i].leg_ik =
+            boost::shared_ptr<IKSolver>(new MammalIK(config));
+      } else {
+        throw SystemError::einval("unknown iktype: " + type);
+      }
+    }
+  } catch (SystemError& se) {
+    se.error_code().Append(
+        "while opening config: '" + parameters_.gait_config + "'");
+    throw;
+  }
 
   return ripple_config;
 }
@@ -159,7 +191,8 @@ void MechWarfare::HandleMessage(const boost::property_tree::ptree& tree) {
 
 void MechWarfare::HandleMessageGait(const boost::property_tree::ptree& tree) {
   Command command;
-  PropertyTreeReadArchive(tree).Accept(&command);
+  PropertyTreeReadArchive(
+      tree, PropertyTreeReadArchive::kErrorOnMissing).Accept(&command);
   m_.gait_driver->SetCommand(command);
 }
 
