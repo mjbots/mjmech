@@ -69,7 +69,7 @@ class GaitDriver::Impl : boost::noncopyable {
   }
 
   void SetFree() {
-    servo_->EnablePower(ServoInterface::kPowerEnable, {}, FailHandler());
+    servo_->EnablePower(ServoInterface::kPowerBrake, {}, FailHandler());
     state_ = kUnpowered;
   }
 
@@ -96,6 +96,14 @@ class GaitDriver::Impl : boost::noncopyable {
 
     StartTimer();
 
+    if (elapsed > (ConvertSecondsToDuration(
+                       parent_->parameters_.command_timeout_s -
+                       parent_->parameters_.idle_time_s))) {
+      Command idle_command;
+      idle_command.lift_height_percent = 0.0;
+      gait_->SetCommand(idle_command);
+    }
+
     // Advance our gait, then send the requisite servo commands out.
     auto gait_commands = gait_->AdvanceTime(parent_->parameters_.period_s);
 
@@ -113,6 +121,7 @@ class GaitDriver::Impl : boost::noncopyable {
     data.timestamp = boost::posix_time::microsec_clock::universal_time();
 
     data.state = state_;
+    data.command = gait_commands;
     data.body_robot = state.body_frame.TransformToFrame(&state.robot_frame);
     data.cog_robot = state.cog_frame.TransformToFrame(&state.robot_frame);
     data.body_world = state.body_frame.TransformToFrame(&state.world_frame);

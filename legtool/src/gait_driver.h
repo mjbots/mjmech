@@ -61,10 +61,15 @@ class GaitDriver : boost::noncopyable {
     /// engine and setting all servos to unpowered.
     double command_timeout_s = 15.0;
 
+    /// Before entering brake mode, spend this long getting into the
+    /// idle pose.
+    double idle_time_s = 1.0;
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(period_s));
       a->Visit(LT_NVP(command_timeout_s));
+      a->Visit(LT_NVP(idle_time_s));
     }
   };
 
@@ -86,6 +91,7 @@ class GaitDriver : boost::noncopyable {
     Transform robot_world;
 
     std::array<Point3D, 4> legs;
+    JointCommand command;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -96,6 +102,7 @@ class GaitDriver : boost::noncopyable {
       a->Visit(LT_NVP(body_world));
       a->Visit(LT_NVP(robot_world));
       a->Visit(LT_NVP(legs));
+      a->Visit(LT_NVP(command));
     }
   };
 

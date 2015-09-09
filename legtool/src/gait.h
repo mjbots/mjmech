@@ -135,6 +135,12 @@ struct JointCommand {
     int servo_number = 0;
     double angle_deg = 0.0;
 
+    template <typename Archive>
+    void Serialize(Archive* a) {
+      a->Visit(LT_NVP(servo_number));
+      a->Visit(LT_NVP(angle_deg));
+    }
+
     Joint() {}
     Joint(int servo_number, double angle_deg)
         : servo_number(servo_number), angle_deg(angle_deg) {}
@@ -146,6 +152,11 @@ struct JointCommand {
   };
 
   std::vector<Joint> joints;
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(LT_NVP(joints));
+  }
 };
 
 class Gait : boost::noncopyable {
