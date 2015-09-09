@@ -41,7 +41,7 @@ class ErrorHandlerJoiner
       }
 
       me->outstanding_.erase(it);
-      if (!ec || me->outstanding_.empty()) {
+      if (ec || me->outstanding_.empty()) {
         ec.Append(message);
         me->handler_(ec);
         me->done_ = true;
