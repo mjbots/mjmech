@@ -88,19 +88,23 @@ def _clear_tree_widget(item):
 
 
 def _set_tree_widget_data(item, struct,
-                          getter=lambda x, y: getattr(x, y)):
+                          getter=lambda x, y: getattr(x, y),
+                          required_size=0):
+    if item.childCount() < required_size:
+        for i in range(item.childCount(), required_size):
+            subitem = QtGui.QTreeWidgetItem(item)
+            subitem.setText(0, str(i))
     for i in range(item.childCount()):
         child = item.child(i)
         name = child.text(0)
 
-        if name.startswith('_'):
-            continue
-
         field = getter(struct, name)
-        if isinstance(field, tuple):
+        if isinstance(field, tuple) and child.childCount() > 0:
             _set_tree_widget_data(child, field)
         elif isinstance(field, list):
-            _set_tree_widget_data(child, field, getter=lambda x, y: x[int(y)])
+            _set_tree_widget_data(child, field,
+                                  getter=lambda x, y: x[int(y)],
+                                  required_size=len(field))
         else:
             child.setText(1, str(field))
 
