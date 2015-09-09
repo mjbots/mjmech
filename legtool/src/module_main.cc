@@ -31,12 +31,6 @@ struct Context {
   TelemetryRegistry<TelemetryLogRegistrar> telemetry_registry{&telemetry_log};
 };
 
-struct FailWrapper {
-  void operator()(ErrorCode ec) const {
-    FailIf(ec);
-  }
-};
-
 int safe_main(int argc, char**argv) {
   namespace po = boost::program_options;
 
@@ -52,7 +46,7 @@ int safe_main(int argc, char**argv) {
       ("help,h", "display usage message")
       ("config,c", po::value(&config_file), "read options from file")
       ("log,l", po::value(&log_file), "write to log file")
-      ("debug,d", po::value(&debug),
+      ("debug,d", po::bool_switch(&debug),
        "disable real-time signals and other debugging hindrances")
       ;
 
@@ -75,7 +69,10 @@ int safe_main(int argc, char**argv) {
     context.telemetry_log.Open(log_file);
   }
 
-  module.AsyncStart(FailWrapper());
+  module.AsyncStart([=](ErrorCode ec) {
+      FailIf(ec);
+      if (debug) { std::cout << "Started!\n"; }
+    });
 
   context.service.run();
   return 0;
