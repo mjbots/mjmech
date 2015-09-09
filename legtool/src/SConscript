@@ -35,6 +35,7 @@ SOURCES = [
     'fail.cc',
     'gait_driver.cc',
     'herkulex.cc',
+    'linux_input.cc',
     'mech_warfare.cc',
     'mjmech_imu_driver.cc',
     'telemetry_log.cc',
@@ -92,6 +93,9 @@ telemetry_log_test = crenv.Program(
 
 mech_warfare_command = crenv.Program('mw_command',
                                      ['mech_warfare_command.cc'] + liblegtool)
+linux_input_manual_test = crenv.Program(
+    'linux_input_manual_test',
+    ['test/linux_input_manual_test.cc'] + liblegtool)
 
 def ModuleMain(root, cname):
     mjmech_main = crenv.Object(
