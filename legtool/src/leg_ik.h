@@ -15,6 +15,7 @@
 #pragma once
 
 #include "common.h"
+#include "error_code.h"
 #include "tf.h"
 #include "visitor.h"
 
@@ -101,7 +102,14 @@ class LizardIK : public IKSolver {
     }
   };
 
-  LizardIK(const Config& config) : config_(config) {}
+  LizardIK(const Config& config)
+  : config_(config) {
+    if (config_.coxa.length_mm == 0.0 ||
+        config_.femur.length_mm == 0.0 ||
+        config_.tibia.length_mm == 0.0) {
+      throw SystemError::einval("invalid lizard leg config");
+    }
+  }
 
   virtual JointAngles Solve(const Point3D& point_mm) const {
     // Solve for the coxa first, as it has only a single solution.
@@ -239,6 +247,7 @@ class MammalIK : public IKSolver {
         a->Visit(LT_NVP(idle_deg));
         a->Visit(LT_NVP(max_deg));
         a->Visit(LT_NVP(sign));
+        a->Visit(LT_NVP(length_mm));
         a->Visit(LT_NVP(ident));
       }
     };
@@ -261,7 +270,14 @@ class MammalIK : public IKSolver {
     }
   };
 
-  MammalIK(const Config& config) : config_(config) {}
+  MammalIK(const Config& config)
+  : config_(config) {
+    // Make some basic sanity checks.
+    if (config_.femur.length_mm == 0.0 ||
+        config_.tibia.length_mm == 0.0) {
+      throw SystemError::einval("invalid mammal leg config");
+    }
+  }
 
   virtual JointAngles Solve(const Point3D& point_mm) const {
     // Find the angle of the shoulder joint.  This will be tangent
