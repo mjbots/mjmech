@@ -37,6 +37,7 @@ class MjmechImuDriver : boost::noncopyable {
                   TelemetryRegistry* telemetry_registry)
       : MjmechImuDriver(service) {
     telemetry_registry->Register("imu", &imu_data_signal_);
+    telemetry_registry->Register("imu_config", &imu_config_signal_);
   }
 
   MjmechImuDriver(boost::asio::io_service&);
@@ -49,11 +50,18 @@ class MjmechImuDriver : boost::noncopyable {
     int gyro_address = 0x59;
     int accel_address = 0x1d;
 
+    double accel_g = 4.0;
+    double rotation_deg_s = 500.0;
+    double rate_hz = 100.0;
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(i2c_device));
       a->Visit(LT_NVP(gyro_address));
       a->Visit(LT_NVP(accel_address));
+      a->Visit(LT_NVP(accel_g));
+      a->Visit(LT_NVP(rotation_deg_s));
+      a->Visit(LT_NVP(rate_hz));
     }
   };
 
@@ -72,8 +80,26 @@ class MjmechImuDriver : boost::noncopyable {
     }
   };
 
+  struct ImuConfig {
+    boost::posix_time::ptime timestamp;
+    double rate_hz = 0.0;
+    double gyro_bw_hz = 0.0;
+    double accel_g = 0.0;
+    double rotation_deg_s = 0.0;
+
+    template <typename Archive>
+    void Serialize(Archive* a) {
+      a->Visit(LT_NVP(timestamp));
+      a->Visit(LT_NVP(rate_hz));
+      a->Visit(LT_NVP(gyro_bw_hz));
+      a->Visit(LT_NVP(accel_g));
+      a->Visit(LT_NVP(rotation_deg_s));
+    }
+  };
+
  private:
   boost::signals2::signal<void (const ImuData*)> imu_data_signal_;
+  boost::signals2::signal<void (const ImuConfig*)> imu_config_signal_;
   Parameters parameters_;
 
   class Impl;

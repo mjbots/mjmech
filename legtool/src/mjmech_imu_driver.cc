@@ -67,8 +67,8 @@ class MjmechImuDriver::Impl : boost::noncopyable {
                           "error opening '" + parameters_.i2c_device + "'");
       }
 
+      // Verify we can talk to the gyro.
       uint8_t whoami[1] = {};
-
       ReadGyro(0x20, 1, whoami, sizeof(whoami));
       if (whoami[0] != 0xb1) {
         throw SystemError::einval(
@@ -76,23 +76,159 @@ class MjmechImuDriver::Impl : boost::noncopyable {
              static_cast<int>(whoami[0])).str());
       }
 
+      // Verify we can talk to the accelerometer.
       uint8_t ignored[1] = {};
       ReadAccel(0x20, 1, ignored, sizeof(ignored));
 
+      imu_config_.timestamp =
+          boost::posix_time::microsec_clock::universal_time();
+
       // Configure the gyroscope.
-      WriteGyro(0x00, {0xcf}); // FS=250dps PWR=Normal XYZ=EN
-      WriteGyro(0x01, {0x18}); // BW=22Hz
-      WriteGyro(0x02, {99}); // ODR=100Hz
+      const uint8_t fs = [this]() {
+        const double scale = parameters_.rotation_deg_s;
+        if (scale <= 250) { return 3; }
+        else if (scale <= 500) { return 2; }
+        else if (scale <= 1000) { return 1; }
+        else if (scale <= 2000) { return 0; }
+        throw SystemError::einval("scale too large");
+      }();
+
+      imu_config_.rotation_deg_s = [fs]() {
+        switch (fs) {
+          case 0: { return 2000.0; }
+          case 1: { return 1000.0; }
+          case 2: { return 500.0; }
+          case 3: { return 250.0; }
+        }
+        throw SystemError::einval("invalid state");
+      }();
+
+      // FS=XX PWR=Normal XYZ=EN
+      WriteGyro(0x00, {static_cast<uint8_t>(0x0f | (fs << 6))});
+
+      // Pick a bandwidth which is less than half the desired rate.
+      const uint8_t bw = [this]() {
+        const double rate = parameters_.rate_hz;
+        if (rate < 8) { return 0; } // 2 Hz
+        else if (rate < 12) { return 1; } // 4 Hz
+        else if (rate < 16) { return 2; } // 6 Hz
+        else if (rate < 20) { return 3; } // 8 Hz
+        else if (rate < 28) { return 4; } // 10 Hz
+        else if (rate < 44) { return 5; } // 14 Hz
+        else if (rate < 64) { return 6; } // 22 Hz
+        else if (rate < 100) { return 7; } // 32 Hz
+        else if (rate < 150) { return 8; } // 50 Hz
+        else if (rate < 200) { return 9; } // 75 Hz
+        else if (rate < 300) { return 10; } // 100 Hz
+        else if (rate < 400) { return 11; } // 150 Hz
+        else if (rate < 500) { return 12; } // 200 Hz
+        else if (rate < 600) { return 13; } // 250 Hz
+        else if (rate < 800) { return 14; } // 300 Hz
+        else { return 15; } // 400 Hz
+      }();
+
+      imu_config_.gyro_bw_hz = [bw]() {
+        switch (bw) {
+          case 0: { return 2.0; }
+          case 1: { return 4.0; }
+          case 2: { return 6.0; }
+          case 3: { return 8.0; }
+          case 4: { return 10.0; }
+          case 5: { return 14.0; }
+          case 6: { return 22.0; }
+          case 7: { return 32.0; }
+          case 8: { return 50.0; }
+          case 9: { return 75.0; }
+          case 10: { return 100.0; }
+          case 11: { return 150.0; }
+          case 12: { return 200.0; }
+          case 13: { return 250.0; }
+          case 14: { return 300.0; }
+          case 15: { return 400.0; }
+        }
+        throw SystemError::einval("invalid state");
+      }();
+
+      WriteGyro(0x01, {static_cast<uint8_t>(0x00 | (bw << 2))}); // BW=X
+
+      auto limit = [](double value) -> uint8_t {
+        if (value < 0) { return 0; }
+        if (value > 255) { return 255; }
+        return static_cast<uint8_t>(value);
+      };
+
+      const uint8_t odr = limit([this]() {
+          const double rate = parameters_.rate_hz;
+          if (rate < 4.95) {
+            throw SystemError::einval("IMU rate too small");
+          } else if (rate < 20) {
+            return (154 * rate + 500) / rate;
+          } else if (rate < 100) {
+            return (79 * rate + 2000) / rate;
+          } else if (rate < 10000) {
+            return (10000 - rate) / rate;
+          } else {
+            throw SystemError::einval("IMU rate too large");
+          }
+        }());
+      WriteGyro(0x02, {odr}); // ODR=100Hz
+
+      imu_config_.rate_hz = [odr]() {
+        if (odr <= 99) { return 10000.0 / (odr + 1); }
+        else if (odr <= 179) { return 10000.0 / (100 + 5 * (odr - 99)); }
+        else if (odr <= 255) { return 10000.0 / (500 + 20 * (odr - 179)); }
+        throw SystemError::einval("invalid state");
+      }();
 
       // Configure the accelerometer.
       WriteAccel(0x2a, {0x18}); // Turn it off so we can change settings.
-      WriteAccel(0x0e, {0}); // FS=2G
-      // 2A 0b00011000 ASLP=0 ODR=100Hz LNOISE=0 F_READ=0 ACTIVE=0
+
+      const uint8_t fsg = [this]() {
+        const double scale = parameters_.accel_g;
+        if (scale <= 2.0) { return 0; }
+        else if (scale <= 4.0) { return 1; }
+        else if (scale <= 8.0) { return 2; }
+        throw SystemError::einval("accel scale too large");
+      }();
+
+      imu_config_.accel_g = [fsg]() {
+        switch (fsg) {
+          case 0: { return 2.0; }
+          case 1: { return 4.0; }
+          case 2: { return 8.0; }
+        }
+        throw SystemError::einval("invalid state");
+      }();
+
+      WriteAccel(0x0e, {fsg}); // FS=2G
+
+      const uint8_t dr = [this]() {
+        const double rate = parameters_.rate_hz;
+        if (rate <= 1.56) { return 7; }
+        else if (rate <= 6.25) { return 6; }
+        else if (rate <= 12.5) { return 5; }
+        else if (rate <= 50) { return 4; }
+        else if (rate <= 100) { return 3; }
+        else if (rate <= 200) { return 2; }
+        else if (rate <= 400) { return 1; }
+        else if (rate <= 800) { return 0; }
+        throw SystemError::einval("accel rate too large");
+      }();
+      const uint8_t lnoise = [this]() {
+        if (parameters_.accel_g <= 4) { return 1; }
+        return 0;
+      }();
+
+      // 2A 0b00011000 ASLP=0 ODR=XXHz LNOISE=0 F_READ=0 ACTIVE=0
       // 2B 0b00000010 ST=0 RST=0 SMODS=0 SLPE=0 MODS=2
-      WriteAccel(0x2a, {0x18, 0x02});
+      WriteAccel(0x2a, {
+          static_cast<uint8_t>(0x00 | (dr << 3) | (lnoise << 2)),
+              0x02});
 
       // Turn it back on.
       WriteAccel(0x2a, {0x19});
+
+      service_.post(std::bind(&Impl::SendConfig, this, imu_config_));
 
     } catch (SystemError& e) {
       e.error_code().Append("when initializing IMU");
@@ -120,6 +256,23 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       return static_cast<int16_t>(result);
     };
 
+    const double kAccelSensitivity = [this]() {
+      const double fs = imu_config_.accel_g;
+      if (fs == 2.0) { return 1.0 / 4096 / 4; }
+      else if (fs == 4.0) { return 1.0 / 2048 / 4; }
+      else if (fs == 8.0) { return 1.0 / 1024 / 4; }
+      throw SystemError::einval("invalid configured accel range");
+    }();
+
+    const double kGyroSensitivity = [this]() {
+      const double fs = imu_config_.rotation_deg_s;
+      if (fs == 250.0) { return 1.0 / 120.0; }
+      else if (fs == 500.0) { return 1.0 / 60.0; }
+      else if (fs == 1000.0) { return 1.0 / 30.0; }
+      else if (fs == 2000.0) { return 1.0 / 15.0; }
+      throw SystemError::einval("invalid configured gyro rate");
+    }();
+
     // Loop reading things and emitting data.
     while (!done_) {
       // Read gyro values until we get a new one.
@@ -139,7 +292,6 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       uint8_t adata[10] = {};
       ReadAccel(0x00, 7, adata, sizeof(adata));
 
-      const double kAccelSensitivity = 1.0 / 4096 / 4;
       const double kGravity = 9.80665;
 
       imu_data.accel_mps2.x =
@@ -148,9 +300,6 @@ class MjmechImuDriver::Impl : boost::noncopyable {
           to_int16(adata[3], adata[4]) * kAccelSensitivity * kGravity;
       imu_data.accel_mps2.z =
           to_int16(adata[5], adata[6]) * kAccelSensitivity * kGravity;
-
-      const double kGyroSensitivity =
-          1.0 / 120.0; // For 250dps full scale range
 
       imu_data.body_rate_deg_s.x =
           to_int16(gdata[1], gdata[2]) * kGyroSensitivity;
@@ -167,6 +316,12 @@ class MjmechImuDriver::Impl : boost::noncopyable {
     BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
 
     parent_->imu_data_signal_(&imu_data);
+  }
+
+  void SendConfig(const ImuConfig& imu_config) {
+    BOOST_ASSERT(std::this_thread::get_id() == parent_id_);
+
+    parent_->imu_config_signal_(&imu_config);
   }
 
   void WriteGyro(uint8_t reg, const std::vector<uint8_t>& data) {
@@ -265,6 +420,7 @@ class MjmechImuDriver::Impl : boost::noncopyable {
 
   // From child only.
   int fd_ = -1;
+  ImuConfig imu_config_;
 };
 
 MjmechImuDriver::MjmechImuDriver(boost::asio::io_service& service)
