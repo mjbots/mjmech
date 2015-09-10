@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(TelemetryLogBasicTest) {
   istr.read(header, 8);
   BOOST_CHECK_EQUAL(std::string(header), "TLOG0002");
 
-  TelemetryReadStream stream(istr);
+  TelemetryReadStream<> stream(istr);
   BOOST_CHECK_EQUAL(stream.Read<uint16_t>(), 2);
   BOOST_CHECK_EQUAL(stream.Read<uint32_t>(), 14);
   char buf[15] = {};

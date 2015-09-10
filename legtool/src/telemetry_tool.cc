@@ -44,16 +44,16 @@ void DoSchema(const Options& options) {
   if (!schema.is_open()) {
     throw std::runtime_error("could not open schema: " + schema_filename);
   }
-  TelemetryReadStream stream(schema);
+  TelemetryReadStream<> stream(schema);
 
   std::unique_ptr<std::ifstream> binary;
-  std::unique_ptr<TelemetryReadStream> binary_stream;
+  std::unique_ptr<TelemetryReadStream<>> binary_stream;
   if (!binary_filename.empty()) {
     binary.reset(new std::ifstream(binary_filename));
     if (!binary->is_open()) {
       throw std::runtime_error("could not open binary: " + binary_filename);
     }
-    binary_stream.reset(new TelemetryReadStream(*binary));
+    binary_stream.reset(new TelemetryReadStream<>(*binary));
   }
 
   TelemetrySchemaReader(stream, binary_stream.get(), std::cout).Read();

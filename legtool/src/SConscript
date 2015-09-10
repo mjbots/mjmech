@@ -62,6 +62,9 @@ bpenv.ParseConfig('pkg-config --cflags --libs python')
 pylegtool = bpenv.SharedLibrary('_legtool', SOURCES + PY_SOURCES,
                                 LIBPREFIX='')
 
+pytelemetry = bpenv.SharedLibrary(
+    '_telemetry_archive', ['py_telemetry_archive.cc'], LIBPREFIX='')
+
 TESTS = ['test/' + x for x in [
         'comm_test.cc',
         'herkulex_test.cc',
@@ -103,6 +106,7 @@ def ModuleMain(root, cname):
         CPPDEFINES={'MODULE_HEADER_FILE': '\\"' + root + '.h\\"',
                     'MODULE_CLASS_NAME': cname})
     crenv.Depends(mjmech_main, root + '.h')
+    crenv.Depends(mjmech_main, liblegtool)
     crenv.Program(root, mjmech_main + liblegtool)
 
 ModuleMain('mjmech_imu_driver', 'MjmechImuDriver')

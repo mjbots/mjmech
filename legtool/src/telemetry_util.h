@@ -28,8 +28,8 @@ class TelemetrySchemaReader {
  public:
   typedef TelemetryFormat TF;
 
-  TelemetrySchemaReader(TelemetryReadStream& stream,
-                        TelemetryReadStream* data,
+  TelemetrySchemaReader(TelemetryReadStream<>& stream,
+                        TelemetryReadStream<>* data,
                         std::ostream& out)
       : stream_(stream),
         data_(data),
@@ -110,11 +110,11 @@ class TelemetrySchemaReader {
       case FT::kFloat32: { out_ << data_->Read<float>(); break; }
       case FT::kFloat64: { out_ << data_->Read<double>(); break; }
       case FT::kString: {
-        out_ << "\"" << data_->Read<std::string>() << "\"";
+        out_ << "\"" << data_->ReadString() << "\"";
         break;
       }
       case FT::kPtime: {
-        out_ << data_->Read<boost::posix_time::ptime>();
+        out_ << data_->ReadPtime();
         break;
       }
       case FT::kFinal:
@@ -134,7 +134,7 @@ class TelemetrySchemaReader {
     RecordingInputSource ris(stream_.stream());
     boost::iostreams::stream<
       RecordingInputSource> io_stream(ris, 1, 1);
-    TelemetryReadStream recording_stream(io_stream);
+    TelemetryReadStream<> recording_stream(io_stream);
     TelemetrySchemaReader sub_reader(recording_stream, nullptr, out_);
     sub_reader.DoField(indent + 2, 0, "", kSkipSemicolon, data_policy);
 
@@ -145,7 +145,7 @@ class TelemetrySchemaReader {
       out_ << "[";
       for (uint32_t i = 0; i < num_elements; i++) {
         std::istringstream istr(io_stream->str());
-        TelemetryReadStream sub_stream(istr);
+        TelemetryReadStream<> sub_stream(istr);
         TelemetrySchemaReader field_reader(sub_stream, data_, out_);
         field_reader.DoField(indent + 2, 0, "", kSkipSemicolon, kDataOnly);
         if ((i + 1) != num_elements) { out_ << ","; }
@@ -287,7 +287,7 @@ class TelemetrySchemaReader {
     bool done = false;
     while (!done) {
       uint32_t field_flags = stream_.Read<uint32_t>();
-      std::string field_name = stream_.Read<std::string>();
+      std::string field_name = stream_.ReadString();
 
       const bool final = DoField(
           indent, field_flags, field_name, kSemicolon, data_policy);
@@ -327,8 +327,8 @@ class TelemetrySchemaReader {
     }
   }
 
-  TelemetryReadStream& stream_;
-  TelemetryReadStream* const data_;
+  TelemetryReadStream<>& stream_;
+  TelemetryReadStream<>* const data_;
   std::ostream& out_;
 };
 

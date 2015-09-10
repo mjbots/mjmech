@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(TelemetryArchiveSchemaTest) {
   TelemetryWriteArchive<Test1> archive;
   std::istringstream istr(archive.schema());
   std::ostringstream repr;
-  TelemetryReadStream stream(istr);
+  TelemetryReadStream<> stream(istr);
 
   TelemetrySchemaReader(stream, nullptr, repr).Read();
   std::string expected = R"XX([SchemaFlags]: 00000000;
@@ -125,13 +125,13 @@ BOOST_AUTO_TEST_CASE(TelemetryArchiveDataTest) {
   TelemetryWriteArchive<Test1> archive;
   std::istringstream istr(archive.schema());
   std::ostringstream repr;
-  TelemetryReadStream stream(istr);
+  TelemetryReadStream<> stream(istr);
 
   Test1 data;
   std::string result = archive.Serialize(&data);
 
   std::istringstream data_istr(result);
-  TelemetryReadStream data_stream(data_istr);
+  TelemetryReadStream<> data_stream(data_istr);
   TelemetrySchemaReader(stream, &data_stream, repr).Read();
   std::string expected = R"XX([SchemaFlags]: 00000000;
 {

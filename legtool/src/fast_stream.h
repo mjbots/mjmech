@@ -64,4 +64,21 @@ class FastOStringStream {
  private:
   vector data_;
 };
+
+class FastIStringStream {
+ public:
+  FastIStringStream(const std::string& data) : data_(data) {}
+
+  void read(char* buffer, size_t length) {
+    last_read_ = std::min(data_.size() - offset_, length);
+    std::memcpy(buffer, &data_[offset_], last_read_);
+    offset_ += last_read_;
+  }
+
+  size_t gcount() const { return last_read_; }
+
+  const std::string data_;
+  size_t offset_ = 0;
+  size_t last_read_ = 0;
+};
 }

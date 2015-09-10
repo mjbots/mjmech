@@ -301,16 +301,32 @@ class TelemetryWriteStream {
   Stream& ostr_;
 };
 
+template <typename Stream=std::istream>
 class TelemetryReadStream {
  public:
   typedef TelemetryFormat TF;
 
-  TelemetryReadStream(std::istream& istr) : istr_(istr) {}
-  std::istream& stream() { return istr_; }
+  TelemetryReadStream(Stream& istr) : istr_(istr) {}
+  Stream& stream() { return istr_; }
 
   template <typename T>
   inline T Read() {
     return ReadScalar<T>();
+  }
+
+  boost::posix_time::ptime ReadPtime() {
+    int64_t value = Read<int64_t>();
+    return ConvertMicrosecondsToPtime(value);
+  }
+
+  std::string ReadString() {
+    uint32_t size = Read<uint32_t>();
+    if (size > static_cast<std::size_t>(TF::BlockOffsets::kMaxBlockSize)) {
+      throw SystemError::einval("corrupt pstring");
+    }
+    std::string result(size, static_cast<char>(0));
+    RawRead(&result[0], size);
+    return result;
   }
 
   uint64_t ReadVarint() {
@@ -341,26 +357,6 @@ class TelemetryReadStream {
     }
   }
 
-  std::istream& istr_;
+  Stream& istr_;
 };
-
-template <>
-inline boost::posix_time::ptime
-TelemetryReadStream::Read<boost::posix_time::ptime>() {
-  int64_t value = Read<int64_t>();
-  return ConvertMicrosecondsToPtime(value);
-}
-
-template <>
-inline std::string
-TelemetryReadStream::Read<std::string>() {
-  uint32_t size = Read<uint32_t>();
-  if (size > static_cast<std::size_t>(TF::BlockOffsets::kMaxBlockSize)) {
-    throw SystemError::einval("corrupt pstring");
-  }
-  std::string result(size, static_cast<char>(0));
-  RawRead(&result[0], size);
-  return result;
-}
-
 }

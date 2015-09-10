@@ -14,9 +14,17 @@
 
 import collections
 import cStringIO as stringio
+import os
 import struct
+import sys
 
-class ReadArchive(object):
+script_path = sys.path[0]
+sys.path.append(os.path.join(script_path, 'build'))
+
+from _telemetry_archive import *
+
+
+class ReadArchivePython(object):
     '''Parse schema and binary data objects serialized using the
     Telemetry protocol.
 
