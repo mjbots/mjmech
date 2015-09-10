@@ -25,7 +25,8 @@ using namespace legtool;
 
 class Reader {
  public:
-  Reader(LinuxInput* input) : input_(input) {}
+  Reader(LinuxInput* input, bool absinfo)
+      : input_(input), absinfo_(absinfo) {}
 
   void StartRead() {
     input_->AsyncRead(
@@ -37,11 +38,15 @@ class Reader {
     FailIf(ec);
 
     std::cout << event_ << "\n";
+    if (event_.ev_type == EV_ABS && absinfo_) {
+      std::cout << input_->abs_info(event_.code) << "\n";
+    }
 
     StartRead();
   }
 
   LinuxInput* const input_;
+  const bool absinfo_;
   LinuxInput::Event event_;
 };
 
@@ -50,11 +55,13 @@ int work(int argc, char** argv) {
 
   std::string device;
   bool wait = false;
+  bool absinfo = false;
   po::options_description desc("Allowable options");
   desc.add_options()
       ("help,h", "display usage message")
       ("device,d", po::value(&device), "input device")
       ("wait,w", po::bool_switch(&wait), "wait for events")
+      ("absinfo,a", po::bool_switch(&absinfo), "display absinfo")
       ;
 
   po::variables_map vm;
@@ -76,8 +83,14 @@ int work(int argc, char** argv) {
   std::cout << linux_input.features(EV_ABS) << "\n";
   std::cout << linux_input.features(EV_KEY) << "\n";
 
+  auto abs_features = linux_input.features(EV_ABS);
+  for (size_t i = 0; i < abs_features.capabilities.size(); i++) {
+    if (!abs_features.capabilities.test(i)) { continue; }
+    std::cout << linux_input.abs_info(i) << "\n";
+  }
+
   if (wait) {
-    Reader reader(&linux_input);
+    Reader reader(&linux_input, absinfo);
     reader.StartRead();
     service.run();
   }

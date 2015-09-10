@@ -41,6 +41,7 @@ class LinuxInput : boost::noncopyable {
   std::string name() const;
 
   struct AbsInfo {
+    int axis = -1;
     int value = 0;
     int minimum = 0;
     int maximum = 0;

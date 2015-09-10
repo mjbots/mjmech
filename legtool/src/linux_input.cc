@@ -69,6 +69,7 @@ void LinuxInput::Open(const std::string& device) {
     cgabs op(i);
     impl_->stream_.io_control(op);
     AbsInfo info;
+    info.axis = i;
     info.minimum = op.abs_info.minimum;
     info.maximum = op.abs_info.maximum;
     info.fuzz = op.abs_info.fuzz;
@@ -103,6 +104,7 @@ LinuxInput::AbsInfo LinuxInput::abs_info(int axis) const {
   if (it != impl_->abs_info_.end()) { return it->second; }
 
   AbsInfo result;
+  result.axis = axis;
   result.minimum = -100;
   result.maximum = 100;
   result.resolution = 100;
@@ -184,12 +186,6 @@ void LinuxInput::cancel() {
 
 std::ostream& operator<<(std::ostream& ostr, const LinuxInput& rhs) {
   ostr << boost::format("<LinuxInput '%s'>") % rhs.name();
-  return ostr;
-}
-
-std::ostream& operator<<(std::ostream& ostr, const LinuxInput::AbsInfo& rhs) {
-  ostr << boost::format("<AbsInfo val=%d min=%d max=%d>") %
-      rhs.value % rhs.minimum % rhs.maximum;
   return ostr;
 }
 
@@ -283,6 +279,12 @@ std::function<std::string (int)> MakeCodeMapper(int ev_type) {
     default: { return MapUnknown; }
   }
 }
+}
+
+std::ostream& operator<<(std::ostream& ostr, const LinuxInput::AbsInfo& rhs) {
+  ostr << boost::format("<AbsInfo %s val=%d min=%d max=%d scaled=%f>") %
+      MapAbs(rhs.axis) % rhs.value % rhs.minimum % rhs.maximum % rhs.scaled();
+  return ostr;
 }
 
 std::ostream& operator<<(std::ostream& ostr, const LinuxInput::Features& rhs) {
