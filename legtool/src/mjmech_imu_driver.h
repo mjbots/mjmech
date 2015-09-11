@@ -54,6 +54,10 @@ class MjmechImuDriver : boost::noncopyable {
     double rotation_deg_s = 500.0;
     double rate_hz = 100.0;
 
+    double roll_deg = 0;
+    double pitch_deg = 0;
+    double yaw_deg = 0;
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(i2c_device));
@@ -62,6 +66,9 @@ class MjmechImuDriver : boost::noncopyable {
       a->Visit(LT_NVP(accel_g));
       a->Visit(LT_NVP(rotation_deg_s));
       a->Visit(LT_NVP(rate_hz));
+      a->Visit(LT_NVP(roll_deg));
+      a->Visit(LT_NVP(pitch_deg));
+      a->Visit(LT_NVP(yaw_deg));
     }
   };
 
@@ -87,6 +94,10 @@ class MjmechImuDriver : boost::noncopyable {
     double accel_g = 0.0;
     double rotation_deg_s = 0.0;
 
+    double roll_deg = 0;
+    double pitch_deg = 0;
+    double yaw_deg = 0;
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(timestamp));
@@ -94,6 +105,9 @@ class MjmechImuDriver : boost::noncopyable {
       a->Visit(LT_NVP(gyro_bw_hz));
       a->Visit(LT_NVP(accel_g));
       a->Visit(LT_NVP(rotation_deg_s));
+      a->Visit(LT_NVP(roll_deg));
+      a->Visit(LT_NVP(pitch_deg));
+      a->Visit(LT_NVP(yaw_deg));
     }
   };
 

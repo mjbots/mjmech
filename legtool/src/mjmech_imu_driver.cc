@@ -18,7 +18,9 @@
 
 #include <thread>
 
+#include "common.h"
 #include "fail.h"
+#include "quaternion.h"
 
 namespace legtool {
 
@@ -57,7 +59,10 @@ class MjmechImuDriver::Impl : boost::noncopyable {
   void Run(ErrorHandler handler) {
     BOOST_ASSERT(std::this_thread::get_id() == child_.get_id());
 
-    // TODO jpieper: Set the bit rate of the I2C device.
+    transform_ = Quaternion::FromEuler(
+        Radians(parameters_.roll_deg),
+        Radians(parameters_.pitch_deg),
+        Radians(parameters_.yaw_deg));
 
     try {
       // Open the I2C device and configure it.
@@ -228,6 +233,10 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       // Turn it back on.
       WriteAccel(0x2a, {0x19});
 
+      imu_config_.roll_deg = parameters_.roll_deg;
+      imu_config_.pitch_deg = parameters_.pitch_deg;
+      imu_config_.yaw_deg = parameters_.yaw_deg;
+
       service_.post(std::bind(&Impl::SendConfig, this, imu_config_));
 
     } catch (SystemError& e) {
@@ -294,19 +303,25 @@ class MjmechImuDriver::Impl : boost::noncopyable {
 
       const double kGravity = 9.80665;
 
-      imu_data.accel_mps2.x =
+      Point3D accel_mps2;
+
+      accel_mps2.x =
           to_int16(adata[1], adata[2]) * kAccelSensitivity * kGravity;
-      imu_data.accel_mps2.y =
+      accel_mps2.y =
           to_int16(adata[3], adata[4]) * kAccelSensitivity * kGravity;
-      imu_data.accel_mps2.z =
+      accel_mps2.z =
           to_int16(adata[5], adata[6]) * kAccelSensitivity * kGravity;
 
-      imu_data.body_rate_deg_s.x =
+      imu_data.accel_mps2 = transform_.Rotate(accel_mps2);
+
+      Point3D body_rate_deg_s;
+      body_rate_deg_s.x =
           to_int16(gdata[1], gdata[2]) * kGyroSensitivity;
-      imu_data.body_rate_deg_s.y =
+      body_rate_deg_s.y =
           to_int16(gdata[3], gdata[4]) * kGyroSensitivity;
-      imu_data.body_rate_deg_s.z =
+      body_rate_deg_s.z =
           to_int16(gdata[5], gdata[6]) * kGyroSensitivity;
+      imu_data.body_rate_deg_s = transform_.Rotate(body_rate_deg_s);
 
       service_.post(std::bind(&Impl::SendData, this, imu_data));
     }
@@ -421,6 +436,7 @@ class MjmechImuDriver::Impl : boost::noncopyable {
   // From child only.
   int fd_ = -1;
   ImuConfig imu_config_;
+  Quaternion transform_;
 };
 
 MjmechImuDriver::MjmechImuDriver(boost::asio::io_service& service)
