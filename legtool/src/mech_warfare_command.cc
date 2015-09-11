@@ -74,7 +74,7 @@ struct Options {
   double max_translate_y_mm_s = 300.0;
   double max_rotate_deg_s = 100.0;
   double max_body_z_mm = 30.0;
-  double min_body_z_mm = -30.0;
+  double min_body_z_mm = -60.0;
   double idle_body_y_mm = 5.0;
   double forward_body_y_mm = 15.0;
   double reverse_body_y_mm = -5.0;
@@ -89,6 +89,7 @@ struct Options {
     a->Visit(LT_NVP(max_rotate_deg_s));
     a->Visit(LT_NVP(max_body_z_mm));
     a->Visit(LT_NVP(min_body_z_mm));
+    a->Visit(LT_NVP(idle_body_y_mm));
     a->Visit(LT_NVP(forward_body_y_mm));
     a->Visit(LT_NVP(reverse_body_y_mm));
     a->Visit(LT_NVP(verbose));
@@ -140,6 +141,11 @@ class Commander {
   void HandleRead(ErrorCode ec) {
     FailIf(ec);
     StartRead();
+
+    if (event_.ev_type == EV_KEY &&
+        event_.code == BTN_A) {
+      btn_a_ = (event_.value != 0);
+    }
   }
 
   void HandleTimeout(ErrorCode ec) {
@@ -179,6 +185,10 @@ class Commander {
               mapping_.sign_body_z,
               options_.min_body_z_mm, options_.max_body_z_mm);
 
+    if (btn_a_) {
+      command.body_z_mm = options_.min_body_z_mm;
+    }
+
     const bool active =
         command.translate_x_mm_s != 0.0 ||
         command.translate_y_mm_s != 0.0 ||
@@ -193,6 +203,8 @@ class Commander {
       } else {
         command.body_y_mm = options_.idle_body_y_mm;
       }
+    } else {
+      command.body_y_mm = options_.idle_body_y_mm;
     }
 
     if (options_.verbose) {
@@ -217,6 +229,7 @@ class Commander {
   const AxisMapping mapping_;
 
   LinuxInput::Event event_;
+  bool btn_a_ = false;
 };
 
 int work(int argc, char** argv) {
