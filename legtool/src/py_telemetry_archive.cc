@@ -407,6 +407,6 @@ BOOST_PYTHON_MODULE(_telemetry_archive) {
 
   class_<ReadArchive>("ReadArchive", init<std::string, std::string>())
       .def("deserialize", &ReadArchive::deserialize)
-      .def("root", &ReadArchive::root)
+      .add_property("root", &ReadArchive::root)
       ;
 }
