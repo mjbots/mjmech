@@ -20,66 +20,10 @@
 
 namespace legtool {
 
-namespace {
-struct EnableArchive {
-  EnableArchive(std::map<std::string, bool>& enabled): enabled(enabled) {}
-
-  template <typename NameValuePair>
-  void Visit(const NameValuePair& pair) {
-    Helper(pair.name(), pair.value(), 0);
-  }
-
-  template <typename T>
-  auto Helper(const char* name, T* value, int)
-      -> decltype((*value)->AsyncStart(ErrorHandler())) {
-    enabled[name] = true;
-  }
-
-  template <typename T>
-  void Helper(const char* name, T* value, long) {}
-
-  std::map<std::string, bool>& enabled;
-};
-}
-
 MechWarfare::MechWarfare(boost::asio::io_service& service)
     : service_(service),
       factory_(service),
       server_(service) {
-
-  m_.servo_base.reset(new ServoBase(service_, factory_));
-  m_.servo.reset(new Servo(m_.servo_base.get()));
-
-  EnableArchive enable_archive(parameters_.enabled);
-  m_.Serialize(&enable_archive);
-}
-
-namespace {
-struct StartArchive {
-  StartArchive(std::map<std::string, bool>& enabled, ErrorHandler handler)
-      : enabled(enabled),
-        joiner(std::make_shared<ErrorHandlerJoiner>(handler)) {}
-
-  template <typename NameValuePair>
-  void Visit(const NameValuePair& pair) {
-    Helper(pair.name(), pair.value(), 0);
-  }
-
-  template <typename T>
-  auto Helper(const char* name, T* value, int)
-      -> decltype((*value)->AsyncStart(ErrorHandler())) {
-    if (enabled[name]) {
-      (*value)->AsyncStart(
-          joiner->Wrap(std::string("starting: '") + name + "'"));
-    }
-  }
-
-  template <typename T>
-  void Helper(const char* name, T* value, long) {}
-
-  std::map<std::string, bool>& enabled;
-  std::shared_ptr<ErrorHandlerJoiner> joiner;
-};
 }
 
 void MechWarfare::AsyncStart(ErrorHandler handler) {
@@ -96,8 +40,7 @@ void MechWarfare::AsyncStart(ErrorHandler handler) {
     return;
   }
 
-  StartArchive archive(parameters_.enabled, handler);
-  m_.Serialize(&archive);
+  parameters_.children.Start(handler);
 }
 
 RippleConfig MechWarfare::LoadRippleConfig() {
