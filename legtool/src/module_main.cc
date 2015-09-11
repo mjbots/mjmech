@@ -54,6 +54,8 @@ int safe_main(int argc, char**argv) {
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
+  po::notify(vm);
+
   if (!config_file.empty()) {
     po::store(po::parse_config_file<char>(config_file.c_str(), desc), vm);
   }
