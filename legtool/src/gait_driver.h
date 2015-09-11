@@ -39,8 +39,6 @@ class GaitDriver : boost::noncopyable {
     telemetry_registry->Register("gait_command", &command_data_signal_);
   }
 
-  GaitDriver(boost::asio::io_service& service,
-             ServoInterface* servo);
   ~GaitDriver();
 
   void SetGait(std::unique_ptr<RippleGait>);
@@ -76,6 +74,9 @@ class GaitDriver : boost::noncopyable {
   Parameters* parameters() { return &parameters_; }
 
  private:
+  GaitDriver(boost::asio::io_service& service,
+             ServoInterface* servo);
+
   enum State {
     kUnpowered,
     kActive,
