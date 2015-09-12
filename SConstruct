@@ -12,17 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-canonenv = Environment()
-canonenv.Append(CPPFLAGS=['-Wall', '-Werror', '-g', '-std=c++1y'])
+env = Environment()
 
+# Set up our global environment.
 if ARGUMENTS.get('debug', 0):
-    canonenv.Append(CPPFLAGS=['-O0'])
+    env.Append(CPPFLAGS=['-O0'])
 else:
-    canonenv.Append(CPPFLAGS=['-O3'])
+    env.Append(CPPFLAGS=['-O3'])
 
+env.Append(CPPFLAGS=['-Wall', '-Werror', '-g', '-std=c++1y'])
+env.Append(LINKFLAGS=['-rdynamic'])
+env.Append(LIBS=['snappy',
+                 'boost_system',
+                 'boost_program_options',
+                 'pthread',
+                 'rt'])
+
+env.ParseConfig('pkg-config --cflags --libs eigen3')
+
+canonenv = env
 Export('canonenv')
 
-SConscript(['imu/SConscript'], variant_dir='imu/build')
-SConscript(['legtool/src/SConscript'], variant_dir='legtool/src/build',
-           duplicate=0)
-SConscript(['legtool/SConscript', 'scoring/manager/SConscript' ])
+subdirs = ['base', 'mech', 'python', 'legtool']
+for subdir in subdirs:
+    SConscript(subdir + '/SConscript',
+               variant_dir=subdir + '/build',
+               duplicate=0)
