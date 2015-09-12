@@ -46,11 +46,22 @@ class PropertyTreeWriteArchive
   template <typename Value>
   void VisitHelper(std::vector<Value>* value_vector,
                    ptree* tree, int) {
-    for (int i = 0; i < value_vector->size(); i++) {
+    DoArray(value_vector, tree);
+  }
+
+  template <typename Array>
+  void DoArray(Array* array, ptree* tree) {
+    for (int i = 0; i < array->size(); i++) {
       ptree element;
-      VisitHelper(&(*value_vector)[i], &element, 0);
+      VisitHelper(&(*array)[i], &element, 0);
       tree->push_back(ptree::value_type("", element));
     }
+  }
+
+  template <typename Value, size_t N>
+  void VisitHelper(std::array<Value, N>* value_array,
+                   ptree* tree, int) {
+    DoArray(value_array, tree);
   }
 
   template <typename Value>
