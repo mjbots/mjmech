@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
         <item>
          <widget class="QFrame" name="plotFrame">
@@ -117,6 +117,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="stepBackSpin">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -127,6 +130,9 @@
           </item>
           <item row="1" column="5">
            <widget class="QDoubleSpinBox" name="stepForwardSpin">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -155,7 +161,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTreeWidget" name="treeWidget">
