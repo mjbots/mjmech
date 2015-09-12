@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <tuple>
+
 namespace legtool {
 
 template <typename T>
