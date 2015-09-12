@@ -68,6 +68,7 @@ pytelemetry = bpenv.SharedLibrary(
 
 TESTS = ['test/' + x for x in [
         'comm_test.cc',
+        'json_archive_test.cc',
         'herkulex_test.cc',
         'leg_ik_test.cc',
         'test_main.cc',
