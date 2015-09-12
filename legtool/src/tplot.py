@@ -34,6 +34,16 @@ import ui_tplot_main_window
 
 import telemetry_log
 
+AXES = ['Left', 'Right', '3', '4']
+
+LEGEND_LOC = {
+    'Left': 2,
+    'Right': 1,
+    '3': 7,
+    '4': 4
+    }
+
+
 class BoolGuard(object):
     def __init__(self):
         self.value = False
@@ -130,6 +140,8 @@ class Tplot(QtGui.QMainWindow):
         self.canvas = FigureCanvas(self.figure)
 
         self.canvas.mpl_connect('motion_notify_event', self.handle_mouse)
+        self.canvas.mpl_connect('key_press_event', self.handle_key_press)
+        self.canvas.mpl_connect('key_release_event', self.handle_key_release)
 
         # Make QT drawing not be super slow.  See:
         # https://github.com/matplotlib/matplotlib/issues/2559/
@@ -140,13 +152,20 @@ class Tplot(QtGui.QMainWindow):
         self.canvas.draw = draw
 
         self.left_axis = self.figure.add_subplot(111)
-        self.left_axis.legend()
+        self.left_axis.tplot_name = 'Left'
+
+        self.axes = {
+            'Left' : self.left_axis,
+            }
 
         layout = QtGui.QVBoxLayout(self.ui.plotFrame)
         layout.addWidget(self.canvas, 1)
 
         self.toolbar = backend_qt4agg.NavigationToolbar2QT(self.canvas, self)
         self.addToolBar(self.toolbar)
+
+        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.canvas.setFocus()
 
         self.log = None
         self.COLORS = 'rgbcmyk'
@@ -287,20 +306,42 @@ class Tplot(QtGui.QMainWindow):
             line.tplot_has_timestamp = True
         line.tplot_xname = xname
         line.tplot_yname = yname
-        label = '%s %s vs. %s' % (record, xname, yname)
+        label = self.make_label(record, xname, yname)
         line.set_label(label)
         line.set_color(self.COLORS[self.next_color])
         self.next_color = (self.next_color + 1) % len(self.COLORS)
-        self.left_axis.add_line(line)
-        self.left_axis.relim()
-        self.left_axis.autoscale_view()
 
-        self.left_axis.legend()
+        axis = self.get_current_axis()
+
+        axis.add_line(line)
+        axis.relim()
+        axis.autoscale_view()
+        axis.legend(loc=LEGEND_LOC[axis.tplot_name])
 
         self.ui.plotsCombo.addItem(label, line)
         self.ui.plotsCombo.setCurrentIndex(self.ui.plotsCombo.count() - 1)
 
         self.canvas.draw()
+
+    def make_label(self, record, xname, yname):
+        if xname == 'timestamp':
+            return '%s.%s' % (record, yname)
+        return '%s %s vs. %s' % (record, yname, xname)
+
+    def get_current_axis(self):
+        requested = self.ui.axisCombo.currentText()
+        maybe_result = self.axes.get(requested, None)
+        if maybe_result:
+            return maybe_result
+
+        result = self.left_axis.twinx()
+        self.axes[requested] = result
+        result.tplot_name = requested
+
+        return result
+
+    def get_all_axes(self):
+        return self.axes.values()
 
     def handle_remove_button(self):
         index = self.ui.plotsCombo.currentIndex()
@@ -345,6 +386,22 @@ class Tplot(QtGui.QMainWindow):
         if not event.inaxes:
             return
         self.statusBar().showMessage('%f,%f' % (event.xdata, event.ydata))
+
+    def handle_key_press(self, event):
+        if event.key not in ['1', '2', '3', '4']:
+            return
+        index = ord(event.key) - ord('1')
+        for key, value in self.axes.iteritems():
+            if key == AXES[index]:
+                value.set_navigate(True)
+            else:
+                value.set_navigate(False)
+
+    def handle_key_release(self, event):
+        if event.key not in ['1', '2', '3', '4']:
+            return
+        for key, value in self.axes.iteritems():
+            value.set_navigate(True)
 
     def update_time(self, new_time, update_slider=True):
         new_time = max(self.time_start, min(self.time_end, new_time))
@@ -397,29 +454,30 @@ class Tplot(QtGui.QMainWindow):
 
     def update_plot_dots(self, new_time):
         updated = False
-        for line in self.left_axis.lines:
-            if not hasattr(line, 'tplot_record_name'):
-                continue
-            if not hasattr(line, 'tplot_has_timestamp'):
-                continue
+        for axis in self.get_all_axes():
+            for line in axis.lines:
+                if not hasattr(line, 'tplot_record_name'):
+                    continue
+                if not hasattr(line, 'tplot_has_timestamp'):
+                    continue
 
-            all_data = self.log.all[line.tplot_record_name]
-            this_index = _bisect(all_data, new_time, lambda x: x.timestamp)
-            if this_index is None:
-                continue
+                all_data = self.log.all[line.tplot_record_name]
+                this_index = _bisect(all_data, new_time, lambda x: x.timestamp)
+                if this_index is None:
+                    continue
 
-            this_data = all_data[this_index]
+                this_data = all_data[this_index]
 
-            if not hasattr(line, 'tplot_marker'):
-                line.tplot_marker = matplotlib.lines.Line2D([], [])
-                line.tplot_marker.set_marker('o')
-                line.tplot_marker.set_color(line._color)
-                self.left_axis.add_line(line.tplot_marker)
+                if not hasattr(line, 'tplot_marker'):
+                    line.tplot_marker = matplotlib.lines.Line2D([], [])
+                    line.tplot_marker.set_marker('o')
+                    line.tplot_marker.set_color(line._color)
+                    self.left_axis.add_line(line.tplot_marker)
 
-            updated = True
-            xdata = [_get_data(this_data, line.tplot_xname)]
-            ydata = [_get_data(this_data, line.tplot_yname)]
-            line.tplot_marker.set_data(xdata, ydata)
+                updated = True
+                xdata = [_get_data(this_data, line.tplot_xname)]
+                ydata = [_get_data(this_data, line.tplot_yname)]
+                line.tplot_marker.set_data(xdata, ydata)
 
         if updated:
             self.canvas.draw()
