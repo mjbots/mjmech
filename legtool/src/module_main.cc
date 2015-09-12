@@ -14,13 +14,17 @@
 
 #include MODULE_HEADER_FILE
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options.hpp>
 
 #include "fail.h"
+#include "handler_util.h"
 #include "program_options_archive.h"
 #include "telemetry_log.h"
 #include "telemetry_log_registrar.h"
 #include "telemetry_registry.h"
+#include "telemetry_remote_debug_registrar.h"
+#include "telemetry_remote_debug_server.h"
 
 using namespace legtool;
 
@@ -28,7 +32,10 @@ namespace {
 struct Context {
   boost::asio::io_service service;
   TelemetryLog telemetry_log;
-  TelemetryRegistry<TelemetryLogRegistrar> telemetry_registry{&telemetry_log};
+  TelemetryRemoteDebugServer remote_debug{service};
+  TelemetryRegistry<TelemetryLogRegistrar,
+                    TelemetryRemoteDebugRegistrar> telemetry_registry{
+    &telemetry_log, &remote_debug};
 };
 
 int safe_main(int argc, char**argv) {
@@ -50,6 +57,8 @@ int safe_main(int argc, char**argv) {
        "disable real-time signals and other debugging hindrances")
       ;
 
+  ProgramOptionsArchive(&desc, "remote_debug.").Accept(
+      context.remote_debug.parameters());
   ProgramOptionsArchive(&desc).Accept(module.parameters());
 
   po::variables_map vm;
@@ -71,10 +80,15 @@ int safe_main(int argc, char**argv) {
     context.telemetry_log.Open(log_file);
   }
 
-  module.AsyncStart([=](ErrorCode ec) {
-      FailIf(ec);
-      if (debug) { std::cout << "Started!\n"; }
-    });
+  std::shared_ptr<ErrorHandlerJoiner> joiner =
+      std::make_shared<ErrorHandlerJoiner>(
+          [=](ErrorCode ec) {
+            FailIf(ec);
+            if (debug) { std::cout << "Started!\n"; }
+          });
+
+  context.remote_debug.AsyncStart(joiner->Wrap("starting remote_debug"));
+  module.AsyncStart(joiner->Wrap("starting main module"));
 
   context.service.run();
   return 0;
