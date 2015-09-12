@@ -1,8 +1,0 @@
-# Copyright 2015 Josh Pieper, jjp@pobox.com.  All right reserved.
-
-Import('canonenv')
-
-env = canonenv.Clone()
-
-env.Command('ui_tplot_main_window.py', 'tplot_main_window.ui',
-            'pyside-uic $SOURCE -o $TARGET')
