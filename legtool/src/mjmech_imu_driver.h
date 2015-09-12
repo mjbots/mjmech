@@ -57,6 +57,8 @@ class MjmechImuDriver : boost::noncopyable {
     double roll_deg = 0;
     double pitch_deg = 0;
     double yaw_deg = 0;
+    Point3D gyro_scale = Point3D(1, 1, 1);
+    Point3D accel_scale = Point3D(1, 1, 1);
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -69,11 +71,21 @@ class MjmechImuDriver : boost::noncopyable {
       a->Visit(LT_NVP(roll_deg));
       a->Visit(LT_NVP(pitch_deg));
       a->Visit(LT_NVP(yaw_deg));
+      a->Visit(LT_NVP(gyro_scale));
+      a->Visit(LT_NVP(accel_scale));
     }
   };
 
   Parameters* parameters() { return &parameters_; }
 
+  /// Data recorded here should have the following conventions:
+  ///
+  ///  +x axis is to the right
+  ///  +y axis is forward
+  ///  +z axis is up
+  ///
+  ///  Positive rotations are clockwise while looking down the
+  ///  relevant axis.
   struct ImuData {
     boost::posix_time::ptime timestamp;
     Point3D accel_mps2;
@@ -98,6 +110,9 @@ class MjmechImuDriver : boost::noncopyable {
     double pitch_deg = 0;
     double yaw_deg = 0;
 
+    Point3D gyro_scale = Point3D(1, 1, 1);
+    Point3D accel_scale = Point3D(1, 1, 1);
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(LT_NVP(timestamp));
@@ -108,6 +123,8 @@ class MjmechImuDriver : boost::noncopyable {
       a->Visit(LT_NVP(roll_deg));
       a->Visit(LT_NVP(pitch_deg));
       a->Visit(LT_NVP(yaw_deg));
+      a->Visit(LT_NVP(gyro_scale));
+      a->Visit(LT_NVP(accel_scale));
     }
   };
 

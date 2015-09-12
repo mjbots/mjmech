@@ -236,6 +236,8 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       imu_config_.roll_deg = parameters_.roll_deg;
       imu_config_.pitch_deg = parameters_.pitch_deg;
       imu_config_.yaw_deg = parameters_.yaw_deg;
+      imu_config_.gyro_scale = parameters_.gyro_scale;
+      imu_config_.accel_scale = parameters_.accel_scale;
 
       service_.post(std::bind(&Impl::SendConfig, this, imu_config_));
 
@@ -306,21 +308,28 @@ class MjmechImuDriver::Impl : boost::noncopyable {
       Point3D accel_mps2;
 
       accel_mps2.x =
-          to_int16(adata[1], adata[2]) * kAccelSensitivity * kGravity;
+          to_int16(adata[1], adata[2]) * kAccelSensitivity * kGravity *
+          parameters_.accel_scale.x;
       accel_mps2.y =
-          to_int16(adata[3], adata[4]) * kAccelSensitivity * kGravity;
+          to_int16(adata[3], adata[4]) * kAccelSensitivity * kGravity *
+          parameters_.accel_scale.y;
       accel_mps2.z =
-          to_int16(adata[5], adata[6]) * kAccelSensitivity * kGravity;
+          to_int16(adata[5], adata[6]) * kAccelSensitivity * kGravity *
+          parameters_.accel_scale.z;
 
       imu_data.accel_mps2 = transform_.Rotate(accel_mps2);
 
       Point3D body_rate_deg_s;
       body_rate_deg_s.x =
-          to_int16(gdata[1], gdata[2]) * kGyroSensitivity;
+          to_int16(gdata[1], gdata[2]) * kGyroSensitivity *
+          parameters_.gyro_scale.x;
       body_rate_deg_s.y =
-          to_int16(gdata[3], gdata[4]) * kGyroSensitivity;
+          to_int16(gdata[3], gdata[4]) * kGyroSensitivity *
+          parameters_.gyro_scale.y;
       body_rate_deg_s.z =
-          to_int16(gdata[5], gdata[6]) * kGyroSensitivity;
+          to_int16(gdata[5], gdata[6]) * kGyroSensitivity *
+          parameters_.gyro_scale.z;
+
       imu_data.body_rate_deg_s = transform_.Rotate(body_rate_deg_s);
 
       service_.post(std::bind(&Impl::SendData, this, imu_data));
