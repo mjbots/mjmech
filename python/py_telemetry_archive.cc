@@ -19,7 +19,7 @@
 
 namespace {
 namespace bp = boost::python;
-using namespace legtool;
+using namespace mjmech::base;
 typedef TelemetryFormat TF;
 
 bp::object g_collections = bp::import("collections");

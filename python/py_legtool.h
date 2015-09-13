@@ -23,7 +23,8 @@ void ExportServo();
 void ExportTf();
 void ExportLegIK();
 
-namespace legtool {
+namespace mjmech {
+namespace python {
 boost::python::object ConvertPtree(const boost::property_tree::ptree&);
 
 template <typename Serializable>
@@ -39,7 +40,7 @@ Serializable SerializableReadSettings(boost::python::object dict) {
   std::istringstream istr(json_str);
   boost::property_tree::read_json(istr, tree);
 
-  PropertyTreeReadArchive(tree).Accept(&object);
+  base::PropertyTreeReadArchive(tree).Accept(&object);
   return object;
 }
 
@@ -48,7 +49,7 @@ void SerializableWriteSettings(const Serializable* object,
                                boost::python::object out) {
   namespace bp = boost::python;
 
-  auto tree = PropertyTreeWriteArchive().
+  auto tree = base::PropertyTreeWriteArchive().
       Accept(const_cast<Serializable*>(object)).tree();
   // Copy this property tree into the python output dict.
   bp::object result = ConvertPtree(tree);
@@ -59,4 +60,5 @@ void SerializableWriteSettings(const Serializable* object,
   }
 }
 
+}
 }

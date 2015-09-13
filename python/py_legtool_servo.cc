@@ -20,7 +20,8 @@
 
 #include "py_legtool.h"
 
-using namespace legtool;
+using namespace mjmech::base;
+using namespace mjmech::mech;
 namespace bp = boost::python;
 
 typedef StreamFactory<StdioGenerator,

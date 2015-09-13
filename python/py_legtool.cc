@@ -19,10 +19,13 @@
 
 #include "py_legtool.h"
 
-using namespace legtool;
+using namespace mjmech::base;
+using namespace mjmech::mech;
+using namespace mjmech::python;
 namespace bp = boost::python;
 
-namespace legtool {
+namespace mjmech {
+namespace python {
 bp::object ConvertPtree(const boost::property_tree::ptree& tree) {
   if (tree.empty()) {
     return bp::str(tree.get_value<std::string>());
@@ -40,6 +43,7 @@ bp::object ConvertPtree(const boost::property_tree::ptree& tree) {
     }
     return result;
   }
+}
 }
 }
 

@@ -21,7 +21,9 @@
 
 #include "py_legtool.h"
 
-using namespace legtool;
+using namespace mjmech::base;
+using namespace mjmech::mech;
+using namespace mjmech::python;
 
 void ExportLegIK() {
   using namespace boost::python;

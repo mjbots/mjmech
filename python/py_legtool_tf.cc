@@ -21,7 +21,7 @@
 
 #include "py_legtool.h"
 
-using namespace legtool;
+using namespace mjmech::base;
 
 namespace {
 const Frame* GetFrameParent(const Frame* frame) {
