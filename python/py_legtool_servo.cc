@@ -14,9 +14,10 @@
 
 #include <boost/python.hpp>
 
-#include "comm_factory.h"
-#include "herkulex.h"
-#include "herkulex_servo_interface.h"
+#include "base/comm_factory.h"
+#include "mech/herkulex.h"
+#include "mech/herkulex_servo_interface.h"
+
 #include "py_legtool.h"
 
 using namespace legtool;

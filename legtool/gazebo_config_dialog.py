@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
+
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-from . import ui_gazebo_config_dialog
+SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(SCRIPT_PATH, 'build'))
+
+import ui_gazebo_config_dialog
 
 class GazeboConfigDialog(QtGui.QDialog):
     def __init__(self, model_name, servo_name_map):
@@ -53,7 +59,7 @@ class GazeboConfigDialog(QtGui.QDialog):
                 'label': label,
                 'edit': edit,
                 }
-            
+
 
     def model_name(self):
         return self.ui.modelNameEdit.text()

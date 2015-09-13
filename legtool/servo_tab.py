@@ -23,13 +23,12 @@ from trollius import Task, From, Return
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-from .common import BoolContext
+from common import BoolContext
 
-from . import gazebo_config_dialog
+import gazebo_config_dialog
 
-sys.path.append(
-    os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), '../../src/build'))
+SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(SCRIPT_PATH, '../python/build'))
 import _legtool
 
 def spawn(callback):

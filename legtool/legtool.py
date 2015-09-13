@@ -26,18 +26,21 @@ import sys
 import trollius
 import trollius as asyncio
 
-from legtool.async import trollius_trace
 
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-from legtool.async import asyncio_qt
+import trollius_trace
+import asyncio_qt
+
+SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(SCRIPT_PATH, 'build'))
 
 import ui_legtool_main_window
 
-from legtool.tabs.servo_tab import ServoTab
-from legtool.tabs.ik_config_tab import IkConfigTab
-from legtool.tabs.gait_tab import GaitTab
+from servo_tab import ServoTab
+from ik_config_tab import IkConfigTab
+from gait_tab import GaitTab
 
 class LegTool(QtGui.QMainWindow):
     DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/legtool/legtool.ini')

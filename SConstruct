@@ -20,6 +20,7 @@ if ARGUMENTS.get('debug', 0):
 else:
     env.Append(CPPFLAGS=['-O3'])
 
+env.Append(CPPPATH=['#/'])
 env.Append(CPPFLAGS=['-Wall', '-Werror', '-g', '-std=c++1y'])
 env.Append(LINKFLAGS=['-rdynamic'])
 env.Append(LIBS=['snappy',
@@ -33,7 +34,7 @@ env.ParseConfig('pkg-config --cflags --libs eigen3')
 canonenv = env
 Export('canonenv')
 
-subdirs = ['base', 'mech', 'python', 'legtool']
+subdirs = ['base', 'mech', 'python', 'legtool', 'tools']
 for subdir in subdirs:
     SConscript(subdir + '/SConscript',
                variant_dir=subdir + '/build',

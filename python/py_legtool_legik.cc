@@ -16,8 +16,9 @@
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-#include "leg_ik.h"
-#include "property_tree_archive.h"
+#include "base/property_tree_archive.h"
+#include "mech/leg_ik.h"
+
 #include "py_legtool.h"
 
 using namespace legtool;

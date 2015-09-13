@@ -25,16 +25,15 @@ from trollius import From, Task
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 
-sys.path.append(
-    os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), '../../src/build'))
+SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(SCRIPT_PATH, '../python/build'))
 import _legtool
 
-from . import convexhull
-from . import settings
+import convexhull
+import settings
 
-from .common import BoolContext
-from . import graphics_scene
+from common import BoolContext
+import graphics_scene
 
 PLAYBACK_TIMEOUT_MS = 40
 

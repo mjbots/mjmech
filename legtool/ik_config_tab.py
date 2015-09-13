@@ -20,15 +20,14 @@ import PySide.QtGui as QtGui
 
 from trollius import Task
 
-sys.path.append(
-    os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), '../../src/build'))
+SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(SCRIPT_PATH, '../../python/build'))
 import _legtool
 from _legtool import Point3D
 
-from .common import BoolContext
-from . import settings
-from . import graphics_scene
+from common import BoolContext
+import settings
+import graphics_scene
 
 class LegConfig(object):
     present = False

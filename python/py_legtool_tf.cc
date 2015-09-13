@@ -16,9 +16,10 @@
 
 #include <boost/format.hpp>
 
-#include "point3d.h"
+#include "base/point3d.h"
+#include "base/tf.h"
+
 #include "py_legtool.h"
-#include "tf.h"
 
 using namespace legtool;
 

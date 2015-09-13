@@ -1,4 +1,4 @@
-# Copyright 2014 Josh Pieper, jjp@pobox.com.
+# Copyright 2014-2015 Josh Pieper, jjp@pobox.com.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,5 @@
 Import('canonenv')
 env = canonenv.Clone()
 
-env.Command('ui_legtool_main_window.py', 'legtool_main_window.ui',
-            'pyside-uic $SOURCE -o $TARGET')
-
-env.Command('ui_gazebo_config_dialog.py',
-            'gazebo_config_dialog.ui',
+env.Command('ui_tplot_main_window.py', 'tplot_main_window.ui',
             'pyside-uic $SOURCE -o $TARGET')

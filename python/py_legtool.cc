@@ -14,9 +14,10 @@
 
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-#include "gait.h"
+#include "mech/gait.h"
+#include "mech/ripple.h"
+
 #include "py_legtool.h"
-#include "ripple.h"
 
 using namespace legtool;
 namespace bp = boost::python;

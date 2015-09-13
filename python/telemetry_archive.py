@@ -18,8 +18,8 @@ import os
 import struct
 import sys
 
-script_path = sys.path[0]
-sys.path.append(os.path.join(script_path, 'build'))
+SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(SCRIPT_PATH, 'build'))
 
 from _telemetry_archive import *
 

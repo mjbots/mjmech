@@ -14,8 +14,8 @@
 
 #include <boost/python.hpp>
 
-#include "fast_stream.h"
-#include "telemetry_format.h"
+#include "base/fast_stream.h"
+#include "base/telemetry_format.h"
 
 namespace {
 namespace bp = boost::python;
