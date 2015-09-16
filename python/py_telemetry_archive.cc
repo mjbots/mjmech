@@ -23,11 +23,18 @@ using namespace mjmech::base;
 typedef TelemetryFormat TF;
 
 bp::object g_collections = bp::import("collections");
+bp::object g_main_module = bp::import("__main__");
+bp::object g_main_namespace = g_main_module.attr("__dict__");
 
 template <typename Base>
 class RecordingStream {
  public:
   RecordingStream(Base& base) : base_(base) {}
+
+  void ignore(size_t length) {
+    char buffer[length];
+    read(buffer, length);
+  }
 
   void read(char* buffer, size_t length) {
     base_.read(buffer, length);
@@ -43,6 +50,49 @@ class RecordingStream {
   size_t last_read_ = 0;
   Base& base_;
 };
+
+std::string FormatDict(bp::dict enum_items) {
+  std::ostringstream ostr;
+  ostr << "{";
+  bp::list items = enum_items.items();
+  for (int i = 0; i < bp::len(items); i++) {
+    int key = bp::extract<int>(items[i][0]);
+    std::string value = bp::extract<std::string>(items[i][1]);
+    ostr << boost::format("%d:\"%s\",") % key % value;
+  }
+  ostr << "}";
+  return ostr.str();
+}
+
+bp::object MakeEnumType(const std::string& field_name,
+                        bp::dict enum_items) {
+  bp::dict globals = bp::extract<bp::dict>(g_main_namespace);
+  bp::dict locals;
+
+  bp::exec(bp::str((boost::format(R"XX(
+class %1%(int):
+  __slots__ = ()
+  __fields__ = ('enum_items')
+
+  def __new__(_cls, value):
+    if isinstance(value, str):
+      if '(' in value:
+        value = int(value.split('(', 1)[1].split(')', 1)[0])
+      else:
+        value = int(value)
+    return int.__new__(_cls, value)
+
+  enum_items = %2%
+
+  def __repr__(self):
+    if self in self.enum_items:
+      return "'%%s(%%d)'" %% (self.enum_items[self], self)
+    return '%%s' %% self
+)XX") % field_name % FormatDict(enum_items)).str()),
+                  globals, locals);
+
+  return locals[field_name];
+}
 
 class ReadArchive {
  public:
@@ -210,7 +260,21 @@ class ReadArchive {
         break;
       }
       case TF::FieldType::kEnum: {
-        throw SystemError::einval("not implemented");
+        uint32_t size = stream.template Read<uint32_t>();
+        if (ignore) {
+          stream.Ignore(size);
+        } else {
+          uint32_t nvalues = stream.template Read<uint32_t>();
+          bp::dict enum_items;
+          for (uint32_t i = 0; i < nvalues; i++) {
+            uint32_t key = stream.template Read<uint32_t>();
+            std::string value = stream.ReadString();
+            enum_items[key] = value;
+          }
+          result["enum_items"] = enum_items;
+          result["enum_type"] = MakeEnumType(field_name, enum_items);
+        }
+        break;
       }
       case TF::FieldType::kFinal: {
         break;
@@ -353,7 +417,11 @@ class ReadArchive {
         return list_result[0];
       }
       case TF::FieldType::kEnum: {
-        throw SystemError::einval("not implemented");
+        uint32_t size = schema_stream.template Read<uint32_t>();
+        schema_stream.Ignore(size);
+
+        return field_result["enum_type"](
+            data_stream.template Read<uint32_t>());
       }
       case TF::FieldType::kFinal: {
         throw SystemError::einval("invalid state");
