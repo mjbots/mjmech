@@ -8,6 +8,8 @@ r1 defects
   * would be nice to have sensing for 5V, 1.8V, and battery rail
     voltage
   * silk screen for top facing JST XH connectors is backwards
+  * weapon connector would be better placed in opening further from
+    center so that it is not under the turret when rotated
 
 
  * update all part numbers based on macrofab run
