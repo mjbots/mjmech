@@ -236,8 +236,8 @@ static void handle_RAMREAD_cmd() {
   uint8_t i;
   rx.val.data[0] = addr;
   rx.val.data[1] = count;
-  for (i=2; i<count; i++) {
-    rx.val.data[i] = handle_ram_read(addr);
+  for (i=0; i<count; i++) {
+    rx.val.data[i+2] = handle_ram_read(addr);
     addr++;
   }
   i++;
