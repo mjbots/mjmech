@@ -292,8 +292,8 @@ MAX3223-MAX3243.pdf</description>
 <wire x1="-1.1" y1="1.1" x2="-1.4" y2="1.1" width="0.127" layer="21"/>
 <wire x1="-1.4" y1="0.8" x2="-1.1" y2="1.1" width="0.127" layer="21"/>
 <text x="-1.4" y="1.5" size="1.27" layer="21">&gt;NAME</text>
-<pad name="G1" x="0" y="0.4" drill="0.3" diameter="0.6096"/>
-<pad name="G2" x="0" y="-0.4" drill="0.3" diameter="0.6096"/>
+<pad name="G1" x="0" y="0.4" drill="0.3048" diameter="0.6096"/>
+<pad name="G2" x="0" y="-0.4" drill="0.3048" diameter="0.6096"/>
 </package>
 <package name="JST_XH_SMT_RA_4">
 <smd name="3" x="1.25" y="4.6" dx="4.5" dy="1.3" layer="1" rot="R90"/>
@@ -522,14 +522,14 @@ MAX3223-MAX3243.pdf</description>
 <smd name="27" x="2.8" y="3.575" dx="1.6" dy="0.3" layer="1" rot="R180"/>
 <smd name="28" x="2.8" y="4.225" dx="1.6" dy="0.3" layer="1" rot="R180"/>
 <smd name="G0" x="0" y="0" dx="5.2" dy="3.1" layer="1" rot="R90"/>
-<pad name="G7" x="-1" y="-2" drill="0.3" rot="R90"/>
-<pad name="G4" x="-1" y="0" drill="0.3" rot="R90"/>
-<pad name="G1" x="-1" y="2" drill="0.3" rot="R90"/>
-<pad name="G6" x="0" y="-1" drill="0.3" rot="R90"/>
-<pad name="G3" x="0" y="1" drill="0.3" rot="R90"/>
-<pad name="G8" x="1" y="-2" drill="0.3" rot="R90"/>
-<pad name="G5" x="1" y="0" drill="0.3" rot="R90"/>
-<pad name="G2" x="1" y="2" drill="0.3" rot="R90"/>
+<pad name="G7" x="-1" y="-2" drill="0.3048" rot="R90"/>
+<pad name="G4" x="-1" y="0" drill="0.3048" rot="R90"/>
+<pad name="G1" x="-1" y="2" drill="0.3048" rot="R90"/>
+<pad name="G6" x="0" y="-1" drill="0.3048" rot="R90"/>
+<pad name="G3" x="0" y="1" drill="0.3048" rot="R90"/>
+<pad name="G8" x="1" y="-2" drill="0.3048" rot="R90"/>
+<pad name="G5" x="1" y="0" drill="0.3048" rot="R90"/>
+<pad name="G2" x="1" y="2" drill="0.3048" rot="R90"/>
 <wire x1="-2.2" y1="5" x2="-2.2" y2="4.6" width="0.127" layer="21"/>
 <wire x1="-2.2" y1="4.6" x2="-2.2" y2="-5" width="0.127" layer="21"/>
 <wire x1="-2.2" y1="-5" x2="2.2" y2="-5" width="0.127" layer="21"/>
