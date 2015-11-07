@@ -1,0 +1,39 @@
+   * BOM
+     * power in + serial connector
+     * +12V boost - TPS55330
+     * down buck for uC - TPS62172 (3.3V)
+     * yaw absolute encoder - AS5048B
+     * connector for remote pitch absolute encoder (AS5048B)
+     * connector for two BMI 160 IMUs
+     * 2x L6234PD BLDC drivers
+     * 2x connectors for brushless motor
+     * micro USB connector for diagnostics - 609-4618-1-ND
+     * USB in connector
+     * USB out connector for camera
+     * programming connector
+     * fire control
+        * MC33926 Freescale
+        * macrofab house mosfet for laser
+     * processor STM32F411CEU6
+     * some switch or button for arming?  maybe a soft switch?
+     * indicator for armed
+     * indicator for general power
+     * indicator for status
+     * indicator for serial comms
+
+   * TODO
+     * Add switch for arming weapon
+     * Add indicator LEDs
+     * maybe have way to adjust voltage on 12V rail?
+     * Label all ICs and parts with useful names
+     * Normalize fonts on silk screen
+       * Remove values from silk screen
+     * Route power
+
+   * mounted on gimbal platform immediately above yaw motor
+   * Make the yaw measurement actually compensated for pitch properly
+     * only worth doing once I re-write it all to use quaternions
+   * 3D printed gimbal is missing center holes for both the swivel hub
+     and the gimbal motor
+   * 3D printed gimbal is a little more flexible than is desired in
+     several axes
