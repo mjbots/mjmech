@@ -2592,8 +2592,12 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="C22" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
 <part name="C23" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
 <part name="C20" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C19" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF"/>
-<part name="C18" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF"/>
+<part name="C19" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF">
+<attribute name="DPN" value="311-1455-1-ND"/>
+</part>
+<part name="C18" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF">
+<attribute name="DPN" value="311-1455-1-ND"/>
+</part>
 <part name="C11" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
 <part name="C12" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.047uF"/>
 <part name="C10" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF"/>
@@ -2611,6 +2615,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="C3" library="mfpassives" deviceset="CAPACITOR_NP" device="_1210" value="22uF 16V">
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
+<part name="SUPPLY5" library="supply2" deviceset="+8V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2723,8 +2728,12 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="C22" gate="G$1" x="43.18" y="-243.84"/>
 <instance part="C23" gate="G$1" x="35.56" y="-243.84"/>
 <instance part="C20" gate="G$1" x="58.42" y="-243.84"/>
-<instance part="C19" gate="G$1" x="68.58" y="-243.84"/>
-<instance part="C18" gate="G$1" x="144.78" y="-248.92"/>
+<instance part="C19" gate="G$1" x="68.58" y="-243.84">
+<attribute name="DPN" x="68.58" y="-243.84" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C18" gate="G$1" x="144.78" y="-248.92">
+<attribute name="DPN" x="144.78" y="-248.92" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C11" gate="G$1" x="-15.24" y="-167.64"/>
 <instance part="C12" gate="G$1" x="-25.4" y="-167.64"/>
 <instance part="C10" gate="G$1" x="81.28" y="-127"/>
@@ -2742,6 +2751,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="C3" gate="G$1" x="139.7" y="-152.4">
 <attribute name="DPN" x="139.7" y="-152.4" size="1.778" layer="96" display="off"/>
 </instance>
+<instance part="SUPPLY5" gate="+8V" x="121.92" y="-121.92"/>
 </instances>
 <busses>
 </busses>
@@ -3116,33 +3126,6 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="246.38" y1="-149.86" x2="259.08" y2="-149.86" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$4" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="VPWR"/>
-<wire x1="228.6" y1="-139.7" x2="233.68" y2="-139.7" width="0.1524" layer="91"/>
-<wire x1="233.68" y1="-139.7" x2="233.68" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="233.68" y1="-124.46" x2="152.4" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="152.4" y1="-124.46" x2="139.7" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="139.7" y1="-124.46" x2="139.7" y2="-147.32" width="0.1524" layer="91"/>
-<wire x1="139.7" y1="-124.46" x2="129.54" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="129.54" y1="-124.46" x2="129.54" y2="-147.32" width="0.1524" layer="91"/>
-<junction x="139.7" y="-124.46"/>
-<wire x1="129.54" y1="-124.46" x2="116.84" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="116.84" y1="-124.46" x2="116.84" y2="-147.32" width="0.1524" layer="91"/>
-<junction x="129.54" y="-124.46"/>
-<wire x1="233.68" y1="-124.46" x2="241.3" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="241.3" y1="-124.46" x2="241.3" y2="-129.54" width="0.1524" layer="91"/>
-<junction x="233.68" y="-124.46"/>
-<pinref part="C5" gate="G$1" pin="P$1"/>
-<junction x="241.3" y="-129.54"/>
-<pinref part="C4" gate="G$1" pin="P$1"/>
-<wire x1="152.4" y1="-144.78" x2="152.4" y2="-124.46" width="0.1524" layer="91"/>
-<junction x="152.4" y="-124.46"/>
-<pinref part="C1" gate="G$1" pin="P$1"/>
-<pinref part="C2" gate="G$1" pin="P$1"/>
-<pinref part="C3" gate="G$1" pin="P$1"/>
-</segment>
-</net>
 <net name="N$5" class="0">
 <segment>
 <wire x1="241.3" y1="-139.7" x2="241.3" y2="-142.24" width="0.1524" layer="91"/>
@@ -3512,6 +3495,34 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="SUPPLY4" gate="+8V" pin="+8V"/>
 <pinref part="R8" gate="G$1" pin="P$2"/>
 <wire x1="220.98" y1="-271.78" x2="220.98" y2="-274.32" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="VPWR"/>
+<wire x1="228.6" y1="-139.7" x2="233.68" y2="-139.7" width="0.1524" layer="91"/>
+<wire x1="233.68" y1="-139.7" x2="233.68" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="233.68" y1="-124.46" x2="152.4" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="152.4" y1="-124.46" x2="139.7" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="-124.46" x2="139.7" y2="-147.32" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="-124.46" x2="129.54" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="129.54" y1="-124.46" x2="129.54" y2="-147.32" width="0.1524" layer="91"/>
+<junction x="139.7" y="-124.46"/>
+<wire x1="129.54" y1="-124.46" x2="121.92" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="121.92" y1="-124.46" x2="116.84" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="-124.46" x2="116.84" y2="-147.32" width="0.1524" layer="91"/>
+<junction x="129.54" y="-124.46"/>
+<wire x1="233.68" y1="-124.46" x2="241.3" y2="-124.46" width="0.1524" layer="91"/>
+<wire x1="241.3" y1="-124.46" x2="241.3" y2="-129.54" width="0.1524" layer="91"/>
+<junction x="233.68" y="-124.46"/>
+<pinref part="C5" gate="G$1" pin="P$1"/>
+<junction x="241.3" y="-129.54"/>
+<pinref part="C4" gate="G$1" pin="P$1"/>
+<wire x1="152.4" y1="-144.78" x2="152.4" y2="-124.46" width="0.1524" layer="91"/>
+<junction x="152.4" y="-124.46"/>
+<pinref part="C1" gate="G$1" pin="P$1"/>
+<pinref part="C2" gate="G$1" pin="P$1"/>
+<pinref part="C3" gate="G$1" pin="P$1"/>
+<pinref part="SUPPLY5" gate="+8V" pin="+8V"/>
+<junction x="121.92" y="-124.46"/>
 </segment>
 </net>
 <net name="N$16" class="0">

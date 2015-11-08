@@ -1,7 +1,8 @@
  * TODO
-   * maybe have way to adjust voltage on 12V rail?
+   * add I2C pullup resistors (plan on high speed operation)
    * select all parts
    * Label all ICs and parts with useful names
+   * Clean up placement and ensure alignment where we can
    * Normalize fonts on silk screen
      * Remove values from silk screen
    * Route power
