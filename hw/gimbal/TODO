@@ -1,8 +1,5 @@
  * TODO
-   * Add switch for arming weapon
-   * Add indicator LEDs
    * maybe have way to adjust voltage on 12V rail?
-   * Update all resistors and caps to the MF passive library
    * select all parts
    * Label all ICs and parts with useful names
    * Normalize fonts on silk screen
@@ -43,3 +40,6 @@
 
 DONE 2015-11-07
  * Initial work on board layout and schematic capture
+ * Add switch for arming weapon
+ * Added indicator LEDs
+ * Update all resistors and caps to the MF passive library
