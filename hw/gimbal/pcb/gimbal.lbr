@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -321,7 +321,7 @@ MAX3223-MAX3243.pdf</description>
 </package>
 <package name="PQFN16">
 <smd name="G0" x="0" y="0" dx="1.7" dy="1.7" layer="1" roundness="20"/>
-<pad name="G1" x="0" y="0" drill="0.3048"/>
+<pad name="G1" x="-0.35" y="0.35" drill="0.3048"/>
 <smd name="1" x="-1.35" y="0.75" dx="0.3" dy="0.65" layer="1" roundness="40" rot="R90"/>
 <wire x1="-1.8" y1="1.8" x2="-1.8" y2="-1.8" width="0.127" layer="21"/>
 <wire x1="-1.8" y1="-1.8" x2="1.8" y2="-1.8" width="0.127" layer="21"/>
@@ -344,6 +344,7 @@ MAX3223-MAX3243.pdf</description>
 <smd name="14" x="0.25" y="1.35" dx="0.3" dy="0.65" layer="1" roundness="40"/>
 <smd name="15" x="-0.25" y="1.35" dx="0.3" dy="0.65" layer="1" roundness="40"/>
 <smd name="16" x="-0.75" y="1.35" dx="0.3" dy="0.65" layer="1" roundness="40"/>
+<pad name="G2" x="0.35" y="-0.35" drill="0.3048"/>
 </package>
 <package name="SO20POWER">
 <description>PowerSO20, Version 2: increased slug pads SLUG1, SLUG3 for prototyping / manual soldering issues</description>
@@ -1651,7 +1652,7 @@ Source: http://www.hirose.co.jp/cataloge_hp/e24000019.pdf</description>
 <devices>
 <device name="PQFN16" package="PQFN16">
 <connects>
-<connect gate="G$1" pin="AGND" pad="6 10 14 G0 G1"/>
+<connect gate="G$1" pin="AGND" pad="6 10 14 G0 G1 G2"/>
 <connect gate="G$1" pin="COMP" pad="7"/>
 <connect gate="G$1" pin="EN" pad="3"/>
 <connect gate="G$1" pin="FB" pad="8"/>
