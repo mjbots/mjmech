@@ -1,6 +1,5 @@
  * TODO
    * select all parts
-   * Label all ICs and parts with useful names
    * Clean up placement and ensure alignment where we can
    * Normalize fonts on silk screen
      * Remove values from silk screen
@@ -38,6 +37,11 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-09
+ * Label all ICs and parts with useful names
+ * Re-organized schematic... maybe it could be kind of considered
+   organized now?
 
 DONE 2015-11-08
  * verified macrofab FET will work at 3.3V

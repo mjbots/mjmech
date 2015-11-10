@@ -2526,15 +2526,21 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
-<part name="R13" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k"/>
-<part name="R14" library="mfpassives" deviceset="RESISTOR" device="_0603" value="220"/>
+<part name="R13" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
+<attribute name="DPN" value="P88.7KHDKR-ND"/>
+</part>
+<part name="R14" library="mfpassives" deviceset="RESISTOR" device="_0603" value="220">
+<attribute name="DPN" value="P220HDKR-ND"/>
+</part>
 <part name="SUPPLY1" library="supply2" deviceset="+8V" device=""/>
 <part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="L1" library="gimbal" deviceset="IND" device="L1212" value="2.2uH">
 <attribute name="DPN" value="490-6638-1-ND"/>
 </part>
-<part name="C15" library="mfpassives" deviceset="CAPACITOR_P" device="_6.3MM" value="100uF"/>
+<part name="C15" library="mfpassives" deviceset="CAPACITOR_P" device="_6.3MM" value="100uF">
+<attribute name="AMFPN" value="MF-CAP-6.3MM-100uF"/>
+</part>
 <part name="L2" library="gimbal" deviceset="IND" device="ASPI-6045S" value="2.2uH">
 <attribute name="DPN" value="ASPI-6045S-2R2N-TCT-ND"/>
 </part>
@@ -2542,10 +2548,18 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="D4" library="gimbal" deviceset="DIODE" device="B520C"/>
 <part name="P+1" library="supply1" deviceset="+12V" device=""/>
-<part name="R11" library="mfpassives" deviceset="RESISTOR" device="_0603" value="78.4k"/>
-<part name="R12" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.87k"/>
-<part name="R9" library="mfpassives" deviceset="RESISTOR" device="_0603" value="88k"/>
-<part name="R10" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k"/>
+<part name="R11" library="mfpassives" deviceset="RESISTOR" device="_0603" value="78.7k">
+<attribute name="DPN" value="P78.7KHCT-ND"/>
+</part>
+<part name="R12" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.87k">
+<attribute name="DPN" value="P1.87KHCT-ND"/>
+</part>
+<part name="R9" library="mfpassives" deviceset="RESISTOR" device="_0603" value="88.7k">
+<attribute name="DPN" value="P88.7KHDKR-ND"/>
+</part>
+<part name="R10" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="DPN" value="P10.0KHCT-ND"/>
+</part>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="+3V3" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
@@ -2569,7 +2583,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="GND15" library="supply1" deviceset="GND" device=""/>
 <part name="GND16" library="supply1" deviceset="GND" device=""/>
 <part name="+3V9" library="supply1" deviceset="+3V3" device=""/>
-<part name="R1" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10"/>
+<part name="R1" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10">
+<attribute name="AMFPN" value="MF-RES-0603-10"/>
+</part>
 <part name="Q1" library="gimbal" deviceset="CRYSTAL" device="SMD5X3.2">
 <attribute name="DPN" value="535-9721-1-ND"/>
 </part>
@@ -2577,10 +2593,18 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="SUPPLY4" library="supply2" deviceset="+8V" device=""/>
 <part name="P+4" library="supply1" deviceset="+12V" device=""/>
 <part name="GND18" library="supply1" deviceset="GND" device=""/>
-<part name="R5" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k"/>
-<part name="R6" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k"/>
-<part name="R7" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k"/>
-<part name="R8" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k"/>
+<part name="R5" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
+<attribute name="DPN" value="P100KHCT-ND"/>
+</part>
+<part name="R6" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="DPN" value="P10.0KHCT-ND"/>
+</part>
+<part name="R7" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
+<attribute name="DPN" value="P100KHCT-ND"/>
+</part>
+<part name="R8" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="DPN" value="P10.0KHCT-ND"/>
+</part>
 <part name="ARM" library="gimbal" deviceset="SLIDE_SWITCH" device="JS_SUB_SWITCH">
 <attribute name="DPN" value="401-2002-6-ND"/>
 </part>
@@ -2589,35 +2613,79 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="D1" library="mfleds" deviceset="LED_SINGLE" device="_0603"/>
 <part name="D2" library="mfleds" deviceset="LED_SINGLE" device="_0603"/>
 <part name="D3" library="mfleds" deviceset="LED_SINGLE" device="_0603"/>
-<part name="R2" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560"/>
-<part name="R3" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560"/>
-<part name="R4" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560"/>
+<part name="R2" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560">
+<attribute name="AMFPN" value="MF-RES-0603-560"/>
+</part>
+<part name="R3" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560">
+<attribute name="AMFPN" value="MF-RES-0603-560"/>
+</part>
+<part name="R4" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560">
+<attribute name="AMFPN" value="MF-RES-0603-560"/>
+</part>
 <part name="+3V11" library="supply1" deviceset="+3V3" device=""/>
-<part name="C22" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C23" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.01uF"/>
-<part name="C26" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C24" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C25" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.01uF"/>
-<part name="C21" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C20" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C2" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C6" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C8" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="10pF"/>
-<part name="C9" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="10pF"/>
-<part name="C4" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C5" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C3" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
+<part name="C22" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C23" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.01uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.01uF"/>
+</part>
+<part name="C26" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C24" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C25" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.01uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.01uF"/>
+</part>
+<part name="C21" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C20" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C2" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C6" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C8" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="10pF">
+<attribute name="AMFPN" value="MF-CAP-0603-10pF"/>
+</part>
+<part name="C9" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="10pF">
+<attribute name="AMFPN" value="MF-CAP-0603-10pF"/>
+</part>
+<part name="C4" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C5" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C3" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
 <part name="C1" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF">
 <attribute name="DPN" value="311-1455-1-ND"/>
 </part>
 <part name="C7" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF">
 <attribute name="DPN" value="311-1455-1-ND"/>
 </part>
-<part name="C14" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF"/>
-<part name="C13" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.047uF"/>
-<part name="C16" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF"/>
-<part name="C10" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF"/>
-<part name="C12" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF"/>
+<part name="C14" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="C13" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.047uF">
+<attribute name="DPN" value="490-1522-1-ND"/>
+</part>
+<part name="C16" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF">
+<attribute name="AMFPN" value="MF-CAP-1206-10uF"/>
+</part>
+<part name="C10" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF">
+<attribute name="AMFPN" value="MF-CAP-1206-10uF"/>
+</part>
+<part name="C12" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF">
+<attribute name="AMFPN" value="MF-CAP-1206-10uF"/>
+</part>
 <part name="C11" library="mfpassives" deviceset="CAPACITOR_NP" device="_1210" value="22uF 16V">
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
@@ -2631,12 +2699,24 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
 <part name="SUPPLY5" library="supply2" deviceset="+8V" device=""/>
-<part name="R19" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k"/>
-<part name="R20" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k"/>
-<part name="R17" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k"/>
-<part name="R18" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k"/>
-<part name="R15" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k"/>
-<part name="R16" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k"/>
+<part name="R19" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
+<attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
+</part>
+<part name="R20" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
+<attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
+</part>
+<part name="R17" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
+<attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
+</part>
+<part name="R18" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
+<attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
+</part>
+<part name="R15" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
+<attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
+</part>
+<part name="R16" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
+<attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -2682,15 +2762,21 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="GND1" gate="1" x="205.74" y="-68.58"/>
 <instance part="GND2" gate="1" x="157.48" y="-78.74"/>
 <instance part="+3V1" gate="G$1" x="96.52" y="0"/>
-<instance part="R13" gate="G$1" x="114.3" y="-27.94" rot="R90"/>
-<instance part="R14" gate="G$1" x="109.22" y="-68.58" rot="R90"/>
+<instance part="R13" gate="G$1" x="114.3" y="-27.94" rot="R90">
+<attribute name="DPN" x="114.3" y="-27.94" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R14" gate="G$1" x="109.22" y="-68.58" rot="R90">
+<attribute name="DPN" x="109.22" y="-68.58" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="SUPPLY1" gate="+8V" x="-10.16" y="76.2"/>
 <instance part="+3V2" gate="G$1" x="73.66" y="78.74"/>
 <instance part="GND3" gate="1" x="30.48" y="33.02"/>
 <instance part="L1" gate="L$1" x="58.42" y="66.04">
 <attribute name="DPN" x="58.42" y="66.04" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="C15" gate="G$1" x="236.22" y="63.5"/>
+<instance part="C15" gate="G$1" x="236.22" y="63.5">
+<attribute name="AMFPN" x="236.22" y="63.5" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="L2" gate="L$1" x="157.48" y="78.74">
 <attribute name="DPN" x="157.48" y="78.74" size="1.778" layer="96" display="off"/>
 </instance>
@@ -2698,10 +2784,18 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="GND4" gate="1" x="167.64" y="15.24"/>
 <instance part="D4" gate="G$1" x="215.9" y="78.74"/>
 <instance part="P+1" gate="1" x="256.54" y="86.36"/>
-<instance part="R11" gate="G$1" x="134.62" y="35.56" rot="R90"/>
-<instance part="R12" gate="G$1" x="149.86" y="33.02" rot="R90"/>
-<instance part="R9" gate="G$1" x="223.52" y="58.42" rot="R90"/>
-<instance part="R10" gate="G$1" x="223.52" y="30.48" rot="R90"/>
+<instance part="R11" gate="G$1" x="134.62" y="35.56" rot="R90">
+<attribute name="DPN" x="134.62" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R12" gate="G$1" x="149.86" y="33.02" rot="R90">
+<attribute name="DPN" x="149.86" y="33.02" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R9" gate="G$1" x="223.52" y="58.42" rot="R90">
+<attribute name="DPN" x="223.52" y="58.42" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R10" gate="G$1" x="223.52" y="30.48" rot="R90">
+<attribute name="DPN" x="223.52" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="GND5" gate="1" x="101.6" y="-274.32"/>
 <instance part="+3V3" gate="G$1" x="76.2" y="-238.76"/>
 <instance part="GND6" gate="1" x="104.14" y="106.68"/>
@@ -2725,7 +2819,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="GND15" gate="1" x="73.66" y="243.84"/>
 <instance part="GND16" gate="1" x="-20.32" y="218.44"/>
 <instance part="+3V9" gate="G$1" x="-25.4" y="254"/>
-<instance part="R1" gate="G$1" x="93.98" y="254" rot="R90"/>
+<instance part="R1" gate="G$1" x="93.98" y="254" rot="R90">
+<attribute name="AMFPN" x="93.98" y="254" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="Q1" gate="G$1" x="203.2" y="165.1">
 <attribute name="DPN" x="203.2" y="165.1" size="1.778" layer="96" display="off"/>
 </instance>
@@ -2733,10 +2829,18 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="SUPPLY4" gate="+8V" x="226.06" y="236.22"/>
 <instance part="P+4" gate="1" x="243.84" y="238.76"/>
 <instance part="GND18" gate="1" x="238.76" y="198.12"/>
-<instance part="R5" gate="G$1" x="226.06" y="226.06" rot="R90"/>
-<instance part="R6" gate="G$1" x="226.06" y="210.82" rot="R90"/>
-<instance part="R7" gate="G$1" x="243.84" y="226.06" rot="R90"/>
-<instance part="R8" gate="G$1" x="243.84" y="210.82" rot="R90"/>
+<instance part="R5" gate="G$1" x="226.06" y="226.06" rot="R90">
+<attribute name="DPN" x="226.06" y="226.06" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R6" gate="G$1" x="226.06" y="210.82" rot="R90">
+<attribute name="DPN" x="226.06" y="210.82" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R7" gate="G$1" x="243.84" y="226.06" rot="R90">
+<attribute name="DPN" x="243.84" y="226.06" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R8" gate="G$1" x="243.84" y="210.82" rot="R90">
+<attribute name="DPN" x="243.84" y="210.82" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="ARM" gate="G$1" x="104.14" y="-101.6">
 <attribute name="DPN" x="104.14" y="-101.6" size="1.778" layer="96" display="off"/>
 </instance>
@@ -2745,35 +2849,79 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="D1" gate="G$1" x="-40.64" y="160.02" rot="R270"/>
 <instance part="D2" gate="G$1" x="-27.94" y="160.02" rot="R270"/>
 <instance part="D3" gate="G$1" x="-15.24" y="160.02" rot="R270"/>
-<instance part="R2" gate="G$1" x="-40.64" y="172.72" rot="R90"/>
-<instance part="R3" gate="G$1" x="-27.94" y="172.72" rot="R90"/>
-<instance part="R4" gate="G$1" x="-15.24" y="172.72" rot="R90"/>
+<instance part="R2" gate="G$1" x="-40.64" y="172.72" rot="R90">
+<attribute name="AMFPN" x="-40.64" y="172.72" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R3" gate="G$1" x="-27.94" y="172.72" rot="R90">
+<attribute name="AMFPN" x="-27.94" y="172.72" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R4" gate="G$1" x="-15.24" y="172.72" rot="R90">
+<attribute name="AMFPN" x="-15.24" y="172.72" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="+3V11" gate="G$1" x="-27.94" y="185.42"/>
-<instance part="C22" gate="G$1" x="-5.08" y="-134.62"/>
-<instance part="C23" gate="G$1" x="-10.16" y="-149.86"/>
-<instance part="C26" gate="G$1" x="81.28" y="-261.62"/>
-<instance part="C24" gate="G$1" x="149.86" y="-139.7"/>
-<instance part="C25" gate="G$1" x="152.4" y="-152.4"/>
-<instance part="C21" gate="G$1" x="162.56" y="-30.48"/>
-<instance part="C20" gate="G$1" x="73.66" y="-45.72"/>
-<instance part="C2" gate="G$1" x="55.88" y="261.62"/>
-<instance part="C6" gate="G$1" x="83.82" y="256.54"/>
-<instance part="C8" gate="G$1" x="182.88" y="157.48"/>
-<instance part="C9" gate="G$1" x="223.52" y="157.48"/>
-<instance part="C4" gate="G$1" x="48.26" y="261.62"/>
-<instance part="C5" gate="G$1" x="40.64" y="261.62"/>
-<instance part="C3" gate="G$1" x="63.5" y="261.62"/>
+<instance part="C22" gate="G$1" x="-5.08" y="-134.62">
+<attribute name="AMFPN" x="-5.08" y="-134.62" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C23" gate="G$1" x="-10.16" y="-149.86">
+<attribute name="AMFPN" x="-10.16" y="-149.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C26" gate="G$1" x="81.28" y="-261.62">
+<attribute name="AMFPN" x="81.28" y="-261.62" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C24" gate="G$1" x="149.86" y="-139.7">
+<attribute name="AMFPN" x="149.86" y="-139.7" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C25" gate="G$1" x="152.4" y="-152.4">
+<attribute name="AMFPN" x="152.4" y="-152.4" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C21" gate="G$1" x="162.56" y="-30.48">
+<attribute name="AMFPN" x="162.56" y="-30.48" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C20" gate="G$1" x="73.66" y="-45.72">
+<attribute name="AMFPN" x="73.66" y="-45.72" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C2" gate="G$1" x="55.88" y="261.62">
+<attribute name="AMFPN" x="55.88" y="261.62" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C6" gate="G$1" x="83.82" y="256.54">
+<attribute name="AMFPN" x="83.82" y="256.54" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C8" gate="G$1" x="182.88" y="157.48">
+<attribute name="AMFPN" x="182.88" y="157.48" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C9" gate="G$1" x="223.52" y="157.48">
+<attribute name="AMFPN" x="223.52" y="157.48" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C4" gate="G$1" x="48.26" y="261.62">
+<attribute name="AMFPN" x="48.26" y="261.62" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C5" gate="G$1" x="40.64" y="261.62">
+<attribute name="AMFPN" x="40.64" y="261.62" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C3" gate="G$1" x="63.5" y="261.62">
+<attribute name="AMFPN" x="63.5" y="261.62" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C1" gate="G$1" x="73.66" y="261.62">
 <attribute name="DPN" x="73.66" y="261.62" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C7" gate="G$1" x="149.86" y="256.54">
 <attribute name="DPN" x="149.86" y="256.54" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="C14" gate="G$1" x="149.86" y="22.86"/>
-<instance part="C13" gate="G$1" x="139.7" y="22.86"/>
-<instance part="C16" gate="G$1" x="246.38" y="63.5"/>
-<instance part="C10" gate="G$1" x="-5.08" y="55.88"/>
-<instance part="C12" gate="G$1" x="124.46" y="40.64"/>
+<instance part="C14" gate="G$1" x="149.86" y="22.86">
+<attribute name="AMFPN" x="149.86" y="22.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C13" gate="G$1" x="139.7" y="22.86">
+<attribute name="DPN" x="139.7" y="22.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C16" gate="G$1" x="246.38" y="63.5">
+<attribute name="AMFPN" x="246.38" y="63.5" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C10" gate="G$1" x="-5.08" y="55.88">
+<attribute name="AMFPN" x="-5.08" y="55.88" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C12" gate="G$1" x="124.46" y="40.64">
+<attribute name="AMFPN" x="124.46" y="40.64" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C11" gate="G$1" x="73.66" y="55.88">
 <attribute name="DPN" x="73.66" y="55.88" size="1.778" layer="96" display="off"/>
 </instance>
@@ -2787,12 +2935,24 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="DPN" x="60.96" y="-48.26" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="SUPPLY5" gate="+8V" x="43.18" y="-17.78"/>
-<instance part="R19" gate="G$1" x="144.78" y="-314.96" rot="R90"/>
-<instance part="R20" gate="G$1" x="149.86" y="-314.96" rot="R90"/>
-<instance part="R17" gate="G$1" x="91.44" y="-314.96" rot="R90"/>
-<instance part="R18" gate="G$1" x="96.52" y="-314.96" rot="R90"/>
-<instance part="R15" gate="G$1" x="30.48" y="-312.42" rot="R90"/>
-<instance part="R16" gate="G$1" x="35.56" y="-312.42" rot="R90"/>
+<instance part="R19" gate="G$1" x="144.78" y="-314.96" rot="R90">
+<attribute name="AMFPN" x="144.78" y="-314.96" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R20" gate="G$1" x="149.86" y="-314.96" rot="R90">
+<attribute name="AMFPN" x="149.86" y="-314.96" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R17" gate="G$1" x="91.44" y="-314.96" rot="R90">
+<attribute name="AMFPN" x="91.44" y="-314.96" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R18" gate="G$1" x="96.52" y="-314.96" rot="R90">
+<attribute name="AMFPN" x="96.52" y="-314.96" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R15" gate="G$1" x="30.48" y="-312.42" rot="R90">
+<attribute name="AMFPN" x="30.48" y="-312.42" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+<instance part="R16" gate="G$1" x="35.56" y="-312.42" rot="R90">
+<attribute name="AMFPN" x="35.56" y="-312.42" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 </instances>
 <busses>
 </busses>

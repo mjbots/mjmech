@@ -1069,12 +1069,14 @@ design rules under a new name.</description>
 <attribute name="MFG#" value="N/A" x="18.9" y="15.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="18.9" y="15.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="18.9" y="15.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DPN" value="P88.7KHDKR-ND" x="18.9" y="15.2" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="R14" library="mfpassives" package="R0603" value="220" x="28.8" y="11.4" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="28.8" y="11.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="28.8" y="11.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="28.8" y="11.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="28.8" y="11.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DPN" value="P220HDKR-ND" x="28.8" y="11.4" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="L1" library="gimbal" package="L_SMT_1212" value="2.2uH" x="42.3" y="30.9" rot="R180">
 <attribute name="DPN" value="490-6638-1-ND" x="42.3" y="30.9" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1083,34 +1085,39 @@ design rules under a new name.</description>
 <attribute name="TOLERANCE" value="N/A" x="46.2" y="7.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="46.2" y="7.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOTLAGE" value="N/A" x="46.2" y="7.5" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-6.3MM-100uF" x="46.2" y="7.5" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="L2" library="gimbal" package="ASPI-6045S" value="2.2uH" x="56.3" y="25.1" rot="R270">
 <attribute name="DPN" value="ASPI-6045S-2R2N-TCT-ND" x="56.3" y="25.1" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="D4" library="gimbal" package="B520C" value="DIODEB520C" x="54.5" y="17.9"/>
-<element name="R11" library="mfpassives" package="R0603" value="78.4k" x="50.4" y="22.2" rot="R180">
+<element name="R11" library="mfpassives" package="R0603" value="78.7k" x="50.4" y="22.2" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DPN" value="P78.7KHCT-ND" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="R12" library="mfpassives" package="R0603" value="1.87k" x="48.1" y="25.5" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="48.1" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="48.1" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="48.1" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="48.1" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="DPN" value="P1.87KHCT-ND" x="48.1" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="R9" library="mfpassives" package="R0603" value="88k" x="48.1" y="16.7" rot="R270">
+<element name="R9" library="mfpassives" package="R0603" value="88.7k" x="48.1" y="16.7" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="48.1" y="16.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="48.1" y="16.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="48.1" y="16.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="48.1" y="16.7" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="DPN" value="P88.7KHDKR-ND" x="48.1" y="16.7" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R10" library="mfpassives" package="R0603" value="10k" x="48.1" y="19.8" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DPN" value="P10.0KHCT-ND" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="U1" library="gimbal" package="LQFP64" value="STM32F4R_64PIN" x="18.5" y="34" rot="R90"/>
 <element name="R1" library="mfpassives" package="R0603" value="10" x="17.5" y="27.3">
@@ -1118,6 +1125,7 @@ design rules under a new name.</description>
 <attribute name="MFG#" value="N/A" x="17.5" y="27.3" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="17.5" y="27.3" size="1.778" layer="27" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="17.5" y="27.3" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-10" x="17.5" y="27.3" size="1.778" layer="27" display="off"/>
 </element>
 <element name="Q1" library="gimbal" package="CRYSTAL-OSC-SMD-5X3.2" value="" x="25.4" y="31.2" rot="R90">
 <attribute name="DPN" value="535-9721-1-ND" x="25.4" y="31.2" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1127,24 +1135,28 @@ design rules under a new name.</description>
 <attribute name="MFG#" value="N/A" x="42.5" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="42.5" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="42.5" y="40.9" size="1.778" layer="27" display="off"/>
+<attribute name="DPN" value="P100KHCT-ND" x="42.5" y="40.9" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R6" library="mfpassives" package="R0603" value="10k" x="42.5" y="39.2" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="42.5" y="39.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="42.5" y="39.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="42.5" y="39.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="42.5" y="39.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DPN" value="P10.0KHCT-ND" x="42.5" y="39.2" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="R7" library="mfpassives" package="R0603" value="100k" x="40.8" y="14.8">
 <attribute name="TOLERANCE" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
+<attribute name="DPN" value="P100KHCT-ND" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R8" library="mfpassives" package="R0603" value="10k" x="40.8" y="13.1" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DPN" value="P10.0KHCT-ND" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="ARM" library="gimbal" package="JS_SUB_SWITCH" value="SLIDE_SWITCHJS_SUB_SWITCH" x="5" y="1.2">
 <attribute name="DPN" value="401-2002-6-ND" x="5" y="1.2" size="1.778" layer="27" display="off"/>
@@ -1163,102 +1175,119 @@ design rules under a new name.</description>
 <attribute name="MFG#" value="N/A" x="16.8" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="16.8" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="16.8" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-560" x="16.8" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R3" library="mfpassives" package="R0603" value="560" x="13.2" y="12.5" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="13.2" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="13.2" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="13.2" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="13.2" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-560" x="13.2" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R4" library="mfpassives" package="R0603" value="560" x="11.2" y="39.2">
 <attribute name="TOLERANCE" value="N/A" x="11.2" y="39.2" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="11.2" y="39.2" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="11.2" y="39.2" size="1.778" layer="27" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="11.2" y="39.2" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-560" x="11.2" y="39.2" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C22" library="mfpassives" package="C0603" value="0.1uF" x="51.2" y="1.8" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C23" library="mfpassives" package="C0603" value="0.01uF" x="49.5" y="1.8" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.01uF" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C26" library="mfpassives" package="C0603" value="0.1uF" x="34" y="21" rot="MR270">
 <attribute name="TOLERANCE" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MFG#" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="C24" library="mfpassives" package="C0603" value="0.1uF" x="33.7" y="1.8" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C25" library="mfpassives" package="C0603" value="0.01uF" x="32" y="1.8" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="32" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="32" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="32" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="32" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.01uF" x="32" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C21" library="mfpassives" package="C0603" value="0.1uF" x="26" y="2.5" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="26" y="2.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="26" y="2.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="26" y="2.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="26" y="2.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="26" y="2.5" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C20" library="mfpassives" package="C0603" value="0.1uF" x="26" y="15.5" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="26" y="15.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="26" y="15.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="26" y="15.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="26" y="15.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="26" y="15.5" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C2" library="mfpassives" package="C0603" value="0.1uF" x="22.5" y="27" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="22.5" y="27" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="22.5" y="27" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="22.5" y="27" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="22.5" y="27" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="22.5" y="27" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C6" library="mfpassives" package="C0603" value="0.1uF" x="25.5" y="34.7">
 <attribute name="TOLERANCE" value="N/A" x="25.5" y="34.7" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="25.5" y="34.7" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="25.5" y="34.7" size="1.778" layer="27" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="25.5" y="34.7" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="25.5" y="34.7" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C8" library="mfpassives" package="C0603" value="10pF" x="28.5" y="30.5" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="28.5" y="30.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="28.5" y="30.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="28.5" y="30.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="28.5" y="30.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-10pF" x="28.5" y="30.5" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C9" library="mfpassives" package="C0603" value="10pF" x="28.5" y="33.9" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="28.5" y="33.9" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="28.5" y="33.9" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="28.5" y="33.9" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="28.5" y="33.9" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-10pF" x="28.5" y="33.9" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C4" library="mfpassives" package="C0603" value="0.1uF" x="13.1" y="40.9">
 <attribute name="TOLERANCE" value="N/A" x="13.1" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="13.1" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="13.1" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="13.1" y="40.9" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="13.1" y="40.9" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C5" library="mfpassives" package="C0603" value="0.1uF" x="21.7" y="40.9">
 <attribute name="TOLERANCE" value="N/A" x="21.7" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="21.7" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="21.7" y="40.9" size="1.778" layer="27" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="21.7" y="40.9" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="21.7" y="40.9" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C3" library="mfpassives" package="C0603" value="0.1uF" x="11.7" y="30.4" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="11.7" y="30.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="11.7" y="30.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="11.7" y="30.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="11.7" y="30.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="11.7" y="30.4" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C1" library="mfpassives" package="C0603" value="4.7uF" x="24.8" y="37" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="24.8" y="37" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1279,30 +1308,35 @@ design rules under a new name.</description>
 <attribute name="MFG#" value="N/A" x="46.5" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="46.5" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="46.5" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="46.5" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C13" library="mfpassives" package="C0603" value="0.047uF" x="50.3" y="29" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="50.3" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="50.3" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="50.3" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="50.3" y="29" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DPN" value="490-1522-1-ND" x="50.3" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C16" library="mfpassives" package="C1206" value="10uF" x="44.7" y="13.4" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-1206-10uF" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C10" library="mfpassives" package="C1206" value="10uF" x="42.3" y="37">
 <attribute name="TOLERANCE" value="N/A" x="42.3" y="37" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="42.3" y="37" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="42.3" y="37" size="1.778" layer="27" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="42.3" y="37" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-1206-10uF" x="42.3" y="37" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C12" library="mfpassives" package="C1206" value="10uF" x="47" y="29" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="47" y="29" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="47" y="29" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="47" y="29" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="47" y="29" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-1206-10uF" x="47" y="29" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C11" library="mfpassives" package="C1210" value="22uF 16V" x="38.6" y="32.5" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="38.6" y="32.5" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1337,36 +1371,42 @@ design rules under a new name.</description>
 <attribute name="MFG#" value="N/A" x="6.7" y="12.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="6.7" y="12.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="12.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="12.2" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="R20" library="mfpassives" package="R0603" value="1.69k" x="6.7" y="9.2" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="6.7" y="9.2" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="6.7" y="9.2" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="6.7" y="9.2" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="9.2" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="9.2" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R17" library="mfpassives" package="R0603" value="1.69k" x="6.7" y="32.8" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="6.7" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="6.7" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="6.7" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="R18" library="mfpassives" package="R0603" value="1.69k" x="6.7" y="29.8" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="6.7" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="6.7" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="6.7" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R15" library="mfpassives" package="R0603" value="1.69k" x="6.7" y="22.5" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="6.7" y="22.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MFG#" value="N/A" x="6.7" y="22.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="6.7" y="22.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="22.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="22.5" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="R16" library="mfpassives" package="R0603" value="1.69k" x="6.7" y="19.5" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MFG#" value="N/A" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="N/A" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 </elements>
 <signals>
