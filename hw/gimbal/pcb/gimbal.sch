@@ -2487,10 +2487,18 @@ In this library the device names are the same as the pin names of the symbols, t
 </class>
 </classes>
 <parts>
-<part name="U4" library="gimbal" deviceset="MC33926" device=""/>
-<part name="U7" library="gimbal" deviceset="AS5048A" device=""/>
-<part name="U3" library="gimbal" deviceset="TPS55330" device="PQFN16"/>
-<part name="U2" library="gimbal" deviceset="TPS62172" device="PWSON8"/>
+<part name="U4" library="gimbal" deviceset="MC33926" device="">
+<attribute name="DPN" value="MC33926PNBR2CT-ND"/>
+</part>
+<part name="U7" library="gimbal" deviceset="AS5048A" device="">
+<attribute name="DPN" value="AS5048A-HTSP-500CT-ND"/>
+</part>
+<part name="U3" library="gimbal" deviceset="TPS55330" device="PQFN16">
+<attribute name="DPN" value="296-36219-1-ND"/>
+</part>
+<part name="U2" library="gimbal" deviceset="TPS62172" device="PWSON8">
+<attribute name="DPN" value="296-29879-1-ND"/>
+</part>
 <part name="J1" library="gimbal" deviceset="JST-XH4" device="SMT_RA">
 <attribute name="DPN" value="455-2262-1-ND"/>
 </part>
@@ -2518,11 +2526,17 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="USB" library="gimbal" deviceset="MICRO-USB" device="">
 <attribute name="DPN" value="609-4618-1-ND"/>
 </part>
-<part name="U5" library="gimbal" deviceset="DRV8313" device=""/>
-<part name="U6" library="gimbal" deviceset="DRV8313" device=""/>
+<part name="U5" library="gimbal" deviceset="DRV8313" device="">
+<attribute name="DPN" value="296-35540-5-ND"/>
+</part>
+<part name="U6" library="gimbal" deviceset="DRV8313" device="">
+<attribute name="DPN" value="296-35540-5-ND"/>
+</part>
 <part name="MOUNT1" library="gimbal" deviceset="M3_MOTOR_MOUNT" device=""/>
 <part name="MOUNT2" library="gimbal" deviceset="M3_MOTOR_MOUNT" device=""/>
-<part name="T1" library="zetex" deviceset="NMOSSOT23" device=""/>
+<part name="T1" library="zetex" deviceset="NMOSSOT23" device="">
+<attribute name="AMFPN" value="MF-DSC-SOT233-BSS84"/>
+</part>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
@@ -2546,7 +2560,9 @@ In this library the device names are the same as the pin names of the symbols, t
 </part>
 <part name="SUPPLY2" library="supply2" deviceset="+8V" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
-<part name="D4" library="gimbal" deviceset="DIODE" device="B520C"/>
+<part name="D4" library="gimbal" deviceset="DIODE" device="B520C">
+<attribute name="DPN" value="B520C-FDICT-ND"/>
+</part>
 <part name="P+1" library="supply1" deviceset="+12V" device=""/>
 <part name="R11" library="mfpassives" deviceset="RESISTOR" device="_0603" value="78.7k">
 <attribute name="DPN" value="P78.7KHCT-ND"/>
@@ -2577,7 +2593,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="P+2" library="supply1" deviceset="+12V" device=""/>
 <part name="P+3" library="supply1" deviceset="+12V" device=""/>
 <part name="+3V7" library="supply1" deviceset="+3V3" device=""/>
-<part name="U1" library="gimbal" deviceset="STM32F4R_64PIN" device=""/>
+<part name="U1" library="gimbal" deviceset="STM32F4R_64PIN" device="">
+<attribute name="DPN" value="497-14909-ND"/>
+</part>
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="+3V8" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND15" library="supply1" deviceset="GND" device=""/>
@@ -2610,9 +2628,15 @@ In this library the device names are the same as the pin names of the symbols, t
 </part>
 <part name="GND19" library="supply1" deviceset="GND" device=""/>
 <part name="+3V10" library="supply1" deviceset="+3V3" device=""/>
-<part name="D1" library="mfleds" deviceset="LED_SINGLE" device="_0603"/>
-<part name="D2" library="mfleds" deviceset="LED_SINGLE" device="_0603"/>
-<part name="D3" library="mfleds" deviceset="LED_SINGLE" device="_0603"/>
+<part name="D1" library="mfleds" deviceset="LED_SINGLE" device="_0603">
+<attribute name="AMFPN" value="MF-LED-0603-GREEN"/>
+</part>
+<part name="D2" library="mfleds" deviceset="LED_SINGLE" device="_0603">
+<attribute name="AMFPN" value="MF-LED-0603-RED"/>
+</part>
+<part name="D3" library="mfleds" deviceset="LED_SINGLE" device="_0603">
+<attribute name="AMFPN" value="MF-LED-0603-RED"/>
+</part>
 <part name="R2" library="mfpassives" deviceset="RESISTOR" device="_0603" value="560">
 <attribute name="AMFPN" value="MF-RES-0603-560"/>
 </part>
@@ -2723,10 +2747,18 @@ In this library the device names are the same as the pin names of the symbols, t
 <plain>
 </plain>
 <instances>
-<instance part="U4" gate="G$1" x="134.62" y="-45.72"/>
-<instance part="U7" gate="G$1" x="101.6" y="-251.46"/>
-<instance part="U3" gate="G$1" x="175.26" y="45.72"/>
-<instance part="U2" gate="G$1" x="27.94" y="60.96"/>
+<instance part="U4" gate="G$1" x="134.62" y="-45.72">
+<attribute name="DPN" x="134.62" y="-45.72" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U7" gate="G$1" x="101.6" y="-251.46">
+<attribute name="DPN" x="101.6" y="-251.46" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U3" gate="G$1" x="175.26" y="45.72">
+<attribute name="DPN" x="175.26" y="45.72" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U2" gate="G$1" x="27.94" y="60.96">
+<attribute name="DPN" x="27.94" y="60.96" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="J1" gate="G$1" x="81.28" y="-388.62">
 <attribute name="DPN" x="81.28" y="-388.62" size="1.778" layer="96" display="off"/>
 </instance>
@@ -2754,11 +2786,17 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="USB" gate="G$1" x="175.26" y="-388.62">
 <attribute name="DPN" x="175.26" y="-388.62" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="U5" gate="G$1" x="35.56" y="-165.1"/>
-<instance part="U6" gate="G$1" x="195.58" y="-167.64"/>
+<instance part="U5" gate="G$1" x="35.56" y="-165.1">
+<attribute name="DPN" x="35.56" y="-165.1" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U6" gate="G$1" x="195.58" y="-167.64">
+<attribute name="DPN" x="195.58" y="-167.64" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="MOUNT1" gate="G$1" x="-22.86" y="-383.54"/>
 <instance part="MOUNT2" gate="G$1" x="-22.86" y="-398.78"/>
-<instance part="T1" gate="A" x="205.74" y="-58.42"/>
+<instance part="T1" gate="A" x="205.74" y="-58.42">
+<attribute name="AMFPN" x="205.74" y="-58.42" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="GND1" gate="1" x="205.74" y="-68.58"/>
 <instance part="GND2" gate="1" x="157.48" y="-78.74"/>
 <instance part="+3V1" gate="G$1" x="96.52" y="0"/>
@@ -2782,7 +2820,9 @@ In this library the device names are the same as the pin names of the symbols, t
 </instance>
 <instance part="SUPPLY2" gate="+8V" x="124.46" y="83.82"/>
 <instance part="GND4" gate="1" x="167.64" y="15.24"/>
-<instance part="D4" gate="G$1" x="215.9" y="78.74"/>
+<instance part="D4" gate="G$1" x="215.9" y="78.74">
+<attribute name="DPN" x="215.9" y="78.74" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="P+1" gate="1" x="256.54" y="86.36"/>
 <instance part="R11" gate="G$1" x="134.62" y="35.56" rot="R90">
 <attribute name="DPN" x="134.62" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
@@ -2813,7 +2853,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="P+2" gate="1" x="7.62" y="-121.92"/>
 <instance part="P+3" gate="1" x="167.64" y="-127"/>
 <instance part="+3V7" gate="G$1" x="172.72" y="-25.4"/>
-<instance part="U1" gate="G$1" x="106.68" y="195.58"/>
+<instance part="U1" gate="G$1" x="106.68" y="195.58">
+<attribute name="DPN" x="106.68" y="195.58" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="GND14" gate="1" x="157.48" y="246.38"/>
 <instance part="+3V8" gate="G$1" x="73.66" y="276.86"/>
 <instance part="GND15" gate="1" x="73.66" y="243.84"/>
@@ -2846,9 +2888,15 @@ In this library the device names are the same as the pin names of the symbols, t
 </instance>
 <instance part="GND19" gate="1" x="121.92" y="-106.68"/>
 <instance part="+3V10" gate="G$1" x="121.92" y="-88.9"/>
-<instance part="D1" gate="G$1" x="-40.64" y="160.02" rot="R270"/>
-<instance part="D2" gate="G$1" x="-27.94" y="160.02" rot="R270"/>
-<instance part="D3" gate="G$1" x="-15.24" y="160.02" rot="R270"/>
+<instance part="D1" gate="G$1" x="-40.64" y="160.02" rot="R270">
+<attribute name="AMFPN" x="-40.64" y="160.02" size="1.778" layer="96" rot="R270" display="off"/>
+</instance>
+<instance part="D2" gate="G$1" x="-27.94" y="160.02" rot="R270">
+<attribute name="AMFPN" x="-27.94" y="160.02" size="1.778" layer="96" rot="R270" display="off"/>
+</instance>
+<instance part="D3" gate="G$1" x="-15.24" y="160.02" rot="R270">
+<attribute name="AMFPN" x="-15.24" y="160.02" size="1.778" layer="96" rot="R270" display="off"/>
+</instance>
 <instance part="R2" gate="G$1" x="-40.64" y="172.72" rot="R90">
 <attribute name="AMFPN" x="-40.64" y="172.72" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>

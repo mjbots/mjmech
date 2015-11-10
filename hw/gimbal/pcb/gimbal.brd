@@ -1023,10 +1023,18 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="U4" library="gimbal" package="PQFN32" value="MC33926" x="22.57" y="8.92" rot="R180"/>
-<element name="U7" library="gimbal" package="TSSOP14" value="AS5048A" x="30" y="21" rot="MR0"/>
-<element name="U3" library="gimbal" package="PQFN16" value="TPS55330PQFN16" x="50.8" y="25" rot="R270"/>
-<element name="U2" library="gimbal" package="PWSON8" value="TPS62172PWSON8" x="41.9" y="34.2" rot="R270"/>
+<element name="U4" library="gimbal" package="PQFN32" value="MC33926" x="22.57" y="8.92" rot="R180">
+<attribute name="DPN" value="MC33926PNBR2CT-ND" x="22.57" y="8.92" size="1.778" layer="27" rot="R180" display="off"/>
+</element>
+<element name="U7" library="gimbal" package="TSSOP14" value="AS5048A" x="30" y="21" rot="MR0">
+<attribute name="DPN" value="AS5048A-HTSP-500CT-ND" x="30" y="21" size="1.778" layer="28" rot="MR0" display="off"/>
+</element>
+<element name="U3" library="gimbal" package="PQFN16" value="TPS55330PQFN16" x="50.8" y="25" rot="R270">
+<attribute name="DPN" value="296-36219-1-ND" x="50.8" y="25" size="1.778" layer="27" rot="R270" display="off"/>
+</element>
+<element name="U2" library="gimbal" package="PWSON8" value="TPS62172PWSON8" x="41.9" y="34.2" rot="R270">
+<attribute name="DPN" value="296-29879-1-ND" x="41.9" y="34.2" size="1.778" layer="27" rot="R270" display="off"/>
+</element>
 <element name="J1" library="gimbal" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="52.4" y="37.5" rot="R180">
 <attribute name="DPN" value="455-2262-1-ND" x="52.4" y="37.5" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
@@ -1054,8 +1062,12 @@ design rules under a new name.</description>
 <element name="USB" library="gimbal" package="FCI_MICROUSB_SMT_RA" value="MICRO-USB" x="4.7" y="39.3" rot="R180">
 <attribute name="DPN" value="609-4618-1-ND" x="4.7" y="39.3" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="U5" library="gimbal" package="HTSSOP28" value="DRV8313" x="54.9" y="7.5" rot="R90"/>
-<element name="U6" library="gimbal" package="HTSSOP28" value="DRV8313" x="37.5" y="7.5" rot="R90"/>
+<element name="U5" library="gimbal" package="HTSSOP28" value="DRV8313" x="54.9" y="7.5" rot="R90">
+<attribute name="DPN" value="296-35540-5-ND" x="54.9" y="7.5" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
+<element name="U6" library="gimbal" package="HTSSOP28" value="DRV8313" x="37.5" y="7.5" rot="R90">
+<attribute name="DPN" value="296-35540-5-ND" x="37.5" y="7.5" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
 <element name="MOUNT1" library="gimbal" package="M3_MOTOR_MOUNT" value="M3_MOTOR_MOUNT" x="42.5" y="21"/>
 <element name="MOUNT2" library="gimbal" package="M3_MOTOR_MOUNT" value="M3_MOTOR_MOUNT" x="17.5" y="21"/>
 <element name="T1" library="zetex" package="SOT-23" value="" x="10" y="7" rot="R90">
@@ -1063,6 +1075,7 @@ design rules under a new name.</description>
 <attribute name="MPN" value="" x="10" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="" x="10" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="OC_FARNELL" value="unknown" x="10" y="7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="AMFPN" value="MF-DSC-SOT233-BSS84" x="10" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="R13" library="mfpassives" package="R0603" value="100k" x="18.9" y="15.2" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="18.9" y="15.2" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1090,7 +1103,9 @@ design rules under a new name.</description>
 <element name="L2" library="gimbal" package="ASPI-6045S" value="2.2uH" x="56.3" y="25.1" rot="R270">
 <attribute name="DPN" value="ASPI-6045S-2R2N-TCT-ND" x="56.3" y="25.1" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="D4" library="gimbal" package="B520C" value="DIODEB520C" x="54.5" y="17.9"/>
+<element name="D4" library="gimbal" package="B520C" value="DIODEB520C" x="54.5" y="17.9">
+<attribute name="DPN" value="B520C-FDICT-ND" x="54.5" y="17.9" size="1.778" layer="27" display="off"/>
+</element>
 <element name="R11" library="mfpassives" package="R0603" value="78.7k" x="50.4" y="22.2" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MFG#" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1119,7 +1134,9 @@ design rules under a new name.</description>
 <attribute name="WATTAGE" value="N/A" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="DPN" value="P10.0KHCT-ND" x="48.1" y="19.8" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="U1" library="gimbal" package="LQFP64" value="STM32F4R_64PIN" x="18.5" y="34" rot="R90"/>
+<element name="U1" library="gimbal" package="LQFP64" value="STM32F4R_64PIN" x="18.5" y="34" rot="R90">
+<attribute name="DPN" value="497-14909-ND" x="18.5" y="34" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
 <element name="R1" library="mfpassives" package="R0603" value="10" x="17.5" y="27.3">
 <attribute name="TOLERANCE" value="N/A" x="17.5" y="27.3" size="1.778" layer="27" display="off"/>
 <attribute name="MFG#" value="N/A" x="17.5" y="27.3" size="1.778" layer="27" display="off"/>
@@ -1163,12 +1180,15 @@ design rules under a new name.</description>
 </element>
 <element name="D1" library="mfleds" package="LED0603" value="" x="15" y="12.5" rot="R270">
 <attribute name="MFG#" value="N/A" x="15" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-LED-0603-GREEN" x="15" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="D2" library="mfleds" package="LED0603" value="" x="11.4" y="12.5" rot="R270">
 <attribute name="MFG#" value="N/A" x="11.4" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="AMFPN" value="MF-LED-0603-RED" x="11.4" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="D3" library="mfleds" package="LED0603" value="" x="10.9" y="37.5" rot="R180">
 <attribute name="MFG#" value="N/A" x="10.9" y="37.5" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="AMFPN" value="MF-LED-0603-RED" x="10.9" y="37.5" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="R2" library="mfpassives" package="R0603" value="560" x="16.8" y="12.5" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="16.8" y="12.5" size="1.778" layer="27" rot="R270" display="off"/>
