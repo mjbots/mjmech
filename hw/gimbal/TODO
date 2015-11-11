@@ -1,4 +1,5 @@
  * TODO
+   * add test points for various voltage rails
    * verify package sizes and part values against part numbers
    * Clean up placement and ensure alignment where we can
    * Normalize fonts on silk screen

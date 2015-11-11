@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="1.27" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.635" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -88,7 +88,7 @@
 <wire x1="-1.4" y1="-0.7" x2="1.4" y2="-0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="-0.7" x2="1.4" y2="0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="0.7" x2="-1.4" y2="0.7" width="0.127" layer="21"/>
-<text x="-1.4" y="1.1" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<text x="-1.4" y="1.1" size="0.8" layer="25" font="vector" ratio="10">&gt;NAME</text>
 </package>
 <package name="R0805">
 <description>&lt;b&gt;Description:&lt;/b&gt; Standard 0805 Package for Resistors&lt;br/&gt;</description>
@@ -128,7 +128,7 @@
 <wire x1="-1.4" y1="-0.7" x2="1.4" y2="-0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="-0.7" x2="1.4" y2="0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="0.7" x2="-1.4" y2="0.7" width="0.127" layer="21"/>
-<text x="-1.4" y="1.1" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<text x="-1.4" y="1.1" size="0.8" layer="25" font="vector" ratio="10">&gt;NAME</text>
 </package>
 <package name="C0805">
 <description>&lt;b&gt;Description:&lt;/b&gt; Standard 0805 Package for Capacitors&lt;br/&gt;</description>
@@ -200,7 +200,7 @@
 <wire x1="-2.3" y1="-3.3" x2="-1.1" y2="-3.3" width="0.127" layer="21"/>
 <wire x1="2" y1="-1.5" x2="2" y2="-2.5" width="0.127" layer="21"/>
 <wire x1="1.5" y1="-2" x2="2.5" y2="-2" width="0.127" layer="21"/>
-<text x="-3.3" y="5" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<text x="-3.3" y="5" size="0.8" layer="25" font="vector" ratio="10">&gt;NAME</text>
 </package>
 <package name="CP8MM">
 <description>&lt;b&gt;Description:&lt;/b&gt; 8MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.&lt;br&gt;</description>

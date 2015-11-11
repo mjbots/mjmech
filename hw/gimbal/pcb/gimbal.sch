@@ -1937,7 +1937,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="-2.3" y1="-3.3" x2="-1.1" y2="-3.3" width="0.127" layer="21"/>
 <wire x1="2" y1="-1.5" x2="2" y2="-2.5" width="0.127" layer="21"/>
 <wire x1="1.5" y1="-2" x2="2.5" y2="-2" width="0.127" layer="21"/>
-<text x="-3.3" y="5" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<text x="-3.3" y="5" size="0.8" layer="25" font="vector" ratio="10">&gt;NAME</text>
 </package>
 <package name="CP8MM">
 <description>&lt;b&gt;Description:&lt;/b&gt; 8MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.&lt;br&gt;</description>
@@ -2006,7 +2006,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="-1.4" y1="-0.7" x2="1.4" y2="-0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="-0.7" x2="1.4" y2="0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="0.7" x2="-1.4" y2="0.7" width="0.127" layer="21"/>
-<text x="-1.4" y="1.1" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<text x="-1.4" y="1.1" size="0.8" layer="25" font="vector" ratio="10">&gt;NAME</text>
 </package>
 <package name="R0805">
 <description>&lt;b&gt;Description:&lt;/b&gt; Standard 0805 Package for Resistors&lt;br/&gt;</description>
@@ -2056,7 +2056,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="-1.4" y1="-0.7" x2="1.4" y2="-0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="-0.7" x2="1.4" y2="0.7" width="0.127" layer="21"/>
 <wire x1="1.4" y1="0.7" x2="-1.4" y2="0.7" width="0.127" layer="21"/>
-<text x="-1.4" y="1.1" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<text x="-1.4" y="1.1" size="0.8" layer="25" font="vector" ratio="10">&gt;NAME</text>
 </package>
 <package name="C0805">
 <description>&lt;b&gt;Description:&lt;/b&gt; Standard 0805 Package for Capacitors&lt;br/&gt;</description>
