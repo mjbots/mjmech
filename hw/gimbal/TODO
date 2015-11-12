@@ -1,10 +1,5 @@
  * TODO
-   * add test points for various voltage rails
    * verify package sizes and part values against part numbers
-   * Clean up placement and ensure alignment where we can
-   * Normalize fonts on silk screen
-     * Remove values from silk screen
-   * Add silk board description and labels
    * Route power
    * autoroute remainder
 
@@ -38,6 +33,14 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-11
+ * add test points for various voltage rails
+ * arranged all silk labels
+ * Clean up placement and ensure alignment where we can
+ * Normalize fonts on silk screen
+   * Remove values from silk screen
+ * Add silk board description and labels
 
 DONE 2015-11-09
  * Label all ICs and parts with useful names

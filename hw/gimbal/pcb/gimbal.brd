@@ -149,6 +149,8 @@
 <wire x1="60" y1="0" x2="60" y2="42" width="0" layer="20"/>
 <wire x1="60" y1="42" x2="0" y2="42" width="0" layer="20"/>
 <wire x1="0" y1="42" x2="0" y2="0" width="0" layer="20"/>
+<text x="59.7" y="12.8" size="0.7" layer="21" ratio="10" rot="R180">(c) 2015 jjp@pobox.com</text>
+<text x="59.7" y="13.9" size="0.7" layer="21" ratio="10" rot="R180">mjmech gimbal v1</text>
 </plain>
 <libraries>
 <library name="gimbal">
@@ -844,6 +846,23 @@ http://www.zetex.com&lt;p&gt;
 </package>
 </packages>
 </library>
+<library name="testpad">
+<description>&lt;b&gt;Test Pins/Pads&lt;/b&gt;&lt;p&gt;
+Cream on SMD OFF.&lt;br&gt;
+new: Attribute TP_SIGNAL_NAME&lt;br&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="P1-13">
+<description>&lt;b&gt;TEST PAD&lt;/b&gt;</description>
+<circle x="0" y="0" radius="0.762" width="0.1524" layer="51"/>
+<pad name="TP" x="0" y="0" drill="1.3208" diameter="2.159" shape="octagon"/>
+<text x="-1.016" y="1.27" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="0" y="0" size="0.0254" layer="27">&gt;VALUE</text>
+<text x="-1.27" y="-2.54" size="1" layer="37">&gt;TP_SIGNAL_NAME</text>
+<rectangle x1="-0.3302" y1="-0.3302" x2="0.3302" y2="0.3302" layer="51"/>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1076,7 +1095,7 @@ design rules under a new name.</description>
 </element>
 <element name="USBO" library="gimbal" package="JST_PH_SMT_VERT_4" value="" x="33.1" y="26.2" smashed="yes" rot="R180">
 <attribute name="DPN" value="455-1736-1-ND" x="33.1" y="26.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="37.6" y="22.8" size="1.27" layer="21" rot="R180"/>
+<attribute name="NAME" x="37.6" y="22.8" size="1" layer="21" ratio="10" rot="R180"/>
 </element>
 <element name="USB" library="gimbal" package="FCI_MICROUSB_SMT_RA" value="MICRO-USB" x="4.7" y="39.3" smashed="yes" rot="R180">
 <attribute name="DPN" value="609-4618-1-ND" x="4.7" y="39.3" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1134,7 +1153,7 @@ design rules under a new name.</description>
 </element>
 <element name="D4" library="gimbal" package="B520C" value="DIODEB520C" x="54.5" y="17.9" smashed="yes">
 <attribute name="DPN" value="B520C-FDICT-ND" x="54.5" y="17.9" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="55.5" y="14.4" size="0.8" layer="21" ratio="10" rot="R180"/>
+<attribute name="NAME" x="51.9" y="22.9" size="0.8" layer="21" ratio="10" rot="R270"/>
 </element>
 <element name="R11" library="mfpassives" package="R0603" value="78.7k" x="50.4" y="22.2" smashed="yes" rot="R180">
 <attribute name="TOLERANCE" value="N/A" x="50.4" y="22.2" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1201,21 +1220,21 @@ design rules under a new name.</description>
 <attribute name="DPN" value="P10.0KHCT-ND" x="42.5" y="39.2" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="41" y="39.6" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="R7" library="mfpassives" package="R0603" value="100k" x="40.8" y="14.8" smashed="yes">
-<attribute name="TOLERANCE" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
-<attribute name="MFG#" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
-<attribute name="VOLTAGE" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
-<attribute name="WATTAGE" value="N/A" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
-<attribute name="DPN" value="P100KHCT-ND" x="40.8" y="14.8" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="39.2" y="15.2" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
+<element name="R7" library="mfpassives" package="R0603" value="100k" x="40.3" y="14.4" smashed="yes">
+<attribute name="TOLERANCE" value="N/A" x="40.3" y="14.4" size="1.778" layer="27" display="off"/>
+<attribute name="MFG#" value="N/A" x="40.3" y="14.4" size="1.778" layer="27" display="off"/>
+<attribute name="VOLTAGE" value="N/A" x="40.3" y="14.4" size="1.778" layer="27" display="off"/>
+<attribute name="WATTAGE" value="N/A" x="40.3" y="14.4" size="1.778" layer="27" display="off"/>
+<attribute name="DPN" value="P100KHCT-ND" x="40.3" y="14.4" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="38.7" y="14.8" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="R8" library="mfpassives" package="R0603" value="10k" x="40.8" y="13.1" smashed="yes" rot="R180">
-<attribute name="TOLERANCE" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MFG#" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="WATTAGE" value="N/A" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="DPN" value="P10.0KHCT-ND" x="40.8" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="39.2" y="13.5" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
+<element name="R8" library="mfpassives" package="R0603" value="10k" x="40.3" y="12.7" smashed="yes" rot="R180">
+<attribute name="TOLERANCE" value="N/A" x="40.3" y="12.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MFG#" value="N/A" x="40.3" y="12.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VOLTAGE" value="N/A" x="40.3" y="12.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="WATTAGE" value="N/A" x="40.3" y="12.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DPN" value="P10.0KHCT-ND" x="40.3" y="12.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="38.7" y="13.1" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="ARM" library="gimbal" package="JS_SUB_SWITCH" value="SLIDE_SWITCHJS_SUB_SWITCH" x="5" y="1.2" smashed="yes">
 <attribute name="DPN" value="401-2002-6-ND" x="5" y="1.2" size="1.778" layer="27" display="off"/>
@@ -1290,7 +1309,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="31.1" y="0.9" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
+<attribute name="NAME" x="31.1" y="0.5" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
 </element>
 <element name="C25" library="mfpassives" package="C0603" value="0.01uF" x="32" y="1.8" smashed="yes" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="32" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1404,13 +1423,13 @@ design rules under a new name.</description>
 <attribute name="DPN" value="490-1522-1-ND" x="50.3" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="51.2" y="29.5" size="0.8" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="C16" library="mfpassives" package="C1206" value="10uF" x="44.7" y="13.4" smashed="yes" rot="R180">
-<attribute name="TOLERANCE" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MFG#" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="TEMP_COF" value="N/A" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="AMFPN" value="MF-CAP-1206-10uF" x="44.7" y="13.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="43.7" y="14.7" size="0.8" layer="25" font="vector" ratio="10"/>
+<element name="C16" library="mfpassives" package="C1206" value="10uF" x="44.2" y="13.1" smashed="yes" rot="R180">
+<attribute name="TOLERANCE" value="N/A" x="44.2" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MFG#" value="N/A" x="44.2" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VOLTAGE" value="N/A" x="44.2" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="TEMP_COF" value="N/A" x="44.2" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-1206-10uF" x="44.2" y="13.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="44.5" y="11.8" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="C10" library="mfpassives" package="C1206" value="10uF" x="42.3" y="37" smashed="yes">
 <attribute name="TOLERANCE" value="N/A" x="42.3" y="37" size="1.778" layer="27" display="off"/>
@@ -1507,6 +1526,26 @@ design rules under a new name.</description>
 <attribute name="WATTAGE" value="N/A" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.7" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="6.3" y="18" size="0.8" layer="25" font="vector" ratio="10" rot="R270"/>
+</element>
+<element name="TP1" library="testpad" package="P1-13" value="TPPAD1-13" x="41" y="27.5" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="39.73" y="24.96" size="1" layer="37"/>
+<attribute name="NAME" x="42.516" y="26.23" size="1" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="41" y="27.5" size="0.0254" layer="27"/>
+</element>
+<element name="TP2" library="testpad" package="P1-13" value="TPPAD1-13" x="45.1" y="16" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="43.83" y="13.46" size="1" layer="37"/>
+<attribute name="NAME" x="43.816" y="16.53" size="1" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="45.1" y="16" size="0.0254" layer="27"/>
+</element>
+<element name="TP3" library="testpad" package="P1-13" value="TPPAD1-13" x="29" y="1.5" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="27.73" y="-1.04" size="1" layer="37"/>
+<attribute name="NAME" x="27.984" y="2.77" size="1" layer="25" ratio="10"/>
+<attribute name="VALUE" x="29" y="1.5" size="0.0254" layer="27"/>
+</element>
+<element name="TP4" library="testpad" package="P1-13" value="TPPAD1-13" x="34.5" y="17.5" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="33.23" y="14.96" size="1" layer="37"/>
+<attribute name="NAME" x="35.916" y="15.93" size="1" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="34.5" y="17.5" size="0.0254" layer="27"/>
 </element>
 </elements>
 <signals>
@@ -1636,6 +1675,7 @@ design rules under a new name.</description>
 <contactref element="C18" pad="P$2"/>
 <contactref element="C19" pad="P$2"/>
 <contactref element="U3" pad="G2"/>
+<contactref element="TP4" pad="TP"/>
 <wire x1="50.3" y1="29.75" x2="56.15" y2="32.9" width="0" layer="19" extent="1-1"/>
 <wire x1="51.15" y1="25.35" x2="50.3" y2="29.75" width="0" layer="19" extent="1-1"/>
 <wire x1="41.9" y1="34.2" x2="41.5" y2="34.2" width="0" layer="19" extent="1-1"/>
@@ -1652,6 +1692,7 @@ design rules under a new name.</description>
 <wire x1="54.9" y1="7.5" x2="53.9" y2="7.5" width="0" layer="19" extent="1-1"/>
 <wire x1="37.5" y1="7.5" x2="36.5" y2="7.5" width="0" layer="19" extent="1-1"/>
 <wire x1="49.45" y1="25.25" x2="50.45" y2="24.65" width="0" layer="19" extent="1-1"/>
+<wire x1="51.15" y1="22.2" x2="51.05" y2="23.65" width="0" layer="19" extent="1-1"/>
 <wire x1="19.07" y1="10.52" x2="20.77" y2="10.72" width="0" layer="19" extent="1-1"/>
 <wire x1="19.07" y1="11.32" x2="19.07" y2="10.52" width="0" layer="19" extent="1-1"/>
 <wire x1="19.07" y1="9.72" x2="19.07" y2="10.52" width="0" layer="19" extent="1-1"/>
@@ -1677,11 +1718,10 @@ design rules under a new name.</description>
 <wire x1="46.5" y1="24.75" x2="49.45" y2="25.25" width="0" layer="19" extent="1-1"/>
 <wire x1="29.1" y1="8.75" x2="26.07" y2="8.92" width="0" layer="19" extent="1-1"/>
 <wire x1="29.55" y1="11.4" x2="29.1" y2="8.75" width="0" layer="19" extent="1-1"/>
-<wire x1="51.15" y1="22.2" x2="51.05" y2="23.65" width="0" layer="19" extent="1-1"/>
-<wire x1="48.1" y1="19.05" x2="51.15" y2="22.2" width="0" layer="19" extent="1-1"/>
-<wire x1="41.55" y1="13.1" x2="38.475" y2="10.3" width="0" layer="19" extent="1-1"/>
-<wire x1="43.25" y1="13.4" x2="41.55" y2="13.1" width="0" layer="19" extent="1-1"/>
+<wire x1="41.05" y1="12.7" x2="38.475" y2="10.3" width="0" layer="19" extent="1-1"/>
+<wire x1="42.75" y1="13.1" x2="41.05" y2="12.7" width="0" layer="19" extent="1-1"/>
 <wire x1="45.55" y1="29" x2="46.5" y2="24.75" width="0" layer="19" extent="1-1"/>
+<wire x1="48.1" y1="19.05" x2="51.15" y2="22.2" width="0" layer="19" extent="1-1"/>
 <wire x1="8.984" y1="6.0602" x2="13.03" y2="4.23" width="0" layer="19" extent="1-1"/>
 <wire x1="7.5" y1="3.95" x2="8.984" y2="6.0602" width="0" layer="19" extent="1-1"/>
 <wire x1="46.2" y1="4.8" x2="41.725" y2="4.7" width="0" layer="19" extent="1-1"/>
@@ -1787,9 +1827,11 @@ design rules under a new name.</description>
 <contactref element="R18" pad="P$2"/>
 <contactref element="R15" pad="P$2"/>
 <contactref element="R16" pad="P$2"/>
+<contactref element="TP1" pad="TP"/>
 <wire x1="41.3" y1="30.9" x2="41.65" y2="33.25" width="0" layer="19" extent="1-1"/>
 <wire x1="38.6" y1="31.05" x2="41.3" y2="30.9" width="0" layer="19" extent="1-1"/>
-<wire x1="34" y1="21.75" x2="38.6" y2="31.05" width="0" layer="19" extent="1-16"/>
+<wire x1="41" y1="27.5" x2="41.3" y2="30.9" width="0" layer="19" extent="1-1"/>
+<wire x1="34" y1="21.75" x2="41" y2="27.5" width="0" layer="19" extent="16-16"/>
 <wire x1="30.65" y1="23.9178" x2="34" y2="21.75" width="0" layer="19" extent="16-16"/>
 <wire x1="22.5" y1="27.75" x2="30.65" y2="23.9178" width="0" layer="19" extent="1-16"/>
 <wire x1="21.925" y1="29.425" x2="22.5" y2="27.75" width="0" layer="19" extent="1-1"/>
@@ -1915,6 +1957,7 @@ design rules under a new name.</description>
 <contactref element="C17" pad="P$1"/>
 <contactref element="C18" pad="P$1"/>
 <contactref element="C19" pad="P$1"/>
+<contactref element="TP3" pad="TP"/>
 <wire x1="40.85" y1="37" x2="43.25" y2="40.9" width="0" layer="19" extent="1-1"/>
 <wire x1="41.65" y1="35.15" x2="40.85" y2="37" width="0" layer="19" extent="1-1"/>
 <wire x1="42.15" y1="35.15" x2="41.65" y2="35.15" width="0" layer="19" extent="1-1"/>
@@ -1930,6 +1973,7 @@ design rules under a new name.</description>
 <wire x1="24.17" y1="5.42" x2="26.07" y2="8.12" width="0" layer="19" extent="1-1"/>
 <wire x1="23.95" y1="2.5" x2="24.17" y2="5.42" width="0" layer="19" extent="1-1"/>
 <wire x1="26" y1="1.75" x2="23.95" y2="2.5" width="0" layer="19" extent="1-1"/>
+<wire x1="29" y1="1.5" x2="26" y2="1.75" width="0" layer="19" extent="1-1"/>
 <wire x1="29.1" y1="5.85" x2="26.07" y2="8.12" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$16">
@@ -1960,10 +2004,12 @@ design rules under a new name.</description>
 <contactref element="C22" pad="P$1"/>
 <contactref element="C24" pad="P$1"/>
 <contactref element="C16" pad="P$1"/>
+<contactref element="TP2" pad="TP"/>
 <wire x1="48.1" y1="15.95" x2="51.05" y2="17.9" width="0" layer="19" extent="1-1"/>
-<wire x1="46.15" y1="13.4" x2="48.1" y2="15.95" width="0" layer="19" extent="1-1"/>
-<wire x1="46.2" y1="10.2" x2="46.15" y2="13.4" width="0" layer="19" extent="1-1"/>
-<wire x1="41.55" y1="14.8" x2="46.15" y2="13.4" width="0" layer="19" extent="1-1"/>
+<wire x1="45.1" y1="16" x2="48.1" y2="15.95" width="0" layer="19" extent="1-1"/>
+<wire x1="45.65" y1="13.1" x2="45.1" y2="16" width="0" layer="19" extent="1-1"/>
+<wire x1="46.2" y1="10.2" x2="45.65" y2="13.1" width="0" layer="19" extent="1-1"/>
+<wire x1="41.05" y1="14.4" x2="45.1" y2="16" width="0" layer="19" extent="1-1"/>
 <wire x1="52.625" y1="4.7" x2="46.2" y2="10.2" width="0" layer="19" extent="1-1"/>
 <wire x1="51.2" y1="1.05" x2="52.625" y2="4.7" width="0" layer="19" extent="1-1"/>
 <wire x1="57.175" y1="4.7" x2="52.625" y2="4.7" width="0" layer="19" extent="1-1"/>
@@ -2230,8 +2276,8 @@ design rules under a new name.</description>
 <contactref element="R8" pad="P$2"/>
 <contactref element="R7" pad="P$1"/>
 <contactref element="U1" pad="10"/>
-<wire x1="40.05" y1="14.8" x2="22.8" y2="34.8" width="0" layer="19" extent="1-1"/>
-<wire x1="40.05" y1="13.1" x2="40.05" y2="14.8" width="0" layer="19" extent="1-1"/>
+<wire x1="39.55" y1="14.4" x2="22.8" y2="34.8" width="0" layer="19" extent="1-1"/>
+<wire x1="39.55" y1="12.7" x2="39.55" y2="14.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$39">
 <contactref element="R2" pad="P$1"/>
