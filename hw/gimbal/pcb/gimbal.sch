@@ -428,15 +428,15 @@ MAX3223-MAX3243.pdf</description>
 <package name="JST_PH_SMT_RA_4">
 <smd name="3" x="1" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
 <smd name="4" x="3" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
-<smd name="SHLD2" x="5.35" y="-2.3" dx="3.4" dy="1.5" layer="1" rot="R90"/>
-<smd name="SHLD1" x="-5.35" y="-2.3" dx="3.4" dy="1.5" layer="1" rot="R90"/>
+<smd name="SHLD2" x="5.35" y="-3.3" dx="3.4" dy="1.5" layer="1" rot="R90"/>
+<smd name="SHLD1" x="-5.35" y="-3.3" dx="3.4" dy="1.5" layer="1" rot="R90"/>
 <smd name="2" x="-1" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
 <smd name="1" x="-3" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
 <text x="-6.2" y="5.5" size="1.27" layer="21">&gt;NAME</text>
-<wire x1="-6.3" y1="-4.2" x2="-6.3" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-6.3" y1="-5.1" x2="-6.3" y2="1.5" width="0.127" layer="21"/>
 <wire x1="-6.3" y1="1.5" x2="6.3" y2="1.5" width="0.127" layer="21"/>
-<wire x1="6.3" y1="1.5" x2="6.3" y2="-4.2" width="0.127" layer="21"/>
-<wire x1="6.3" y1="-4.2" x2="-6.3" y2="-4.2" width="0.127" layer="21"/>
+<wire x1="6.3" y1="1.5" x2="6.3" y2="-5.1" width="0.127" layer="21"/>
+<wire x1="6.3" y1="-5.1" x2="-6.3" y2="-5.1" width="0.127" layer="21"/>
 </package>
 <package name="JST_PH_SMT_VERT_4">
 <smd name="SHLD1" x="-5.4" y="0.5" dx="3" dy="1.6" layer="1" rot="R90"/>
@@ -556,8 +556,8 @@ MAX3223-MAX3243.pdf</description>
 </polygon>
 </package>
 <package name="L_SMT_1212">
-<smd name="P$1" x="-1" y="0" dx="3.1" dy="1.1" layer="1" rot="R90"/>
-<smd name="P$2" x="1" y="0" dx="3.1" dy="1.1" layer="1" rot="R90"/>
+<smd name="P$1" x="-1.05" y="0" dx="3.1" dy="1.3" layer="1" rot="R90"/>
+<smd name="P$2" x="1.05" y="0" dx="3.1" dy="1.3" layer="1" rot="R90"/>
 <text x="-1.7" y="2" size="1.27" layer="21">&gt;NAME</text>
 <wire x1="-1.9" y1="1.7" x2="1.9" y2="1.7" width="0.127" layer="39"/>
 <wire x1="1.9" y1="1.7" x2="1.9" y2="-1.7" width="0.127" layer="39"/>
@@ -696,6 +696,17 @@ MAX3223-MAX3243.pdf</description>
 <wire x1="4.5" y1="2.6" x2="4.5" y2="-1" width="0.127" layer="21"/>
 <wire x1="4.5" y1="-1" x2="-4.5" y2="-1" width="0.127" layer="21"/>
 <text x="-4.4" y="4.6" size="1.27" layer="21">&gt;NAME</text>
+</package>
+<package name="ABM3B">
+<smd name="1" x="-2" y="-1.2" dx="1.8" dy="1.2" layer="1" rot="R180"/>
+<smd name="2" x="2" y="-1.2" dx="1.8" dy="1.2" layer="1" rot="R180"/>
+<smd name="3" x="2" y="1.2" dx="1.8" dy="1.2" layer="1" rot="R180"/>
+<smd name="4" x="-2" y="1.2" dx="1.8" dy="1.2" layer="1" rot="R180"/>
+<wire x1="-3.235" y1="2.235" x2="-3.235" y2="-2.235" width="0.127" layer="21"/>
+<wire x1="-3.235" y1="-2.235" x2="3.235" y2="-2.235" width="0.127" layer="21"/>
+<wire x1="3.235" y1="-2.235" x2="3.235" y2="2.235" width="0.127" layer="21"/>
+<wire x1="3.235" y1="2.235" x2="-3.235" y2="2.235" width="0.127" layer="21"/>
+<text x="-2.5" y="2.735" size="0.8" layer="21" ratio="10">&gt;NAME</text>
 </package>
 </packages>
 <symbols>
@@ -1436,6 +1447,16 @@ MAX3223-MAX3243.pdf</description>
 <technology name=""/>
 </technologies>
 </device>
+<device name="ABM3B" package="ABM3B">
+<connects>
+<connect gate="G$1" pin="P$1" pad="1"/>
+<connect gate="G$1" pin="P$2" pad="3"/>
+<connect gate="G$1" pin="P$3" pad="2 4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
 </devices>
 </deviceset>
 <deviceset name="SLIDE_SWITCH">
@@ -1710,87 +1731,6 @@ MAX3223-MAX3243.pdf</description>
 </connects>
 <technologies>
 <technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
-<library name="zetex">
-<description>&lt;b&gt;Zetex Power MOS FETs, Bridges, Diodes&lt;/b&gt;&lt;p&gt;
-http://www.zetex.com&lt;p&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
-<packages>
-<package name="SOT-23">
-<description>&lt;b&gt;Small Outline Transistor&lt;/b&gt;</description>
-<wire x1="-1.4224" y1="0.381" x2="1.4732" y2="0.381" width="0.1524" layer="21"/>
-<wire x1="1.4732" y1="0.381" x2="1.4732" y2="-0.381" width="0.1524" layer="21"/>
-<wire x1="1.4732" y1="-0.381" x2="-1.4224" y2="-0.381" width="0.1524" layer="21"/>
-<wire x1="-1.4224" y1="-0.381" x2="-1.4224" y2="0.381" width="0.1524" layer="21"/>
-<smd name="3" x="0.9906" y="1.016" dx="0.7874" dy="0.889" layer="1"/>
-<smd name="2" x="-0.9398" y="1.016" dx="0.7874" dy="0.889" layer="1"/>
-<smd name="1" x="0.0254" y="-1.016" dx="0.7874" dy="0.889" layer="1"/>
-<text x="-1.397" y="1.778" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
-<text x="-1.397" y="3.302" size="1.27" layer="25" ratio="10">&gt;NAME</text>
-<rectangle x1="0.7874" y1="0.4318" x2="1.1684" y2="0.9398" layer="51"/>
-<rectangle x1="-1.143" y1="0.4318" x2="-0.762" y2="0.9398" layer="51"/>
-<rectangle x1="-0.1778" y1="-0.9398" x2="0.2032" y2="-0.4318" layer="51"/>
-</package>
-</packages>
-<symbols>
-<symbol name="N_MOSFET">
-<wire x1="-0.508" y1="0" x2="0" y2="0" width="0.1524" layer="94"/>
-<wire x1="-1.524" y1="-2.159" x2="0" y2="-2.159" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="2.54" width="0.1524" layer="94"/>
-<wire x1="0" y1="0" x2="0" y2="-2.159" width="0.1524" layer="94"/>
-<wire x1="1.397" y1="-0.254" x2="1.397" y2="-3.048" width="0.1524" layer="94"/>
-<wire x1="1.397" y1="-3.048" x2="0" y2="-3.048" width="0.1524" layer="94"/>
-<wire x1="-1.524" y1="2.159" x2="0" y2="2.159" width="0.1524" layer="94"/>
-<wire x1="0" y1="2.159" x2="0" y2="2.54" width="0.1524" layer="94"/>
-<wire x1="0" y1="3.048" x2="1.397" y2="3.048" width="0.1524" layer="94"/>
-<wire x1="1.397" y1="3.048" x2="1.397" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="0" y1="-2.159" x2="0" y2="-2.54" width="0.1524" layer="94"/>
-<text x="2.54" y="0" size="1.778" layer="96">&gt;VALUE</text>
-<text x="2.54" y="2.54" size="1.778" layer="95">&gt;NAME</text>
-<rectangle x1="-2.032" y1="1.397" x2="-1.524" y2="2.921" layer="94"/>
-<rectangle x1="-2.032" y1="-0.762" x2="-1.524" y2="0.762" layer="94"/>
-<rectangle x1="-2.032" y1="-2.921" x2="-1.524" y2="-1.397" layer="94"/>
-<rectangle x1="0.762" y1="0.762" x2="2.032" y2="0.889" layer="94"/>
-<pin name="D" x="0" y="5.08" visible="off" length="short" direction="pas" rot="R270"/>
-<pin name="S" x="0" y="-5.08" visible="off" length="short" direction="pas" rot="R90"/>
-<pin name="G" x="-5.08" y="-2.54" visible="off" length="short" direction="pas"/>
-<polygon width="0.1016" layer="94">
-<vertex x="-1.524" y="0"/>
-<vertex x="-0.508" y="0.635"/>
-<vertex x="-0.508" y="-0.635"/>
-</polygon>
-<polygon width="0.1016" layer="94">
-<vertex x="1.397" y="0.762"/>
-<vertex x="2.032" y="-0.254"/>
-<vertex x="0.762" y="-0.254"/>
-</polygon>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="NMOSSOT23" prefix="T" uservalue="yes">
-<description>&lt;b&gt;MOS FET&lt;/b&gt;</description>
-<gates>
-<gate name="A" symbol="N_MOSFET" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="SOT-23">
-<connects>
-<connect gate="A" pin="D" pad="1"/>
-<connect gate="A" pin="G" pad="3"/>
-<connect gate="A" pin="S" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
 </technologies>
 </device>
 </devices>
@@ -3169,6 +3109,113 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="mfdiscrete">
+<packages>
+<package name="SOT-23-3">
+<description>&lt;b&gt;Description:&lt;/b&gt; Standard SOT-23-3 footprint.&lt;br/&gt;</description>
+<smd name="P$1" x="-0.95" y="-1" dx="0.9" dy="0.8" layer="1" rot="R90"/>
+<smd name="P$2" x="0.95" y="-1" dx="0.9" dy="0.8" layer="1" rot="R90"/>
+<smd name="P$3" x="0" y="1" dx="0.9" dy="0.8" layer="1" rot="R90"/>
+<wire x1="-1.6" y1="-1.8" x2="1.6" y2="-1.8" width="0.127" layer="21"/>
+<wire x1="1.6" y1="-1.8" x2="1.6" y2="1.8" width="0.127" layer="21"/>
+<wire x1="1.6" y1="1.8" x2="-1.6" y2="1.8" width="0.127" layer="21"/>
+<wire x1="-1.6" y1="1.8" x2="-1.6" y2="-1.8" width="0.127" layer="21"/>
+<text x="-1.6" y="2.2" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<polygon width="0.127" layer="21">
+<vertex x="-2.2" y="-1.6" curve="-90"/>
+<vertex x="-2.4" y="-1.4" curve="-90"/>
+<vertex x="-2.2" y="-1.2" curve="-90"/>
+<vertex x="-2" y="-1.4" curve="-90"/>
+</polygon>
+</package>
+<package name="TO-252-3">
+<description>&lt;b&gt;Description:&lt;/b&gt; Footprint for TO-252-3 Standard.&lt;br/&gt;</description>
+<smd name="PAD" x="0" y="0" dx="6.7" dy="6.7" layer="1"/>
+<smd name="1" x="-2.3" y="-6.65" dx="3" dy="1.6" layer="1" rot="R90"/>
+<smd name="2" x="2.3" y="-6.65" dx="3" dy="1.6" layer="1" rot="R90"/>
+<wire x1="-3.8" y1="3.8" x2="3.8" y2="3.8" width="0.127" layer="21"/>
+<wire x1="3.8" y1="3.8" x2="3.8" y2="-8.6" width="0.127" layer="21"/>
+<wire x1="3.8" y1="-8.6" x2="-3.8" y2="-8.6" width="0.127" layer="21"/>
+<wire x1="-3.8" y1="-8.6" x2="-3.8" y2="3.8" width="0.127" layer="21"/>
+<text x="-3.8" y="4.2" size="0.8128" layer="25" font="vector" ratio="16">&gt;NAME</text>
+</package>
+</packages>
+<symbols>
+<symbol name="N-CHANNEL_FET">
+<description>&lt;b&gt;Description:&lt;/b&gt; Symbol for N-Channel Mosfets.&lt;br/&gt;</description>
+<pin name="GATE" x="-7.62" y="0" visible="off" length="short"/>
+<pin name="DRAIN" x="2.54" y="7.62" visible="off" length="short" rot="R270"/>
+<pin name="SOURCE" x="2.54" y="-7.62" visible="off" length="short" rot="R90"/>
+<circle x="0" y="0" radius="3.81845625" width="0.1524" layer="94"/>
+<text x="-5.08" y="0.254" size="1.016" layer="94" font="vector">G</text>
+<text x="2.794" y="3.81" size="1.016" layer="94" font="vector">D</text>
+<text x="2.794" y="-4.826" size="1.016" layer="94" font="vector">S</text>
+<text x="0" y="5.08" size="1.016" layer="95" font="vector" align="bottom-right">&gt;NAME</text>
+<text x="0" y="-5.08" size="1.016" layer="96" font="vector" rot="R180">&gt;VALUE</text>
+<wire x1="-5.08" y1="0" x2="-1.778" y2="0" width="0.1524" layer="94"/>
+<wire x1="-1.778" y1="0" x2="-1.778" y2="2.54" width="0.1524" layer="94"/>
+<wire x1="-1.778" y1="0" x2="-1.778" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="2.54" y1="5.08" x2="2.54" y2="1.778" width="0.1524" layer="94"/>
+<wire x1="2.54" y1="1.778" x2="-1.016" y2="1.778" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="1.778" x2="-1.016" y2="2.54" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="1.778" x2="-1.016" y2="1.016" width="0.1524" layer="94"/>
+<wire x1="2.54" y1="-5.08" x2="2.54" y2="-1.778" width="0.1524" layer="94"/>
+<wire x1="2.54" y1="-1.778" x2="0.762" y2="-1.778" width="0.1524" layer="94"/>
+<wire x1="0.762" y1="-1.778" x2="-1.016" y2="-1.778" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="-1.778" x2="-1.016" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="-1.778" x2="-1.016" y2="-1.016" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="0.508" x2="-1.016" y2="0" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="0" x2="-1.016" y2="-0.508" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="0" x2="0.762" y2="0" width="0.1524" layer="94"/>
+<wire x1="0.762" y1="0" x2="0.762" y2="-1.778" width="0.1524" layer="94"/>
+<wire x1="2.54" y1="1.778" x2="2.54" y2="-1.778" width="0.1524" layer="94"/>
+<wire x1="2.032" y1="0.254" x2="3.048" y2="0.254" width="0.1524" layer="94"/>
+<polygon width="0.1524" layer="94">
+<vertex x="2.54" y="0.254"/>
+<vertex x="2.032" y="-0.508"/>
+<vertex x="3.048" y="-0.508"/>
+</polygon>
+<polygon width="0.1524" layer="94">
+<vertex x="-1.016" y="0"/>
+<vertex x="-0.254" y="0.508"/>
+<vertex x="-0.254" y="-0.508"/>
+</polygon>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="N-CHANNEL_FET" prefix="U" uservalue="yes">
+<description>&lt;b&gt;Library:&lt;/b&gt;  MF_Discrete_Semiconductor&lt;br/&gt;
+&lt;b&gt;Description:&lt;/b&gt; Device for Single N-Channel Mosfet. Manufacture part number (MFG#) can be added via Attributes.&lt;br/&gt;</description>
+<gates>
+<gate name="G$1" symbol="N-CHANNEL_FET" x="0" y="0"/>
+</gates>
+<devices>
+<device name="_SOT-23-3" package="SOT-23-3">
+<connects>
+<connect gate="G$1" pin="DRAIN" pad="P$3"/>
+<connect gate="G$1" pin="GATE" pad="P$1"/>
+<connect gate="G$1" pin="SOURCE" pad="P$2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="_TO-252-3" package="TO-252-3">
+<connects>
+<connect gate="G$1" pin="DRAIN" pad="PAD"/>
+<connect gate="G$1" pin="GATE" pad="1"/>
+<connect gate="G$1" pin="SOURCE" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="MFG#" value="N/A" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -3226,17 +3273,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </part>
 <part name="MOUNT1" library="gimbal" deviceset="M3_MOTOR_MOUNT" device=""/>
 <part name="MOUNT2" library="gimbal" deviceset="M3_MOTOR_MOUNT" device=""/>
-<part name="T1" library="zetex" deviceset="NMOSSOT23" device="">
-<attribute name="AMFPN" value="MF-DSC-SOT233-BSS84"/>
-</part>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
 <part name="R13" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
-<attribute name="DPN" value="P88.7KHDKR-ND"/>
+<attribute name="DPN" value="P100KHCT-ND"/>
 </part>
 <part name="R14" library="mfpassives" deviceset="RESISTOR" device="_0603" value="220">
-<attribute name="DPN" value="P220HDKR-ND"/>
+<attribute name="DPN" value="P220HCT-ND"/>
 </part>
 <part name="SUPPLY1" library="supply2" deviceset="+8V" device=""/>
 <part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
@@ -3263,7 +3307,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="P1.87KHCT-ND"/>
 </part>
 <part name="R9" library="mfpassives" deviceset="RESISTOR" device="_0603" value="88.7k">
-<attribute name="DPN" value="P88.7KHDKR-ND"/>
+<attribute name="DPN" value="P88.7KHCT-ND"/>
 </part>
 <part name="R10" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
 <attribute name="DPN" value="P10.0KHCT-ND"/>
@@ -3296,7 +3340,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R1" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10">
 <attribute name="AMFPN" value="MF-RES-0603-10"/>
 </part>
-<part name="Q1" library="gimbal" deviceset="CRYSTAL" device="SMD5X3.2">
+<part name="Q1" library="gimbal" deviceset="CRYSTAL" device="ABM3B">
 <attribute name="DPN" value="535-9721-1-ND"/>
 </part>
 <part name="GND17" library="supply1" deviceset="GND" device=""/>
@@ -3316,7 +3360,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="P10.0KHCT-ND"/>
 </part>
 <part name="ARM" library="gimbal" deviceset="SLIDE_SWITCH" device="JS_SUB_SWITCH">
-<attribute name="DPN" value="401-2002-6-ND"/>
+<attribute name="DPN" value="401-2002-1-ND"/>
 </part>
 <part name="GND19" library="supply1" deviceset="GND" device=""/>
 <part name="+3V10" library="supply1" deviceset="+3V3" device=""/>
@@ -3437,6 +3481,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="TP2" library="testpad" deviceset="TP" device="PAD1-13"/>
 <part name="TP3" library="testpad" deviceset="TP" device="PAD1-13"/>
 <part name="TP4" library="testpad" deviceset="TP" device="PAD1-13"/>
+<part name="U8" library="mfdiscrete" deviceset="N-CHANNEL_FET" device="_SOT-23-3"/>
 </parts>
 <sheets>
 <sheet>
@@ -3490,10 +3535,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </instance>
 <instance part="MOUNT1" gate="G$1" x="-22.86" y="-383.54"/>
 <instance part="MOUNT2" gate="G$1" x="-22.86" y="-398.78"/>
-<instance part="T1" gate="A" x="205.74" y="-58.42">
-<attribute name="AMFPN" x="205.74" y="-58.42" size="1.778" layer="96" display="off"/>
-</instance>
-<instance part="GND1" gate="1" x="205.74" y="-68.58"/>
+<instance part="GND1" gate="1" x="205.74" y="-78.74"/>
 <instance part="GND2" gate="1" x="157.48" y="-78.74"/>
 <instance part="+3V1" gate="G$1" x="96.52" y="0"/>
 <instance part="R13" gate="G$1" x="114.3" y="-27.94" rot="R90">
@@ -3701,6 +3743,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="TP2" gate="G$1" x="264.16" y="86.36"/>
 <instance part="TP3" gate="G$1" x="-20.32" y="71.12"/>
 <instance part="TP4" gate="G$1" x="81.28" y="40.64"/>
+<instance part="U8" gate="G$1" x="203.2" y="-63.5"/>
 </instances>
 <busses>
 </busses>
@@ -3708,25 +3751,25 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <net name="N$1" class="0">
 <segment>
 <pinref part="J2" gate="A" pin="6"/>
-<pinref part="T1" gate="A" pin="D"/>
 <wire x1="187.96" y1="-50.8" x2="205.74" y2="-50.8" width="0.1524" layer="91"/>
-<wire x1="205.74" y1="-50.8" x2="205.74" y2="-53.34" width="0.1524" layer="91"/>
+<pinref part="U8" gate="G$1" pin="DRAIN"/>
+<wire x1="205.74" y1="-55.88" x2="205.74" y2="-50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="GND" class="0">
 <segment>
-<pinref part="T1" gate="A" pin="S"/>
 <pinref part="GND1" gate="1" pin="GND"/>
-<wire x1="205.74" y1="-63.5" x2="205.74" y2="-66.04" width="0.1524" layer="91"/>
-<wire x1="205.74" y1="-66.04" x2="213.36" y2="-66.04" width="0.1524" layer="91"/>
-<wire x1="213.36" y1="-66.04" x2="213.36" y2="-48.26" width="0.1524" layer="91"/>
-<junction x="205.74" y="-66.04"/>
+<wire x1="205.74" y1="-76.2" x2="213.36" y2="-76.2" width="0.1524" layer="91"/>
+<wire x1="213.36" y1="-76.2" x2="213.36" y2="-48.26" width="0.1524" layer="91"/>
+<junction x="205.74" y="-76.2"/>
 <pinref part="J2" gate="A" pin="4"/>
 <wire x1="213.36" y1="-48.26" x2="187.96" y2="-48.26" width="0.1524" layer="91"/>
 <pinref part="J2" gate="A" pin="2"/>
 <wire x1="187.96" y1="-45.72" x2="213.36" y2="-45.72" width="0.1524" layer="91"/>
 <wire x1="213.36" y1="-45.72" x2="213.36" y2="-48.26" width="0.1524" layer="91"/>
 <junction x="213.36" y="-48.26"/>
+<pinref part="U8" gate="G$1" pin="SOURCE"/>
+<wire x1="205.74" y1="-71.12" x2="205.74" y2="-76.2" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U4" gate="G$1" pin="PGND"/>
@@ -4049,9 +4092,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </net>
 <net name="LASER_EN" class="0">
 <segment>
-<pinref part="T1" gate="A" pin="G"/>
-<wire x1="200.66" y1="-60.96" x2="187.96" y2="-60.96" width="0.1524" layer="91"/>
-<label x="185.42" y="-60.96" size="1.778" layer="95"/>
+<wire x1="195.58" y1="-63.5" x2="180.34" y2="-63.5" width="0.1524" layer="91"/>
+<label x="177.8" y="-63.5" size="1.778" layer="95"/>
+<pinref part="U8" gate="G$1" pin="GATE"/>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="PB2"/>

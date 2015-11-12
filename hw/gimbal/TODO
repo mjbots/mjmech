@@ -1,5 +1,4 @@
  * TODO
-   * verify package sizes and part values against part numbers
    * Route power
    * autoroute remainder
 
@@ -41,6 +40,7 @@ DONE 2015-11-11
  * Normalize fonts on silk screen
    * Remove values from silk screen
  * Add silk board description and labels
+ * verify package sizes and part values against part numbers
 
 DONE 2015-11-09
  * Label all ICs and parts with useful names
