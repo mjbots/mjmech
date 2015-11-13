@@ -14,7 +14,7 @@
 
 #include <boost/python.hpp>
 
-#include "base/comm_factory.h"
+#include "base/concrete_comm_factory.h"
 #include "mech/herkulex.h"
 #include "mech/herkulex_servo_interface.h"
 
@@ -24,10 +24,8 @@ using namespace mjmech::base;
 using namespace mjmech::mech;
 namespace bp = boost::python;
 
-typedef StreamFactory<StdioGenerator,
-                      SerialPortGenerator,
-                      TcpClientGenerator> Factory;
-typedef HerkuleX<Factory> Servo;
+typedef ConcreteStreamFactory Factory;
+typedef HerkuleX Servo;
 
 namespace {
 bp::object g_runtime_error = bp::eval("RuntimeError");
@@ -157,9 +155,9 @@ class Selector : boost::noncopyable {
 
     auto params = servo_.parameters();
 
+    auto opt = params->stream.options_description();
     if (StartsWith(serial_port, "tcp:")) {
-      params->stream.type = "tcp";
-      auto tcp = params->stream.Get<TcpClientGenerator>();
+      opt->find("type", false).semantic()->notify(std::string("tcp"));
       std::string host_target = serial_port.substr(4);
       size_t colon = host_target.find_first_of(':');
       if (colon == std::string::npos) {
@@ -167,11 +165,13 @@ class Selector : boost::noncopyable {
             std::runtime_error("missing colon in tcp host:target"));
         return;
       }
-      tcp->host = host_target.substr(0, colon);
-      tcp->port = boost::lexical_cast<int>(host_target.substr(colon + 1));
+      opt->find("tcp.host", false).semantic()
+          ->notify(host_target.substr(0, colon));
+      opt->find("tcp.port", false).semantic()
+          ->notify(host_target.substr(colon + 1));
     } else {
-      params->stream.type = "serial";
-      params->stream.Get<SerialPortGenerator>()->serial_port = serial_port;
+      opt->find("type", false).semantic()->notify(std::string("serial"));
+      opt->find("serial.serial_port", false).semantic()->notify(serial_port);
     }
 
     servo_.AsyncStart([=](ErrorCode ec) {
