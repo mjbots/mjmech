@@ -2,6 +2,7 @@
    * silks for signals on weap connector
    * Route power
    * autoroute remainder
+   * fix up silks to not be on vias
 
  * BOM
    * power in + serial connector
