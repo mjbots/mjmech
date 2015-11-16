@@ -1,8 +1,4 @@
  * TODO
-   * silks for signals on weap connector
-   * Route power
-   * autoroute remainder
-   * fix up silks to not be on vias
 
  * BOM
    * power in + serial connector
@@ -34,6 +30,14 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-15
+ * route larger width 3.3V supply around to where it is used
+ * add decoupling caps for 3.3V supply on external I2C connectors
+ * Route power
+ * silks for signals on weap connector
+ * autoroute remainder
+ * fix up silks to not be on vias
 
 DONE 2015-11-11
  * add test points for various voltage rails
