@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+yes_flag=""
+if [[ "$1" == "-y" ]]; then
+    yes_flag="-y"
+elif [[ "$1" != "" ]]; then
+    echo invalid option
+    exit 1
+fi
+
 PKGLIST=(
     libeigen3-dev libsnappy-dev python-snappy libi2c-dev
     libboost1.55-dev
@@ -14,7 +22,7 @@ if apt-get install --dry-run "${PKGLIST[@]}" | grep '^Conf'; then
     echo
     echo Need to install some packages
     (set -x;
-        sudo apt-get install "${PKGLIST[@]}"
+        sudo apt-get install $yes_flag "${PKGLIST[@]}"
     )
 else
     echo All packages up to date
