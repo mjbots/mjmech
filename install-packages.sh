@@ -88,4 +88,28 @@ if ! expr "(" "$revision" + 0 ")" ">=" "$gs_min_revision" >/dev/null; then
     (set -x;
         sudo tar xf "$tmp_tar_name" -C / "$gstreamer_root_rel"
     )
+else
+    echo gstreamer in $gstreamer_root is up to date
+fi
+
+# we need to install supporting packages for gstreamer, but not gstreamer
+# packages themselves. We will do it by ruining apt-get in dry-run mode, then
+# post-processing package list.
+# (note: the package list below is the same one used in mj-gstreamer-build
+# script)
+GST_PKGLIST=($(
+        apt-get --dry-run install \
+            gstreamer1.0 gstreamer1.0-plugins-good \
+            gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+            gstreamer1.0-plugins-base gstreamer1.0-libav | \
+            grep ^Inst | cut -d ' ' -f 2 | \
+            grep -v gstreamer | grep -v -- '-doc$' || true
+    ))
+if [[ "$GST_PKGLIST" != "" ]]; then
+    echo Need to install some gstreamer media driver packages
+    (set -x;
+        sudo apt-get install $yes_flag "${GST_PKGLIST[@]}"
+    )
+else
+    echo All gstreamer media packages are up to date
 fi
