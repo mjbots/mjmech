@@ -36,6 +36,8 @@ targetenv.Append(CPPPATH=[
         '#/Inc',
         ])
 targetenv.Append(LINKFLAGS=['-Wl,--gc-sections'])
+targetenv.Append(CFLAGS=['-ffunction-sections'])
+targetenv.Append(CXXFLAGS=['-ffunction-sections'])
 
 Export('targetenv')
 Export('hostenv')
