@@ -18,7 +18,10 @@ PKGLIST=(
     libboost-date-time1.55-dev libboost-filesystem1.55-dev
 )
 
-if apt-get install --dry-run "${PKGLIST[@]}" | grep '^Conf'; then
+if [[ "$yes_flag" != "" ]] || (
+        apt-get install --dry-run "${PKGLIST[@]}" \
+            | egrep ' could not be installed| ^Conf'
+    ); then
     echo
     echo Need to install some packages
     (set -x;
