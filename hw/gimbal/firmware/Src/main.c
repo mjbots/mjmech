@@ -44,9 +44,7 @@
 
 /* USER CODE BEGIN Includes */
 
-caddr_t _sbrk(int incr) {
-  return 0;
-}
+#include "gimbal.h"
 
 /* USER CODE END Includes */
 
@@ -66,6 +64,10 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+
+caddr_t _sbrk(int incr) {
+  return 0;
+}
 
 /* USER CODE END 0 */
 
@@ -101,10 +103,13 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
+  gimbal_main();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
   /* USER CODE END WHILE */

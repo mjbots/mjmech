@@ -35,6 +35,7 @@ LIBINC += -IMiddlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
 LIBINC += -IMiddlewares/ST/STM32_USB_Host_Library/Core/Inc
 LIBINC += -IDrivers/CMSIS/Include
 LIBINC += -IDrivers/CMSIS/Device/ST/STM32F4xx/Include
+LIBINC += -Igimbal
 
 
 LIBS := ./$(LIBDIR)/STM32F4xx_HAL_Driver/libstm32fw.a
@@ -42,6 +43,7 @@ LIBS += ./$(MDLDIR)/ST/STM32_USB_Device_Library/libstm32usbdev.a
 	   
 	   
 LIBS += -lm
+CPP     = $(SYSTEM)-g++
 CC      = $(SYSTEM)-gcc
 CCDEP   = $(SYSTEM)-gcc
 LD      = $(SYSTEM)-gcc
@@ -61,6 +63,7 @@ OCD	= sudo ~/openocd-git/openocd/src/openocd \
 # INCLUDES = -I$(SRCDIR) $(LIBINC)
 INCLUDES = $(LIBINC)
 CFLAGS  = $(CPU) $(CMSIS_OPT) $(OTHER_OPT) -Wall -fno-common -fno-strict-aliasing -O2 $(INCLUDES) -g -Wfatal-errors -g 
+CPPFLAGS = $(CFLAGS) 
 ASFLAGS = $(CFLAGS) -x assembler-with-cpp
 LDFLAGS = -Wl,--gc-sections,-Map=$*.map,-cref -T $(LDSCRIPT) $(CPU) 
 ARFLAGS = cr
@@ -73,6 +76,8 @@ SYSTEM_OBJ = $(CMSIS_DEVSUP)/Source/Templates/system_$(SYSTEM_FILE).o
 BIN = main.bin
 
 OBJS = $(sort \
+ $(patsubst %.cc,%.o,$(wildcard gimbal/*.cc)) \
+ $(patsubst %.c,%.o,$(wildcard gimbal/*.c)) \
  $(patsubst %.c,%.o,$(wildcard Src/*.c)) \
  $(patsubst %.s,%.o,$(wildcard Src/*.s)) \
  $(STARTUP_OBJ) \
@@ -119,6 +124,10 @@ include .depend
 
 .depend: Src/*.c
 	$(CCDEP) $(CFLAGS) -MM $^ | sed -e 's@.*.o:@Src/&@' > .depend 
+
+.cc.o:
+	@echo cpp $<
+	@$(CPP) $(CPPFLAGS) -c -o $@ $<
 
 .c.o:
 	@echo cc $<
