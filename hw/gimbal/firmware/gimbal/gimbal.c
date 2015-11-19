@@ -14,5 +14,12 @@
 
 #include "gimbal.h"
 
+#include "gpio.h"
+
 void gimbal_main() {
+  // For now, lets try to flash an LED with no sleeps or anything.
+  while (1) {
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+  }
 }
