@@ -11,7 +11,7 @@ fi
 
 PKGLIST=(
     scons libeigen3-dev libsnappy-dev python-snappy libi2c-dev
-    pyside-tools libboost1.55-dev
+    pyside-tools liblog4cpp5-dev libboost1.55-dev
     libboost-system1.55-dev libboost-program-options1.55-dev
     libboost-coroutine1.55-dev libboost-context1.55-dev
     libboost-test1.55-dev libboost-python1.55-dev
@@ -21,7 +21,7 @@ PKGLIST=(
 
 if [[ "$yes_flag" != "" ]] || (
         apt-get install --dry-run "${PKGLIST[@]}" \
-            | egrep ' could not be installed| ^Conf'
+            | egrep ' could not be installed|^Conf'
     ); then
     echo
     echo Need to install some packages
