@@ -1,4 +1,30 @@
- * TODO
+ * Software
+   * flash an LED
+   * read and write to the primary UART
+   * get USB CDC device working
+
+   * read and write anything from each I2C bus
+   * read and write from the SPI bus
+   * read from the ADC
+
+   * get I2C DMA working
+   * get SPI DMA working
+   * get ADC DMA working
+
+   * driver for BMI160
+   * driver for AS5048
+   * herkulex protocol
+   * AHRS
+   * gimbal control software
+     * first, do a basic version just like the open-loop brugi
+     * close loop using absolute encoders
+     * add support for second IMU
+
+   * persistent configuration and protocol
+   * error handling and reporting
+   * live streaming of data structures for debugging over USB
+
+
 
  * BOM
    * power in + serial connector
@@ -30,6 +56,12 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-19
+ * basic SCons build system in place
+
+DONE 2015-11-16
+ * macrofab order placed
 
 DONE 2015-11-15
  * route larger width 3.3V supply around to where it is used
