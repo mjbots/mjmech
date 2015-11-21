@@ -91,6 +91,8 @@ class BulkReader(object):
 
         return result
 
+
+
     def get(self, filter=None):
         '''Return a dictionary containing lists of objects
         corresponding to one or more records.
@@ -99,7 +101,19 @@ class BulkReader(object):
         to return.  If it is a callable, it should be a predicate
         which returns true if the named record should be included.
         '''
+        items = dict()
+        for name, data in self.items(filter=filter):
+            if name not in items:
+                items[name] = list()
+            items[name].append(data)
 
+        return items
+
+    def items(self, filter=None):
+        '''Yield a pair of (name, data) records in the same
+        order they appear in the file.
+        @p filter -- same as for get function
+        '''
         records = {}
 
         for block_type, block_data in self._read_blocks():
@@ -115,7 +129,8 @@ class BulkReader(object):
                 identifier = stream.read_uint32()
                 flags = stream.read_uint16()
 
-                if identifier not in records:
+                record = records.get(identifier, None)
+                if record is None:
                     continue
 
                 if flags & BlockDataFlags.kPreviousOffset:
@@ -131,10 +146,7 @@ class BulkReader(object):
                 assert flags == 0  # no unknown flags
 
                 rest = stream.stream.read()
-                records[identifier].add(rest)
-
-        return dict((x.name, x.elements) for x in records.itervalues())
-
+                yield record.name, record.deserialize(rest)
 
 class _BulkRecord(object):
     def __init__(self, identifier, flags, name, schema):
@@ -143,10 +155,9 @@ class _BulkRecord(object):
         self.name = name
         self.schema = schema
         self.archive = telemetry_archive.ReadArchive(schema, name)
-        self.elements = []
 
-    def add(self, data):
-        self.elements.append(self.archive.deserialize(data))
+    def deserialize(self, data):
+        return self.archive.deserialize(data)
 
     def make_meta(self):
         return self.archive.root
