@@ -10,6 +10,7 @@
    * get I2C DMA working
    * get SPI DMA working
    * get ADC DMA working
+   * get PWM working
 
    * driver for BMI160
    * driver for AS5048
