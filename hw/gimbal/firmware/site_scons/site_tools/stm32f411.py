@@ -21,6 +21,7 @@ def generate(env, **kwargs):
             '-mfpu=fpv4-sp-d16',
             ]
     env.Append(CFLAGS=CPUFLAGS)
+    env.Append(CXXFLAGS=CPUFLAGS + ['-fno-exceptions'])
     env.Append(ASFLAGS=CPUFLAGS + ['-x', 'assembler-with-cpp'])
     env.Append(LINKFLAGS=['-T', 'stm32f411.ld'] + CPUFLAGS)
     env.Append(CPPDEFINES=['STM32F411xE'])

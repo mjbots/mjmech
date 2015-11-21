@@ -20,7 +20,7 @@ Import('libsrc')
 
 env = targetenv.Clone()
 
-SOURCES = Glob('*.c')
+SOURCES = Glob('*.c') + Glob('*.cc')
 
 # NOTE jpieper: There does exist a circular reference between libsrc
 # and libmiddlewares.  Silly ST.

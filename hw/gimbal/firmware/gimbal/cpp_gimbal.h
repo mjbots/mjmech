@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "gimbal.h"
-#include "cpp_gimbal.h"
+#pragma once
 
-#include "gpio.h"
-
-void gimbal_main() {
-  cpp_gimbal_main();
-}
+/// Primary entry point, in C++.
+void cpp_gimbal_main();

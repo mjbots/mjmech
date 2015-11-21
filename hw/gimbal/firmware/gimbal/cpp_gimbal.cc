@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "gimbal.h"
-#include "cpp_gimbal.h"
-
 #include "gpio.h"
 
-void gimbal_main() {
-  cpp_gimbal_main();
+extern "C" {
+void cpp_gimbal_main() {
+  // For now, lets try to flash an LED with no sleeps or anything.
+  while (1) {
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+  }
+}
 }

@@ -14,7 +14,7 @@
 
 TOOLS = {
     'CC' : 'gcc',
-    'CPP' : 'g++',
+    'CXX' : 'g++',
     'LD' : 'gcc',
     'AR' : 'ar',
     'AS' : 'gcc',
