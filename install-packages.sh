@@ -58,7 +58,12 @@ if ! expr "(" "$revision" + 0 ")" ">=" "$gs_min_revision" >/dev/null; then
         url=https://raw.githubusercontent.com/mjbots/mj-gstreamer-build
         url+=/master/tars/$tar_name
         (set -x;
-            wget -O "$tmp_tar_name.partial" "$url"
+            if ! wget -O "$tmp_tar_name.partial" "$url"; then
+                # Sometimes, github fails with "503: backend read error"
+                # Wait a bit, then retry.
+                sleep 30
+                wget -O "$tmp_tar_name.partial" "$url"
+            fi
             mv "$tmp_tar_name.partial" "$tmp_tar_name"
         )
     fi
