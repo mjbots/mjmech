@@ -100,7 +100,7 @@ struct StaticFunction<R(Args...), Size>
 
   template <std::size_t Amount=3>
   StaticFunction<R(Args...), Size-Amount> shrink() const {
-    return StaticFunction<R(Args...), Size-1>(*this);
+    return *this;
   }
 
   ~StaticFunction() {
