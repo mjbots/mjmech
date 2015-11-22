@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Import('hostenv')
 Import('targetenv')
 Import('libcmsis')
 Import('libhal')
@@ -20,7 +21,16 @@ Import('libsrc')
 
 env = targetenv.Clone()
 
-SOURCES = Glob('*.c') + Glob('*.cc')
+SOURCES = [
+    'gimbal.c',
+    'cpp_gimbal.cc',
+    'pool_ptr.cc',
+    ]
+
+HOST_SOURCES = list(set(SOURCES) - set([
+            'cpp_gimbal.cc',
+            'gimbal.c',
+        ]))
 
 # NOTE jpieper: There does exist a circular reference between libsrc
 # and libmiddlewares.  Silly ST.
@@ -43,3 +53,19 @@ do_flash = env.Command(
     'touch $TARGET')
 
 env.Alias('flash', do_flash)
+
+TESTS = ['test/' + x for x in [
+        'pool_ptr_test.cc',
+        'static_function_test.cc',
+        'test_main.cc',
+        ]]
+
+testenv = hostenv.Clone()
+testenv.Append(LIBS=['boost_unit_test_framework'])
+testenv['OBJPREFIX'] = 'tst_'
+
+test_gimbal = testenv.Program('test_gimbal', HOST_SOURCES + TESTS)
+test_command = testenv.Command('test_gimbal.passed', test_gimbal,
+                               '$SOURCE && touch $TARGET')
+
+env.Default(test_command)

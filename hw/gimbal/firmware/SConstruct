@@ -13,11 +13,16 @@
 # limitations under the License.
 
 def setup_env(env):
-    env.Append(CFLAGS=['-Wall', '-Werror', '-fno-common', '-g'])
-    env.Append(CXXFLAGS=['-std=c++1y'])
+    bothflags = ['-Wall', '-Werror', '-g', '-fno-common']
+
+    env.Append(CFLAGS=bothflags)
+    env.Append(LINKFLAGS=['-g'])
+    env.Append(CXXFLAGS=bothflags + ['-std=c++1y'])
     env.Append(ASFLAGS=['-x', 'assembler-with-cpp'])
     env.Append(LIBS=['m'])
     env.Append(CPPPATH=['/usr/include/eigen3'])
+    env.Append(CPPPATH=['#/../../..'])
+    env.Append(CPPPATH=['#'])
 
 
 targetenv = Environment(tools=['stm32f411'])
