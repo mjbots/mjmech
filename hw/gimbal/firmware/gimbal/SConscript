@@ -58,6 +58,7 @@ TESTS = ['test/' + x for x in [
         'pool_ptr_test.cc',
         'static_function_test.cc',
         'test_main.cc',
+        'tokenizer_test.cc',
         ]]
 
 testenv = hostenv.Clone()
