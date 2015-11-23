@@ -260,20 +260,20 @@ class ReadArchive {
         break;
       }
       case TF::FieldType::kEnum: {
-        uint32_t size = stream.template Read<uint32_t>();
-        if (ignore) {
-          stream.Ignore(size);
-        } else {
-          uint32_t nvalues = stream.template Read<uint32_t>();
-          bp::dict enum_items;
-          for (uint32_t i = 0; i < nvalues; i++) {
-            uint32_t key = stream.template Read<uint32_t>();
-            std::string value = stream.ReadString();
+        uint32_t nvalues = stream.template Read<uint32_t>();
+        bp::dict enum_items;
+        for (uint32_t i = 0; i < nvalues; i++) {
+          uint32_t key = stream.template Read<uint32_t>();
+          std::string value = stream.ReadString();
+          if (!ignore) {
             enum_items[key] = value;
           }
+        }
+        if (!ignore) {
           result["enum_items"] = enum_items;
           result["enum_type"] = MakeEnumType(field_name, enum_items);
         }
+
         break;
       }
       case TF::FieldType::kFinal: {
@@ -417,8 +417,11 @@ class ReadArchive {
         return list_result[0];
       }
       case TF::FieldType::kEnum: {
-        uint32_t size = schema_stream.template Read<uint32_t>();
-        schema_stream.Ignore(size);
+        uint32_t nvalues = schema_stream.template Read<uint32_t>();
+        for (uint32_t i = 0; i < nvalues; i++) {
+          schema_stream.template Read<uint32_t>();
+          schema_stream.ReadString();
+        }
 
         return field_result["enum_type"](
             data_stream.template Read<uint32_t>());
