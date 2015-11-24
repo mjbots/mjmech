@@ -55,6 +55,7 @@ do_flash = env.Command(
 env.Alias('flash', do_flash)
 
 TESTS = ['test/' + x for x in [
+        'persistent_config_test.cc',
         'pool_ptr_test.cc',
         'static_function_test.cc',
         'test_main.cc',
