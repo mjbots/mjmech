@@ -14,6 +14,7 @@
 
 #include <boost/python.hpp>
 
+#include "base/error_code.h"
 #include "base/fast_stream.h"
 #include "base/telemetry_format.h"
 
