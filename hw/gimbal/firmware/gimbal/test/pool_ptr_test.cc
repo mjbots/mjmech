@@ -56,5 +56,30 @@ BOOST_AUTO_TEST_CASE(BasicPoolPtrTest) {
     BOOST_CHECK_EQUAL(my_int, 9);
   }
 
-  BOOST_CHECK_EQUAL(my_int, 2);
+  // The destructor should not have been called.
+  BOOST_CHECK_EQUAL(my_int, 9);
+}
+
+namespace {
+struct Base {
+  virtual ~Base() {}
+  virtual int Get42() const = 0;
+};
+
+struct Derived : public Base {
+  virtual ~Derived() {}
+  virtual int Get42() const { return 42; }
+};
+}
+
+BOOST_AUTO_TEST_CASE(PoolVirtualTest) {
+  SizedPool<> pool;
+  Base* base = nullptr;
+  {
+    PoolPtr<Derived> derived(&pool);
+    base = derived.get();
+    BOOST_CHECK_EQUAL(base->Get42(), 42);
+  }
+
+  BOOST_CHECK_EQUAL(base->Get42(), 42);
 }

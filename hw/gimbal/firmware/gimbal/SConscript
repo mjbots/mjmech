@@ -20,10 +20,12 @@ Import('libmiddlewares')
 Import('libsrc')
 
 env = targetenv.Clone()
+env.Append(CXXFLAGS=['-Wno-unused-local-typedefs'])
 
 SOURCES = [
     'gimbal.c',
     'cpp_gimbal.cc',
+    'persistent_config.cc',
     'pool_ptr.cc',
     ]
 
@@ -64,6 +66,7 @@ TESTS = ['test/' + x for x in [
 
 testenv = hostenv.Clone()
 testenv.Append(LIBS=['boost_unit_test_framework'])
+testenv.Append(CXXFLAGS=['-Wno-unused-local-typedefs'])
 testenv['OBJPREFIX'] = 'tst_'
 
 test_gimbal = testenv.Program('test_gimbal', HOST_SOURCES + TESTS)

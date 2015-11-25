@@ -116,6 +116,7 @@ struct StaticFunction<R(Args...), Size>
   }
 
   bool valid() const { return storage_ != Storage(); }
+  std::size_t size() const { return getImpl().size(); }
 
   const void* data() const {
     return static_cast<const void*>(storage_.data());

@@ -15,6 +15,7 @@
 #pragma once
 
 #include <cstdio>
+#include <cstdlib>
 #include <type_traits>
 
 #include "base/gsl/gsl-lite.h"
@@ -167,6 +168,8 @@ struct ItemArchive : public mjmech::base::VisitArchive<Derived> {
     mjmech::base::VisitArchive<Derived>::Visit(pair);
   }
 
+  bool found() const { return found_; }
+
   gsl::cstring_span my_key_;
   gsl::cstring_span remaining_key_;
   bool found_ = false;
@@ -199,12 +202,12 @@ struct SetArchive : public ItemArchive<SetArchive> {
 };
 
 template <>
-float SetArchive::ParseValue<float>(const gsl::cstring_span& value) const {
-  return std::strtof(&*value.begin(), nullptr);
+inline float SetArchive::ParseValue<float>(const gsl::cstring_span& value) const {
+  return std::strtod(&*value.begin(), nullptr);
 }
 
 template <>
-double SetArchive::ParseValue<double>(const gsl::cstring_span& value) const {
+inline double SetArchive::ParseValue<double>(const gsl::cstring_span& value) const {
   return std::strtod(&*value.begin(), nullptr);
 }
 
@@ -234,7 +237,7 @@ struct ReadArchive : public ItemArchive<ReadArchive> {
 
   template <typename T>
   gsl::cstring_span EmitValue(T value) {
-    int out_size = std::snprintf(
+    int out_size = snprintf(
         &*buffer_.begin(), buffer_.size(), "%d", value);
     return gsl::cstring_span(buffer_.begin(), buffer_.begin() + out_size);
   }
@@ -245,8 +248,8 @@ struct ReadArchive : public ItemArchive<ReadArchive> {
 };
 
 template <>
-gsl::cstring_span ReadArchive::EmitValue<float>(float value) {
-  int out_size = std::snprintf(
+inline gsl::cstring_span ReadArchive::EmitValue<float>(float value) {
+  int out_size = snprintf(
       &*buffer_.begin(), buffer_.size(), "%f", value);
   return gsl::cstring_span(buffer_.begin(), buffer_.begin() + out_size);
 }

@@ -43,7 +43,8 @@ class AsyncStream : public AsyncReadStream, public AsyncWriteStream {
   AsyncStream(const AsyncStream&) = delete;
 };
 
-void AsyncWrite(AsyncWriteStream& stream, const gsl::cstring_span& data,
+template <typename Stream>
+void AsyncWrite(Stream& stream, const gsl::cstring_span& data,
                 ErrorCallback callback) {
   if (data.empty()) { callback(0); return; }
 

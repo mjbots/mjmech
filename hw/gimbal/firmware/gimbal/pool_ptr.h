@@ -57,7 +57,8 @@ class PoolPtr {
   }
 
   ~PoolPtr() {
-    ptr_->~T();
+    // This class should not be used with things that need their
+    // destructors to be called.
   }
 
   // Accessors to appear like a regular pointer.

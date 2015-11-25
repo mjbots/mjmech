@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "gimbal/persistent_config_detail.h"
+#include "gimbal/persistent_config.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -138,6 +138,78 @@ BOOST_AUTO_TEST_CASE(EnumerateArchiveTest) {
   std::string expected = R"XX(bigstruct.u8 3
 bigstruct.sub.vi 0
 bigstruct.sub.vf 1.000000
+)XX";
+  BOOST_CHECK_EQUAL(test_stream.ostr.str(), expected);
+}
+
+namespace {
+struct OtherStruct {
+  int vint = 0;
+  uint16_t v2 = 1;
+  uint32_t v3 = 2;
+  float vfloat = 3.5;
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(MJ_NVP(vint));
+    a->Visit(MJ_NVP(v2));
+    a->Visit(MJ_NVP(v3));
+    a->Visit(MJ_NVP(vfloat));
+  }
+};
+}
+
+BOOST_AUTO_TEST_CASE(PersistentConfigTest) {
+  SizedPool<> pool;
+  PersistentConfig config(&pool);
+  BigStruct bs;
+  config.Register(gsl::ensure_z("bigs"), &bs);
+  OtherStruct os;
+  config.Register(gsl::ensure_z("other"), &os);
+
+  TestWriteStream test_stream;
+  int count = 0;
+  int error = 0;
+  auto callback = [&](int err) { count++; error = err; };
+
+  config.Command(gsl::ensure_z("bogus"), test_stream, callback);
+
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(error, 0);
+  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "unknown command\n");
+
+  count = 0;
+  test_stream.ostr.str("");
+  BOOST_REQUIRE_EQUAL(os.vfloat, 3.5);
+  config.Command(gsl::ensure_z("set other.vfloat 4.5"), test_stream, callback);
+
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(error, 0);
+  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "OK\n");
+  BOOST_CHECK_EQUAL(os.vfloat, 4.5);
+
+  count = 0;
+  test_stream.ostr.str("");
+  config.Command(gsl::ensure_z("get bigs.u8"), test_stream, callback);
+
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(error, 0);
+  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "3\n");
+
+  count = 0;
+  test_stream.ostr.str("");
+  config.Command(gsl::ensure_z("enumerate"), test_stream, callback);
+
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(error, 0);
+  std::string expected = R"XX(bigs.u8 3
+bigs.sub.vi 0
+bigs.sub.vf 1.000000
+other.vint 0
+other.v2 1
+other.v3 2
+other.vfloat 4.500000
+OK
 )XX";
   BOOST_CHECK_EQUAL(test_stream.ostr.str(), expected);
 }
