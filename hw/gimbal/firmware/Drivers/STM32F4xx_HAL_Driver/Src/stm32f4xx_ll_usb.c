@@ -188,7 +188,12 @@ HAL_StatusTypeDef USB_SetCurrentMode(USB_OTG_GlobalTypeDef *USBx , USB_OTG_ModeT
   {
     USBx->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
   }
-  HAL_Delay(50);
+
+  /* NOTE jpieper: I disabled this because it didn't seem to serve a
+   * reasonable purpose and I don't want to block everything for an
+   * entire 50ms on startup. */
+
+  /* HAL_Delay(50); */
 
   return HAL_OK;
 }
@@ -922,7 +927,12 @@ HAL_StatusTypeDef  USB_SetDevAddress (USB_OTG_GlobalTypeDef *USBx, uint8_t addre
 HAL_StatusTypeDef  USB_DevConnect (USB_OTG_GlobalTypeDef *USBx)
 {
   USBx_DEVICE->DCTL &= ~USB_OTG_DCTL_SDIS ;
-  HAL_Delay(3);
+
+  /* NOTE jpieper: I disabled this because I didn't see as it adds
+   * much value.  If the delay is necessary, it can be imposed
+   * externally while other work is happening. */
+
+  /* HAL_Delay(3); */
 
   return HAL_OK;
 }
@@ -935,7 +945,12 @@ HAL_StatusTypeDef  USB_DevConnect (USB_OTG_GlobalTypeDef *USBx)
 HAL_StatusTypeDef  USB_DevDisconnect (USB_OTG_GlobalTypeDef *USBx)
 {
   USBx_DEVICE->DCTL |= USB_OTG_DCTL_SDIS ;
-  HAL_Delay(3);
+
+  /* NOTE jpieper: I disabled this because I didn't see as it adds
+   * much value.  If the delay is necessary, it can be imposed
+   * externally while other work is happening. */
+
+  /* HAL_Delay(3); */
 
   return HAL_OK;
 }
@@ -1251,6 +1266,9 @@ HAL_StatusTypeDef USB_ResetPort(USB_OTG_GlobalTypeDef *USBx)
     USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG );
 
   USBx_HPRT0 = (USB_OTG_HPRT_PRST | hprt0);
+
+  /* TODO jpieper: If I start using this functionality, we should
+   * figure out a way not to have a blocking delay here. */
   HAL_Delay (10);                                /* See Note #1 */
   USBx_HPRT0 = ((~USB_OTG_HPRT_PRST) & hprt0);
   return HAL_OK;
