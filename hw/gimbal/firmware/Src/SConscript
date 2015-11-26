@@ -24,6 +24,6 @@ SOURCES = Glob('*.c')
 # TODO jpieper: We disable these errors until I can fix them.
 env.Append(CFLAGS=['-Wno-pointer-sign'])
 
-libsrc = env.Library('src', SOURCES)
+libsrc = env.Object(SOURCES)
 
 Export('libsrc')

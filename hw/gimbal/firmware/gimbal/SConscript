@@ -41,7 +41,8 @@ HOST_SOURCES = list(set(SOURCES) - set([
 # NOTE jpieper: There does exist a circular reference between libsrc
 # and libmiddlewares.  Silly ST.
 target = env.Program(
-    'gimbal', SOURCES + libsrc + libmiddlewares + libsrc + libhal + libcmsis)
+    'gimbal', libcmsis + SOURCES + libsrc + libmiddlewares + libhal)
+env.Depends(target, '#/stm32f411.ld')
 
 env.Default(target)
 
@@ -50,7 +51,7 @@ flash1 = env.Command(
     '$OBJCOPY -Obinary -j .isr_vector $SOURCE $TARGET')
 flash2 = env.Command(
     'gimbal.flash2.bin', target,
-    '$OBJCOPY -Obinary -j .text -j .rodata -j .ARM -j .data $SOURCE $TARGET')
+    '$OBJCOPY -Obinary -j .text -j .ARM.extab -j .ARM -j .preinit_array -j .init_array -j .fini_array -j .data $SOURCE $TARGET')
 
 do_flash = env.Command(
     'flash-stamp', flash1 + flash2,
