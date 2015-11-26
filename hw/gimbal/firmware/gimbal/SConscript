@@ -23,14 +23,16 @@ env = targetenv.Clone()
 env.Append(CXXFLAGS=['-Wno-unused-local-typedefs'])
 
 SOURCES = [
-    'gimbal.c',
     'cpp_gimbal.cc',
+    'crc_stm32.cc',
+    'gimbal.c',
     'persistent_config.cc',
     'pool_ptr.cc',
     ]
 
 HOST_SOURCES = list(set(SOURCES) - set([
             'cpp_gimbal.cc',
+            'crc_stm32.cc',
             'gimbal.c',
         ]))
 
@@ -57,6 +59,7 @@ do_flash = env.Command(
 env.Alias('flash', do_flash)
 
 TESTS = ['test/' + x for x in [
+        'crc_test.cc',
         'persistent_config_test.cc',
         'pool_ptr_test.cc',
         'static_function_test.cc',

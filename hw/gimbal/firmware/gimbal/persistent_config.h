@@ -28,9 +28,11 @@ template <typename T>
 class ConcreteBase;
 }
 
+class FlashInterface;
+
 class PersistentConfig {
  public:
-  PersistentConfig(Pool*);
+  PersistentConfig(Pool&, FlashInterface&, AsyncWriteStream&);
   ~PersistentConfig();
 
   /// Associate the given serializable with the given name.
@@ -47,7 +49,7 @@ class PersistentConfig {
   /// stream, and invoking @p callback when all has been written.  It
   /// is an error to call Command while a previous instance is
   /// outstanding.
-  void Command(const gsl::cstring_span&, AsyncWriteStream&, ErrorCallback);
+  void Command(const gsl::cstring_span&, ErrorCallback);
 
   /// Restore all registered configuration structures from Flash.
   /// This should be invoked after all modules have had a chance to
@@ -57,8 +59,9 @@ class PersistentConfig {
   class Base {
    public:
     virtual ~Base() {}
-    virtual int WriteBinary(SimpleOStream&) = 0;
-    virtual int ReadBinary(SimpleIStream&) = 0;
+    virtual int WriteBinary(OStreamInterface&) = 0;
+    virtual void WriteSchema(OStreamInterface&) = 0;
+    virtual int ReadBinary(IStreamInterface&) = 0;
     virtual int Set(const gsl::cstring_span&, const gsl::cstring_span&) = 0;
     virtual void Enumerate(detail::EnumerateArchive::Context*,
                            const gsl::string_span& buffer,
@@ -89,13 +92,17 @@ class ConcreteBase : public PersistentConfig::Base {
   ConcreteBase(T* item) : item_(item) {}
   virtual ~ConcreteBase() {}
 
-  int WriteBinary(SimpleOStream& stream) override final {
+  int WriteBinary(OStreamInterface& stream) override final {
     mjmech::base::TelemetryWriteArchive<T>::Serialize(item_, stream);
     return 0;
   }
 
-  int ReadBinary(SimpleIStream& stream) override final {
-    Expects(false);
+  void WriteSchema(OStreamInterface& stream) override final {
+    mjmech::base::TelemetryWriteArchive<T>::WriteSchema(stream);
+  }
+
+  int ReadBinary(IStreamInterface& stream) override final {
+    mjmech::base::TelemetrySimpleReadArchive<T>::Deserialize(item_, stream);
     return 0;
   }
 

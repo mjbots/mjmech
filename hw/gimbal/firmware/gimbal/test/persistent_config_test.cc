@@ -18,6 +18,9 @@
 
 #include "base/visitor.h"
 
+#include "gimbal/test/flash_test.h"
+#include "gimbal/test/stream_test.h"
+
 namespace {
 struct TestStruct {
   int vi = 0;
@@ -60,23 +63,6 @@ BOOST_AUTO_TEST_CASE(SetArchiveTest) {
   BOOST_CHECK_EQUAL(bs.sub.vf, 2.5);
 }
 
-namespace {
-class TestWriteStream : public AsyncWriteStream {
- public:
-  ~TestWriteStream() override {}
-
-  void AsyncWriteSome(const gsl::cstring_span& data,
-                      SizeCallback callback) override final {
-    // We'll only accept one character at a time to ensure that
-    // retrying is working.
-    ostr.write(&*data.begin(), 1);
-    callback(0, 1);
-  }
-
-  std::ostringstream ostr;
-};
-}
-
 BOOST_AUTO_TEST_CASE(ReadArchiveTest) {
   BigStruct bs;
 
@@ -87,7 +73,7 @@ BOOST_AUTO_TEST_CASE(ReadArchiveTest) {
   bs.sub.vf = 8.25;
 
   bool done = false;
-  TestWriteStream test_stream;
+  test::TestWriteStream test_stream;
   detail::ReadArchive("sub.vi", span, test_stream, [&done](ErrorCode error) {
       Expects(!error);
       done = true;
@@ -110,7 +96,7 @@ BOOST_AUTO_TEST_CASE(ReadArchiveTest) {
 BOOST_AUTO_TEST_CASE(EnumerateArchiveTest) {
   BigStruct bs;
 
-  TestWriteStream test_stream;
+  test::TestWriteStream test_stream;
   detail::EnumerateArchive::Context context;
   context.root_prefix = gsl::ensure_z("bigstruct");
   char buffer[256] = {};
@@ -157,22 +143,28 @@ struct OtherStruct {
     a->Visit(MJ_NVP(vfloat));
   }
 };
+
+struct PersistentConfigFixture {
+  SizedPool<> pool;
+  test::FlashTest flash;
+  test::TestWriteStream test_stream;
+  PersistentConfig config{pool, flash, test_stream};
+  BigStruct bs;
+  OtherStruct os;
+
+  PersistentConfigFixture() {
+    config.Register(gsl::ensure_z("bigs"), &bs);
+    config.Register(gsl::ensure_z("other"), &os);
+  }
+};
 }
 
-BOOST_AUTO_TEST_CASE(PersistentConfigTest) {
-  SizedPool<> pool;
-  PersistentConfig config(&pool);
-  BigStruct bs;
-  config.Register(gsl::ensure_z("bigs"), &bs);
-  OtherStruct os;
-  config.Register(gsl::ensure_z("other"), &os);
-
-  TestWriteStream test_stream;
+BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
   int count = 0;
   int error = 0;
   auto callback = [&](int err) { count++; error = err; };
 
-  config.Command(gsl::ensure_z("bogus"), test_stream, callback);
+  config.Command(gsl::ensure_z("bogus"), callback);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -181,7 +173,7 @@ BOOST_AUTO_TEST_CASE(PersistentConfigTest) {
   count = 0;
   test_stream.ostr.str("");
   BOOST_REQUIRE_EQUAL(os.vfloat, 3.5);
-  config.Command(gsl::ensure_z("set other.vfloat 4.5"), test_stream, callback);
+  config.Command(gsl::ensure_z("set other.vfloat 4.5"), callback);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -190,7 +182,7 @@ BOOST_AUTO_TEST_CASE(PersistentConfigTest) {
 
   count = 0;
   test_stream.ostr.str("");
-  config.Command(gsl::ensure_z("get bigs.u8"), test_stream, callback);
+  config.Command(gsl::ensure_z("get bigs.u8"), callback);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -198,7 +190,7 @@ BOOST_AUTO_TEST_CASE(PersistentConfigTest) {
 
   count = 0;
   test_stream.ostr.str("");
-  config.Command(gsl::ensure_z("enumerate"), test_stream, callback);
+  config.Command(gsl::ensure_z("enumerate"), callback);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -212,4 +204,46 @@ other.vfloat 4.500000
 OK
 )XX";
   BOOST_CHECK_EQUAL(test_stream.ostr.str(), expected);
+}
+
+BOOST_FIXTURE_TEST_CASE(PersistentConfigFlashTest, PersistentConfigFixture) {
+  int count = 0;
+  int error = 0;
+  auto callback = [&](int err) { count++; error = err; };
+
+  config.Command("write", callback);
+
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(error, 0);
+  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "OK\n");
+
+  SimpleIStream raw_stream(flash.buffer_, sizeof(flash.buffer_));
+  mjmech::base::TelemetryReadStream<SimpleIStream> stream(raw_stream);
+
+  BOOST_CHECK_EQUAL(stream.ReadString(), "bigs");
+  BOOST_CHECK_EQUAL(stream.Read<uint32_t>(), 0x617e3c8d); // CRC
+  std::string bigs_data = stream.ReadString();
+  BOOST_CHECK_EQUAL(bigs_data.size(), static_cast<std::size_t>(9));
+
+  BOOST_CHECK_EQUAL(stream.ReadString(), "other");
+  BOOST_CHECK_EQUAL(stream.Read<uint32_t>(), 0x1cac97a0); // CRC
+  std::string other_data = stream.ReadString();
+  BOOST_CHECK_EQUAL(other_data.size(), static_cast<std::size_t>(14));
+
+  BOOST_CHECK_EQUAL(stream.ReadString(), "");
+
+  bs.u8 = 9;
+  os.v2 = 10;
+
+  count = 0;
+  test_stream.ostr.str("");
+
+  config.Command("load", callback);
+
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(error, 0);
+  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "OK\n");
+
+  BOOST_CHECK_EQUAL(bs.u8, 3);
+  BOOST_CHECK_EQUAL(os.v2, 1);
 }
