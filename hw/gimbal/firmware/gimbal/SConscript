@@ -26,8 +26,10 @@ SOURCES = [
     'cpp_gimbal.cc',
     'crc_stm32.cc',
     'gimbal.c',
+    'lock_manager.cc',
     'persistent_config.cc',
     'pool_ptr.cc',
+    'telemetry_manager.cc',
     ]
 
 HOST_SOURCES = list(set(SOURCES) - set([
@@ -60,9 +62,11 @@ env.Alias('flash', do_flash)
 
 TESTS = ['test/' + x for x in [
         'crc_test.cc',
+        'lock_manager_test.cc',
         'persistent_config_test.cc',
         'pool_ptr_test.cc',
         'static_function_test.cc',
+        'telemetry_manager_test.cc',
         'test_main.cc',
         'tokenizer_test.cc',
         ]]
