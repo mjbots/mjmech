@@ -18,6 +18,6 @@ env = targetenv.Clone()
 
 SOURCES = Glob('Src/*.c')
 
-libhal = env.Library('hal', SOURCES)
+libhal = env.Object(SOURCES)
 
 Export('libhal')
