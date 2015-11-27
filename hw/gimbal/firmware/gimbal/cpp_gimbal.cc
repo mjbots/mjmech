@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <stdlib.h>
+
 #include "gpio.h"
 #include "iwdg.h"
+
+void *operator new(size_t size) throw() { return malloc(size); }
+void operator delete(void* p) throw() { free(p); }
+
 
 extern "C" {
 void cpp_gimbal_main() {
