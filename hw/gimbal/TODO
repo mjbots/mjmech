@@ -1,6 +1,4 @@
  * Software
-   * strip out C++ library stuff from image
-
    * read and write to the primary UART
    * get USB CDC device working
 
@@ -60,6 +58,9 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-27
+ * strip out C++ library stuff from image
 
 DONE 2015-11-26
  * Got LED blinking on discovery board
