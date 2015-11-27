@@ -1,5 +1,6 @@
  * Software
-   * flash an LED
+   * strip out C++ library stuff from image
+
    * read and write to the primary UART
    * get USB CDC device working
 
@@ -20,6 +21,8 @@
      * first, do a basic version just like the open-loop brugi
      * close loop using absolute encoders
      * add support for second IMU
+   * get watchdog working
+
 
    * persistent configuration and protocol
    * error handling and reporting
@@ -57,6 +60,9 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-26
+ * Got LED blinking on discovery board
 
 DONE 2015-11-19
  * basic SCons build system in place
