@@ -14,6 +14,8 @@
 
 #include "telemetry_manager.h"
 
+#include <cstdlib>
+
 #include "lock_manager.h"
 #include "named_registry.h"
 #include "tokenizer.h"

@@ -23,6 +23,7 @@ def setup_env(env):
     env.Append(CPPPATH=['/usr/include/eigen3'])
     env.Append(CPPPATH=['#/../../..'])
     env.Append(CPPPATH=['#'])
+    env.Append(CPPDEFINES=['MJMECH_DISABLE_BOOST'])
 
 
 targetenv = Environment(tools=['stm32f411'])

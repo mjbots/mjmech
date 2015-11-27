@@ -31,6 +31,8 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
+#include <stdlib.h>
+
 #include "stm32f4xx_hal.h"
 #include "adc.h"
 #include "crc.h"
@@ -89,6 +91,16 @@ void _exit(int foo) { while (1) {} }
 int _kill(int foo) { return -1; }
 
 int _getpid() { return -1; }
+
+void* malloc(size_t size) { return (void *)0; }
+
+void free(void *ptr) {}
+
+int __aebi_atext(void *object,
+                 void (*destructor)(void *),
+                 void *dso_handle) {
+  return 0;
+}
 
 /* USER CODE END 0 */
 
