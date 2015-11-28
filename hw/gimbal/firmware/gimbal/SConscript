@@ -17,10 +17,12 @@ Import('targetenv')
 Import('libcmsis')
 Import('libhal')
 Import('libmiddlewares')
+Import('libmiddlewares_include')
 Import('libsrc')
 
 env = targetenv.Clone()
 env.Append(CXXFLAGS=['-Wno-unused-local-typedefs'])
+env.Append(CPPPATH=libmiddlewares_include)
 
 SOURCES = [
     'cpp_gimbal.cc',
@@ -30,16 +32,16 @@ SOURCES = [
     'persistent_config.cc',
     'pool_ptr.cc',
     'telemetry_manager.cc',
+    'usb_cdc_stream.cc',
     ]
 
 HOST_SOURCES = list(set(SOURCES) - set([
             'cpp_gimbal.cc',
             'crc_stm32.cc',
             'gimbal.c',
+            'usb_cdc_stream.cc',
         ]))
 
-# NOTE jpieper: There does exist a circular reference between libsrc
-# and libmiddlewares.  Silly ST.
 target = env.Program(
     'gimbal', libcmsis + SOURCES + libsrc + libmiddlewares + libhal)
 env.Depends(target, '#/stm32f411.ld')
@@ -56,8 +58,7 @@ flash2 = env.Command(
 do_flash = env.Command(
     'flash-stamp', flash1 + flash2,
     '$FLASH write ${SOURCES[0]} 0x8000000 && ' +
-    '$FLASH write ${SOURCES[1]} 0x8020000 && ' +
-    'touch $TARGET')
+    '$FLASH write ${SOURCES[1]} 0x8020000')
 
 env.Alias('flash', do_flash)
 

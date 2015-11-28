@@ -465,6 +465,8 @@ __ALIGN_BEGIN uint8_t USBD_CDC_OtherSpeedCfgDesc[USB_CDC_CONFIG_DESC_SIZ] __ALIG
   * @{
   */
 
+static USBD_CDC_HandleTypeDef g_usbd_cdc_handle;
+
 /**
   * @brief  USBD_CDC_Init
   *         Initialize the CDC interface
@@ -515,42 +517,18 @@ static uint8_t  USBD_CDC_Init (USBD_HandleTypeDef *pdev,
 
 
   /** TODO jpieper: Re-enable with static data. */
-  pdev->pClassData = USBD_malloc(sizeof (USBD_CDC_HandleTypeDef));
+  pdev->pClassData = &g_usbd_cdc_handle;
+  /* USBD_malloc(sizeof (USBD_CDC_HandleTypeDef)); */
 
-  if(pdev->pClassData == NULL)
-  {
-    ret = 1;
-  }
-  else
-  {
-    hcdc = (USBD_CDC_HandleTypeDef*) pdev->pClassData;
+  hcdc = (USBD_CDC_HandleTypeDef*) pdev->pClassData;
 
-    /* Init  physical Interface components */
-    ((USBD_CDC_ItfTypeDef *)pdev->pUserData)->Init();
+  /* Init  physical Interface components */
+  ((USBD_CDC_ItfTypeDef *)pdev->pUserData)->Init();
 
-    /* Init Xfer states */
-    hcdc->TxState =0;
-    hcdc->RxState =0;
+  /* Init Xfer states */
+  hcdc->TxState =0;
+  hcdc->RxState =0;
 
-    if(pdev->dev_speed == USBD_SPEED_HIGH  )
-    {
-      /* Prepare Out endpoint to receive next packet */
-      USBD_LL_PrepareReceive(pdev,
-                             CDC_OUT_EP,
-                             hcdc->RxBuffer,
-                             CDC_DATA_HS_OUT_PACKET_SIZE);
-    }
-    else
-    {
-      /* Prepare Out endpoint to receive next packet */
-      USBD_LL_PrepareReceive(pdev,
-                             CDC_OUT_EP,
-                             hcdc->RxBuffer,
-                             CDC_DATA_FS_OUT_PACKET_SIZE);
-    }
-
-
-  }
   return ret;
 }
 
@@ -670,6 +648,8 @@ static uint8_t  USBD_CDC_DataIn (USBD_HandleTypeDef *pdev, uint8_t epnum)
   {
 
     hcdc->TxState = 0;
+
+    ((USBD_CDC_ItfTypeDef *)pdev->pUserData)->TxComplete();
 
     return USBD_OK;
   }

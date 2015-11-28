@@ -27,7 +27,7 @@ class AsyncReadStream {
   AsyncReadStream() {}
   AsyncReadStream(const AsyncReadStream&) = delete;
   virtual ~AsyncReadStream() {}
-  virtual void AsyncReadSome(gsl::string_span*, SizeCallback) = 0;
+  virtual void AsyncReadSome(const gsl::string_span&, SizeCallback) = 0;
 };
 
 class AsyncWriteStream {
@@ -40,6 +40,7 @@ class AsyncWriteStream {
 
 class AsyncStream : public AsyncReadStream, public AsyncWriteStream {
  public:
+  AsyncStream() {}
   AsyncStream(const AsyncStream&) = delete;
 };
 

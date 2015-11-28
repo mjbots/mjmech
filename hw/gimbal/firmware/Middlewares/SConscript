@@ -29,7 +29,7 @@ for module in MODULES:
     env.Append(CPPPATH=[includedir])
     libmiddlewares_include.append('#/Middlewares/' + includedir)
 
-libmiddlewares = env.Library('middlewares', SOURCES)
+libmiddlewares = env.Object(SOURCES)
 
 Export('libmiddlewares')
 Export('libmiddlewares_include')
