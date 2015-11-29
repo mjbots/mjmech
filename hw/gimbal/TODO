@@ -1,7 +1,4 @@
  * Software
-   * read and write to the primary UART
-   * get USB CDC device working
-
    * read and write anything from each I2C bus
    * read and write from the SPI bus
    * read from the ADC
@@ -58,6 +55,10 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-28
+ * read and write to the primary UART
+ * get USB CDC device working
 
 DONE 2015-11-27
  * strip out C++ library stuff from image
