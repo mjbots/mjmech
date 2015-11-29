@@ -32,6 +32,7 @@ SOURCES = [
     'persistent_config.cc',
     'pool_ptr.cc',
     'telemetry_manager.cc',
+    'uart_stream.cc',
     'usb_cdc_stream.cc',
     ]
 
@@ -39,6 +40,7 @@ HOST_SOURCES = list(set(SOURCES) - set([
             'cpp_gimbal.cc',
             'crc_stm32.cc',
             'gimbal.c',
+            'uart_stream.cc',
             'usb_cdc_stream.cc',
         ]))
 

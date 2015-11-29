@@ -18,50 +18,47 @@
 
 #include "gpio.h"
 #include "iwdg.h"
-#include "usart.h"
+#include "uart_stream.h"
 #include "usb_cdc_stream.h"
 
 void *operator new(size_t size) throw() { return malloc(size); }
 void operator delete(void* p) throw() { free(p); }
 
 namespace {
-volatile int g_complete = 0;
-volatile bool g_receiving = false;
-volatile int g_rx_count = 0;
-volatile int g_usb_rx_count = 0;
+int g_rx_count = 0;
+int g_usb_rx_count = 0;
 char g_usb_buffer[2] = {};
+char g_uart_buffer[2] = {};
 }
 
 extern "C" {
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
-  g_complete++;
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  g_receiving = false;
-  g_rx_count += 1;
-}
-
-void Read(AsyncReadStream& stream) {
-  stream.AsyncReadSome(gsl::string_span(g_usb_buffer),
-                       [&](int, int) {
-                         g_usb_rx_count++;
-                         Read(stream);
+void Read(AsyncReadStream& stream, gsl::string_span buffer, int* count) {
+  stream.AsyncReadSome(buffer,
+                       [&stream, count, buffer](int, int) {
+                         (*count)++;
+                         Read(stream, buffer, count);
                        });
 }
 
 void cpp_gimbal_main() {
   UsbCdcStream usb_cdc;
+  UartStream uart2(&huart2);
 
   // For now, lets try to flash an LED with no sleeps or anything.
   uint32_t old_tick = 0;
   int cycle = 0;
   char buffer[64] = {};
-  char rx_buffer[2] = {};
+
   bool usb_write = false;
   int usb_tx_count = 0;
-  Read(usb_cdc);
+
+  bool uart_write = false;
+  int uart_tx_count = 0;
+
+  Read(usb_cdc, gsl::string_span(g_usb_buffer), &g_usb_rx_count);
+  Read(uart2, gsl::string_span(g_uart_buffer), &g_rx_count);
+
   while (1) {
     HAL_IWDG_Refresh(&hiwdg);
     uint32_t new_tick = HAL_GetTick();
@@ -70,10 +67,17 @@ void cpp_gimbal_main() {
     }
     if (new_tick != old_tick && (new_tick % 250) == 0) {
       snprintf(buffer, sizeof(buffer) - 1, "tick: %lu cpt: %d rx:%d ur:%d ut:%d\r\n",
-               new_tick, g_complete, g_rx_count, g_usb_rx_count, usb_tx_count);
-      HAL_UART_Transmit_DMA(
-          &huart2, reinterpret_cast<uint8_t*>(buffer),
-          std::strlen(buffer));
+               new_tick, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count);
+
+
+      if (!uart_write) {
+        uart_write = true;
+        AsyncWrite(uart2, gsl::ensure_z(buffer),
+                   [&](int) {
+                     uart_write = false;
+                     uart_tx_count++;
+                   });
+      }
       if (!usb_write) {
         usb_write = true;
         AsyncWrite(usb_cdc, gsl::ensure_z(buffer),
@@ -101,14 +105,6 @@ void cpp_gimbal_main() {
       }
     }
     old_tick = new_tick;
-
-    if (!g_receiving) {
-      g_receiving = true;
-      HAL_UART_Receive_DMA(
-          &huart2,
-          reinterpret_cast<uint8_t*>(rx_buffer),
-          1);
-    }
   }
 }
 }
