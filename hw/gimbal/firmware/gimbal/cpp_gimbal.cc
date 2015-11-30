@@ -17,7 +17,9 @@
 #include <cstring>
 
 #include "gpio.h"
+#include "i2c.h"
 #include "iwdg.h"
+
 #include "uart_stream.h"
 #include "usb_cdc_stream.h"
 
@@ -66,8 +68,14 @@ void cpp_gimbal_main() {
       usb_cdc.PollMillisecond();
     }
     if (new_tick != old_tick && (new_tick % 250) == 0) {
-      snprintf(buffer, sizeof(buffer) - 1, "tick: %lu cpt: %d rx:%d ur:%d ut:%d\r\n",
-               new_tick, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count);
+      uint8_t i2c_buf[4] = {};
+      auto i2c_status = HAL_I2C_Mem_Read(
+          &hi2c1, 0x32, 0x20, I2C_MEMADD_SIZE_8BIT,
+          i2c_buf, sizeof(i2c_buf), 100);
+
+      snprintf(buffer, sizeof(buffer) - 1, "tick: %lu cpt: %d rx:%d ur:%d ut:%d i2cs:%d i2cd:%d\r\n",
+               new_tick, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count,
+               static_cast<int>(i2c_status), static_cast<int>(i2c_buf[0]));
 
 
       if (!uart_write) {
