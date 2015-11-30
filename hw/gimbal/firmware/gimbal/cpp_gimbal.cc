@@ -88,6 +88,7 @@ void cpp_gimbal_main() {
 
       if (!i2c_read) {
         i2c_read = true;
+        std::memset(i2c_buf, 0, sizeof(i2c_buf));
         i2c1.AsyncRead(0x32, 0x20, gsl::string_span(i2c_buf), [&](int error) {
             i2c_read = false;
             i2c_status = error;

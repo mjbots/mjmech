@@ -92,7 +92,7 @@ void Stm32I2C::AsyncRead(uint8_t device_address,
 
   if (i2c_status != 0) {
     read_callback_ = ErrorCallback();
-    callback(2);
+    callback(i2c_status);
   }
 }
 
@@ -112,7 +112,7 @@ void Stm32I2C::AsyncWrite(uint8_t device_address,
 
   if (i2c_status != 0) {
     write_callback_ = ErrorCallback();
-    callback(2);
+    callback(i2c_status);
   }
 }
 
@@ -141,10 +141,10 @@ void Stm32I2C::Error() {
   if (write_callback_.valid()) {
     auto callback = write_callback_;
     write_callback_ = ErrorCallback();
-    callback(1);
+    callback(0x1000 | hi2c_->ErrorCode);
   } else if (read_callback_.valid()) {
     auto callback = read_callback_;
     read_callback_ = ErrorCallback();
-    callback(1);
+    callback(0x1000 | hi2c_->ErrorCode);
   }
 }
