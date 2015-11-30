@@ -16,11 +16,8 @@
 
 #include "base/gsl/gsl-lite.h"
 
+#include "async_types.h"
 #include "static_function.h"
-
-typedef int ErrorCode;
-typedef StaticFunction<void (ErrorCode)> ErrorCallback;
-typedef StaticFunction<void (ErrorCode, size_t)> SizeCallback;
 
 class AsyncReadStream {
  public:

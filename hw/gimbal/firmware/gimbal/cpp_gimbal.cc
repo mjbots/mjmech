@@ -23,6 +23,7 @@
 
 #include "uart_stream.h"
 #include "usb_cdc_stream.h"
+#include "stm32_i2c.h"
 
 void *operator new(size_t size) throw() { return malloc(size); }
 void operator delete(void* p) throw() { free(p); }
@@ -32,14 +33,9 @@ int g_rx_count = 0;
 int g_usb_rx_count = 0;
 char g_usb_buffer[2] = {};
 char g_uart_buffer[2] = {};
-int g_i2c_rx_count = 0;
 }
 
 extern "C" {
-
-void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-  g_i2c_rx_count++;
-}
 
 void Read(AsyncReadStream& stream, gsl::string_span buffer, int* count) {
   stream.AsyncReadSome(buffer,
@@ -52,18 +48,23 @@ void Read(AsyncReadStream& stream, gsl::string_span buffer, int* count) {
 void cpp_gimbal_main() {
   UsbCdcStream usb_cdc;
   UartStream uart2(&huart2);
+  Stm32I2C i2c1(&hi2c1);
 
   // For now, lets try to flash an LED with no sleeps or anything.
   uint32_t old_tick = 0;
   int cycle = 0;
-  char buffer[80] = {};
+  char buffer[100] = {};
+
+  bool i2c_read = false;
+  int i2c_rx_count = 0;
 
   bool usb_write = false;
   int usb_tx_count = 0;
 
   bool uart_write = false;
   int uart_tx_count = 0;
-  uint8_t i2c_buf[4] = {};
+  int i2c_status = 0;
+  char i2c_buf[4] = {};
 
   HAL_TIM_Base_Start(&htim5);
 
@@ -77,16 +78,22 @@ void cpp_gimbal_main() {
       usb_cdc.PollMillisecond();
     }
     if (new_tick != old_tick && (new_tick % 250) == 0) {
-      auto i2c_status = HAL_I2C_Mem_Read_DMA(
-          &hi2c1, 0x32, 0x20, I2C_MEMADD_SIZE_8BIT,
-          i2c_buf, sizeof(i2c_buf));
 
       uint32_t tim5 = __HAL_TIM_GET_COUNTER(&htim5);
       snprintf(buffer, sizeof(buffer) - 1, "tick: %lu/%lu cpt: %d rx:%d ur:%d ut:%d i2cs:%d i2cd:%d i2cr:%d\r\n",
                new_tick, tim5, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count,
                static_cast<int>(i2c_status), static_cast<int>(i2c_buf[0]),
-               g_i2c_rx_count);
+               i2c_rx_count);
 
+
+      if (!i2c_read) {
+        i2c_read = true;
+        i2c1.AsyncRead(0x32, 0x20, gsl::string_span(i2c_buf), [&](int error) {
+            i2c_read = false;
+            i2c_status = error;
+            i2c_rx_count++;
+          });
+      }
 
       if (!uart_write) {
         uart_write = true;
