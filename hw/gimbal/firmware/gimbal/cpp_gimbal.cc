@@ -19,6 +19,7 @@
 #include "gpio.h"
 #include "i2c.h"
 #include "iwdg.h"
+#include "tim.h"
 
 #include "uart_stream.h"
 #include "usb_cdc_stream.h"
@@ -64,6 +65,8 @@ void cpp_gimbal_main() {
   int uart_tx_count = 0;
   uint8_t i2c_buf[4] = {};
 
+  HAL_TIM_Base_Start(&htim5);
+
   Read(usb_cdc, gsl::string_span(g_usb_buffer), &g_usb_rx_count);
   Read(uart2, gsl::string_span(g_uart_buffer), &g_rx_count);
 
@@ -78,8 +81,9 @@ void cpp_gimbal_main() {
           &hi2c1, 0x32, 0x20, I2C_MEMADD_SIZE_8BIT,
           i2c_buf, sizeof(i2c_buf));
 
-      snprintf(buffer, sizeof(buffer) - 1, "tick: %lu cpt: %d rx:%d ur:%d ut:%d i2cs:%d i2cd:%d i2cr:%d\r\n",
-               new_tick, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count,
+      uint32_t tim5 = __HAL_TIM_GET_COUNTER(&htim5);
+      snprintf(buffer, sizeof(buffer) - 1, "tick: %lu/%lu cpt: %d rx:%d ur:%d ut:%d i2cs:%d i2cd:%d i2cr:%d\r\n",
+               new_tick, tim5, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count,
                static_cast<int>(i2c_status), static_cast<int>(i2c_buf[0]),
                g_i2c_rx_count);
 
