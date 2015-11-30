@@ -134,6 +134,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM5_Init();
   MX_USART2_UART_Init();
   MX_USB_DEVICE_Init();
 
@@ -145,7 +146,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
   while (1)
   {
   /* USER CODE END WHILE */
