@@ -36,13 +36,13 @@
             (+++) Configure the DMA handle parameters
             (+++) Configure the DMA Tx or Rx Stream
             (+++) Associate the initialized DMA handle to the hi2c DMA Tx or Rx handle
-            (+++) Configure the priority and enable the NVIC for the transfer complete interrupt on 
+            (+++) Configure the priority and enable the NVIC for the transfer complete interrupt on
                   the DMA Tx or Rx Stream
 
     (#) Configure the Communication Speed, Duty cycle, Addressing mode, Own Address1,
         Dual Addressing mode, Own Address2, General call and Nostretch mode in the hi2c Init structure.
 
-    (#) Initialize the I2C registers by calling the HAL_I2C_Init(), configures also the low level Hardware 
+    (#) Initialize the I2C registers by calling the HAL_I2C_Init(), configures also the low level Hardware
         (GPIO, CLOCK, NVIC...etc) by calling the customized HAL_I2C_MspInit(&hi2c) API.
 
     (#) To check if target device is ready for communication, use the function HAL_I2C_IsDeviceReady()
@@ -198,7 +198,7 @@
 /* Private define ------------------------------------------------------------*/
 /** @addtogroup I2C_Private_Constants
   * @{
-  */    
+  */
 #define I2C_TIMEOUT_FLAG          ((uint32_t)35)     /* 35 ms */
 #define I2C_TIMEOUT_ADDR_SLAVE    ((uint32_t)10000)  /* 10 s  */
 #define I2C_TIMEOUT_BUSY_FLAG     ((uint32_t)10000)  /* 10 s  */
@@ -511,7 +511,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -604,10 +604,10 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
     {
       return HAL_BUSY;
     }
-    
+
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -793,7 +793,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -896,7 +896,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData,
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -986,7 +986,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t D
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1061,7 +1061,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t De
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1163,7 +1163,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1220,7 +1220,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pDa
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1278,7 +1278,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t 
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1358,7 +1358,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t D
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1448,7 +1448,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint8_t *p
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1537,7 +1537,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pD
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1614,7 +1614,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1712,7 +1712,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1899,7 +1899,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Write_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddr
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -1976,7 +1976,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddre
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -2083,7 +2083,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Write_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAdd
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -2165,7 +2165,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddr
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -2254,7 +2254,7 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c, uint16_t DevAdd
 
     /* Process Locked */
     __HAL_LOCK(hi2c);
-    
+
     /* Disable Pos */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
 
@@ -2517,10 +2517,10 @@ void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c)
   if(hi2c->ErrorCode != HAL_I2C_ERROR_NONE)
   {
     hi2c->State = HAL_I2C_STATE_READY;
-    
+
     /* Disable Pos bit in I2C CR1 when error occurred in Master/Mem Receive IT Process */
     hi2c->Instance->CR1 &= ~I2C_CR1_POS;
-    
+
     HAL_I2C_ErrorCallback(hi2c);
   }
 }
@@ -3366,7 +3366,7 @@ static void I2C_DMAMasterReceiveCplt(DMA_HandleTypeDef *hdma)
 
   /* Disable Acknowledge */
   hi2c->Instance->CR1 &= ~I2C_CR1_ACK;
-  
+
   /* Generate Stop */
   hi2c->Instance->CR1 |= I2C_CR1_STOP;
 
@@ -3477,7 +3477,7 @@ static void I2C_DMAMemReceiveCplt(DMA_HandleTypeDef *hdma)
 
   /* Disable Acknowledge */
   hi2c->Instance->CR1 &= ~I2C_CR1_ACK;
-  
+
   /* Generate Stop */
   hi2c->Instance->CR1 |= I2C_CR1_STOP;
 
