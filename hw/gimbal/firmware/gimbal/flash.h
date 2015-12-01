@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "simple_stream.h"
+
 class FlashInterface {
  public:
   FlashInterface(const FlashInterface&) = delete;
