@@ -19,7 +19,7 @@
 namespace test {
 class TestWriteStream : public AsyncWriteStream {
  public:
-  ~TestWriteStream() override {}
+  virtual ~TestWriteStream() {}
 
   void AsyncWriteSome(const gsl::cstring_span& data,
                       SizeCallback callback) override final {
@@ -30,5 +30,55 @@ class TestWriteStream : public AsyncWriteStream {
   }
 
   std::ostringstream ostr;
+};
+
+class TestStream : public AsyncStream {
+ public:
+  virtual ~TestStream() {}
+
+  void AsyncWriteSome(const gsl::cstring_span& data,
+                      SizeCallback callback) override final {
+    BOOST_REQUIRE_GT(data.size(), 0);
+    ostr.write(&*data.begin(), data.size());
+    callback(0, data.size());
+  }
+
+  void AsyncReadSome(const gsl::string_span& data,
+                     SizeCallback callback) override final {
+    BOOST_REQUIRE_GT(data.size(), 0);
+    BOOST_REQUIRE(!read_callback_.valid());
+
+    std::size_t to_read = std::min(data.size(), input.size());
+    if (to_read == 0) {
+      read_buffer_ = data;
+      read_callback_ = callback;
+      return;
+    }
+
+    std::memcpy(data.data(), input.data(), to_read);
+    input = input.substr(to_read);
+
+    callback(0, to_read);
+  }
+
+  void Write(const std::string& data) {
+    input = input + data;
+
+    if (read_callback_.valid()) {
+      auto callback = read_callback_;
+      read_callback_ = SizeCallback();
+      auto buffer = read_buffer_;
+      read_buffer_ = gsl::string_span();
+
+      AsyncReadSome(buffer, callback);
+    }
+  }
+
+  std::ostringstream ostr;
+
+  std::string input;
+
+  gsl::string_span read_buffer_;
+  SizeCallback read_callback_;
 };
 }
