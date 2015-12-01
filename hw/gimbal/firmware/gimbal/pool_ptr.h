@@ -24,6 +24,9 @@ class Pool {
 
   void* Allocate(std::size_t size, std::size_t alignment);
 
+  std::size_t size() const { return size_; }
+  std::size_t available() const { return size_ - position_; }
+
  private:
   char* const data_;
   const std::size_t size_;
