@@ -16,6 +16,8 @@
 
 #include <cstring>
 
+#include "base/gsl/gsl-lite.h"
+
 class OStreamInterface {
  public:
   virtual void write(const char* data, size_t amount) = 0;
