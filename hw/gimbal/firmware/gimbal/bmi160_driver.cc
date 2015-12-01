@@ -393,3 +393,7 @@ void Bmi160Driver::AsyncStart(ErrorCallback callback) {
 }
 
 ImuDataSignal* Bmi160Driver::data_signal() { return &impl_->data_signal_; }
+
+const Bmi160Driver::Bmi160Data* Bmi160Driver::data() const {
+  return &impl_->data_;
+}

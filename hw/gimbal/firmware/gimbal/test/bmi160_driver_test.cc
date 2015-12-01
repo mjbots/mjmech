@@ -137,8 +137,12 @@ BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
   bool acc_poweron = false;
   bool gyr_poweron = false;
 
+  std::set<Bmi160Driver::State> observed_states;
+
   // Process callbacks until the initialization sequence is completed.
   for (int i = 0; i < 1000 && count == 0; i++) {
+    observed_states.insert(dut.data()->state);
+
     imu_sim.ProcessAction();
     auto cmd = imu_sim.register_file_[0x7e];
     if (cmd != 0) {
@@ -156,4 +160,15 @@ BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
 
   BOOST_CHECK_EQUAL(acc_poweron, true);
   BOOST_CHECK_EQUAL(gyr_poweron, true);
+
+  typedef Bmi160Driver::State BS;
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kInitial), 0);
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kIdentifying), 1);
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kConfiguring), 1);
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kPoweringAccel), 1);
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kPoweringGyro), 1);
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kErrorCheck), 1);
+  BOOST_CHECK_EQUAL(observed_states.count(BS::kOperational), 0);
+
+  BOOST_CHECK_EQUAL(dut.data()->state, BS::kOperational);
 }

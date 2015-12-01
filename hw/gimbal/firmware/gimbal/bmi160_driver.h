@@ -33,7 +33,6 @@ class Bmi160Driver {
 
   ImuDataSignal* data_signal();
 
- private:
   struct Config {
     uint8_t address = 0x68;
     uint16_t rate_hz = 800;
@@ -49,7 +48,7 @@ class Bmi160Driver {
     }
   };
 
-  enum State : uint8_t {
+  enum State {
     kInitial,
     kIdentifying,
     kConfiguring,
@@ -97,6 +96,9 @@ class Bmi160Driver {
     }
   };
 
+  const Bmi160Data* data() const;
+
+ private:
   class Impl;
   PoolPtr<Impl> impl_;
 };
