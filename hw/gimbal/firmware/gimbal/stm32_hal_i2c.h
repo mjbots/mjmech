@@ -20,10 +20,10 @@
 
 #include "async_i2c.h"
 
-class Stm32I2C : public AsyncI2C {
+class Stm32HalI2C : public AsyncI2C {
  public:
-  Stm32I2C(I2C_HandleTypeDef*);
-  virtual ~Stm32I2C();
+  Stm32HalI2C(I2C_HandleTypeDef*);
+  virtual ~Stm32HalI2C();
 
   void AsyncRead(uint8_t device_address,
                  uint8_t memory_address,

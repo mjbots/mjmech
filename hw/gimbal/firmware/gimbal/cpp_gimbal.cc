@@ -29,7 +29,7 @@
 #include "pool_ptr.h"
 #include "stm32_clock.h"
 #include "stm32_flash.h"
-#include "stm32_i2c.h"
+#include "stm32_hal_i2c.h"
 #include "system_info.h"
 #include "telemetry_manager.h"
 #include "uart_stream.h"
@@ -79,7 +79,7 @@ void cpp_gimbal_main() {
   auto& debug_stream = usb_cdc;
 
   SizedPool<> pool;
-  Stm32I2C i2c1(&hi2c1);
+  Stm32HalI2C i2c1(&hi2c1);
   Stm32Flash flash;
   PersistentConfig config(pool, flash, debug_stream);
   LockManager lock_manager;

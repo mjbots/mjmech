@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "stm32_i2c.h"
+#include "stm32_hal_i2c.h"
 
 #include <assert.h>
 
 namespace {
 struct Registry {
   I2C_HandleTypeDef* hi2c = nullptr;
-  Stm32I2C* stm32 = nullptr;
+  Stm32HalI2C* stm32 = nullptr;
 };
 
 Registry g_registry[3] = {};
@@ -55,7 +55,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
 }
 }
 
-Stm32I2C::Stm32I2C(I2C_HandleTypeDef* hi2c) : hi2c_(hi2c) {
+Stm32HalI2C::Stm32HalI2C(I2C_HandleTypeDef* hi2c) : hi2c_(hi2c) {
   for (auto& item: g_registry) {
     if (item.hi2c == nullptr) {
       item.hi2c = hi2c;
@@ -66,7 +66,7 @@ Stm32I2C::Stm32I2C(I2C_HandleTypeDef* hi2c) : hi2c_(hi2c) {
   assert(false);
 }
 
-Stm32I2C::~Stm32I2C() {
+Stm32HalI2C::~Stm32HalI2C() {
   for (auto& item: g_registry) {
     if (item.hi2c == hi2c_) {
       assert(item.stm32 == this);
@@ -77,10 +77,10 @@ Stm32I2C::~Stm32I2C() {
   }
 }
 
-void Stm32I2C::AsyncRead(uint8_t device_address,
-                         uint8_t memory_address,
-                         const gsl::string_span& buffer,
-                         ErrorCallback callback) {
+void Stm32HalI2C::AsyncRead(uint8_t device_address,
+                            uint8_t memory_address,
+                            const gsl::string_span& buffer,
+                            ErrorCallback callback) {
   assert(!read_callback_.valid());
   assert(!write_callback_.valid());
 
@@ -96,10 +96,10 @@ void Stm32I2C::AsyncRead(uint8_t device_address,
   }
 }
 
-void Stm32I2C::AsyncWrite(uint8_t device_address,
-                          uint8_t memory_address,
-                          const gsl::cstring_span& buffer,
-                          ErrorCallback callback) {
+void Stm32HalI2C::AsyncWrite(uint8_t device_address,
+                             uint8_t memory_address,
+                             const gsl::cstring_span& buffer,
+                             ErrorCallback callback) {
   assert(!read_callback_.valid());
   assert(!write_callback_.valid());
 
@@ -116,7 +116,7 @@ void Stm32I2C::AsyncWrite(uint8_t device_address,
   }
 }
 
-void Stm32I2C::ReceiveComplete() {
+void Stm32HalI2C::ReceiveComplete() {
   if (!read_callback_.valid()) { return; }
 
   auto callback = read_callback_;
@@ -124,7 +124,7 @@ void Stm32I2C::ReceiveComplete() {
   callback(0);
 }
 
-void Stm32I2C::TransmitComplete() {
+void Stm32HalI2C::TransmitComplete() {
   if (!write_callback_.valid()) { return; }
 
   auto callback = write_callback_;
@@ -132,7 +132,7 @@ void Stm32I2C::TransmitComplete() {
   callback(0);
 }
 
-void Stm32I2C::Error() {
+void Stm32HalI2C::Error() {
   if (!write_callback_.valid() &&
       !read_callback_.valid()) { return; }
 
