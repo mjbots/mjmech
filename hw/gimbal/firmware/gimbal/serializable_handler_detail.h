@@ -61,7 +61,7 @@ struct EnumerateArchive : public mjmech::base::VisitArchive<EnumerateArchive> {
       *done_ = true;
 
       gsl::cstring_span data = FormatField(
-          context_->buffer, gsl::ensure_z(pair.name()), *pair.value());
+          context_->buffer, gsl::ensure_z(pair.name()), pair.get_value());
       AsyncWrite(*context_->stream, data, [ctx = this->context_](int error) {
           if (error) { ctx->callback(error); return; }
           ctx->current_field_index_to_write++;
@@ -182,8 +182,9 @@ struct SetArchive : public ItemArchive<SetArchive> {
 
   template <typename NameValuePair>
   void VisitScalar(const NameValuePair& pair) {
-    using Tref = decltype(*pair.value());
-    using T = typename std::remove_reference<Tref>::type;
+    using Tref = decltype(pair.get_value());
+    using T = typename std::remove_const<
+      typename std::remove_reference<Tref>::type>::type;
     pair.set_value(ParseValue<T>(value_));
   }
 
@@ -224,7 +225,7 @@ struct ReadArchive : public ItemArchive<ReadArchive> {
 
   template <typename NameValuePair>
   void VisitScalar(const NameValuePair& pair) {
-    auto out_buffer = EmitValue(*pair.value());
+    auto out_buffer = EmitValue(pair.get_value());
 
     AsyncWrite(stream_, out_buffer, callback_);
   }
@@ -238,9 +239,14 @@ struct ReadArchive : public ItemArchive<ReadArchive> {
   template <typename T>
   gsl::cstring_span EmitValue(T value) {
     int out_size = snprintf(
-        &*buffer_.begin(), buffer_.size(), "%d", value);
+        &*buffer_.begin(), buffer_.size(), GetFormat(value), value);
     return gsl::cstring_span(buffer_.begin(), buffer_.begin() + out_size);
   }
+
+  template <typename T>
+  static const char* GetFormat(T) { return "%d"; }
+
+  static const char* GetFormat(uint32_t) { return "%ul"; }
 
   const gsl::string_span buffer_;
   AsyncWriteStream& stream_;

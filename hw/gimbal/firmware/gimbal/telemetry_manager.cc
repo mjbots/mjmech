@@ -31,7 +31,7 @@ class TelemetryManager::Impl {
     int rate = 0;
     int next = 1;
     bool to_send = false;
-    Base* base = nullptr;
+    SerializableHandlerBase* base = nullptr;
   };
 
   typedef NamedRegistryBase<Element, 8> NamedRegistry;
@@ -266,7 +266,7 @@ void TelemetryManager::Poll() {
 Pool* TelemetryManager::pool() const { return &impl_->pool_; }
 
 StaticFunction<void ()> TelemetryManager::RegisterDetail(
-    const gsl::cstring_span& name, Base* base) {
+    const gsl::cstring_span& name, SerializableHandlerBase* base) {
   auto* item = impl_->elements_.FindOrCreate(
       name, Impl::NamedRegistry::kAllowCreate);
   PoolPtr<Impl::Element> element(&impl_->pool_);

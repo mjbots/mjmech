@@ -19,17 +19,13 @@
 
 #include "async_stream.h"
 #include "pool_ptr.h"
+#include "serializable_handler.h"
 #include "simple_stream.h"
 #include "static_function.h"
 
 class Pool;
 class AsyncWriteStream;
 class LockManager;
-
-namespace detail {
-template <typename T>
-class ConcreteTelemetry;
-}
 
 /// The telemetry manager enables live introspection into arbitrary
 /// serializable structures.
@@ -48,7 +44,7 @@ class TelemetryManager {
   template <typename Serializable>
   StaticFunction<void ()> Register(
       const gsl::cstring_span& name, Serializable* serializable) {
-    PoolPtr<detail::ConcreteTelemetry<Serializable> >
+    PoolPtr<SerializableHandler<Serializable> >
         concrete(pool(), serializable);
     return RegisterDetail(name, concrete.get());
   }
@@ -62,39 +58,12 @@ class TelemetryManager {
   /// This should be called frequently.
   void Poll();
 
-  class Base {
-   public:
-    virtual ~Base() {}
-    virtual int WriteBinary(OStreamInterface&) = 0;
-    virtual int WriteSchema(OStreamInterface&) = 0;
-  };
-
  private:
-  StaticFunction<void ()> RegisterDetail(const gsl::cstring_span& name, Base*);
+  StaticFunction<void ()> RegisterDetail(
+      const gsl::cstring_span& name, SerializableHandlerBase*);
 
   Pool* pool() const;
 
   class Impl;
   PoolPtr<Impl> impl_;
 };
-
-namespace detail {
-template <typename T>
-class ConcreteTelemetry : public TelemetryManager::Base {
- public:
-  ConcreteTelemetry(T* item) : item_(item) {}
-  virtual ~ConcreteTelemetry() {}
-
-  int WriteBinary(OStreamInterface& stream) override final {
-    mjmech::base::TelemetryWriteArchive<T>::Serialize(item_, stream);
-    return 0;
-  }
-
-  int WriteSchema(OStreamInterface& stream) override final {
-    mjmech::base::TelemetryWriteArchive<T>::WriteSchema(stream);
-    return 0;
-  }
-
-  T* item_;
-};
-}
