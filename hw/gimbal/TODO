@@ -1,14 +1,24 @@
- * Software
-   * read and write anything from each I2C bus
+ * Board + Software
+   * figure out why I2C gets stuck every now and then, or figure out
+     how to unstick it
+   * driver for BMI160
+
+   * basic main loop
+     * persistent configuration and protocol
+     * live streaming of data structures for debugging over USB
+
+   * Simple allan variance measurement of BMI160, verify that it is
+     working as expected with useful performance
+
+   * Design and send off BMI160 module
+
    * read and write from the SPI bus
    * read from the ADC
 
-   * get I2C DMA working
    * get SPI DMA working
    * get ADC DMA working
    * get PWM working
 
-   * driver for BMI160
    * driver for AS5048
    * herkulex protocol
    * AHRS
@@ -18,10 +28,7 @@
      * add support for second IMU
    * get watchdog working
 
-
-   * persistent configuration and protocol
    * error handling and reporting
-   * live streaming of data structures for debugging over USB
 
 
 
@@ -55,6 +62,9 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-11-30
+ * Got DMA backed I2C working
 
 DONE 2015-11-28
  * read and write to the primary UART
