@@ -156,7 +156,7 @@ class PersistentConfig::Impl {
     WriteOK(callback);
   }
 
-  uint32_t CalculateSchemaCrc(Base* base) const {
+  uint32_t CalculateSchemaCrc(SerializableHandlerBase* base) const {
     char schema_buffer[2048] = {};
     SimpleOStream schema_stream(schema_buffer, sizeof(schema_buffer));
     base->WriteSchema(schema_stream);
@@ -218,7 +218,7 @@ class PersistentConfig::Impl {
   FlashInterface& flash_;
   AsyncWriteStream& stream_;
 
-  typedef NamedRegistryBase<Base, 8> NamedRegistry;
+  typedef NamedRegistryBase<SerializableHandlerBase, 8> NamedRegistry;
   NamedRegistry elements_;
 
   // TODO jpieper: This buffer could be shared with other things that
@@ -262,7 +262,7 @@ void PersistentConfig::Load() {
 }
 
 void PersistentConfig::RegisterDetail(
-    const gsl::cstring_span& name, Base* base) {
+    const gsl::cstring_span& name, SerializableHandlerBase* base) {
   auto* const element = impl_->elements_.FindOrCreate(
       name, Impl::NamedRegistry::kAllowCreate);
   element->ptr = base;
