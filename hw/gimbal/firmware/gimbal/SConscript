@@ -34,6 +34,7 @@ SOURCES = [
     'pool_ptr.cc',
     'stm32_flash.cc',
     'stm32_i2c.cc',
+    'system_info.cc',
     'telemetry_manager.cc',
     'uart_stream.cc',
     'usb_cdc_stream.cc',
