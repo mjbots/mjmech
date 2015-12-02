@@ -74,11 +74,12 @@ class SerializableHandler : public SerializableHandlerBase {
     context->buffer = buffer;
     context->callback = callback;
     context->current_field_index_to_write = 0;
-    context->evaluate_enumerate_archive = [&]() {
+    context->evaluate_enumerate_archive = [this, context]() {
       uint16_t current_index = 0;
       bool done = false;
-      detail::EnumerateArchive(context, context->root_prefix,
-                               &current_index, &done, nullptr).Accept(item_);
+      detail::EnumerateArchive(
+          context, context->root_prefix,
+          &current_index, &done, nullptr).Accept(this->item_);
       return done;
     };
 
