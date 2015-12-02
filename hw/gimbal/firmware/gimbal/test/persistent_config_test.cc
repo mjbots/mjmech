@@ -43,6 +43,14 @@ struct BigStruct {
     a->Visit(MJ_NVP(sub));
   }
 };
+
+std::string StripCR(const std::string& str) {
+  std::ostringstream result;
+  for (char c: str) {
+    if (c != '\r') { result.write(&c, 1);}
+  }
+  return result.str();
+}
 }
 
 BOOST_AUTO_TEST_CASE(SetArchiveTest) {
@@ -125,7 +133,7 @@ BOOST_AUTO_TEST_CASE(EnumerateArchiveTest) {
 bigstruct.sub.vi 0
 bigstruct.sub.vf 1.000000
 )XX";
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), expected);
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), expected);
 }
 
 namespace {
@@ -168,7 +176,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "unknown command\n");
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), "unknown command\n");
 
   count = 0;
   test_stream.ostr.str("");
@@ -177,7 +185,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "OK\n");
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), "OK\n");
   BOOST_CHECK_EQUAL(os.vfloat, 4.5);
 
   count = 0;
@@ -186,7 +194,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "3\n");
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), "3\n");
 
   count = 0;
   test_stream.ostr.str("");
@@ -203,7 +211,7 @@ other.v3 2
 other.vfloat 4.500000
 OK
 )XX";
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), expected);
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), expected);
 }
 
 BOOST_FIXTURE_TEST_CASE(PersistentConfigFlashTest, PersistentConfigFixture) {
@@ -215,7 +223,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigFlashTest, PersistentConfigFixture) {
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "OK\n");
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), "OK\n");
 
   SimpleIStream raw_stream(flash.buffer_, sizeof(flash.buffer_));
   mjmech::base::TelemetryReadStream<SimpleIStream> stream(raw_stream);
@@ -242,7 +250,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigFlashTest, PersistentConfigFixture) {
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(test_stream.ostr.str(), "OK\n");
+  BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), "OK\n");
 
   BOOST_CHECK_EQUAL(bs.u8, 3);
   BOOST_CHECK_EQUAL(os.v2, 1);

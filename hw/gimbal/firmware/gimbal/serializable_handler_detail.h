@@ -113,7 +113,7 @@ struct EnumerateArchive : public mjmech::base::VisitArchive<EnumerateArchive> {
     if (FormatPrefix(&it, &end, this)) {
       return gsl::cstring_span();
     }
-    if ((name.size() + 2) > std::distance(it, end)) {
+    if ((name.size() + 3) > std::distance(it, end)) {
       return gsl::cstring_span();
     }
 
@@ -126,6 +126,8 @@ struct EnumerateArchive : public mjmech::base::VisitArchive<EnumerateArchive> {
     ++it;
 
     FormatValue(&it, &end, value);
+    *it = '\r';
+    ++it;
     *it = '\n';
     ++it;
     return gsl::cstring_span(buffer.begin(), it);

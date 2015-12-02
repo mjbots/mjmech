@@ -77,7 +77,7 @@ class PersistentConfig::Impl {
     auto* const element =
         elements_.FindOrCreate(group, NamedRegistry::kFindOnly);
     if (element == nullptr) {
-      WriteMessage(gsl::ensure_z("unknown group\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown group\r\n"), callback);
     } else {
       current_callback_ = callback;
       int err =
@@ -85,11 +85,11 @@ class PersistentConfig::Impl {
               send_buffer_, tokenizer.remaining(), stream_,
               [this](int error) {
                 if (error) { this->current_callback_(error); return; }
-                WriteMessage(gsl::ensure_z("\n"),
+                WriteMessage(gsl::ensure_z("\r\n"),
                              this->current_callback_);
               });
       if (err) {
-        WriteMessage(gsl::ensure_z("error reading\n"), callback);
+        WriteMessage(gsl::ensure_z("error reading\r\n"), callback);
       }
     }
   }
@@ -101,7 +101,7 @@ class PersistentConfig::Impl {
     auto* const element =
         elements_.FindOrCreate(group, NamedRegistry::kFindOnly);
     if (element == nullptr) {
-      WriteMessage(gsl::ensure_z("unknown group\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown group\r\n"), callback);
     } else {
       Tokenizer name_value(tokenizer.remaining(), " ");
       auto key = name_value.next();
@@ -110,7 +110,7 @@ class PersistentConfig::Impl {
       if (result == 0) {
         WriteOK(callback);
       } else {
-        WriteMessage(gsl::ensure_z("error setting\n"), callback);
+        WriteMessage(gsl::ensure_z("error setting\r\n"), callback);
       }
     }
   }
@@ -201,12 +201,12 @@ class PersistentConfig::Impl {
   }
 
   void WriteOK(ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("OK\n"), callback);
+    WriteMessage(gsl::ensure_z("OK\r\n"), callback);
   }
 
   void UnknownCommand(const gsl::cstring_span& command,
                       ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("unknown command\n"), callback);
+    WriteMessage(gsl::ensure_z("unknown command\r\n"), callback);
   }
 
   void WriteMessage(const gsl::cstring_span& message,

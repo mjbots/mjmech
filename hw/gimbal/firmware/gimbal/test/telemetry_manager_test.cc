@@ -65,10 +65,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerTest, Fixture) {
   dut.Command(gsl::ensure_z("list"), callback);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  std::string expected = R"XX(struct1
-struct2
-OK
-)XX";
+  std::string expected = "struct1\r\nstruct2\r\nOK\r\n";
   BOOST_CHECK_EQUAL(stream.ostr.str(), expected);
 
   count = 0;
@@ -76,14 +73,14 @@ OK
   dut.Command(gsl::ensure_z("get struct2"), callback);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct2\n"));
+  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct2\r\n"));
 
   count = 0;
   stream.ostr.str("");
   dut.Command(gsl::ensure_z("schema struct2"), callback);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK(StartsWith(stream.ostr.str(), "schema struct2\n"));
+  BOOST_CHECK(StartsWith(stream.ostr.str(), "schema struct2\r\n"));
 }
 
 BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
@@ -114,7 +111,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
   dut.Command(gsl::ensure_z("rate struct1 1"), callback);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(stream.ostr.str(), "OK\n");
+  BOOST_CHECK_EQUAL(stream.ostr.str(), "OK\r\n");
   stream.ostr.str("");
 
   // Nothing should come out spontaneously still.
@@ -128,7 +125,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
   updated1();
   BOOST_CHECK_EQUAL(stream.ostr.str(), "");
   dut.Poll();
-  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct1\n"));
+  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct1\r\n"));
   stream.ostr.str("");
 
   // Now set a time rate.
@@ -136,7 +133,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
   dut.Command(gsl::ensure_z("rate struct1 20"), callback);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
-  BOOST_CHECK_EQUAL(stream.ostr.str(), "OK\n");
+  BOOST_CHECK_EQUAL(stream.ostr.str(), "OK\r\n");
   stream.ostr.str("");
 
   // Now, calling update followed by poll should have no effect.
@@ -150,7 +147,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
     Poll();
   }
 
-  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct1\n"));
+  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct1\r\n"));
 
   // And it should come out again in the same number of cycles.
   stream.ostr.str("");
@@ -160,5 +157,5 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
     Poll();
   }
 
-  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct1\n"));
+  BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct1\r\n"));
 }

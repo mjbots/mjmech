@@ -31,6 +31,7 @@ class TelemetryManager::Impl {
     int rate = 0;
     int next = 1;
     bool to_send = false;
+    bool text = false;
     SerializableHandlerBase* base = nullptr;
   };
 
@@ -86,21 +87,38 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
       return;
     }
 
     EmitData(element, callback);
   }
 
+  void Enumerate(NamedRegistry::Element* element, ErrorCallback callback) {
+    current_callback_ = callback;
+
+    element->ptr->base->Enumerate(
+        &enumerate_context_,
+        send_buffer_,
+        element->name,
+        stream_,
+        [this](int err) {
+          this->WriteOK(current_callback_);
+        });
+  }
+
   void EmitData(NamedRegistry::Element* element, ErrorCallback callback) {
-    Emit(
-        gsl::ensure_z("emit "),
-        element,
-        [](NamedRegistry::Element* element, SimpleOStream* ostream) {
-          element->ptr->base->WriteBinary(*ostream);
-        },
-        callback);
+    if (element->ptr->text) {
+      Enumerate(element, callback);
+    } else {
+      Emit(
+          gsl::ensure_z("emit "),
+          element,
+          [](NamedRegistry::Element* element, SimpleOStream* ostream) {
+            element->ptr->base->WriteBinary(*ostream);
+          },
+          callback);
+    }
   }
 
   typedef StaticFunction<void (NamedRegistry::Element*,
@@ -112,7 +130,7 @@ class TelemetryManager::Impl {
     SimpleOStream ostream(send_buffer_, sizeof(send_buffer_));
     ostream.write(prefix);
     ostream.write(element->name);
-    ostream.write(gsl::ensure_z("\n"));
+    ostream.write(gsl::ensure_z("\r\n"));
 
     char* const size_position = send_buffer_ + ostream.position();
     ostream.skip(sizeof(uint32_t));
@@ -155,6 +173,8 @@ class TelemetryManager::Impl {
     char *ptr = &send_buffer_[0];
     std::copy(element->name.begin(), element->name.end(), ptr);
     ptr += element->name.size();
+    *ptr = '\r';
+    ptr++;
     *ptr = '\n';
     ptr++;
     AsyncWrite(stream_, gsl::cstring_span(send_buffer_, ptr),
@@ -165,7 +185,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
       return;
     }
 
@@ -185,7 +205,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
       return;
     }
 
@@ -206,13 +226,34 @@ class TelemetryManager::Impl {
     WriteOK(callback);
   }
 
+  void Format(const gsl::cstring_span& command, ErrorCallback callback) {
+    Tokenizer tokenizer(command, " ");
+    auto name = tokenizer.next();
+    auto format_str = tokenizer.next();
+
+    auto* const element =
+        elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
+    if (!element) {
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
+      return;
+    }
+
+    char buffer[5] = {};
+    Expects(format_str.size() < (sizeof(buffer) - 1));
+    std::copy(format_str.begin(), format_str.end(), buffer);
+    const long format = strtol(buffer, nullptr, 0);
+    element->ptr->text = format != 0;
+
+    WriteOK(callback);
+  }
+
   void UnknownCommand(const gsl::cstring_span& command,
                       ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("unknown command\n"), callback);
+    WriteMessage(gsl::ensure_z("unknown command\r\n"), callback);
   }
 
   void WriteOK(ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("OK\n"), callback);
+    WriteMessage(gsl::ensure_z("OK\r\n"), callback);
   }
 
   void WriteMessage(const gsl::cstring_span& message,
@@ -230,6 +271,7 @@ class TelemetryManager::Impl {
   ErrorCallback current_callback_;
   char send_buffer_[256] = {};
   std::size_t current_list_index_ = 0;
+  detail::EnumerateArchive::Context enumerate_context_;
 };
 
 TelemetryManager::TelemetryManager(
@@ -250,6 +292,8 @@ void TelemetryManager::Command(const gsl::cstring_span& command,
     impl_->Schema(tokenizer.remaining(), callback);
   } else if (cmd == gsl::ensure_z("rate")) {
     impl_->Rate(tokenizer.remaining(), callback);
+  } else if (cmd == gsl::ensure_z("fmt")) {
+    impl_->Format(tokenizer.remaining(), callback);
   } else {
     impl_->UnknownCommand(cmd, callback);
   }
