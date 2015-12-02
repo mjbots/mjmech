@@ -86,7 +86,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\n"), callback);
       return;
     }
 
@@ -165,7 +165,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\n"), callback);
       return;
     }
 
@@ -185,7 +185,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\n"), callback);
       return;
     }
 
@@ -194,7 +194,9 @@ class TelemetryManager::Impl {
     std::copy(rate_str.begin(), rate_str.end(), buffer);
     long rate = strtol(buffer, nullptr, 0);
     element->ptr->rate = rate;
-    if (rate < 10) {
+    if (rate == 0) {
+      element->ptr->next = 1;
+    } else if (rate < 10) {
       element->ptr->rate = 1;
       element->ptr->next = 1;
     } else {

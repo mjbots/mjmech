@@ -16,121 +16,127 @@
 
 #include <cstring>
 
+#include "base/visitor.h"
+
 #include "gpio.h"
 #include "i2c.h"
 #include "iwdg.h"
 #include "tim.h"
 
+#include "command_manager.h"
+#include "lock_manager.h"
+#include "persistent_config.h"
+#include "pool_ptr.h"
+#include "stm32_clock.h"
+#include "stm32_flash.h"
+#include "stm32_i2c.h"
+#include "system_info.h"
+#include "telemetry_manager.h"
 #include "uart_stream.h"
 #include "usb_cdc_stream.h"
-#include "stm32_i2c.h"
 
 void *operator new(size_t size) throw() { return malloc(size); }
 void operator delete(void* p) throw() { free(p); }
 
 namespace {
-int g_rx_count = 0;
-int g_usb_rx_count = 0;
-char g_usb_buffer[2] = {};
-char g_uart_buffer[2] = {};
+struct SystemStatus {
+  uint32_t timestamp = 0;
+  bool command_manager_init = false;
+
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(MJ_NVP(timestamp));
+    a->Visit(MJ_NVP(command_manager_init));
+  }
+};
+
+void UpdateLEDs(uint32_t count) {
+  int cycle = count / 250;
+  if (cycle & 1) {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+  } else {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+  }
+  if (cycle & 2) {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+  } else {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+  }
+  if (cycle & 4) {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+  } else {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+  }
+}
 }
 
 extern "C" {
 
-void Read(AsyncReadStream& stream, gsl::string_span buffer, int* count) {
-  stream.AsyncReadSome(buffer,
-                       [&stream, count, buffer](int, int) {
-                         (*count)++;
-                         Read(stream, buffer, count);
-                       });
-}
-
 void cpp_gimbal_main() {
   UsbCdcStream usb_cdc;
   UartStream uart2(&huart2);
+
+  auto& debug_stream = usb_cdc;
+
+  SizedPool<> pool;
   Stm32I2C i2c1(&hi2c1);
+  Stm32Flash flash;
+  PersistentConfig config(pool, flash, debug_stream);
+  LockManager lock_manager;
+  TelemetryManager telemetry(pool, debug_stream, lock_manager);
+  CommandManager command_manager(pool, debug_stream, lock_manager);
+  Stm32Clock clock;
+  SystemInfo system_info(pool, telemetry, clock);
 
-  // For now, lets try to flash an LED with no sleeps or anything.
-  uint32_t old_tick = 0;
-  int cycle = 0;
+  command_manager.Register(
+      gsl::ensure_z("conf"),
+      [&](const gsl::cstring_span& args, ErrorCallback cbk) {
+        config.Command(args, cbk);
+      });
+  command_manager.Register(
+      gsl::ensure_z("tel"),
+      [&](const gsl::cstring_span& args, ErrorCallback cbk) {
+        telemetry.Command(args, cbk);
+      });
+
+  SystemStatus system_status;
+  telemetry.Register(gsl::ensure_z("system_status"), &system_status);
+
+  command_manager.AsyncStart([&](int error) {
+      if (!error) {
+        system_status.command_manager_init = true;
+      }
+    });
+
   char buffer[100] = {};
-
-  bool i2c_read = false;
-  int i2c_rx_count = 0;
-
-  bool usb_write = false;
-  int usb_tx_count = 0;
-
   bool uart_write = false;
-  int uart_tx_count = 0;
-  int i2c_status = 0;
-  char i2c_buf[4] = {};
 
-  HAL_TIM_Base_Start(&htim5);
-
-  Read(usb_cdc, gsl::string_span(g_usb_buffer), &g_usb_rx_count);
-  Read(uart2, gsl::string_span(g_uart_buffer), &g_rx_count);
-
+  uint32_t old_tick = 0;
   while (1) {
-    HAL_IWDG_Refresh(&hiwdg);
     uint32_t new_tick = HAL_GetTick();
     if (new_tick != old_tick) {
       usb_cdc.PollMillisecond();
-    }
-    if (new_tick != old_tick && (new_tick % 250) == 0) {
+      telemetry.PollMillisecond();
+      system_info.PollMillisecond();
+      system_status.timestamp = clock.timestamp();
 
-      uint32_t tim5 = __HAL_TIM_GET_COUNTER(&htim5);
-      snprintf(buffer, sizeof(buffer) - 1, "tick: %lu/%lu cpt: %d rx:%d ur:%d ut:%d i2cs:%d i2cd:%d i2cr:%d\r\n",
-               new_tick, tim5, uart_tx_count, g_rx_count, g_usb_rx_count, usb_tx_count,
-               static_cast<int>(i2c_status), static_cast<int>(i2c_buf[0]),
-               i2c_rx_count);
-
-
-      if (!i2c_read) {
-        i2c_read = true;
-        std::memset(i2c_buf, 0, sizeof(i2c_buf));
-        i2c1.AsyncRead(0x32, 0x20, gsl::string_span(i2c_buf), [&](int error) {
-            i2c_read = false;
-            i2c_status = error;
-            i2c_rx_count++;
-          });
-      }
-
-      if (!uart_write) {
-        uart_write = true;
-        AsyncWrite(uart2, gsl::ensure_z(buffer),
-                   [&](int) {
-                     uart_write = false;
-                     uart_tx_count++;
-                   });
-      }
-      if (!usb_write) {
-        usb_write = true;
-        AsyncWrite(usb_cdc, gsl::ensure_z(buffer),
-                   [&](int){
-                     usb_write = false;
-                     usb_tx_count++;
-                   });
-      }
-
-      cycle = (cycle + 1) % 8;
-      if (cycle & 1) {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-      } else {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-      }
-      if (cycle & 2) {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-      } else {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-      }
-      if (cycle & 4) {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-      } else {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+      if ((new_tick % 1000) == 0) {
+        snprintf(buffer, sizeof(buffer) - 1, "%lu: hi\r\n", clock.timestamp());
+        if (!uart_write) {
+          uart_write = true;
+          AsyncWrite(uart2, gsl::ensure_z(buffer),
+                     [&](int error){ uart_write = false; });
+        }
       }
     }
     old_tick = new_tick;
+
+    HAL_IWDG_Refresh(&hiwdg);
+    telemetry.Poll();
+    command_manager.Poll();
+    system_info.MainLoopCount();
+
+    UpdateLEDs(new_tick);
   }
 }
 }

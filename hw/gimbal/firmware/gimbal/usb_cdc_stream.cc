@@ -81,8 +81,6 @@ UsbCdcStream::UsbCdcStream() {
   // There should only be one of us at a time.
   assert(!g_usb_cdc);
   g_usb_cdc = this;
-
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, rx_buffer_);
 }
 
 UsbCdcStream::~UsbCdcStream() {
@@ -93,6 +91,7 @@ UsbCdcStream::~UsbCdcStream() {
 int8_t UsbCdcStream::Init() {
   if (rx_callback_.valid()) {
     // We had a request before we were valid.  Kick it off now.
+    USBD_CDC_SetRxBuffer(&hUsbDeviceFS, rx_buffer_);
     USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   }
   return 0;
@@ -155,6 +154,7 @@ void UsbCdcStream::AsyncReadSome(const gsl::string_span& buffer,
     rx_callback_ = callback;
     rx_queue_ = buffer;
 
+    USBD_CDC_SetRxBuffer(&hUsbDeviceFS, rx_buffer_);
     USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   }
 }

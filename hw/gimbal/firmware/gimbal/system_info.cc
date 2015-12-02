@@ -42,7 +42,7 @@ class SystemInfo::Impl {
   Impl(Pool& pool, TelemetryManager& telemetry, Clock& clock)
       : pool_(pool),
         clock_(clock) {
-    data_updater_ = telemetry.Register("system_info", &data_);
+    data_updater_ = telemetry.Register(gsl::ensure_z("system_info"), &data_);
   }
 
   void PollMillsecond() {
