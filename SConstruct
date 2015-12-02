@@ -28,7 +28,9 @@ env.Append(LIBS=['snappy',
                  'boost_program_options',
                  'pthread',
                  'rt',
-                 'log4cpp'])
+                 'log4cpp',
+                 'boost_filesystem',
+                 'boost_date_time'])
 
 env.ParseConfig('pkg-config --cflags --libs eigen3')
 
