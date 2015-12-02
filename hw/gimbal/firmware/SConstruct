@@ -32,8 +32,8 @@ hostenv = Environment()
 setup_env(targetenv)
 setup_env(hostenv)
 
-targetenv.Append(CFLAGS=['-Os'])
-targetenv.Append(CXXFLAGS=['-Os'])
+targetenv.Append(CFLAGS=['-O0'])
+targetenv.Append(CXXFLAGS=['-O0'])
 targetenv.Append(CPPPATH=['/usr/include/newlib/c++/4.8'])
 targetenv.Append(CPPPATH=['/usr/include/newlib/c++/4.8/arm-none-eabi/armv7e-m'])
 
