@@ -141,7 +141,7 @@ class TelemetryManager::Impl {
     mjmech::base::TelemetryWriteStream<SimpleOStream> tstream(size_stream);
     tstream.Write(static_cast<uint32_t>(
                       ostream.position() + send_buffer_ -
-                      size_position + sizeof(uint32_t)));
+                      (size_position + sizeof(uint32_t))));
 
     AsyncWrite(
         stream_,
