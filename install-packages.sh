@@ -2,12 +2,29 @@
 set -e
 
 yes_flag=""
-if [[ "$1" == "-y" ]]; then
-    yes_flag="-y"
-elif [[ "$1" != "" ]]; then
-    echo invalid option
-    exit 1
-fi
+do_system=""
+do_test=""
+while [[ "$#" != "0" ]]; do
+    case "$1" in
+        -y)
+            yes_flag="-y"
+            ;;
+        --system)
+            do_system="1"
+            ;;
+        --test)
+            do_test="1"
+            ;;
+        *)
+            echo Invalid args. Possible options:
+            echo " -y -- do not ask for confirmation"
+            echo " --system -- also install system packages"
+            echo " --test   -- just test if anything needs installing"
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 PKGLIST=(
     scons libeigen3-dev libsnappy-dev python-snappy libi2c-dev
@@ -19,12 +36,20 @@ PKGLIST=(
     libboost-date-time1.55-dev libboost-filesystem1.55-dev
 )
 
+if [[ "$do_system" == "1" ]]; then
+    PKGLIST=( "${PKGLIST[@]}"
+        ifplugd iw wireless-tools wpasupplicant git lsof
+        htop strace ltrace build-essential dkms
+    )
+fi
+
 if [[ "$yes_flag" != "" ]] || (
         apt-get install --dry-run "${PKGLIST[@]}" \
             | egrep ' could not be installed|^Conf'
     ); then
     echo
     echo Need to install some packages
+    if [[ "$do_test" == "1" ]]; then exit 1; fi
     (set -x;
         sudo apt-get install $yes_flag "${PKGLIST[@]}"
     )
@@ -38,6 +63,8 @@ revision="$(cat $gstreamer_root/mj-gstreamer-revision || echo not-found)"
 
 if ! expr "(" "$revision" + 0 ")" ">=" "$gs_min_revision" >/dev/null; then
     echo "Need to install gstreamer into $gstreamer_root"
+
+    if [[ "$do_test" == "1" ]]; then exit 1; fi
 
     if [[ "$yes_flag" == "" ]]; then
         echo -n 'Continue? (y/n) '
@@ -112,6 +139,8 @@ GST_PKGLIST=($(
     ))
 if [[ "$GST_PKGLIST" != "" ]]; then
     echo Need to install some gstreamer media driver packages
+    if [[ "$do_test" == "1" ]]; then exit 1; fi
+
     (set -x;
         sudo apt-get install $yes_flag "${GST_PKGLIST[@]}"
     )
