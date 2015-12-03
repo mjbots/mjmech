@@ -1,11 +1,6 @@
  * Board + Software
-   * figure out why I2C gets stuck every now and then, or figure out
-     how to unstick it
-   * driver for BMI160
-
-   * basic main loop
-     * persistent configuration and protocol
-     * live streaming of data structures for debugging over USB
+   * test out BMI160 driver
+   * commission raw I2C driver
 
    * Simple allan variance measurement of BMI160, verify that it is
      working as expected with useful performance
@@ -15,6 +10,7 @@
    * read and write from the SPI bus
    * read from the ADC
 
+   * get I2C DMA working
    * get SPI DMA working
    * get ADC DMA working
    * get PWM working
@@ -62,6 +58,16 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-02
+ * got tserial.py basically working, along with fixing a bunch of bugs
+   in the online code
+ * drafted raw I2C driver
+
+DONE 2015-12-01
+ * basic main loop
+   * persistent configuration and protocol
+   * live streaming of data structures for debugging over USB
 
 DONE 2015-11-30
  * Got DMA backed I2C working
