@@ -68,7 +68,7 @@ class CommandManager::Impl {
 
     Tokenizer tokenizer(line, " ");
     auto cmd = tokenizer.next();
-    if (cmd == "") { return; }
+    if (cmd.size() == 0) { return; }
 
     auto* element = registry_.FindOrCreate(cmd, Registry::kFindOnly);
 
