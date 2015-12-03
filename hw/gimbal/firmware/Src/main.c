@@ -31,6 +31,7 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
+#include <assert.h>
 #include <stdlib.h>
 
 #include "stm32f4xx_hal.h"
@@ -93,7 +94,10 @@ int _kill(int foo) { return -1; }
 
 int _getpid() { return -1; }
 
-void* malloc(size_t size) { return (void *)0; }
+void* malloc(size_t size) {
+  assert(0);
+  return (void *)0;
+}
 
 void free(void *ptr) {}
 
