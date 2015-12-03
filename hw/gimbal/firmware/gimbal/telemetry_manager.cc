@@ -247,6 +247,16 @@ class TelemetryManager::Impl {
     WriteOK(callback);
   }
 
+  void Stop(ErrorCallback callback) {
+    for (size_t i = 0; i < elements_.size(); i++) {
+      if (elements_[i].name.size() == 0) { break; }
+      elements_[i].ptr->to_send = false;
+      elements_[i].ptr->rate = 0;
+    }
+
+    WriteOK(callback);
+  }
+
   void UnknownCommand(const gsl::cstring_span& command,
                       ErrorCallback callback) {
     WriteMessage(gsl::ensure_z("unknown command\r\n"), callback);
@@ -294,6 +304,8 @@ void TelemetryManager::Command(const gsl::cstring_span& command,
     impl_->Rate(tokenizer.remaining(), callback);
   } else if (cmd == gsl::ensure_z("fmt")) {
     impl_->Format(tokenizer.remaining(), callback);
+  } else if (cmd == gsl::ensure_z("stop")) {
+    impl_->Stop(callback);
   } else {
     impl_->UnknownCommand(cmd, callback);
   }
