@@ -35,6 +35,7 @@ SOURCES = [
     'pool_ptr.cc',
     'stm32_flash.cc',
     'stm32_hal_i2c.cc',
+    'stm32_raw_i2c.cc',
     'system_info.cc',
     'telemetry_manager.cc',
     'uart_stream.cc',
@@ -47,6 +48,7 @@ HOST_SOURCES = list(set(SOURCES) - set([
             'gimbal.c',
             'stm32_flash.cc',
             'stm32_hal_i2c.cc',
+            'stm32_raw_i2c.cc',
             'uart_stream.cc',
             'usb_cdc_stream.cc',
         ]))
