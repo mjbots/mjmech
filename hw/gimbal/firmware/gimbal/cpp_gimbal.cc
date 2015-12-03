@@ -128,6 +128,8 @@ void cpp_gimbal_main() {
                      [&](int error){ uart_write = false; });
         }
       }
+
+      UpdateLEDs(new_tick);
     }
     old_tick = new_tick;
 
@@ -135,8 +137,6 @@ void cpp_gimbal_main() {
     telemetry.Poll();
     command_manager.Poll();
     system_info.MainLoopCount();
-
-    UpdateLEDs(new_tick);
   }
 }
 }
