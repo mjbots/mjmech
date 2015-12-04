@@ -37,8 +37,11 @@ env.ParseConfig('pkg-config --cflags --libs eigen3')
 canonenv = env
 Export('canonenv')
 
+import os
+variant_suffix = '-' + os.uname()[4]
+
 subdirs = ['base', 'mech', 'python', 'legtool', 'tools']
 for subdir in subdirs:
     SConscript(subdir + '/SConscript',
-               variant_dir=subdir + '/build',
+               variant_dir=subdir + '/build' + variant_suffix,
                duplicate=0)
