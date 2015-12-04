@@ -204,7 +204,9 @@ class Bmi160Driver::Impl {
       case kIdentifying: {
         const uint8_t received_id = static_cast<uint8_t>(buffer_[0]);
         if (received_id != bi(BMI160::CHIP_ID_VALUE)) {
-          start_callback_(0x101);
+          data_.imu.error = 0x40000 | received_id;
+          Emit();
+          start_callback_(data_.imu.error);
           return;
         }
 
@@ -234,7 +236,7 @@ class Bmi160Driver::Impl {
 
         data_.state = kConfiguring;
         async_i2c_.AsyncWrite(
-            config_.address, kStart, gsl::cstring_span(buffer_, 4),
+            config_.address, kStart, gsl::cstring_span(buffer_, buffer_ + 4),
             callback);
         break;
       }

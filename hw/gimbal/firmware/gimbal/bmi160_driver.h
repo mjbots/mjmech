@@ -94,6 +94,9 @@ class Bmi160Driver {
     void Serialize(Archive* a) {
       a->Visit(MJ_ENUM(state, StateMapper));
       a->Visit(MJ_NVP(sensor_time));
+      a->Visit(MJ_NVP(gyro_max_dps));
+      a->Visit(MJ_NVP(accel_max_g));
+      a->Visit(MJ_NVP(rate_hz));
       a->Visit(MJ_NVP(imu));
     }
   };
