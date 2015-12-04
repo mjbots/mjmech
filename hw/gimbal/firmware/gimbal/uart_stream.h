@@ -26,6 +26,8 @@ class UartStream : public AsyncStream {
   virtual void AsyncReadSome(const gsl::string_span&, SizeCallback) override;
   virtual void AsyncWriteSome(const gsl::cstring_span&, SizeCallback) override;
 
+  void Poll();
+
   // The following are used internally only.
   void TransmitComplete();
   void ReceiveComplete();
@@ -34,6 +36,9 @@ class UartStream : public AsyncStream {
   UART_HandleTypeDef* const huart_;
   SizeCallback tx_callback_;
   std::size_t tx_size_ = 0;
+
+  volatile bool rx_complete_ = false;
+  volatile bool tx_complete_ = false;
 
   SizeCallback rx_callback_;
 };

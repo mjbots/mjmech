@@ -150,6 +150,7 @@ void cpp_gimbal_main() {
     old_tick = new_tick;
 
     HAL_IWDG_Refresh(&hiwdg);
+    uart2.Poll();
     i2c1.Poll();
     telemetry.Poll();
     command_manager.Poll();

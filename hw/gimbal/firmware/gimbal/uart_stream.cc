@@ -84,12 +84,32 @@ void UartStream::AsyncReadSome(const gsl::string_span& buffer,
       1);
 }
 
-void UartStream::ReceiveComplete() {
-  if (!rx_callback_.valid()) { return; }
+void UartStream::Poll() {
+  if (tx_complete_) {
+    tx_complete_ = false;
 
-  auto callback = rx_callback_;
-  rx_callback_ = SizeCallback();
-  callback(0, 1);
+    if (!tx_callback_.valid()) { return; }
+
+    auto callback = tx_callback_;
+    tx_callback_ = SizeCallback();
+    auto size = tx_size_;
+    tx_size_ = 0;
+    callback(0, size);
+  }
+
+  if (rx_complete_) {
+    rx_complete_ = false;
+
+    if (!rx_callback_.valid()) { return; }
+
+    auto callback = rx_callback_;
+    rx_callback_ = SizeCallback();
+    callback(0, 1);
+  }
+}
+
+void UartStream::ReceiveComplete() {
+  rx_complete_ = true;
 }
 
 void UartStream::AsyncWriteSome(const gsl::cstring_span& buffer,
@@ -105,11 +125,5 @@ void UartStream::AsyncWriteSome(const gsl::cstring_span& buffer,
 }
 
 void UartStream::TransmitComplete() {
-  if (!tx_callback_.valid()) { return; }
-
-  auto callback = tx_callback_;
-  tx_callback_ = SizeCallback();
-  auto size = tx_size_;
-  tx_size_ = 0;
-  callback(0, size);
+  tx_complete_ = true;
 }
