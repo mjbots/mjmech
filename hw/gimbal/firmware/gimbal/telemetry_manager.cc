@@ -43,6 +43,7 @@ class TelemetryManager::Impl {
     // sending it out now.
     if (element->ptr->rate == 1) {
       element->ptr->to_send = true;
+      maybe_need_to_send_ = true;
     }
   }
 
@@ -56,12 +57,15 @@ class TelemetryManager::Impl {
         if (ptr->next == 0) {
           ptr->to_send = true;
           ptr->next = ptr->rate;
+          maybe_need_to_send_ = true;
         }
       }
     }
   }
 
   void Poll() {
+    if (!maybe_need_to_send_) { return; }
+
     // Are we locked currently?  If so, then there's nothing we can
     // do.
     if (lock_manager_.locked(LockManager::kTelemetryManager)) { return; }
@@ -81,6 +85,8 @@ class TelemetryManager::Impl {
         return;
       }
     }
+
+    maybe_need_to_send_ = false;
   }
 
   void Get(const gsl::cstring_span& name, ErrorCallback callback) {
@@ -282,6 +288,7 @@ class TelemetryManager::Impl {
   char send_buffer_[256] = {};
   std::size_t current_list_index_ = 0;
   detail::EnumerateArchive::Context enumerate_context_;
+  bool maybe_need_to_send_ = false;
 };
 
 TelemetryManager::TelemetryManager(
