@@ -1,4 +1,5 @@
  * Board + Software
+   * usb_cdc_stream needs to do less work in interrupt context
    * test out BMI160 driver
    * commission raw I2C driver
 
@@ -9,11 +10,11 @@
 
    * read and write from the SPI bus
    * read from the ADC
+   * get PWM working
 
    * get I2C DMA working
    * get SPI DMA working
    * get ADC DMA working
-   * get PWM working
 
    * driver for AS5048
    * herkulex protocol
@@ -25,6 +26,8 @@
    * get watchdog working
 
    * error handling and reporting
+
+   * report current heap size in system_info
 
 
 
