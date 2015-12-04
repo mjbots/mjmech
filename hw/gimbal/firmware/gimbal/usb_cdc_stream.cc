@@ -203,6 +203,47 @@ void UsbCdcStream::AsyncWriteSome(const gsl::cstring_span& buffer,
   }
 }
 
+void UsbCdcStream::Poll() {
+  if (tx_complete_) {
+    tx_complete_ = false;
+
+    write_outstanding_ = false;
+    tx_position_ = 0;
+    if (tx_queue_.size() != 0) {
+      // We had a transmit request while we were flushing the buffer.
+      // Send it now.
+      gsl::cstring_span queue = tx_queue_;
+      tx_queue_ = gsl::cstring_span();
+      auto callback = tx_callback_;
+      tx_callback_ = SizeCallback();
+      AsyncWriteSome(queue, callback);
+    } else if (tx_callback_.valid()) {
+      auto callback = tx_callback_;
+      tx_callback_ = SizeCallback();
+      auto callback_size = tx_callback_size_;
+      tx_callback_size_ = 0;
+      callback(0, callback_size);
+    }
+  }
+  if (rx_complete_) {
+    rx_complete_ = false;
+
+    // We better have a callback outstanding.
+    if (rx_callback_.valid()) {
+      assert(rx_queue_.size() != 0);
+
+      auto to_read = std::min(static_cast<std::size_t>(rx_size_),
+                              rx_queue_.size());
+      std::memcpy(rx_queue_.data(), rx_buffer_, to_read);
+      rx_queue_ = gsl::string_span();
+      rx_position_ = to_read;
+      auto callback = rx_callback_;
+      rx_callback_ = SizeCallback();
+      callback(0, to_read);
+    }
+  }
+}
+
 void UsbCdcStream::PollMillisecond() {
   // Flush our output buffer on millisecond boundaries.
   if (!write_outstanding_ && tx_position_ != 0) {
@@ -218,40 +259,14 @@ int8_t UsbCdcStream::HandleControl(uint8_t, uint8_t*, uint16_t) {
 }
 
 int8_t UsbCdcStream::HandleReceive(uint8_t* buf, uint32_t* len) {
-  // We better have a callback outstanding.
-  if (!rx_callback_.valid()) { return 0; }
-  assert(rx_queue_.size() != 0);
-
   rx_size_ = *len;
-
-  auto to_read = std::min(rx_size_, rx_queue_.size());
-  std::memcpy(rx_queue_.data(), rx_buffer_, to_read);
-  rx_queue_ = gsl::string_span();
-  rx_position_ = to_read;
-  auto callback = rx_callback_;
-  rx_callback_ = SizeCallback();
-  callback(0, to_read);
+  rx_complete_ = true;
 
   return 0;
 }
 
 int8_t UsbCdcStream::HandleTxComplete() {
-  write_outstanding_ = false;
-  tx_position_ = 0;
-  if (tx_queue_.size() != 0) {
-    // We had a transmit request while we were flushing the buffer.
-    // Send it now.
-    gsl::cstring_span queue = tx_queue_;
-    tx_queue_ = gsl::cstring_span();
-    auto callback = tx_callback_;
-    tx_callback_ = SizeCallback();
-    AsyncWriteSome(queue, callback);
-  } else if (tx_callback_.valid()) {
-    auto callback = tx_callback_;
-    tx_callback_ = SizeCallback();
-    auto callback_size = tx_callback_size_;
-    tx_callback_size_ = 0;
-    callback(0, callback_size);
-  }
+  tx_complete_ = true;
+
   return 0;
 }

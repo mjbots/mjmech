@@ -24,6 +24,7 @@ class UsbCdcStream : public AsyncStream {
   virtual void AsyncReadSome(const gsl::string_span&, SizeCallback) override;
   virtual void AsyncWriteSome(const gsl::cstring_span&, SizeCallback) override;
 
+  void Poll();
   void PollMillisecond();
 
   // These are not for public consumption.
@@ -36,7 +37,6 @@ class UsbCdcStream : public AsyncStream {
  private:
   uint8_t rx_buffer_[64] = {};
   std::size_t rx_position_ = 0;
-  std::size_t rx_size_ = 0;
   gsl::string_span rx_queue_;
   SizeCallback rx_callback_;
 
@@ -48,4 +48,7 @@ class UsbCdcStream : public AsyncStream {
   std::size_t tx_callback_size_ = 0;
   bool write_outstanding_ = false;
 
+  volatile bool tx_complete_ = false;
+  volatile bool rx_complete_ = false;
+  volatile std::size_t rx_size_ = 0;
 };

@@ -88,23 +88,24 @@ void UartStream::Poll() {
   if (tx_complete_) {
     tx_complete_ = false;
 
-    if (!tx_callback_.valid()) { return; }
+    if (tx_callback_.valid()) {
 
-    auto callback = tx_callback_;
-    tx_callback_ = SizeCallback();
-    auto size = tx_size_;
-    tx_size_ = 0;
-    callback(0, size);
+      auto callback = tx_callback_;
+      tx_callback_ = SizeCallback();
+      auto size = tx_size_;
+      tx_size_ = 0;
+      callback(0, size);
+    }
   }
 
   if (rx_complete_) {
     rx_complete_ = false;
 
-    if (!rx_callback_.valid()) { return; }
-
-    auto callback = rx_callback_;
-    rx_callback_ = SizeCallback();
-    callback(0, 1);
+    if (rx_callback_.valid()) {
+      auto callback = rx_callback_;
+      rx_callback_ = SizeCallback();
+      callback(0, 1);
+    }
   }
 }
 
