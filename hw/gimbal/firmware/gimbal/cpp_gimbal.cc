@@ -134,6 +134,7 @@ void cpp_gimbal_main() {
     old_tick = new_tick;
 
     HAL_IWDG_Refresh(&hiwdg);
+    i2c1.Poll();
     telemetry.Poll();
     command_manager.Poll();
     system_info.MainLoopCount();

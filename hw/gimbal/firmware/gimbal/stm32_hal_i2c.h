@@ -33,6 +33,7 @@ class Stm32HalI2C : public AsyncI2C {
                   uint8_t memory_address,
                   const gsl::cstring_span& buffer,
                   ErrorCallback) override;
+  void Poll();
 
   void ReceiveComplete();
   void TransmitComplete();
@@ -40,6 +41,8 @@ class Stm32HalI2C : public AsyncI2C {
 
  private:
   I2C_HandleTypeDef* const hi2c_;
+  bool tx_complete_ = false;
+  bool rx_complete_ = false;
   ErrorCallback read_callback_;
   ErrorCallback write_callback_;
 };

@@ -116,20 +116,31 @@ void Stm32HalI2C::AsyncWrite(uint8_t device_address,
   }
 }
 
-void Stm32HalI2C::ReceiveComplete() {
-  if (!read_callback_.valid()) { return; }
+void Stm32HalI2C::Poll() {
+  if (tx_complete_) {
+    tx_complete_ = false;
+    if (!write_callback_.valid()) { return; }
 
-  auto callback = read_callback_;
-  read_callback_ = ErrorCallback();
-  callback(0);
+    auto callback = write_callback_;
+    write_callback_ = ErrorCallback();
+    callback(0);
+  }
+  if (rx_complete_) {
+    rx_complete_ = false;
+    if (!read_callback_.valid()) { return; }
+
+    auto callback = read_callback_;
+    read_callback_ = ErrorCallback();
+    callback(0);
+  }
+}
+
+void Stm32HalI2C::ReceiveComplete() {
+  rx_complete_ = true;
 }
 
 void Stm32HalI2C::TransmitComplete() {
-  if (!write_callback_.valid()) { return; }
-
-  auto callback = write_callback_;
-  write_callback_ = ErrorCallback();
-  callback(0);
+  tx_complete_ = true;
 }
 
 void Stm32HalI2C::Error() {
