@@ -285,7 +285,7 @@ class TelemetryManager::Impl {
   NamedRegistry elements_;
 
   ErrorCallback current_callback_;
-  char send_buffer_[256] = {};
+  char send_buffer_[1024] = {};
   std::size_t current_list_index_ = 0;
   detail::EnumerateArchive::Context enumerate_context_;
   bool maybe_need_to_send_ = false;

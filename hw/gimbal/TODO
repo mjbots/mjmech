@@ -29,6 +29,10 @@
 
    * report current heap size in system_info
 
+   * Make TelemetryManager support schema and binary objects of
+     arbitrary size using a custom stream which only emits a subset
+     and doing the whole visitation multiple times.
+
 
 
  * BOM
