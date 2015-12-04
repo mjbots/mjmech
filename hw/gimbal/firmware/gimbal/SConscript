@@ -53,8 +53,12 @@ HOST_SOURCES = list(set(SOURCES) - set([
             'usb_cdc_stream.cc',
         ]))
 
+raw_env = env.Clone()
+raw_env.Append(CFLAGS=['-O0', '-Wno-unused-but-set-variable'])
+raw_objs = raw_env.Object(['hardfault.s', 'hardfault_handler.c'])
+
 target = env.Program(
-    'gimbal', libcmsis + SOURCES + libsrc + libmiddlewares + libhal)
+    'gimbal', raw_objs + libcmsis + SOURCES + libsrc + libmiddlewares + libhal)
 env.Depends(target, '#/stm32f411.ld')
 
 env.Default(target)
