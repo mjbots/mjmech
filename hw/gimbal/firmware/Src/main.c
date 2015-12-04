@@ -69,8 +69,17 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN 0 */
 
+char* heap_end = 0;
+
 caddr_t _sbrk(int incr) {
-  return 0;
+  // assert(0);
+  extern char _heap_start;
+
+  if (heap_end == 0) { heap_end = &_heap_start; }
+
+  char* prev_heap_end = heap_end;
+  heap_end += incr;
+  return (caddr_t) prev_heap_end;
 }
 
 int _close(int file) { return -1; }
@@ -93,13 +102,6 @@ void _exit(int foo) { while (1) {} }
 int _kill(int foo) { return -1; }
 
 int _getpid() { return -1; }
-
-void* malloc(size_t size) {
-  assert(0);
-  return (void *)0;
-}
-
-void free(void *ptr) {}
 
 int __aebi_atext(void *object,
                  void (*destructor)(void *),
