@@ -69,9 +69,16 @@ class BulkReader(object):
         name = stream.read_pstring()
         schema = stream.stream.read()
 
-        if not (filter is None or
-                isinstance(filter, list) and name in filter or
-                filter(name)):
+        use_this = False
+        if filter is None:
+            use_this = True
+        elif isinstance(filter, list):
+            if name in filter:
+                use_this = True
+        elif filter(name):
+            use_this = True
+
+        if not use_this:
             return None, None
 
         return identifier, _BulkRecord(identifier, flags, name, schema)
