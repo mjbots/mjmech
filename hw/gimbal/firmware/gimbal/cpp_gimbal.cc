@@ -81,7 +81,8 @@ void cpp_gimbal_main() {
   UsbCdcStream usb_cdc;
   UartStream uart2(&huart2);
 
-  auto& debug_stream = usb_cdc;
+  auto& debug_stream = uart2;
+  auto& time_stream = usb_cdc;
 
   SizedPool<> pool;
   Stm32HalI2C i2c1(&hi2c1);
@@ -139,7 +140,7 @@ void cpp_gimbal_main() {
                  clock.timestamp());
         if (!uart_write) {
           uart_write = true;
-          AsyncWrite(uart2, gsl::ensure_z(buffer),
+          AsyncWrite(time_stream, gsl::ensure_z(buffer),
                      [&](int error){ uart_write = false; });
         }
       }
