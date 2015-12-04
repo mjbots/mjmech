@@ -52,10 +52,9 @@ class Bmi160Driver {
   enum State {
     kInitial,
     kIdentifying,
-    kConfiguring,
-    kWaitingToPower,
     kPoweringAccel,
     kPoweringGyro,
+    kConfiguring,
     kErrorCheck,
     kOperational,
     kFault,
@@ -66,9 +65,9 @@ class Bmi160Driver {
     return std::array<std::pair<State, const char*>, kNumStates> { {
       { kInitial, "kInitial" },
       { kIdentifying, "kIdentifying" },
-      { kConfiguring, "kConfiguring" },
       { kPoweringAccel, "kPoweringAccel" },
       { kPoweringGyro, "kPoweringGyro" },
+      { kConfiguring, "kConfiguring" },
       { kErrorCheck, "kErrorCheck" },
       { kOperational, "kOperational" },
       { kFault, "kFault" }, }

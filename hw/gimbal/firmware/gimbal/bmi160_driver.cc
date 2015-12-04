@@ -118,73 +118,52 @@ class Bmi160Driver::Impl {
   }
 
   void Poll() {
-    const ErrorCallback callback =
-        [this](int error) { this->ConfigCallback(error); };
+    if (delay_end_ != 0) {
+      const uint32_t now = clock_.timestamp();
+      if (now > delay_end_) {
+        auto callback = delay_callback_;
+        delay_callback_ = ErrorCallback();
+        callback(0);
+        delay_end_ = 0;
+      }
+    }
 
     switch (data_.state) {
       case kInitial:
       case kIdentifying:
+      case kPoweringAccel:
+      case kPoweringGyro:
       case kConfiguring:
-      case kWaitingToPower: {
-        break;
-      }
-      case kPoweringAccel: {
-        const uint32_t timestamp = clock_.timestamp();
-        const int32_t delta = timestamp - last_event_timestamp_;
-        if (delta < 60) { return; }
-
-        buffer_[0] = bi(BMI160::CMD_gyr_set_pmu_mode) |
-                     bi(BMI160::PMU_gyr_normal);
-        data_.state = kPoweringGyro;
-        async_i2c_.AsyncWrite(
-            config_.address,
-            bi(BMI160::CMD),
-            gsl::cstring_span(buffer_, 1),
-            callback);
-        break;
-      }
-      case kPoweringGyro: {
-        const uint32_t timestamp = clock_.timestamp();
-        const int32_t delta = timestamp - last_event_timestamp_;
-        if (delta < 900) { return; }
-
-        data_.state = kErrorCheck;
-        async_i2c_.AsyncRead(
-            config_.address,
-            bi(BMI160::ERR_REG),
-            gsl::string_span(buffer_, 1),
-            callback);
-
-        break;
-      }
-      case kErrorCheck:
-      case kFault: {
+      case kErrorCheck: {
         break;
       }
       case kOperational: {
         if (operational_busy_) { return; }
         const uint32_t timestamp = clock_.timestamp();
-        const int32_t delta = timestamp - last_event_timestamp_;
-
-        if (delta < min_operational_delay_) { return; }
+        const int32_t delta = timestamp - last_data_read_;
+        if (delta < min_operational_delay_) { break; }
 
         StartStatusRead();
         break;
       }
+      case kFault:
       case kNumStates: {
-        assert(false);
+        break;
       }
     }
   }
 
   void ConfigCallback(int error) {
-    const ErrorCallback callback =
+    const auto callback =
         [this](int error) { this->ConfigCallback(error); };
 
     if (error) {
       // For now, all configuration errors are fatal.
+      data_.imu.error = 0x10000000 |
+                        (data_.state << 16) |
+                        (config_index_ << 8) |
+                        error;
       data_.state = kFault;
-      data_.imu.error = 0x10000 | error;
       Emit();
       start_callback_(data_.imu.error);
       return;
@@ -194,11 +173,7 @@ class Bmi160Driver::Impl {
       case kInitial: {
         // Verify that the correct device is present.
         data_.state = kIdentifying;
-        async_i2c_.AsyncRead(
-            config_.address,
-            bi(BMI160::CHIP_ID),
-            gsl::string_span(buffer_, 1),
-            callback);
+        AsyncRead(BMI160::CHIP_ID, 1, callback);
         break;
       }
       case kIdentifying: {
@@ -210,63 +185,66 @@ class Bmi160Driver::Impl {
           return;
         }
 
-        // Now, configure the devices.
-        const int kStart = bi(BMI160::ACC_CONF);
+        // Power up the accelerometer.
+        buffer_[0] = bi(BMI160::CMD_acc_set_pmu_mode) |
+                     bi(BMI160::PMU_acc_normal);
+        data_.state = kPoweringAccel;
+        AsyncWrite(BMI160::CMD, 1, 30, callback);
+        break;
+      }
+      case kPoweringAccel: {
+        buffer_[0] = bi(BMI160::CMD_gyr_set_pmu_mode) |
+                     bi(BMI160::PMU_gyr_normal);
+
+        data_.state = kPoweringGyro;
+        AsyncWrite(BMI160::CMD, 1, 80, callback);
+        break;
+      }
+      case kPoweringGyro: {
+        // Now we need to set all of our desired configuration.
 
         const int acc_us = 0 << 7;
         const int acc_bwp = 2 << 4; // Only valid value for acc_us = 0;
         const int acc_odr = FindODR(config_.rate_hz) << 0;
-
-        buffer_[bi(BMI160::ACC_CONF) - kStart] = acc_us | acc_bwp | acc_odr;
+        reg_config_[0].reg = BMI160::ACC_CONF;
+        reg_config_[0].value = acc_us | acc_bwp | acc_odr;
+        data_.rate_hz = CalculateRate(acc_odr);
 
         const int acc_range = FindAccRange(config_.accel_max_g);
-        buffer_[bi(BMI160::ACC_RANGE) - kStart] = acc_range;
-
-        data_.rate_hz = CalculateRate(acc_odr);
+        reg_config_[1].reg = BMI160::ACC_RANGE;
+        reg_config_[1].value = acc_range;
         data_.accel_max_g = CalculateAccRange(acc_range);
 
         const int gyr_bwp = 0x02 << 4; // Normal mode.
         const int gyr_odr = FindODR(config_.rate_hz) << 0;
-        buffer_[bi(BMI160::GYR_CONF) - kStart] = gyr_bwp | gyr_odr;
+        reg_config_[2].reg = BMI160::GYR_CONF;
+        reg_config_[2].value = gyr_bwp | gyr_odr;
 
         const int gyr_range = FindGyrRange(config_.gyro_max_dps);
-        buffer_[bi(BMI160::GYR_RANGE)] = gyr_range;
-
+        reg_config_[3].reg = BMI160::GYR_RANGE;
+        reg_config_[3].value = gyr_range;
         data_.gyro_max_dps = CalculateGyrRange(gyr_range);
 
+        config_index_ = 0;
         data_.state = kConfiguring;
-        async_i2c_.AsyncWrite(
-            config_.address, kStart, gsl::cstring_span(buffer_, buffer_ + 4),
-            callback);
-        break;
+        // fall-through
       }
       case kConfiguring: {
-        buffer_[0] = 0xff;
-        data_.state = kWaitingToPower;
-        // fall through
-      }
-      case kWaitingToPower: {
-        if (buffer_[0] != 0x00) {
-          async_i2c_.AsyncRead(
-              config_.address,
-              bi(BMI160::CMD),
-              gsl::string_span(buffer_, 1),
-              callback);
-        } else {
-          buffer_[0] = bi(BMI160::CMD_acc_set_pmu_mode) |
-                       bi(BMI160::PMU_acc_normal);
-          data_.state = kPoweringAccel;
-          last_event_timestamp_ = clock_.timestamp();
-          async_i2c_.AsyncWrite(
-              config_.address,
-              bi(BMI160::CMD),
-              gsl::cstring_span(buffer_, 1),
-              callback);
+        if (config_index_ >= reg_config_.size() ||
+            reg_config_[config_index_].reg == static_cast<BMI160>(0)) {
+          // We are done.  Move on to error check.
+          data_.state = kErrorCheck;
+          AsyncRead(BMI160::ERR_REG, 1, callback);
+          return;
         }
+
+        uint8_t index = config_index_;
+        config_index_++;
+
+        buffer_[0] = reg_config_[index].value;
+        AsyncWrite(reg_config_[index].reg, 1, 5, callback);
         break;
       }
-      case kPoweringAccel: { return; }
-      case kPoweringGyro: { return; }
       case kErrorCheck: {
         if (buffer_[0] != 0) {
           data_.state = kFault;
@@ -275,7 +253,6 @@ class Bmi160Driver::Impl {
           return;
         }
         data_.state = kOperational;
-        last_event_timestamp_ = clock_.timestamp();
         start_callback_(0);
         break;
       }
@@ -290,6 +267,27 @@ class Bmi160Driver::Impl {
     Emit();
   }
 
+  void AsyncRead(BMI160 reg, uint8_t size, ErrorCallback callback) {
+    async_i2c_.AsyncRead(config_.address, bi(reg),
+                         gsl::string_span(buffer_, size), callback);
+  }
+
+  void AsyncWrite(BMI160 reg, uint8_t size, int delay_ms, ErrorCallback callback) {
+    delay_callback_ = callback;
+    this->delay_end_ = 0;
+    async_i2c_.AsyncWrite(
+        config_.address, bi(reg),
+        gsl::cstring_span(buffer_, size),
+        [this, delay_ms](int error) {
+          if (error) {
+            auto callback = this->delay_callback_;
+            this->delay_callback_ = ErrorCallback();
+            callback(error);
+          }
+          this->delay_end_ = this->clock_.timestamp() + delay_ms * 10;
+        });
+  }
+
   void Emit() {
     data_.imu.timestamp = clock_.timestamp();
     data_updater_();
@@ -298,13 +296,9 @@ class Bmi160Driver::Impl {
   void StartStatusRead() {
     // We first hot spin looking for the data ready flag to be true.
     // Once that is the case, then we read the whole buffer.
-    last_event_timestamp_ = clock_.timestamp();
     operational_busy_ = true;
-    async_i2c_.AsyncRead(
-        config_.address,
-        static_cast<int>(BMI160::STATUS),
-        gsl::string_span(buffer_, 1),
-        [this](int error) { this->HandleStatusRead(error); });
+    AsyncRead(BMI160::STATUS, 1,
+              [this](int error) { this->HandleStatusRead(error); });
   }
 
   void HandleStatusRead(int error) {
@@ -324,11 +318,9 @@ class Bmi160Driver::Impl {
   }
 
   void StartDataRead() {
-    async_i2c_.AsyncRead(
-        config_.address,
-        static_cast<int>(BMI160::DATA_GYR),
-        gsl::string_span(buffer_),
-        [this](int error) { this->HandleDataRead(error); });
+    last_data_read_ = clock_.timestamp();
+    AsyncRead(BMI160::DATA_GYR, sizeof(buffer_),
+              [this](int error) { this->HandleDataRead(error); });
   }
 
   void HandleDataRead(int error) {
@@ -417,15 +409,25 @@ class Bmi160Driver::Impl {
   ImuDataSignal data_signal_;
   StaticFunction<void ()> data_updater_;
   ErrorCallback start_callback_;
-  uint32_t last_event_timestamp_ = 0;
   bool operational_busy_ = false;
-  int32_t min_operational_delay_ = 0;
+  int min_operational_delay_ = 0;
+  uint32_t last_data_read_ = 0;
+  uint8_t config_index_ = 0;
+
+  ErrorCallback delay_callback_;
+  uint32_t delay_end_ = 0;
 
   enum {
     kBufferSize = (static_cast<int>(BMI160::STATUS) -
                    static_cast<int>(BMI160::DATA_GYR) + 1),
   };
   char buffer_[kBufferSize] = {};
+
+  struct RegConfig {
+    BMI160 reg = static_cast<BMI160>(0);
+    uint8_t value = 0;
+  };
+  std::array<RegConfig, 4> reg_config_;
 };
 
 Bmi160Driver::Bmi160Driver(Pool& pool,
