@@ -33,7 +33,9 @@ class ClockTest : public Clock {
  public:
   virtual ~ClockTest() {}
 
-  virtual uint32_t timestamp() const override { return 0; }
+  virtual uint32_t timestamp() const override { return value_; }
+
+  uint32_t value_ = 0;
 };
 
 class Bmi160Simulator : public AsyncI2C {
@@ -44,7 +46,7 @@ class Bmi160Simulator : public AsyncI2C {
                          uint8_t memory_address,
                          const gsl::string_span& buffer,
                          ErrorCallback callback) override {
-    BOOST_CHECK_EQUAL(device_address, 0x68);
+    BOOST_CHECK_EQUAL(device_address, 0xd0);
 
     for (std::size_t i = 0; i < buffer.size(); i++) {
       *(buffer.data() + i) = static_cast<char>(Read(memory_address + i));
@@ -57,7 +59,7 @@ class Bmi160Simulator : public AsyncI2C {
                           uint8_t memory_address,
                           const gsl::cstring_span& buffer,
                           ErrorCallback callback) override {
-    BOOST_CHECK_EQUAL(device_address, 0x68);
+    BOOST_CHECK_EQUAL(device_address, 0xd0);
 
     for (std::size_t i = 0; i < buffer.size(); i++) {
       Write(memory_address + i, static_cast<uint8_t>(*(buffer.data() + i)));
@@ -80,7 +82,13 @@ class Bmi160Simulator : public AsyncI2C {
     register_file_[address] = value;
   }
 
-  void ProcessAction() {
+  void ProcessAction(ClockTest* clock) {
+    if (!write_callback_.valid() &&
+        !read_callback_.valid()) {
+      // Just advance time by a tick.
+      clock->value_++;
+      return;
+    }
     BOOST_CHECK_EQUAL(write_callback_.valid() ^ read_callback_.valid(), true);
 
     if (read_callback_.valid()) {
@@ -140,10 +148,14 @@ BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
   std::set<Bmi160Driver::State> observed_states;
 
   // Process callbacks until the initialization sequence is completed.
-  for (int i = 0; i < 1000 && count == 0; i++) {
+  for (int i = 0; i < 10000 && count == 0; i++) {
     observed_states.insert(dut.data()->state);
 
-    imu_sim.ProcessAction();
+    if (i % 2) {
+      dut.Poll();
+    } else {
+      imu_sim.ProcessAction(&clock);
+    }
     auto cmd = imu_sim.register_file_[0x7e];
     if (cmd != 0) {
       if (cmd == 0x11) { acc_poweron = true; }

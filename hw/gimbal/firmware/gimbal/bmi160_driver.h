@@ -30,12 +30,13 @@ class Bmi160Driver {
   ~Bmi160Driver();
 
   void AsyncStart(ErrorCallback);
+  void Poll();
 
   ImuDataSignal* data_signal();
 
   struct Config {
-    uint8_t address = 0x68;
-    uint16_t rate_hz = 800;
+    uint8_t address = 0xd0;
+    uint16_t rate_hz = 100;
     uint16_t gyro_max_dps = 1000;
     uint8_t accel_max_g = 4;
 
@@ -52,6 +53,7 @@ class Bmi160Driver {
     kInitial,
     kIdentifying,
     kConfiguring,
+    kWaitingToPower,
     kPoweringAccel,
     kPoweringGyro,
     kErrorCheck,

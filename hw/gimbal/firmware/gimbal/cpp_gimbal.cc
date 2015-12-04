@@ -23,6 +23,7 @@
 #include "iwdg.h"
 #include "tim.h"
 
+#include "bmi160_driver.h"
 #include "command_manager.h"
 #include "lock_manager.h"
 #include "persistent_config.h"
@@ -42,11 +43,15 @@ namespace {
 struct SystemStatus {
   uint32_t timestamp = 0;
   bool command_manager_init = false;
+  bool bmi160_init = false;
+  int32_t bmi160_error = 0;
 
   template <typename Archive>
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(timestamp));
     a->Visit(MJ_NVP(command_manager_init));
+    a->Visit(MJ_NVP(bmi160_init));
+    a->Visit(MJ_NVP(bmi160_error));
   }
 };
 
@@ -87,6 +92,8 @@ void cpp_gimbal_main() {
   CommandManager command_manager(pool, debug_stream, lock_manager);
   Stm32Clock clock;
   SystemInfo system_info(pool, telemetry, clock);
+  Bmi160Driver bmi160(pool, gsl::ensure_z("pimu"),
+                      i2c1, clock, config, telemetry);
 
   command_manager.Register(
       gsl::ensure_z("conf"),
@@ -108,6 +115,13 @@ void cpp_gimbal_main() {
       }
     });
 
+  bmi160.AsyncStart([&](int error) {
+      if (!error) {
+        system_status.bmi160_init = true;
+        system_status.bmi160_error = error;
+      }
+    });
+
   char buffer[100] = {};
   bool uart_write = false;
 
@@ -121,7 +135,8 @@ void cpp_gimbal_main() {
       system_status.timestamp = clock.timestamp();
 
       if ((new_tick % 1000) == 0) {
-        snprintf(buffer, sizeof(buffer) - 1, "%lu: hi\r\n", clock.timestamp());
+        snprintf(buffer, sizeof(buffer) - 1, "%lu: \r\n",
+                 clock.timestamp());
         if (!uart_write) {
           uart_write = true;
           AsyncWrite(uart2, gsl::ensure_z(buffer),
@@ -137,6 +152,7 @@ void cpp_gimbal_main() {
     i2c1.Poll();
     telemetry.Poll();
     command_manager.Poll();
+    bmi160.Poll();
     system_info.MainLoopCount();
   }
 }
