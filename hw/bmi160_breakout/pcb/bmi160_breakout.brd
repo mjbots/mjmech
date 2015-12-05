@@ -84,7 +84,7 @@
 <vertex x="5.7" y="6.9"/>
 </polygon>
 <text x="2.5" y="3.8" size="0.8" layer="21">G</text>
-<text x="7.1" y="3.8" size="0.8" layer="21">V</text>
+<text x="7" y="3.8" size="0.8" layer="21">V</text>
 <text x="4" y="3.8" size="0.8" layer="21">C</text>
 <text x="5.5" y="3.8" size="0.8" layer="21">D</text>
 <wire x1="7" y1="6.75" x2="7" y2="6" width="0.1" layer="22"/>
@@ -495,10 +495,8 @@ design rules under a new name.</description>
 <contactref element="SJ1" pad="2"/>
 <wire x1="6.5" y1="4.5" x2="6.2" y2="4.8" width="0.2032" layer="1"/>
 <wire x1="6.2" y1="4.8" x2="6.2" y2="5.6" width="0.2032" layer="1"/>
-<wire x1="6.7" y1="5.5" x2="6.7" y2="4.7" width="0.2032" layer="16"/>
-<wire x1="6.7" y1="4.7" x2="6.6" y2="4.6" width="0.2032" layer="16"/>
-<wire x1="6.6" y1="4.6" x2="6.5" y2="4.5" width="0.2032" layer="16"/>
-<wire x1="6.7" y1="9.7" x2="6.7" y2="5.5" width="0.2032" layer="16"/>
+<wire x1="6.7" y1="4.7" x2="6.5" y2="4.5" width="0.2032" layer="16"/>
+<wire x1="6.7" y1="9.7" x2="6.7" y2="4.7" width="0.2032" layer="16"/>
 <wire x1="6.9" y1="9.7" x2="6.7" y2="9.7" width="0.2032" layer="16"/>
 <wire x1="6.2" y1="5.6" x2="6.195" y2="5.63" width="0.2032" layer="1"/>
 <via x="6.5" y="4.5" extent="1-16" drill="0.3048"/>
