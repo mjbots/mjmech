@@ -160,8 +160,8 @@ class Bmi160Driver::Impl {
     if (error) {
       // For now, all configuration errors are fatal.
       data_.imu.error = 0x10000000 |
-                        (data_.state << 16) |
-                        (config_index_ << 8) |
+                        (data_.state << 24) |
+                        (config_index_ << 16) |
                         error;
       data_.state = kFault;
       Emit();
@@ -179,7 +179,7 @@ class Bmi160Driver::Impl {
       case kIdentifying: {
         const uint8_t received_id = static_cast<uint8_t>(buffer_[0]);
         if (received_id != bi(BMI160::CHIP_ID_VALUE)) {
-          data_.imu.error = 0x40000 | received_id;
+          data_.imu.error = 0x40000000 | received_id;
           Emit();
           start_callback_(data_.imu.error);
           return;
@@ -248,7 +248,7 @@ class Bmi160Driver::Impl {
       case kErrorCheck: {
         if (buffer_[0] != 0) {
           data_.state = kFault;
-          data_.imu.error = 0x20000 | static_cast<uint8_t>(buffer_[0]);
+          data_.imu.error = 0x20000000 | static_cast<uint8_t>(buffer_[0]);
           start_callback_(data_.imu.error);
           return;
         }
