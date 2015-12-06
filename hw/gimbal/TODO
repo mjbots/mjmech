@@ -1,20 +1,9 @@
  * Board + Software
-   * usb_cdc_stream needs to do less work in interrupt context
-   * test out BMI160 driver
-   * commission raw I2C driver
-
-   * Simple allan variance measurement of BMI160, verify that it is
-     working as expected with useful performance
-
-   * Design and send off BMI160 module
+   * send off BMI160 module
 
    * read and write from the SPI bus
    * read from the ADC
    * get PWM working
-
-   * get I2C DMA working
-   * get SPI DMA working
-   * get ADC DMA working
 
    * driver for AS5048
    * herkulex protocol
@@ -23,7 +12,6 @@
      * first, do a basic version just like the open-loop brugi
      * close loop using absolute encoders
      * add support for second IMU
-   * get watchdog working
 
    * error handling and reporting
 
@@ -32,6 +20,11 @@
    * Make TelemetryManager support schema and binary objects of
      arbitrary size using a custom stream which only emits a subset
      and doing the whole visitation multiple times.
+
+   * get watchdog working
+   * get I2C DMA working
+   * get SPI DMA working
+   * get ADC DMA working
 
 
 
@@ -65,6 +58,16 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-05
+ * usb_cdc_stream needs to do less work in interrupt context
+ * test out BMI160 driver
+ * drew up BMI160 breakout boar
+ * Simple allan variance measurement of BMI160
+    * ARW 0.7 deg/sqrt(hr)
+    * bias drift: 8 deg/hr
+   * commission raw I2C driver
+ * implemented error recovery in CommandManager
 
 DONE 2015-12-02
  * got tserial.py basically working, along with fixing a bunch of bugs
