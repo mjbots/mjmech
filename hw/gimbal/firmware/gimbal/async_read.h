@@ -63,8 +63,21 @@ inline void AsyncReadUntil(AsyncReadUntilContext& context) {
   detail::AsyncReadUntilHelper(context, 0);
 }
 
-inline void AsyncIgnoreUntil(AsyncReadStream& stream,
-                             const char* delimiters,
-                             SizeCallback callback) {
-  // TODO jpieper.
+inline void AsyncIgnoreUntil(AsyncReadUntilContext& context) {
+  context.stream->AsyncReadSome(
+      gsl::string_span(context.buffer.data(), context.buffer.data() + 1),
+      [ctx=&context](int error, std::size_t size) {
+        if (error) {
+          ctx->callback(error, 0);
+          return;
+        }
+
+        if (std::strchr(ctx->delimiters,
+                        ctx->buffer.data()[0]) != nullptr) {
+          ctx->callback(0, 0);
+          return;
+        }
+
+        AsyncIgnoreUntil(*ctx);
+      });
 }

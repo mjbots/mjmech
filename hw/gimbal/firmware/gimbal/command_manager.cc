@@ -46,9 +46,13 @@ class CommandManager::Impl {
 
       // TODO jpieper: Once we have an error system, log this error.
 
-      AsyncIgnoreUntil(stream_, "\r\n", [this](int error, int size) {
-          this->StartRead();
-        });
+      read_until_context_.stream = &stream_;
+      read_until_context_.buffer = gsl::string_span(line_buffer_);
+      read_until_context_.delimiters = "\r\n";
+      read_until_context_.callback = [this](int error, int size) {
+        this->StartRead();
+      };
+      AsyncIgnoreUntil(read_until_context_);
       return;
     }
 
