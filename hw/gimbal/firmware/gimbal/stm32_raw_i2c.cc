@@ -95,6 +95,11 @@ class Stm32RawI2C::Impl {
     // addresses.
     i2c_->OAR1 = 0;
     i2c_->OAR2 = 0;
+
+    if (i2c_->SR2 & I2C_SR2_BUSY) {
+      // Hmmm.  Try sending a stop command.
+      i2c_->CR1 |= I2C_CR1_STOP;
+    }
   }
 
   void Poll() {

@@ -78,7 +78,7 @@ void UartStream::AsyncReadSome(const gsl::string_span& buffer,
 
   // We only ever ask for 1 byte at a time from the serial port.
   rx_callback_ = callback;
-  HAL_UART_Receive_DMA(
+  HAL_UART_Receive_IT(
       huart_,
       reinterpret_cast<uint8_t*>(buffer.data()),
       1);
@@ -105,6 +105,7 @@ void UartStream::Poll() {
       auto callback = rx_callback_;
       rx_callback_ = SizeCallback();
       callback(0, 1);
+      assert(rx_callback_.valid());
     }
   }
 }
