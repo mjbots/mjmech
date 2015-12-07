@@ -18,6 +18,7 @@
 
 #include "base/visitor.h"
 
+#include "adc.h"
 #include "gpio.h"
 #include "i2c.h"
 #include "iwdg.h"
@@ -47,6 +48,7 @@ struct SystemStatus {
   bool command_manager_init = false;
   bool bmi160_init = false;
   int32_t bmi160_error = 0;
+  uint32_t adc_value = 0;
 
   template <typename Archive>
   void Serialize(Archive* a) {
@@ -54,6 +56,7 @@ struct SystemStatus {
     a->Visit(MJ_NVP(command_manager_init));
     a->Visit(MJ_NVP(bmi160_init));
     a->Visit(MJ_NVP(bmi160_error));
+    a->Visit(MJ_NVP(adc_value));
   }
 };
 
@@ -165,6 +168,12 @@ void cpp_gimbal_main() {
               spi_count++;
             });
         }
+
+        HAL_ADC_Start(&hadc1);
+      }
+
+      if (__HAL_ADC_GET_FLAG(&hadc1, ADC_FLAG_EOC)) {
+        system_status.adc_value = HAL_ADC_GetValue(&hadc1);
       }
 
       UpdateLEDs(new_tick);
