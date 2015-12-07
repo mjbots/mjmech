@@ -1,7 +1,4 @@
  * Board + Software
-   * send off BMI160 module
-
-   * read and write from the SPI bus
    * read from the ADC
    * get PWM working
 
@@ -13,6 +10,7 @@
      * close loop using absolute encoders
      * add support for second IMU
 
+   * make STM32 flash interface actually write to flash
    * error handling and reporting
 
    * report current heap size in system_info
@@ -58,6 +56,10 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-06
+ * read and write from the SPI bus
+ * sent off BMI160 module to macrofab
 
 DONE 2015-12-05
  * usb_cdc_stream needs to do less work in interrupt context
