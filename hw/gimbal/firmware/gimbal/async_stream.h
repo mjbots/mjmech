@@ -57,3 +57,20 @@ void AsyncWrite(Stream& stream, const gsl::cstring_span& data,
                    cbk);
       });
 }
+
+template <typename Stream>
+void AsyncRead(Stream& stream, const gsl::string_span& data,
+                ErrorCallback callback) {
+  if (data.empty()) { callback(0); return; }
+
+  stream.AsyncReadSome(
+      data,
+      [stream=&stream, data, cbk=callback.shrink<4>()]
+      (ErrorCode error, std::size_t size) {
+        if (error) { cbk(error); return; }
+        if (data.size() == size) { cbk(0); return; }
+        AsyncRead(*stream,
+                  gsl::string_span(data.begin() + size, data.end()),
+                  cbk);
+      });
+}
