@@ -25,6 +25,7 @@ env.Append(CXXFLAGS=['-Wno-unused-local-typedefs'])
 env.Append(CPPPATH=libmiddlewares_include)
 
 SOURCES = [
+    'as5048_driver.cc',
     'bmi160_driver.cc',
     'command_manager.cc',
     'cpp_gimbal.cc',
@@ -80,6 +81,7 @@ do_flash = env.Command(
 env.Alias('flash', do_flash)
 
 TESTS = ['test/' + x for x in [
+        'as5048_driver_test.cc',
         'bmi160_driver_test.cc',
         'command_manager_test.cc',
         'crc_test.cc',

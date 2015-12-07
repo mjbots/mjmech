@@ -15,7 +15,6 @@
 #include "gimbal/bmi160_driver.h"
 
 #include <map>
-#include <set>
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -25,51 +24,19 @@
 #include "gimbal/persistent_config.h"
 #include "gimbal/telemetry_manager.h"
 
+#include "async_i2c_simulator.h"
+#include "clock_test.h"
 #include "flash_test.h"
 #include "stream_test.h"
 
 namespace {
-class ClockTest : public Clock {
+
+class Bmi160Simulator : public test::AsyncI2CSimulator {
  public:
-  virtual ~ClockTest() {}
-
-  virtual uint32_t timestamp() const override { return value_; }
-
-  uint32_t value_ = 0;
-};
-
-class Bmi160Simulator : public AsyncI2C {
- public:
+  Bmi160Simulator() : test::AsyncI2CSimulator(0xd0) {}
   virtual ~Bmi160Simulator() {}
 
-  virtual void AsyncRead(uint8_t device_address,
-                         uint8_t memory_address,
-                         const gsl::string_span& buffer,
-                         ErrorCallback callback) override {
-    BOOST_CHECK_EQUAL(device_address, 0xd0);
-
-    for (std::size_t i = 0; i < buffer.size(); i++) {
-      *(buffer.data() + i) = static_cast<char>(Read(memory_address + i));
-    }
-
-    read_callback_ = callback;
-  }
-
-  virtual void AsyncWrite(uint8_t device_address,
-                          uint8_t memory_address,
-                          const gsl::cstring_span& buffer,
-                          ErrorCallback callback) override {
-    BOOST_CHECK_EQUAL(device_address, 0xd0);
-
-    for (std::size_t i = 0; i < buffer.size(); i++) {
-      Write(memory_address + i, static_cast<uint8_t>(*(buffer.data() + i)));
-    }
-
-    write_callback_ = callback;
-  }
-
-  uint8_t Read(int address) {
-    addresses_read_.insert(address);
+  uint8_t Read(uint8_t address) override {
     switch (address) {
       case 0x00: { return 0xd1; }
       default: { return register_file_[address]; }
@@ -77,45 +44,11 @@ class Bmi160Simulator : public AsyncI2C {
     return 0;
   }
 
-  void Write(int address, uint8_t value) {
-    addresses_written_.insert(address);
+  void Write(uint8_t address, uint8_t value) override {
     register_file_[address] = value;
   }
 
-  void ProcessAction(ClockTest* clock) {
-    if (!write_callback_.valid() &&
-        !read_callback_.valid()) {
-      // Just advance time by a tick.
-      clock->value_++;
-      return;
-    }
-    BOOST_CHECK_EQUAL(write_callback_.valid() ^ read_callback_.valid(), true);
-
-    if (read_callback_.valid()) {
-      auto callback = read_callback_;
-      read_callback_ = ErrorCallback();
-      callback(0);
-    } else {
-      auto callback = write_callback_;
-      write_callback_ = ErrorCallback();
-      callback(0);
-    }
-  }
-
-  void ProcessWrite() {
-    BOOST_CHECK(!write_callback_.valid());
-    BOOST_CHECK_EQUAL(read_callback_.valid(), true);
-
-    auto callback = read_callback_;
-    read_callback_ = ErrorCallback();
-    callback(0);
-  }
-
-  std::set<int> addresses_read_;
-  std::set<int> addresses_written_;
   std::map<int, int> register_file_;
-  ErrorCallback read_callback_;
-  ErrorCallback write_callback_;
 };
 
 }
@@ -123,7 +56,7 @@ class Bmi160Simulator : public AsyncI2C {
 BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
   SizedPool<> pool;
   Bmi160Simulator imu_sim;
-  ClockTest clock;
+  test::ClockTest clock;
   test::FlashTest flash;
   test::TestWriteStream test_stream;
   LockManager lock_manager;
@@ -154,7 +87,9 @@ BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
     if (i % 2) {
       dut.Poll();
     } else {
-      imu_sim.ProcessAction(&clock);
+      if (!imu_sim.ProcessAction()) {
+        clock.value_ += 1;
+      }
     }
     auto cmd = imu_sim.register_file_[0x7e];
     if (cmd != 0) {
