@@ -1,12 +1,12 @@
  * Board + Software
-   * read from the ADC
    * get PWM working
+   * driver for AS5048 (test existing driver)
 
-   * driver for AS5048
-   * herkulex protocol
+   * Make UART be able to tri-state when not transmitting
    * AHRS
    * gimbal control software
      * first, do a basic version just like the open-loop brugi
+     * connect up herkulex protocol
      * close loop using absolute encoders
      * add support for second IMU
 
@@ -21,9 +21,13 @@
 
    * get watchdog working
    * get I2C DMA working
-   * get SPI DMA working
-   * get ADC DMA working
 
+   * make UI for debugging
+     * window with serial terminal
+     * tree view for configuration
+     * tree view for telemetry
+     * real-time line plots of arbitrary values
+     * maybe special pages to pull out specific config or telemetry values
 
 
  * BOM
@@ -56,6 +60,10 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-07
+ * read from the ADC
+ * implemented herkulex protocol
 
 DONE 2015-12-06
  * read and write from the SPI bus
