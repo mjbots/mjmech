@@ -31,6 +31,7 @@
 #include "stm32_clock.h"
 #include "stm32_flash.h"
 #include "stm32_hal_i2c.h"
+#include "stm32_hal_spi.h"
 #include "stm32_raw_i2c.h"
 #include "system_info.h"
 #include "telemetry_manager.h"
@@ -87,6 +88,7 @@ void cpp_gimbal_main() {
 
   SizedPool<> pool;
   Stm32RawI2C i2c1(pool, 1, Stm32RawI2C::Parameters());
+  Stm32HalSPI spi1(pool, 1, GPIOE, GPIO_PIN_3);
   Stm32Flash flash;
   PersistentConfig config(pool, flash, debug_stream);
   LockManager lock_manager;
@@ -127,6 +129,12 @@ void cpp_gimbal_main() {
   char buffer[100] = {};
   bool uart_write = false;
 
+  bool spi_write = false;
+  int spi_count = 0;
+  int spi_error = 0;
+  char spi_write_buf[2] = { 0xcf, 0x00 };
+  char spi_read_buf[2] = {};
+
   uint32_t old_tick = 0;
   while (1) {
     uint32_t new_tick = HAL_GetTick();
@@ -137,12 +145,25 @@ void cpp_gimbal_main() {
       system_status.timestamp = clock.timestamp();
 
       if ((new_tick % 1000) == 0) {
-        snprintf(buffer, sizeof(buffer) - 1, "%lu: \r\n",
-                 clock.timestamp());
+        snprintf(buffer, sizeof(buffer) - 1, "%lu: spic=%d spie=%d spid=%02X\r\n",
+                 clock.timestamp(),
+                 spi_count,
+                 spi_error,
+                 static_cast<int>(static_cast<uint8_t>(spi_read_buf[1])));
         if (!uart_write) {
           uart_write = true;
           AsyncWrite(time_stream, gsl::ensure_z(buffer),
                      [&](int error){ uart_write = false; });
+        }
+
+        if (!spi_write) {
+          spi_write = true;
+          std::memset(spi_read_buf, 0, sizeof(spi_read_buf));
+          spi1.AsyncTransaction(spi_write_buf, spi_read_buf, [&](int error) {
+              spi_write = false;
+              spi_error = error;
+              spi_count++;
+            });
         }
       }
 
@@ -154,6 +175,7 @@ void cpp_gimbal_main() {
     usb_cdc.Poll();
     uart2.Poll();
     i2c1.Poll();
+    spi1.Poll();
     telemetry.Poll();
     command_manager.Poll();
     bmi160.Poll();
