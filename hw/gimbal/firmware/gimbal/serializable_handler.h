@@ -36,6 +36,7 @@ class SerializableHandlerBase {
                    const gsl::cstring_span& key,
                    AsyncWriteStream&,
                    ErrorCallback) = 0;
+  virtual void SetDefault() = 0;
 };
 
 template <typename T>
@@ -93,6 +94,10 @@ class SerializableHandler : public SerializableHandlerBase {
     detail::ReadArchive archive(key, buffer, stream, callback);
     archive.Accept(item_);
     return archive.found() ? 0 : 1;
+  }
+
+  void SetDefault() override final {
+    *item_ = T();
   }
 
  private:

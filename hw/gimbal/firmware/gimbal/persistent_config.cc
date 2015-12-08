@@ -204,6 +204,14 @@ class PersistentConfig::Impl {
     WriteOK(callback);
   }
 
+  void Default(ErrorCallback callback) {
+    for (size_t i = 0; i < elements_.size(); i++) {
+      if (elements_[i].name.size() == 0) { break; }
+      elements_[i].ptr->SetDefault();
+    }
+    WriteOK(callback);
+  }
+
   void WriteOK(ErrorCallback callback) {
     WriteMessage(gsl::ensure_z("OK\r\n"), callback);
   }
@@ -257,6 +265,8 @@ void PersistentConfig::Command(const gsl::cstring_span& command,
     impl_->Load(callback);
   } else if (cmd == gsl::ensure_z("write")) {
     impl_->Write(callback);
+  } else if (cmd == gsl::ensure_z("default")) {
+    impl_->Default(callback);
   } else {
     impl_->UnknownCommand(cmd, callback);
   }
