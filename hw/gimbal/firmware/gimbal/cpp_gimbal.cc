@@ -32,6 +32,7 @@
 #include "persistent_config.h"
 #include "pool_ptr.h"
 #include "stm32_analog_sampler.h"
+#include "stm32_bldc_pwm.h"
 #include "stm32_clock.h"
 #include "stm32_flash.h"
 #include "stm32_hal_i2c.h"
@@ -103,6 +104,9 @@ void cpp_gimbal_main() {
   Stm32AnalogSampler analog_sampler(pool, clock, config, telemetry);
   Bmi160Driver bmi160(pool, gsl::ensure_z("pimu"),
                       i2c1, clock, config, telemetry);
+  Stm32BldcPwm motor1(&htim2, TIM_CHANNEL_1,
+                      &htim2, TIM_CHANNEL_2,
+                      &htim3, TIM_CHANNEL_4);
 
   command_manager.Register(
       gsl::ensure_z("conf"),
@@ -140,7 +144,6 @@ void cpp_gimbal_main() {
   char spi_write_buf[2] = { 0xcf, 0x00 };
   char spi_read_buf[2] = {};
 
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
 
   uint32_t old_tick = 0;
@@ -175,7 +178,9 @@ void cpp_gimbal_main() {
             });
         }
 
-        TIM2->CCR1 = (new_tick / 10) % 2048;
+        motor1.Set(((new_tick / 10) % 2048) * 32,
+                   ((new_tick / 10 + 100) % 2048) * 32,
+                   ((new_tick / 10 + 200) % 2048) * 32);
         TIM1->CCR2 = (new_tick / 10 + 100) % 2048;
       }
 
