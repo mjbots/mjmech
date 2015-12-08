@@ -23,6 +23,25 @@ struct Registry {
 };
 
 Registry g_stream_registry[3];
+
+uint32_t int_log2(uint32_t value) {
+  int result = 0;
+  while (value >>= 1) {
+    result += 1;
+  }
+  return result;
+}
+
+uint32_t GetPinInputMask(uint16_t pin) {
+  int bit = int_log2(pin);
+  return (1 << (bit * 2)) | (1 << (bit * 2 + 1));
+}
+
+uint32_t GetPinOutputBits(uint16_t pin) {
+  // Put the pin back into alternate function mode, or 0b10.
+  int bit = int_log2(pin);
+  return (1 << (bit * 2 + 1));
+}
 }
 
 extern "C" {
@@ -49,7 +68,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 }
 
-UartStream::UartStream(UART_HandleTypeDef* huart) : huart_(huart) {
+UartStream::UartStream(UART_HandleTypeDef* huart,
+                       GPIO_TypeDef* tx_gpio,
+                       uint16_t tx_pin)
+    : huart_(huart),
+      gpio_conf_register_(tx_gpio ? &tx_gpio->MODER : nullptr),
+      gpio_input_mask_(GetPinInputMask(tx_pin)),
+      gpio_output_bits_(GetPinOutputBits(tx_pin)) {
+
+  if (gpio_conf_register_) {
+    (*gpio_conf_register_) &= ~gpio_input_mask_;
+  }
+
   for (auto& item: g_stream_registry) {
     if (item.huart == nullptr) {
       item.huart = huart;
@@ -96,6 +126,14 @@ void UartStream::Poll() {
       tx_size_ = 0;
       callback(0, size);
     }
+
+    // Only put ourselves back into input mode if we didn't
+    // immediately schedule another transmission.
+    if (!tx_callback_.valid()) {
+      if (gpio_conf_register_) {
+        (*gpio_conf_register_) &= ~gpio_input_mask_;
+      }
+    }
   }
 
   if (rx_complete_) {
@@ -117,6 +155,10 @@ void UartStream::ReceiveComplete() {
 void UartStream::AsyncWriteSome(const gsl::cstring_span& buffer,
                                 SizeCallback callback) {
   assert(!tx_callback_.valid());
+
+  if (gpio_conf_register_) {
+    (*gpio_conf_register_) |= gpio_output_bits_;
+  }
 
   tx_callback_ = callback;
   tx_size_ = buffer.size();

@@ -20,7 +20,9 @@
 
 class UartStream : public AsyncStream {
  public:
-  UartStream(UART_HandleTypeDef*);
+  /// @p tx_gpio may be nullptr, in which case the output will not be
+  /// tristated when the transmitter is idle.
+  UartStream(UART_HandleTypeDef*, GPIO_TypeDef* tx_gpio, uint16_t tx_pin);
   virtual ~UartStream();
 
   virtual void AsyncReadSome(const gsl::string_span&, SizeCallback) override;
@@ -36,6 +38,10 @@ class UartStream : public AsyncStream {
   UART_HandleTypeDef* const huart_;
   SizeCallback tx_callback_;
   std::size_t tx_size_ = 0;
+  volatile uint32_t* const gpio_conf_register_;
+  const uint32_t gpio_input_mask_;
+  const uint32_t gpio_output_bits_;
+
 
   volatile bool rx_complete_ = false;
   volatile bool tx_complete_ = false;
