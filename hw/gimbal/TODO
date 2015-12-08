@@ -1,8 +1,8 @@
  * Board + Software
-   * get PWM working
+   * Make UART be able to tri-state when not transmitting
+
    * driver for AS5048 (test existing driver)
 
-   * Make UART be able to tri-state when not transmitting
    * AHRS
    * gimbal control software
      * first, do a basic version just like the open-loop brugi
@@ -10,7 +10,6 @@
      * close loop using absolute encoders
      * add support for second IMU
 
-   * make STM32 flash interface actually write to flash
    * error handling and reporting
 
    * report current heap size in system_info
@@ -61,9 +60,13 @@
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
 
+DONE 2015-12-08
+ * make STM32 flash interface actually write to flash
+
 DONE 2015-12-07
  * read from the ADC
  * implemented herkulex protocol
+ * get PWM working
 
 DONE 2015-12-06
  * read and write from the SPI bus
