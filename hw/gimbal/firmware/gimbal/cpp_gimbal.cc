@@ -18,10 +18,13 @@
 
 #include "base/visitor.h"
 
+
 #include "gpio.h"
 #include "i2c.h"
 #include "iwdg.h"
 #include "tim.h"
+
+#include "stm32f4xx_hal_tim_ex.h"
 
 #include "bmi160_driver.h"
 #include "command_manager.h"
@@ -137,6 +140,9 @@ void cpp_gimbal_main() {
   char spi_write_buf[2] = { 0xcf, 0x00 };
   char spi_read_buf[2] = {};
 
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+
   uint32_t old_tick = 0;
   while (1) {
     uint32_t new_tick = HAL_GetTick();
@@ -168,6 +174,9 @@ void cpp_gimbal_main() {
               spi_count++;
             });
         }
+
+        TIM2->CCR1 = (new_tick / 10) % 2048;
+        TIM1->CCR2 = (new_tick / 10 + 100) % 2048;
       }
 
       UpdateLEDs(new_tick);
