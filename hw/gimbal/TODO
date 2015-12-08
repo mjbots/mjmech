@@ -1,6 +1,4 @@
  * Board + Software
-   * Make UART be able to tri-state when not transmitting
-
    * driver for AS5048 (test existing driver)
 
    * AHRS
@@ -14,10 +12,14 @@
 
    * report current heap size in system_info
 
-   * Make TelemetryManager support schema and binary objects of
-     arbitrary size using a custom stream which only emits a subset
-     and doing the whole visitation multiple times.
+   * Make TelemetryManager support schema objects of arbitrary size
+     using a custom stream which only emits a subset and doing the
+     whole visitation multiple times.
+     * (note, not binary objects, as that could result in "tearing" of
+       the structures)
 
+   * allow things which register with PersistentConfig to get notified
+     when their config changes for explicit live updating
    * get watchdog working
    * get I2C DMA working
 
@@ -62,6 +64,7 @@
 
 DONE 2015-12-08
  * make STM32 flash interface actually write to flash
+ * Make UART be able to tri-state when not transmitting
 
 DONE 2015-12-07
  * read from the ADC
