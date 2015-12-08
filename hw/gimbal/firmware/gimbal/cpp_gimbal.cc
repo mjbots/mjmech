@@ -122,6 +122,8 @@ void cpp_gimbal_main() {
   SystemStatus system_status;
   telemetry.Register(gsl::ensure_z("system_status"), &system_status);
 
+  config.Load();
+
   command_manager.AsyncStart([&](int error) {
       if (!error) {
         system_status.command_manager_init = true;

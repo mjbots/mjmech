@@ -14,29 +14,55 @@
 
 #include "stm32_flash.h"
 
+#include <assert.h>
+
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_flash.h"
+
 namespace {
-char g_buffer[8192];
+char* const kFlashSector1 = (char*) 0x08004000;
 }
 
-Stm32Flash::Stm32Flash() {}
+Stm32Flash::Stm32Flash() {
+}
 
 Stm32Flash::~Stm32Flash() {}
 
 Stm32Flash::Info Stm32Flash::GetInfo() {
   Info result;
-  result.start = g_buffer;
-  result.end = g_buffer + sizeof(g_buffer);
+  result.start = kFlashSector1;
+  result.end = result.start + 16384;
   return result;
 }
 
 void Stm32Flash::Erase() {
+  uint32_t error = 0;
+
+  FLASH_EraseInitTypeDef erase;
+  erase.TypeErase = FLASH_TYPEERASE_SECTORS;
+  erase.Banks = 0;
+  erase.Sector = FLASH_SECTOR_1;
+  erase.NbSectors = 1;
+  erase.VoltageRange = FLASH_VOLTAGE_RANGE_3; // 2.7 to 3.6
+
+  HAL_StatusTypeDef result = HAL_FLASHEx_Erase(&erase, &error);
+
+  assert(result == 0);
+  assert(error == 0xffffffff);
 }
 
 void Stm32Flash::Unlock() {
+  FLASH->SR |= FLASH_SR_PGSERR;
+  FLASH->SR |= FLASH_SR_PGPERR;
+  HAL_FLASH_Unlock();
 }
 
 void Stm32Flash::Lock() {
+  HAL_FLASH_Lock();
 }
 
 void Stm32Flash::ProgramByte(char* ptr, uint8_t value) {
+  HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE,
+                    reinterpret_cast<uint32_t>(ptr),
+                    value);
 }

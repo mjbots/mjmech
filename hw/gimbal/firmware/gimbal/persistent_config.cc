@@ -116,6 +116,12 @@ class PersistentConfig::Impl {
   }
 
   void Load(ErrorCallback callback) {
+    DoLoad();
+
+    WriteOK(callback);
+  }
+
+  void DoLoad() {
     auto info = flash_.GetInfo();
     SimpleIStream flash_stream(info.start, info.end - info.start);
     mjmech::base::TelemetryReadStream<SimpleIStream> stream(flash_stream);
@@ -152,8 +158,6 @@ class PersistentConfig::Impl {
 
       element->ptr->ReadBinary(flash_stream);
     }
-
-    WriteOK(callback);
   }
 
   uint32_t CalculateSchemaCrc(SerializableHandlerBase* base) const {
@@ -259,6 +263,7 @@ void PersistentConfig::Command(const gsl::cstring_span& command,
 }
 
 void PersistentConfig::Load() {
+  impl_->DoLoad();
 }
 
 void PersistentConfig::RegisterDetail(
