@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
     imu_signal(&data);
   }
 
-  BOOST_CHECK_SMALL(ahrs_data.pitch_deg - 5.73, 1e-2);
-  BOOST_CHECK_SMALL(ahrs_data.roll_deg - 0.0, 1e-2);
+  BOOST_CHECK_SMALL(ahrs_data.euler_deg.pitch - 5.73, 1e-2);
+  BOOST_CHECK_SMALL(ahrs_data.euler_deg.roll - 0.0, 1e-2);
 
   // Now try with some amount of roll.
 
@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
     imu_signal(&data);
   }
 
-  BOOST_CHECK_SMALL(ahrs_data.pitch_deg - 0.0, 1e-2);
-  BOOST_CHECK_SMALL(ahrs_data.roll_deg + 5.73, 1e-2);
+  BOOST_CHECK_SMALL(ahrs_data.euler_deg.pitch - 0.0, 1e-2);
+  BOOST_CHECK_SMALL(ahrs_data.euler_deg.roll + 5.73, 1e-2);
 
   // If we start seeing some gyro about the roll axis, this roll value
   // should increase for a bit, then assuming we have an integrative
@@ -82,11 +82,11 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
     imu_signal(&data);
   }
 
-  BOOST_CHECK_GE(ahrs_data.roll_deg, -5.63);
+  BOOST_CHECK_GE(ahrs_data.euler_deg.roll, -5.63);
 
   for (int i = 0; i < 20000; i++) {
     imu_signal(&data);
   }
 
-  BOOST_CHECK_SMALL(ahrs_data.roll_deg + 5.73, 1e-2);
+  BOOST_CHECK_SMALL(ahrs_data.euler_deg.roll + 5.73, 1e-2);
 }

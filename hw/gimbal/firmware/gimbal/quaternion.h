@@ -18,6 +18,7 @@
 
 #include <Eigen/Core>
 
+#include "euler.h"
 #include "point3d.h"
 
 class Quaternion;
@@ -73,36 +74,28 @@ class Quaternion {
   ///  +roll -> right side down
   ///  +pitch -> forward edge up
   ///  +yaw -> clockwise looking down
-  struct Euler {
-    float roll_rad;
-    float pitch_rad;
-    float yaw_rad;
-
-    Euler() : roll_rad(0.f), pitch_rad(0.f), yaw_rad(0.f) {}
-  };
-
-  Euler euler() const {
+  Euler euler_rad() const {
     float sp = 2.0f * (w_ * x_ + y_ * z_);
-    Euler result;
+    Euler result_rad;
     if (std::abs(sp - 1.0f) < 1e-8f) { // north pole
-      result.pitch_rad = M_PI_2;
-      result.roll_rad = 0.0f;
-      result.yaw_rad = -std::atan2((w_ * y_ + x_ * z_),
+      result_rad.pitch = M_PI_2;
+      result_rad.roll = 0.0f;
+      result_rad.yaw = -std::atan2((w_ * y_ + x_ * z_),
                                    -(y_ * z_ - w_ * x_));
     } else if (std::abs(sp + 1.0f) < 1e-8f) { // south pole
-      result.pitch_rad = -M_PI_2;
-      result.roll_rad = 0.0f;
-      result.yaw_rad = std::atan2((w_ * y_ + x_ * z_),
+      result_rad.pitch = -M_PI_2;
+      result_rad.roll = 0.0f;
+      result_rad.yaw = std::atan2((w_ * y_ + x_ * z_),
                                   (y_ * z_ - w_ * x_));
     } else {
-      result.pitch_rad = std::asin(sp);
-      result.roll_rad = -std::atan2(2.0f * (x_ * z_ - w_ * y_),
+      result_rad.pitch = std::asin(sp);
+      result_rad.roll = -std::atan2(2.0f * (x_ * z_ - w_ * y_),
                                     1.0f - 2.0f * x_ * x_ - 2.0f * y_ * y_);
-      result.yaw_rad = std::atan2(2.0f * (x_ * y_ - w_ * z_),
+      result_rad.yaw = std::atan2(2.0f * (x_ * y_ - w_ * z_),
                                   1.0f - 2.0f * x_ * x_ - 2.0f * z_ * z_);
     }
 
-    return result;
+    return result_rad;
   }
 
   static Quaternion FromEuler(

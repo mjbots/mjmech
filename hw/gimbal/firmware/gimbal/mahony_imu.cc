@@ -95,12 +95,8 @@ class MahonyImu::Impl {
         Quaternion::IntegrateRotationRate(cg, 1.0f / data->rate_hz);
 
     // TODO jpieper: Add in the integrative term here.
-    o.body_rate_dps = g.scaled(1.0 / kDegToRad);
-
-    auto euler = o.attitude.euler();
-    o.yaw_deg = euler.yaw_rad / kDegToRad;
-    o.pitch_deg = euler.pitch_rad / kDegToRad;
-    o.roll_deg = euler.roll_rad / kDegToRad;
+    o.body_rate_dps = g.scaled(1.0f / kDegToRad);
+    o.euler_deg = o.attitude.euler_rad().scaled(1.0f / kDegToRad);
   }
 
   Clock& clock_;

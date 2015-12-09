@@ -16,25 +16,23 @@
 
 #include "base/visitor.h"
 
-#include "quaternion.h"
-#include "static_signal.h"
+struct Euler {
+  float yaw = 0.0f;
+  float pitch = 0.0f;
+  float roll = 0.0f;
 
-struct AhrsData {
-  uint32_t timestamp = {};
-  int32_t error = 0;
+  Euler() {}
+  Euler(float yaw, float pitch, float roll)
+      : yaw(yaw), pitch(pitch), roll(roll) {}
 
-  Quaternion attitude;
-  Euler euler_deg;
-  Point3D body_rate_dps;
+  Euler scaled(float scale) const {
+    return Euler{yaw * scale, pitch * scale, roll * scale};
+  }
 
   template <typename Archive>
   void Serialize(Archive* a) {
-    a->Visit(MJ_NVP(timestamp));
-    a->Visit(MJ_NVP(error));
-    a->Visit(MJ_NVP(attitude));
-    a->Visit(MJ_NVP(euler_deg));
-    a->Visit(MJ_NVP(body_rate_dps));
+    a->Visit(MJ_NVP(yaw));
+    a->Visit(MJ_NVP(pitch));
+    a->Visit(MJ_NVP(roll));
   }
 };
-
-typedef StaticSignal<void (const AhrsData*)> AhrsDataSignal;
