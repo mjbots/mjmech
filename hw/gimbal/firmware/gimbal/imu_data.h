@@ -16,30 +16,23 @@
 
 #include "base/visitor.h"
 
+#include "point3d.h"
 #include "static_signal.h"
 
 struct ImuData {
   uint32_t timestamp = {};
   int32_t error = 0;
   uint16_t rate_hz = 0;
-  float gyro_x_dps = {};
-  float gyro_y_dps = {};
-  float gyro_z_dps = {};
-  float accel_x_g = {};
-  float accel_y_g = {};
-  float accel_z_g = {};
+  Point3D gyro_dps;
+  Point3D accel_g;
 
   template <typename Archive>
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(timestamp));
     a->Visit(MJ_NVP(error));
     a->Visit(MJ_NVP(rate_hz));
-    a->Visit(MJ_NVP(gyro_x_dps));
-    a->Visit(MJ_NVP(gyro_y_dps));
-    a->Visit(MJ_NVP(gyro_z_dps));
-    a->Visit(MJ_NVP(accel_x_g));
-    a->Visit(MJ_NVP(accel_y_g));
-    a->Visit(MJ_NVP(accel_z_g));
+    a->Visit(MJ_NVP(gyro_dps));
+    a->Visit(MJ_NVP(accel_g));
   }
 };
 

@@ -371,14 +371,14 @@ class Bmi160Driver::Impl {
     const int acc_z = data(10);
 
     const float gyro_scale = FindGyroScale();
-    data_.imu.gyro_x_dps = gyr_x * gyro_scale;
-    data_.imu.gyro_y_dps = gyr_y * gyro_scale;
-    data_.imu.gyro_z_dps = gyr_z * gyro_scale;
+    data_.imu.gyro_dps.x = gyr_x * gyro_scale;
+    data_.imu.gyro_dps.y = gyr_y * gyro_scale;
+    data_.imu.gyro_dps.z = gyr_z * gyro_scale;
 
     const float accel_scale = FindAccelScale();
-    data_.imu.accel_x_g = acc_x * accel_scale;
-    data_.imu.accel_y_g = acc_y * accel_scale;
-    data_.imu.accel_z_g = acc_z * accel_scale;
+    data_.imu.accel_g.x = acc_x * accel_scale;
+    data_.imu.accel_g.y = acc_y * accel_scale;
+    data_.imu.accel_g.z = acc_z * accel_scale;
 
     data_.imu.rate_hz = data_.rate_hz;
 

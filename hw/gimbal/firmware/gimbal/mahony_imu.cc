@@ -65,13 +65,12 @@ class MahonyImu::Impl {
   }
 
   void DoOperating(const ImuData* data) {
-    const Point3D a_g(data->accel_x_g, data->accel_y_g, data->accel_z_g);
+    const Point3D a_g = data->accel_g;
     const Point3D a = a_g.scaled(1.0 / a_g.length());
 
     const float kDegToRad = mjmech::base::kPi / 180.0;
     // TODO jpieper: Apply initial bias estimate.
-    const Point3D g = Point3D(
-        data->gyro_x_dps, data->gyro_y_dps, data->gyro_z_dps).scaled(kDegToRad);
+    const Point3D g = data->gyro_dps.scaled(kDegToRad);
 
     // Estimate the direction of gravity.
     auto& o = data_.ahrs;

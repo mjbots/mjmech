@@ -44,15 +44,15 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
 
   ImuData data;
   data.rate_hz = 100;
-  data.accel_z_g = 1.0f;
+  data.accel_g.z = 1.0f;
   BOOST_CHECK_EQUAL(count, 0);
   imu_signal(&data);
   BOOST_CHECK_EQUAL(count, 1);
 
   // Now try to pick an acceleration that indicates a slight pitch.
   // Verify that we converge to that correct pitch with time.
-  data.accel_z_g = std::cos(0.1);
-  data.accel_y_g = std::sin(0.1);
+  data.accel_g.z = std::cos(0.1);
+  data.accel_g.y = std::sin(0.1);
 
   for (int i = 0; i < 10000; i++) {
     imu_signal(&data);
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
 
   // Now try with some amount of roll.
 
-  data.accel_y_g = 0.0;
-  data.accel_x_g = std::sin(0.1);
+  data.accel_g.y = 0.0;
+  data.accel_g.x = std::sin(0.1);
 
   for (int i = 0; i < 10000; i++) {
     imu_signal(&data);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
   // If we start seeing some gyro about the roll axis, this roll value
   // should increase for a bit, then assuming we have an integrative
   // term, should stabilize back where it was.
-  data.gyro_y_dps = 2.0;
+  data.gyro_dps.y = 2.0;
 
   for (int i = 0; i < 10; i++) {
     imu_signal(&data);

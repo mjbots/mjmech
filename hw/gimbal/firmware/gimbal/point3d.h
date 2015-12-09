@@ -16,6 +16,8 @@
 
 #include <assert.h>
 
+#include <cmath>
+
 #include "base/visitor.h"
 
 struct Point3D {
