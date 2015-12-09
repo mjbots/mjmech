@@ -16,31 +16,31 @@
 
 #include "base/visitor.h"
 
+#include "quaternion.h"
 #include "static_signal.h"
 
-struct ImuData {
+struct AhrsData {
   uint32_t timestamp = {};
   int32_t error = 0;
-  uint16_t rate_hz = 0;
-  float gyro_x_dps = {};
-  float gyro_y_dps = {};
-  float gyro_z_dps = {};
-  float accel_x_g = {};
-  float accel_y_g = {};
-  float accel_z_g = {};
+
+  Quaternion attitude;
+
+  float yaw_deg = 0.0f;
+  float pitch_deg = 0.0f;
+  float roll_deg = 0.0f;
+
+  Point3D body_rate_dps;
 
   template <typename Archive>
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(timestamp));
     a->Visit(MJ_NVP(error));
-    a->Visit(MJ_NVP(rate_hz));
-    a->Visit(MJ_NVP(gyro_x_dps));
-    a->Visit(MJ_NVP(gyro_y_dps));
-    a->Visit(MJ_NVP(gyro_z_dps));
-    a->Visit(MJ_NVP(accel_x_g));
-    a->Visit(MJ_NVP(accel_y_g));
-    a->Visit(MJ_NVP(accel_z_g));
+    a->Visit(MJ_NVP(attitude));
+    a->Visit(MJ_NVP(yaw_deg));
+    a->Visit(MJ_NVP(pitch_deg));
+    a->Visit(MJ_NVP(roll_deg));
+    a->Visit(MJ_NVP(body_rate_dps));
   }
 };
 
-typedef StaticSignal<void (const ImuData*)> ImuDataSignal;
+typedef StaticSignal<void (const AhrsData*)> AhrsDataSignal;

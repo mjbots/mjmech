@@ -380,6 +380,8 @@ class Bmi160Driver::Impl {
     data_.imu.accel_y_g = acc_y * accel_scale;
     data_.imu.accel_z_g = acc_z * accel_scale;
 
+    data_.imu.rate_hz = data_.rate_hz;
+
     Emit();
   }
 
