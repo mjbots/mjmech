@@ -30,6 +30,9 @@
      * real-time line plots of arbitrary values
      * maybe special pages to pull out specific config or telemetry values
 
+ * r1 defects
+   * STM32 footprint is too small! :(
+   * something is messed up about the ARM switch footprint or part
 
  * BOM
    * power in + serial connector
