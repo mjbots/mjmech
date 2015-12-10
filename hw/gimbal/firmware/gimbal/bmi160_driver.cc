@@ -340,7 +340,6 @@ class Bmi160Driver::Impl {
     data_.imu.error = error;
     data_.state = kFault;
     Emit();
-    data_signal_(&data_.imu);
   }
 
   void HandleData() {
@@ -383,6 +382,7 @@ class Bmi160Driver::Impl {
     data_.imu.rate_hz = data_.rate_hz;
 
     Emit();
+    data_signal_(&data_.imu);
   }
 
   float FindGyroScale() const {
