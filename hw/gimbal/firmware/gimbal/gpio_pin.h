@@ -14,23 +14,10 @@
 
 #pragma once
 
-#include "tim.h"
-
-#include "clock.h"
-
-class Stm32Clock : public Clock {
+class GpioPin {
  public:
-  Stm32Clock() {
-    HAL_TIM_Base_Start(&htim5);
-  }
+  virtual ~GpioPin() {}
 
-  virtual ~Stm32Clock() {}
-
-  virtual uint32_t timestamp() const {
-    return __HAL_TIM_GET_COUNTER(&htim5);
-  }
-
-  virtual uint32_t ticks_per_second() const {
-    return 10000;
-  }
+  virtual void Set(bool) = 0;
+  virtual bool Read() const = 0;
 };

@@ -22,6 +22,7 @@
 struct AhrsData {
   uint32_t timestamp = {};
   int32_t error = 0;
+  uint16_t rate_hz = 0;
 
   Quaternion attitude;
   Euler euler_deg;
@@ -31,6 +32,7 @@ struct AhrsData {
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(timestamp));
     a->Visit(MJ_NVP(error));
+    a->Visit(MJ_NVP(rate_hz));
     a->Visit(MJ_NVP(attitude));
     a->Visit(MJ_NVP(euler_deg));
     a->Visit(MJ_NVP(body_rate_dps));

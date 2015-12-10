@@ -72,8 +72,11 @@ class MahonyImu::Impl {
     // TODO jpieper: Apply initial bias estimate.
     const Point3D g = data->gyro_dps.scaled(kDegToRad);
 
-    // Estimate the direction of gravity.
+    // Start initializing our output structure.
     auto& o = data_.ahrs;
+    o.rate_hz = data->rate_hz;
+
+    // Estimate the direction of gravity.
     Point3D rotated = o.attitude.conjugated().
                       Rotate(Point3D(0.0, 0.0, 0.5));
 

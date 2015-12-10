@@ -31,6 +31,7 @@ SOURCES = [
     'cpp_gimbal.cc',
     'crc_stm32.cc',
     'gimbal.c',
+    'gimbal_stabilizer.cc',
     'herkulex_protocol.cc',
     'lock_manager.cc',
     'mahony_imu.cc',

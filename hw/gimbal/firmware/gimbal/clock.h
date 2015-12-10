@@ -19,4 +19,5 @@ class Clock {
   virtual ~Clock() {}
 
   virtual uint32_t timestamp() const = 0;
+  virtual uint32_t ticks_per_second() const = 0;
 };

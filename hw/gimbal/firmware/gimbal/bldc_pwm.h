@@ -29,4 +29,6 @@ class BldcPwm {
   virtual void Set(uint16_t phase_a,
                    uint16_t phase_b,
                    uint16_t phase_c) = 0;
+
+  // TODO jpieper: Probably need ability to read fault flags.
 };

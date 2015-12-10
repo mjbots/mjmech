@@ -22,6 +22,7 @@ class ClockTest : public Clock {
   virtual ~ClockTest() {}
 
   virtual uint32_t timestamp() const override { return value_; }
+  virtual uint32_t ticks_per_second() const override { return 10000; }
 
   uint32_t value_ = 0;
 };
