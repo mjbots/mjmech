@@ -28,6 +28,7 @@
 
 #include "bmi160_driver.h"
 #include "command_manager.h"
+#include "gimbal_stabilizer.h"
 #include "lock_manager.h"
 #include "mahony_imu.h"
 #include "persistent_config.h"
@@ -36,6 +37,7 @@
 #include "stm32_bldc_pwm.h"
 #include "stm32_clock.h"
 #include "stm32_flash.h"
+#include "stm32_gpio_pin.h"
 #include "stm32_hal_i2c.h"
 #include "stm32_hal_spi.h"
 #include "stm32_raw_i2c.h"
@@ -105,10 +107,17 @@ void cpp_gimbal_main() {
   Stm32AnalogSampler analog_sampler(pool, clock, config, telemetry);
   Bmi160Driver bmi160(pool, gsl::ensure_z("pimu"),
                       i2c1, clock, config, telemetry);
-  Stm32BldcPwm motor1(&htim2, TIM_CHANNEL_1,
+  Stm32BldcPwm motor1(&htim3, TIM_CHANNEL_1,
+                      &htim3, TIM_CHANNEL_2,
+                      &htim3, TIM_CHANNEL_3);
+  Stm32BldcPwm motor2(&htim2, TIM_CHANNEL_1,
                       &htim2, TIM_CHANNEL_2,
                       &htim3, TIM_CHANNEL_4);
   MahonyImu imu(pool, clock, config, telemetry, *bmi160.data_signal());
+
+  Stm32GpioPin motor_enable(GPIOA, GPIO_PIN_6);
+  GimbalStabilizer stabilizer(pool, clock, config, telemetry, *imu.data_signal(),
+                              motor_enable, motor1, motor2);
 
   command_manager.Register(
       gsl::ensure_z("conf"),
@@ -119,6 +128,11 @@ void cpp_gimbal_main() {
       gsl::ensure_z("tel"),
       [&](const gsl::cstring_span& args, ErrorCallback cbk) {
         telemetry.Command(args, cbk);
+      });
+  command_manager.Register(
+      gsl::ensure_z("gim"),
+      [&](const gsl::cstring_span& args, ErrorCallback cbk) {
+        stabilizer.Command(args, cbk);
       });
 
   SystemStatus system_status;
