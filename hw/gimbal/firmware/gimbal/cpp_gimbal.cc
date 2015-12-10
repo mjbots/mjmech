@@ -29,6 +29,7 @@
 #include "bmi160_driver.h"
 #include "command_manager.h"
 #include "lock_manager.h"
+#include "mahony_imu.h"
 #include "persistent_config.h"
 #include "pool_ptr.h"
 #include "stm32_analog_sampler.h"
@@ -107,6 +108,7 @@ void cpp_gimbal_main() {
   Stm32BldcPwm motor1(&htim2, TIM_CHANNEL_1,
                       &htim2, TIM_CHANNEL_2,
                       &htim3, TIM_CHANNEL_4);
+  MahonyImu imu(pool, clock, config, telemetry, *bmi160.data_signal());
 
   command_manager.Register(
       gsl::ensure_z("conf"),
