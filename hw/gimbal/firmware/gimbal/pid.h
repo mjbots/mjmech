@@ -23,6 +23,7 @@ class PID {
     float ki = 0.0f;
     float kd = 0.0f;
     float ilimit = 0.0f;
+    int8_t sign = 1;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -30,6 +31,7 @@ class PID {
       a->Visit(MJ_NVP(ki));
       a->Visit(MJ_NVP(kd));
       a->Visit(MJ_NVP(ilimit));
+      a->Visit(MJ_NVP(sign));
     }
   };
 
@@ -68,9 +70,10 @@ class PID {
     }
 
     state_->command =
-        config_->kp * state_->error +
-        config_->kd * state_->error_rate +
-        state_->integral;
+        config_->sign * (
+            config_->kp * state_->error +
+            config_->kd * state_->error_rate +
+            state_->integral);
 
     return state_->command;
   }

@@ -30,6 +30,14 @@ struct ChannelConfig {
     a->Visit(MJ_NVP(motor));
     a->Visit(MJ_NVP(pid));
   }
+
+  ChannelConfig() {
+    pid.kp = 0.01;
+    pid.ki = 0.1;
+    pid.kd = 0.01;
+    pid.ilimit = 1000.0;
+    pid.sign = -1;
+  }
 };
 
 struct Config {
@@ -99,7 +107,7 @@ class GimbalStabilizer::Impl {
 
     const uint32_t now = clock_.timestamp();
     const float elapsed_s =
-        (now - data_.start_timestamp) /
+        static_cast<float>(now - data_.start_timestamp) /
         clock_.ticks_per_second();
     if (elapsed_s > config_.initialization_period_s) {
       data_.desired_deg.pitch = 0.0f;
@@ -127,6 +135,11 @@ class GimbalStabilizer::Impl {
         yaw_pid_.Apply(data->euler_deg.yaw, data_.desired_deg.yaw,
                        data->body_rate_dps.z, data_.desired_body_rate_dps.z,
                        data->rate_hz);
+
+    // For the open loop case, our integral should be wrapped to be
+    // within +- 1.0f;
+    data_.pitch.integral = std::fmod(data_.pitch.integral, 1.0);
+    data_.yaw.integral = std::fmod(data_.yaw.integral, 1.0);
 
     const auto phase = [](float command, float phase) {
       const float fresult = (std::sin((command + phase) *
