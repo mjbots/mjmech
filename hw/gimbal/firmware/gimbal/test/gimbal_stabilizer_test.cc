@@ -61,4 +61,6 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
                        ahrs_signal,
                        motor_enable,
                        motor1, motor2);
+
+  BOOST_CHECK_EQUAL(dut.data().state, GimbalStabilizer::kInitializing);
 }

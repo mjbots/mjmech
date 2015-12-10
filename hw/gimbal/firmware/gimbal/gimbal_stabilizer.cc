@@ -18,7 +18,6 @@
 #include "clock.h"
 #include "gpio_pin.h"
 #include "persistent_config.h"
-#include "pid.h"
 #include "telemetry_manager.h"
 
 namespace {
@@ -196,45 +195,6 @@ class GimbalStabilizer::Impl {
 
   Config config_;
 
-  enum State {
-    kInitializing,
-    kOperating,
-    kFault,
-    kNumStates,
-  };
-
-  static std::array<std::pair<State, const char*>, kNumStates> StateMapper() {
-    return { {
-        { kInitializing, "kInitializing" },
-        { kOperating, "kOperating" },
-        { kFault, "kFault" },
-      } };
-  }
-
-  struct Data {
-    State state;
-    PID::State pitch;
-    PID::State yaw;
-
-    uint32_t start_timestamp = 0;
-
-    Euler desired_deg;
-    Point3D desired_body_rate_dps;
-    uint32_t last_ahrs_update = 0;
-    bool torque_on = false;
-
-    template <typename Archive>
-    void Serialize(Archive* a) {
-      a->Visit(MJ_ENUM(state, StateMapper));
-      a->Visit(MJ_NVP(pitch));
-      a->Visit(MJ_NVP(yaw));
-      a->Visit(MJ_NVP(start_timestamp));
-      a->Visit(MJ_NVP(desired_deg));
-      a->Visit(MJ_NVP(desired_body_rate_dps));
-      a->Visit(MJ_NVP(last_ahrs_update));
-      a->Visit(MJ_NVP(torque_on));
-    }
-  };
 
   Data data_;
   StaticFunction<void ()> data_updater_;
@@ -258,4 +218,20 @@ GimbalStabilizer::~GimbalStabilizer() {}
 
 void GimbalStabilizer::PollMillisecond() {
   impl_->PollMillisecond();
+}
+
+void GimbalStabilizer::Reset() {
+  impl_->data_.state = kInitializing;
+  impl_->data_.start_timestamp = 0;
+  impl_->data_.pitch = PID::State();
+  impl_->data_.yaw = PID::State();
+  impl_->data_.torque_on = false;
+}
+
+void GimbalStabilizer::SetTorque(bool v) {
+  impl_->data_.torque_on = v;
+}
+
+const GimbalStabilizer::Data& GimbalStabilizer::data() const {
+  return impl_->data_;
 }

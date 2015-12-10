@@ -16,6 +16,7 @@
 
 #include "ahrs_data.h"
 #include "async_types.h"
+#include "pid.h"
 #include "pool_ptr.h"
 
 class BldcPwm;
@@ -50,6 +51,48 @@ class GimbalStabilizer {
   void Command(const gsl::cstring_span&, ErrorCallback);
 
   void PollMillisecond();
+
+  enum State {
+    kInitializing,
+    kOperating,
+    kFault,
+    kNumStates,
+  };
+
+  static std::array<std::pair<State, const char*>, kNumStates> StateMapper() {
+    return { {
+        { kInitializing, "kInitializing" },
+        { kOperating, "kOperating" },
+        { kFault, "kFault" },
+      } };
+  }
+
+  struct Data {
+    State state;
+    PID::State pitch;
+    PID::State yaw;
+
+    uint32_t start_timestamp = 0;
+
+    Euler desired_deg;
+    Point3D desired_body_rate_dps;
+    uint32_t last_ahrs_update = 0;
+    bool torque_on = false;
+
+    template <typename Archive>
+    void Serialize(Archive* a) {
+      a->Visit(MJ_ENUM(state, StateMapper));
+      a->Visit(MJ_NVP(pitch));
+      a->Visit(MJ_NVP(yaw));
+      a->Visit(MJ_NVP(start_timestamp));
+      a->Visit(MJ_NVP(desired_deg));
+      a->Visit(MJ_NVP(desired_body_rate_dps));
+      a->Visit(MJ_NVP(last_ahrs_update));
+      a->Visit(MJ_NVP(torque_on));
+    }
+  };
+
+  const Data& data() const;
 
  private:
   class Impl;
