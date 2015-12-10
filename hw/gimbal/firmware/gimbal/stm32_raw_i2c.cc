@@ -97,8 +97,14 @@ class Stm32RawI2C::Impl {
     i2c_->OAR2 = 0;
 
     if (i2c_->SR2 & I2C_SR2_BUSY) {
-      // Hmmm.  Try sending a stop command.
-      i2c_->CR1 |= I2C_CR1_STOP;
+      for (int i = 0; i < 1000; i++) {
+        // Hmmm.  Try resetting things.
+        i2c_->CR1 |= I2C_CR1_SWRST;
+      }
+
+      for (int i = 0; i < 1000; i++) {
+        i2c_->CR1 &= ~I2C_CR1_SWRST;
+      }
     }
   }
 
