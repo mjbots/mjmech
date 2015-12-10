@@ -137,9 +137,13 @@ class GimbalStabilizer::Impl {
                        data->rate_hz);
 
     // For the open loop case, our integral should be wrapped to be
-    // within +- 1.0f;
-    data_.pitch.integral = std::fmod(data_.pitch.integral, 1.0);
-    data_.yaw.integral = std::fmod(data_.yaw.integral, 1.0);
+    // between 0 and 1.0.
+    const auto wrap_integral = [](float* integral) {
+      *integral = std::fmod(*integral, 1.0f);
+      if (*integral < 0.0f) { (*integral) += 1.0f; }
+    };
+    wrap_integral(&data_.pitch.integral);
+    wrap_integral(&data_.yaw.integral);
 
     const auto phase = [](float command, float phase) {
       const float fresult = (std::sin((command + phase) *
@@ -247,4 +251,8 @@ void GimbalStabilizer::SetTorque(bool v) {
 
 const GimbalStabilizer::Data& GimbalStabilizer::data() const {
   return impl_->data_;
+}
+
+void GimbalStabilizer::Command(const gsl::cstring_span& cmd, ErrorCallback cbk) {
+  cbk(0);
 }
