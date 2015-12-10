@@ -23,6 +23,7 @@ class PID {
     float ki = 0.0f;
     float kd = 0.0f;
     float ilimit = 0.0f;
+    float kpkd_limit = -1;
     int8_t sign = 1;
 
     template <typename Archive>
@@ -31,6 +32,7 @@ class PID {
       a->Visit(MJ_NVP(ki));
       a->Visit(MJ_NVP(kd));
       a->Visit(MJ_NVP(ilimit));
+      a->Visit(MJ_NVP(kpkd_limit));
       a->Visit(MJ_NVP(sign));
     }
   };
@@ -69,11 +71,19 @@ class PID {
       state_->integral = -config_->ilimit;
     }
 
-    state_->command =
-        config_->sign * (
-            config_->kp * state_->error +
-            config_->kd * state_->error_rate +
-            state_->integral);
+    float kpkd =
+        config_->kp * state_->error +
+        config_->kd * state_->error_rate;
+
+    if (config_->kpkd_limit >= 0.0) {
+      if (kpkd > config_->kpkd_limit) {
+        kpkd = config_->kpkd_limit;
+      } else if (kpkd < -config_->kpkd_limit) {
+        kpkd = -config_->kpkd_limit;
+      }
+    }
+
+    state_->command = config_->sign * (kpkd + state_->integral);
 
     return state_->command;
   }
