@@ -16,25 +16,13 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-#include "gimbal/lock_manager.h"
-#include "gimbal/persistent_config.h"
-#include "gimbal/telemetry_manager.h"
-
-#include "clock_test.h"
-#include "flash_test.h"
-#include "stream_test.h"
+#include "context.h"
 
 BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
-  SizedPool<> pool;
-  test::ClockTest clock;
-  test::FlashTest flash;
-  test::TestWriteStream test_stream;
-  LockManager lock_manager;
-  PersistentConfig config(pool, flash, test_stream);
-  TelemetryManager telemetry(pool, test_stream, lock_manager);
+  test::Context ctx;
 
   ImuDataSignal imu_signal;
-  MahonyImu dut(pool, clock, config, telemetry, imu_signal);
+  MahonyImu dut(ctx.pool, ctx.clock, ctx.config, ctx.telemetry, imu_signal);
   AhrsData ahrs_data;
   int count = 0;
   dut.data_signal()->Connect([&](const AhrsData* data) {

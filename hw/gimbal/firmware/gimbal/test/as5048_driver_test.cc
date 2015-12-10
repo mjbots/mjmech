@@ -16,14 +16,8 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-#include "gimbal/lock_manager.h"
-#include "gimbal/persistent_config.h"
-#include "gimbal/telemetry_manager.h"
-
 #include "async_i2c_simulator.h"
-#include "clock_test.h"
-#include "flash_test.h"
-#include "stream_test.h"
+#include "context.h"
 
 namespace {
 class As5048Simulator : public test::AsyncI2CSimulator {
@@ -48,19 +42,13 @@ class As5048Simulator : public test::AsyncI2CSimulator {
 }
 
 BOOST_AUTO_TEST_CASE(BasicAs5048DriverTest) {
-  SizedPool<> pool;
+  test::Context ctx;
   As5048Simulator dut_sim;
-  test::ClockTest clock;
-  test::FlashTest flash;
-  test::TestWriteStream test_stream;
-  LockManager lock_manager;
-  PersistentConfig config(pool, flash, test_stream);
-  TelemetryManager telemetry(pool, test_stream, lock_manager);
 
-  As5048Driver dut(pool, gsl::ensure_z("dut"),
-                   &dut_sim, nullptr, clock, config, telemetry);
+  As5048Driver dut(ctx.pool, gsl::ensure_z("dut"),
+                   &dut_sim, nullptr, ctx.clock, ctx.config, ctx.telemetry);
 
-  clock.value_ = 1234;
+  ctx.clock.value_ = 1234;
   As5048Driver::Data data;
   int count = 0;
   int error = 0;

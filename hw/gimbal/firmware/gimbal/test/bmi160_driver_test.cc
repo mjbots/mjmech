@@ -19,15 +19,9 @@
 #include <boost/test/auto_unit_test.hpp>
 
 #include "gimbal/async_i2c.h"
-#include "gimbal/clock.h"
-#include "gimbal/lock_manager.h"
-#include "gimbal/persistent_config.h"
-#include "gimbal/telemetry_manager.h"
 
 #include "async_i2c_simulator.h"
-#include "clock_test.h"
-#include "flash_test.h"
-#include "stream_test.h"
+#include "context.h"
 
 namespace {
 
@@ -54,17 +48,11 @@ class Bmi160Simulator : public test::AsyncI2CSimulator {
 }
 
 BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
-  SizedPool<> pool;
-  Bmi160Simulator imu_sim;
-  test::ClockTest clock;
-  test::FlashTest flash;
-  test::TestWriteStream test_stream;
-  LockManager lock_manager;
-  PersistentConfig config(pool, flash, test_stream);
-  TelemetryManager telemetry(pool, test_stream, lock_manager);
+  test::Context ctx;
 
-  Bmi160Driver dut(pool, gsl::ensure_z("dut"),
-                   imu_sim, clock, config, telemetry);
+  Bmi160Simulator imu_sim;
+  Bmi160Driver dut(ctx.pool, gsl::ensure_z("dut"),
+                   imu_sim, ctx.clock, ctx.config, ctx.telemetry);
 
   int count = 0;
   int error = 0;
@@ -88,7 +76,7 @@ BOOST_AUTO_TEST_CASE(Bmi160DriverTest) {
       dut.Poll();
     } else {
       if (!imu_sim.ProcessAction()) {
-        clock.value_ += 1;
+        ctx.clock.value_ += 1;
       }
     }
     auto cmd = imu_sim.register_file_[0x7e];
