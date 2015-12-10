@@ -92,6 +92,7 @@ TESTS = ['test/' + x for x in [
         'bmi160_driver_test.cc',
         'command_manager_test.cc',
         'crc_test.cc',
+        'gimbal_stabilizer_test.cc',
         'herkulex_protocol_test.cc',
         'lock_manager_test.cc',
         'mahony_imu_test.cc',
