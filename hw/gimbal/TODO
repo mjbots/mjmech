@@ -3,10 +3,16 @@
 
    * AHRS
    * gimbal control software
-     * first, do a basic version just like the open-loop brugi
+     * make commands to set target
      * connect up herkulex protocol
      * close loop using absolute encoders
      * add support for second IMU
+
+   * initialize the AHRS with the accelerometer rather than making it
+     slew there
+   * make I2C more robust... jiggle connections and ensure it keeps
+     working, although it should log errors somehow
+   * make I2C rates above 400kHz work
 
    * error handling and reporting
 
@@ -17,6 +23,8 @@
      whole visitation multiple times.
      * (note, not binary objects, as that could result in "tearing" of
        the structures)
+   * make text command handling more generic, so that "help" could be
+     implemented across all sub-modules
 
    * allow things which register with PersistentConfig to get notified
      when their config changes for explicit live updating
@@ -64,6 +72,9 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-10
+ * first, do a basic version just like the open-loop brugi
 
 DONE 2015-12-08
  * make STM32 flash interface actually write to flash
