@@ -1,46 +1,52 @@
  * Board + Software
    * driver for AS5048 (test existing driver)
 
-   * AHRS
    * gimbal control software
-     * make commands to set target
      * connect up herkulex protocol
      * close loop using absolute encoders
      * add support for second IMU
 
-   * initialize the AHRS with the accelerometer rather than making it
-     slew there
+   * get I2C DMA working
    * make I2C more robust... jiggle connections and ensure it keeps
      working, although it should log errors somehow
    * make I2C rates above 400kHz work
 
+   * initialize the AHRS with the accelerometer rather than making it
+     slew there
+   * would be nice to have a warning if the IMU isn't emitting data at
+     the rate we expect
+
    * error handling and reporting
 
-   * report current heap size in system_info
-
-   * Make TelemetryManager support schema objects of arbitrary size
-     using a custom stream which only emits a subset and doing the
-     whole visitation multiple times.
-     * (note, not binary objects, as that could result in "tearing" of
-       the structures)
-   * make text command handling more generic, so that "help" could be
-     implemented across all sub-modules
-
-   * allow things which register with PersistentConfig to get notified
-     when their config changes for explicit live updating
    * get watchdog working
-   * get I2C DMA working
 
    * make UI for debugging
      * window with serial terminal
      * tree view for configuration
      * tree view for telemetry
      * real-time line plots of arbitrary values
-     * maybe special pages to pull out specific config or telemetry values
+     * maybe special pages to pull out specific config or telemetry
+      values
+
+   * wishlist
+     * report current heap size in system_info
+     * allow things which register with PersistentConfig to get notified
+       when their config changes for explicit live updating
+     * make text command handling more generic, so that "help" could be
+       implemented across all sub-modules
+     * Make TelemetryManager support schema objects of arbitrary size
+       using a custom stream which only emits a subset and doing the
+       whole visitation multiple times.
+       * (note, not binary objects, as that could result in "tearing" of
+         the structures)
+
 
  * r1 defects
    * STM32 footprint is too small! :(
    * something is messed up about the ARM switch footprint or part
+   * something is messed up with USB connector footprint
+   * some of the capacitors have silkscreens in the wrong place?
+     C24/25 C22/23
 
  * BOM
    * power in + serial connector
@@ -75,6 +81,11 @@
 
 DONE 2015-12-10
  * first, do a basic version just like the open-loop brugi
+ * make commands to set target
+ * make rate commands work
+
+DONE 2015-12-09
+ * Got simple VRU working
 
 DONE 2015-12-08
  * make STM32 flash interface actually write to flash
