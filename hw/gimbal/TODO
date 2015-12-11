@@ -6,10 +6,18 @@
      * close loop using absolute encoders
      * add support for second IMU
 
-   * get I2C DMA working
    * make I2C more robust... jiggle connections and ensure it keeps
      working, although it should log errors somehow
-   * make I2C rates above 400kHz work
+     * ARLO can trigger spuriously, need to be able to clear error and
+       have bmi160 driver try again in this case
+
+   * make UI for debugging
+     * window with serial terminal
+     * tree view for configuration
+     * tree view for telemetry
+     * real-time line plots of arbitrary values
+     * maybe special pages to pull out specific config or telemetry
+      values
 
    * initialize the AHRS with the accelerometer rather than making it
      slew there
@@ -20,15 +28,10 @@
 
    * get watchdog working
 
-   * make UI for debugging
-     * window with serial terminal
-     * tree view for configuration
-     * tree view for telemetry
-     * real-time line plots of arbitrary values
-     * maybe special pages to pull out specific config or telemetry
-      values
+   * make I2C rates above 400kHz work
 
    * wishlist
+     * get I2C DMA working
      * report current heap size in system_info
      * allow things which register with PersistentConfig to get notified
        when their config changes for explicit live updating
