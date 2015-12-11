@@ -1283,7 +1283,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="48.6" y="0.9" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
+<attribute name="NAME" x="50.2" y="3.4" size="0.8" layer="25" font="vector" ratio="10"/>
 </element>
 <element name="C23" library="mfpassives" package="C0603" value="0.01uF" x="49.5" y="1.8" smashed="yes" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1291,7 +1291,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="AMFPN" value="MF-CAP-0603-0.01uF" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="50.1" y="3.4" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="48.6" y="0.5" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
 </element>
 <element name="C26" library="mfpassives" package="C0603" value="0.1uF" x="34" y="21" smashed="yes" rot="MR270">
 <attribute name="TOLERANCE" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1307,7 +1307,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="31.1" y="0.5" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
+<attribute name="NAME" x="32.8" y="3.5" size="0.8" layer="25" font="vector" ratio="10"/>
 </element>
 <element name="C25" library="mfpassives" package="C0603" value="0.01uF" x="31.9" y="1.8" smashed="yes" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="31.9" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1315,7 +1315,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="31.9" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="31.9" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="AMFPN" value="MF-CAP-0603-0.01uF" x="31.9" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="32.7" y="3.4" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="31" y="0.4" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
 </element>
 <element name="C21" library="mfpassives" package="C0603" value="0.1uF" x="26" y="2.5" smashed="yes" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="26" y="2.5" size="1.778" layer="27" rot="R90" display="off"/>
