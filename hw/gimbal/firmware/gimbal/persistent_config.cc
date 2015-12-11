@@ -133,7 +133,11 @@ class PersistentConfig::Impl {
 
     while (true) {
       uint32_t name_size = stream.Read<uint32_t>();
-      if (name_size == 0) { break; }
+      typedef mjmech::base::TelemetryFormat TF;
+      if (name_size == 0 ||
+          name_size >= static_cast<uint32_t>(TF::BlockOffsets::kMaxBlockSize)) {
+        break;
+      }
       gsl::cstring_span name(flash_stream.current(),
                              flash_stream.current() + name_size);
       flash_stream.ignore(name_size);
