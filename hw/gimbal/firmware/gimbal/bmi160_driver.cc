@@ -299,7 +299,9 @@ class Bmi160Driver::Impl {
 
   void HandleStatusRead(int error) {
     if (error) {
-      Fault(0x30000000 | error);
+      data_.i2c_last_error = 0x30000000 | error;
+      data_.i2c_errors++;
+      operational_busy_ = false;
       return;
     }
 
@@ -314,16 +316,19 @@ class Bmi160Driver::Impl {
   }
 
   void StartDataRead() {
-    last_data_read_ = clock_.timestamp();
     AsyncRead(BMI160::DATA_GYR, sizeof(buffer_),
               [this](int error) { this->HandleDataRead(error); });
   }
 
   void HandleDataRead(int error) {
     if (error) {
-      Fault(0x40000000 | error);
+      data_.i2c_last_error = 0x40000000 | error;
+      data_.i2c_errors++;
+      operational_busy_ = false;
       return;
     }
+
+    last_data_read_ = clock_.timestamp();
 
     // Actually handle the data.
     HandleData();

@@ -97,14 +97,18 @@ class Stm32RawI2C::Impl {
     i2c_->OAR2 = 0;
 
     if (i2c_->SR2 & I2C_SR2_BUSY) {
-      for (int i = 0; i < 1000; i++) {
-        // Hmmm.  Try resetting things.
-        i2c_->CR1 |= I2C_CR1_SWRST;
-      }
+      ResetBus();
+    }
+  }
 
-      for (int i = 0; i < 1000; i++) {
-        i2c_->CR1 &= ~I2C_CR1_SWRST;
-      }
+  void ResetBus() {
+    for (int i = 0; i < 1000; i++) {
+      // Hmmm.  Try resetting things.
+      i2c_->CR1 |= I2C_CR1_SWRST;
+    }
+
+    for (int i = 0; i < 1000; i++) {
+      i2c_->CR1 &= ~I2C_CR1_SWRST;
     }
   }
 
@@ -222,11 +226,21 @@ class Stm32RawI2C::Impl {
 
   void AssertIdle() {
     assert(state_ == kIdle);
-    assert((i2c_->SR2 & I2C_SR2_BUSY) == 0);
   }
 
   void SelectDevice() {
-    // TODO jpieper: Possibly disable and re-enable peripheral.
+    if (i2c_->SR2 & I2C_SR2_BUSY) {
+      // Hmmph, guess we can try the reset trick again.
+      ResetBus();
+    }
+
+    if (i2c_->SR2 & I2C_SR2_BUSY) {
+      auto callback = context_.callback;
+      context_ = Context();
+      uint16_t error_result = i2c_->SR1;
+      callback(error_result);
+      return;
+    }
 
     // Clear any outstanding errors.
     i2c_->SR1 &= ~(kSr1Errors);
@@ -238,8 +252,23 @@ class Stm32RawI2C::Impl {
     // quickly, as we don't allow multiple bus masters.
     i2c_->CR1 |= I2C_CR1_START;
 
-    // TODO jpieper: Add minimal shortest possible timeout for this.
-    while ((i2c_->SR1 & I2C_SR1_SB) == 0);
+    // Wait only a short while for the start bit to be set.
+    bool start_bit = false;
+    for (int i = 0; i < 1000; i++) {
+      if (i2c_->SR1 & I2C_SR1_SB) {
+        start_bit = true;
+        break;
+      }
+    }
+    if (!start_bit) {
+      // Send a stop bit and report an error.
+      i2c_->CR1 |= I2C_CR1_STOP;
+      auto callback = context_.callback;
+      context_ = Context();
+      uint16_t error_result = i2c_->SR1;
+      callback(error_result);
+      return;
+    }
 
     // Start sending the address.
     i2c_->DR = context_.device_address & ~(0x01);

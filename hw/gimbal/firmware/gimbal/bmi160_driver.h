@@ -87,6 +87,9 @@ class Bmi160Driver {
     uint16_t accel_max_g = 0;
     uint16_t rate_hz = 0;
 
+    uint32_t i2c_errors = 0;
+    int32_t i2c_last_error = 0;
+
     ImuData imu;
 
     template <typename Archive>
@@ -96,6 +99,8 @@ class Bmi160Driver {
       a->Visit(MJ_NVP(gyro_max_dps));
       a->Visit(MJ_NVP(accel_max_g));
       a->Visit(MJ_NVP(rate_hz));
+      a->Visit(MJ_NVP(i2c_errors));
+      a->Visit(MJ_NVP(i2c_last_error));
       a->Visit(MJ_NVP(imu));
     }
   };
