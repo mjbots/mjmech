@@ -156,7 +156,7 @@ struct PersistentConfigFixture {
   SizedPool<> pool;
   test::FlashTest flash;
   test::TestWriteStream test_stream;
-  PersistentConfig config{pool, flash, test_stream};
+  PersistentConfig config{pool, flash};
   BigStruct bs;
   OtherStruct os;
 
@@ -171,8 +171,9 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
   int count = 0;
   int error = 0;
   auto callback = [&](int err) { count++; error = err; };
+  CommandManager::Response response(&test_stream, callback);
 
-  config.Command(gsl::ensure_z("bogus"), callback);
+  config.Command(gsl::ensure_z("bogus"), response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -181,7 +182,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
   count = 0;
   test_stream.ostr.str("");
   BOOST_REQUIRE_EQUAL(os.vfloat, 3.5);
-  config.Command(gsl::ensure_z("set other.vfloat 4.5"), callback);
+  config.Command(gsl::ensure_z("set other.vfloat 4.5"), response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -190,7 +191,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
 
   count = 0;
   test_stream.ostr.str("");
-  config.Command(gsl::ensure_z("get bigs.u8"), callback);
+  config.Command(gsl::ensure_z("get bigs.u8"), response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -198,7 +199,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
 
   count = 0;
   test_stream.ostr.str("");
-  config.Command(gsl::ensure_z("enumerate"), callback);
+  config.Command(gsl::ensure_z("enumerate"), response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -218,8 +219,9 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigFlashTest, PersistentConfigFixture) {
   int count = 0;
   int error = 0;
   auto callback = [&](int err) { count++; error = err; };
+  CommandManager::Response response(&test_stream, callback);
 
-  config.Command("write", callback);
+  config.Command("write", response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
@@ -246,7 +248,7 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigFlashTest, PersistentConfigFixture) {
   count = 0;
   test_stream.ostr.str("");
 
-  config.Command("load", callback);
+  config.Command("load", response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);

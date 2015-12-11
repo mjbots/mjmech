@@ -49,7 +49,7 @@ struct Fixture {
   SizedPool<> pool;
   test::TestWriteStream stream;
   LockManager lock_manager;
-  TelemetryManager dut{pool, stream, lock_manager};
+  TelemetryManager dut{pool, lock_manager};
   Struct1 struct1;
   Struct2 struct2;
 };
@@ -62,7 +62,8 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerTest, Fixture) {
   int count = 0;
   int error = 0;
   auto callback = [&](int err) { count++; error = err; };
-  dut.Command(gsl::ensure_z("list"), callback);
+  CommandManager::Response response(&stream, callback);
+  dut.Command(gsl::ensure_z("list"), response);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
   std::string expected = "struct1\r\nstruct2\r\nOK\r\n";
@@ -70,14 +71,14 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerTest, Fixture) {
 
   count = 0;
   stream.ostr.str("");
-  dut.Command(gsl::ensure_z("get struct2"), callback);
+  dut.Command(gsl::ensure_z("get struct2"), response);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
   BOOST_CHECK(StartsWith(stream.ostr.str(), "emit struct2\r\n"));
 
   count = 0;
   stream.ostr.str("");
-  dut.Command(gsl::ensure_z("schema struct2"), callback);
+  dut.Command(gsl::ensure_z("schema struct2"), response);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
   BOOST_CHECK(StartsWith(stream.ostr.str(), "schema struct2\r\n"));
@@ -90,6 +91,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
   int count = 0;
   int error = 0;
   auto callback = [&](int err) { count++; error = err; };
+  CommandManager::Response response(&stream, callback);
 
   auto Poll = [&]() {
     dut.PollMillisecond();
@@ -108,7 +110,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
 
   // Now set a rate that should only result in stuff coming out when
   // we update.
-  dut.Command(gsl::ensure_z("rate struct1 1"), callback);
+  dut.Command(gsl::ensure_z("rate struct1 1"), response);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
   BOOST_CHECK_EQUAL(stream.ostr.str(), "OK\r\n");
@@ -130,7 +132,7 @@ BOOST_FIXTURE_TEST_CASE(TelemetryManagerEmitTest, Fixture) {
 
   // Now set a time rate.
   count = 0;
-  dut.Command(gsl::ensure_z("rate struct1 20"), callback);
+  dut.Command(gsl::ensure_z("rate struct1 20"), response);
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
   BOOST_CHECK_EQUAL(stream.ostr.str(), "OK\r\n");

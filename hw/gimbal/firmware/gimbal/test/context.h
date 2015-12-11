@@ -29,7 +29,7 @@ struct Context {
   test::FlashTest flash;
   test::TestWriteStream test_stream;
   LockManager lock_manager;
-  PersistentConfig config{pool, flash, test_stream};
-  TelemetryManager telemetry{pool, test_stream, lock_manager};
+  PersistentConfig config{pool, flash};
+  TelemetryManager telemetry{pool, lock_manager};
 };
 }

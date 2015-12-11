@@ -28,6 +28,7 @@ class MahonyImu {
             TelemetryManager&, ImuDataSignal&);
   ~MahonyImu();
 
+  const AhrsData& data() const;
   AhrsDataSignal* data_signal();
 
  private:

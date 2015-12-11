@@ -98,9 +98,9 @@ void cpp_gimbal_main() {
   Stm32RawI2C i2c1(pool, 1, Stm32RawI2C::Parameters());
   Stm32HalSPI spi1(pool, 1, GPIOE, GPIO_PIN_3);
   Stm32Flash flash;
-  PersistentConfig config(pool, flash, debug_stream);
+  PersistentConfig config(pool, flash);
   LockManager lock_manager;
-  TelemetryManager telemetry(pool, debug_stream, lock_manager);
+  TelemetryManager telemetry(pool, lock_manager);
   CommandManager command_manager(pool, debug_stream, lock_manager);
   Stm32Clock clock;
   SystemInfo system_info(pool, telemetry, clock);
@@ -116,23 +116,27 @@ void cpp_gimbal_main() {
   MahonyImu imu(pool, clock, config, telemetry, *bmi160.data_signal());
 
   Stm32GpioPin motor_enable(GPIOA, GPIO_PIN_6);
-  GimbalStabilizer stabilizer(pool, clock, config, telemetry, *imu.data_signal(),
+  GimbalStabilizer stabilizer(pool, clock, config, telemetry,
+                              *imu.data_signal(),
                               motor_enable, motor1, motor2);
 
   command_manager.Register(
       gsl::ensure_z("conf"),
-      [&](const gsl::cstring_span& args, ErrorCallback cbk) {
-        config.Command(args, cbk);
+      [&](const gsl::cstring_span& args,
+          const CommandManager::Response& response) {
+        config.Command(args, response);
       });
   command_manager.Register(
       gsl::ensure_z("tel"),
-      [&](const gsl::cstring_span& args, ErrorCallback cbk) {
-        telemetry.Command(args, cbk);
+      [&](const gsl::cstring_span& args,
+          const CommandManager::Response& response) {
+        telemetry.Command(args, response);
       });
   command_manager.Register(
       gsl::ensure_z("gim"),
-      [&](const gsl::cstring_span& args, ErrorCallback cbk) {
-        stabilizer.Command(args, cbk);
+      [&](const gsl::cstring_span& args,
+          const CommandManager::Response& response) {
+        stabilizer.Command(args, response);
       });
 
   SystemStatus system_status;
@@ -172,6 +176,7 @@ void cpp_gimbal_main() {
       telemetry.PollMillisecond();
       system_info.PollMillisecond();
       analog_sampler.PollMillisecond();
+      stabilizer.PollMillisecond();
       system_status.timestamp = clock.timestamp();
 
       if ((new_tick % 1000) == 0) {
@@ -196,9 +201,6 @@ void cpp_gimbal_main() {
             });
         }
 
-        motor1.Set(((new_tick / 10) % 2048) * 32,
-                   ((new_tick / 10 + 100) % 2048) * 32,
-                   ((new_tick / 10 + 200) % 2048) * 32);
         TIM1->CCR2 = (new_tick / 10 + 100) % 2048;
       }
 

@@ -19,6 +19,7 @@
 #include "base/telemetry_archive.h"
 
 #include "async_stream.h"
+#include "command_manager.h"
 #include "pool_ptr.h"
 #include "serializable_handler.h"
 #include "simple_stream.h"
@@ -27,7 +28,7 @@ class FlashInterface;
 
 class PersistentConfig {
  public:
-  PersistentConfig(Pool&, FlashInterface&, AsyncWriteStream&);
+  PersistentConfig(Pool&, FlashInterface&);
   ~PersistentConfig();
 
   /// Associate the given serializable with the given name.
@@ -45,7 +46,7 @@ class PersistentConfig {
   /// stream, and invoking @p callback when all has been written.  It
   /// is an error to call Command while a previous instance is
   /// outstanding.
-  void Command(const gsl::cstring_span&, ErrorCallback);
+  void Command(const gsl::cstring_span&, const CommandManager::Response&);
 
   /// Restore all registered configuration structures from Flash.
   /// This should be invoked after all modules have had a chance to

@@ -16,6 +16,7 @@
 
 #include "ahrs_data.h"
 #include "async_types.h"
+#include "command_manager.h"
 #include "pid.h"
 #include "pool_ptr.h"
 
@@ -44,11 +45,15 @@ class GimbalStabilizer {
   /// AHRS reference frame.
   void SetImuAttitude(float pitch_deg, float yaw_deg);
 
+  /// Move the IMU at the following pitch and roll rate, stabilizing
+  /// external disturbances.
+  void SetImuRate(float pitch_dps, float yaw_dps);
+
   /// Set an equivalent IMU yaw command so as to position the unit at
   /// the given absolute yaw angle.
   void SetAbsoluteYaw(float yaw_deg);
 
-  void Command(const gsl::cstring_span&, ErrorCallback);
+  void Command(const gsl::cstring_span&, const CommandManager::Response&);
 
   void PollMillisecond();
 
@@ -75,6 +80,7 @@ class GimbalStabilizer {
     uint32_t start_timestamp = 0;
 
     Euler desired_deg;
+    Euler target_deg;
     Point3D desired_body_rate_dps;
     uint32_t last_ahrs_update = 0;
     bool torque_on = false;
@@ -86,6 +92,7 @@ class GimbalStabilizer {
       a->Visit(MJ_NVP(yaw));
       a->Visit(MJ_NVP(start_timestamp));
       a->Visit(MJ_NVP(desired_deg));
+      a->Visit(MJ_NVP(target_deg));
       a->Visit(MJ_NVP(desired_body_rate_dps));
       a->Visit(MJ_NVP(last_ahrs_update));
       a->Visit(MJ_NVP(torque_on));

@@ -37,27 +37,27 @@
 
 class PersistentConfig::Impl {
  public:
-  Impl(Pool& pool, FlashInterface& flash, AsyncWriteStream& stream)
-      : pool_(pool), flash_(flash), stream_(stream) {}
+  Impl(Pool& pool, FlashInterface& flash)
+      : pool_(pool), flash_(flash) {}
 
-  void Enumerate(ErrorCallback callback) {
-    current_callback_ = callback;
+  void Enumerate(const CommandManager::Response& response) {
+    current_response_ = response;
     current_enumerate_index_ = 0;
 
     EnumerateCallback(0);
   }
 
   void EnumerateCallback(int error) {
-    if (error) { current_callback_(error); return; }
+    if (error) { current_response_.callback(error); return; }
 
     if (current_enumerate_index_ >= elements_.size()) {
-      WriteOK(current_callback_);
+      WriteOK(current_response_);
       return;
     }
 
     auto* const element = &elements_[current_enumerate_index_];
     if (element->name.size() == 0) {
-      WriteOK(current_callback_);
+      WriteOK(current_response_);
       return;
     }
 
@@ -66,59 +66,64 @@ class PersistentConfig::Impl {
     element->ptr->Enumerate(&this->enumerate_context_,
                             this->send_buffer_,
                             element->name,
-                            stream_,
+                            *current_response_.stream,
                             [this](int err) { this->EnumerateCallback(err); });
   }
 
   void Get(const gsl::cstring_span& field,
-           ErrorCallback callback) {
+           const CommandManager::Response& response) {
     Tokenizer tokenizer(field, ".");
     auto group = tokenizer.next();
     auto* const element =
         elements_.FindOrCreate(group, NamedRegistry::kFindOnly);
     if (element == nullptr) {
-      WriteMessage(gsl::ensure_z("unknown group\r\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown group\r\n"), response);
     } else {
-      current_callback_ = callback;
+      current_response_ = response;
       int err =
           element->ptr->Read(
-              send_buffer_, tokenizer.remaining(), stream_,
+              send_buffer_,
+              tokenizer.remaining(),
+              *current_response_.stream,
               [this](int error) {
-                if (error) { this->current_callback_(error); return; }
+                if (error) {
+                  this->current_response_.callback(error);
+                  return;
+                }
                 WriteMessage(gsl::ensure_z("\r\n"),
-                             this->current_callback_);
+                             this->current_response_);
               });
       if (err) {
-        WriteMessage(gsl::ensure_z("error reading\r\n"), callback);
+        WriteMessage(gsl::ensure_z("error reading\r\n"), response);
       }
     }
   }
 
   void Set(const gsl::cstring_span& command,
-           ErrorCallback callback) {
+           const CommandManager::Response& response) {
     Tokenizer tokenizer(command, ".");
     auto group = tokenizer.next();
     auto* const element =
         elements_.FindOrCreate(group, NamedRegistry::kFindOnly);
     if (element == nullptr) {
-      WriteMessage(gsl::ensure_z("unknown group\r\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown group\r\n"), response);
     } else {
       Tokenizer name_value(tokenizer.remaining(), " ");
       auto key = name_value.next();
       auto value = name_value.remaining();
       int result = element->ptr->Set(key, value);
       if (result == 0) {
-        WriteOK(callback);
+        WriteOK(response);
       } else {
-        WriteMessage(gsl::ensure_z("error setting\r\n"), callback);
+        WriteMessage(gsl::ensure_z("error setting\r\n"), response);
       }
     }
   }
 
-  void Load(ErrorCallback callback) {
+  void Load(const CommandManager::Response& response) {
     DoLoad();
 
-    WriteOK(callback);
+    WriteOK(response);
   }
 
   void DoLoad() {
@@ -171,7 +176,7 @@ class PersistentConfig::Impl {
     return crc;
   }
 
-  void Write(ErrorCallback callback) {
+  void Write(const CommandManager::Response& response) {
     auto info = flash_.GetInfo();
     flash_.Unlock();
     flash_.Erase();
@@ -201,34 +206,33 @@ class PersistentConfig::Impl {
 
     flash_.Lock();
 
-    WriteOK(callback);
+    WriteOK(response);
   }
 
-  void Default(ErrorCallback callback) {
+  void Default(const CommandManager::Response& response) {
     for (size_t i = 0; i < elements_.size(); i++) {
       if (elements_[i].name.size() == 0) { break; }
       elements_[i].ptr->SetDefault();
     }
-    WriteOK(callback);
+    WriteOK(response);
   }
 
-  void WriteOK(ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("OK\r\n"), callback);
+  void WriteOK(const CommandManager::Response& response) {
+    WriteMessage(gsl::ensure_z("OK\r\n"), response);
   }
 
   void UnknownCommand(const gsl::cstring_span& command,
-                      ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("unknown command\r\n"), callback);
+                      const CommandManager::Response& response) {
+    WriteMessage(gsl::ensure_z("unknown command\r\n"), response);
   }
 
   void WriteMessage(const gsl::cstring_span& message,
-                    ErrorCallback callback) {
-    AsyncWrite(stream_, message, callback);
+                    const CommandManager::Response& response) {
+    AsyncWrite(*response.stream, message, response.callback);
   }
 
   Pool& pool_;
   FlashInterface& flash_;
-  AsyncWriteStream& stream_;
 
   typedef NamedRegistryBase<SerializableHandlerBase, 8> NamedRegistry;
   NamedRegistry elements_;
@@ -238,37 +242,37 @@ class PersistentConfig::Impl {
   // time anyways.
   char send_buffer_[256] = {};
 
-  ErrorCallback current_callback_;
+  CommandManager::Response current_response_;
   std::size_t current_enumerate_index_ = 0;
   detail::EnumerateArchive::Context enumerate_context_;
 };
 
 PersistentConfig::PersistentConfig(
-    Pool& pool, FlashInterface& flash, AsyncWriteStream& stream)
-    : impl_(&pool, pool, flash, stream) {
+    Pool& pool, FlashInterface& flash)
+    : impl_(&pool, pool, flash) {
 }
 
 PersistentConfig::~PersistentConfig() {
 }
 
 void PersistentConfig::Command(const gsl::cstring_span& command,
-                               ErrorCallback callback) {
+                               const CommandManager::Response& response) {
   Tokenizer tokenizer(command, " ");
   auto cmd = tokenizer.next();
   if (cmd == gsl::ensure_z("enumerate")) {
-    impl_->Enumerate(callback);
+    impl_->Enumerate(response);
   } else if (cmd == gsl::ensure_z("get")) {
-    impl_->Get(tokenizer.remaining(), callback);
+    impl_->Get(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("set")) {
-    impl_->Set(tokenizer.remaining(), callback);
+    impl_->Set(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("load")) {
-    impl_->Load(callback);
+    impl_->Load(response);
   } else if (cmd == gsl::ensure_z("write")) {
-    impl_->Write(callback);
+    impl_->Write(response);
   } else if (cmd == gsl::ensure_z("default")) {
-    impl_->Default(callback);
+    impl_->Default(response);
   } else {
-    impl_->UnknownCommand(cmd, callback);
+    impl_->UnknownCommand(cmd, response);
   }
 }
 

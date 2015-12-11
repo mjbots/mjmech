@@ -21,6 +21,7 @@
 #include "static_function.h"
 
 class AsyncStream;
+class AsyncWriteStream;
 class LockManager;
 
 class CommandManager {
@@ -30,8 +31,16 @@ class CommandManager {
 
   CommandManager(const CommandManager&) = delete;
 
+  struct Response {
+    AsyncWriteStream* stream = nullptr;
+    ErrorCallback callback;
+
+    Response(AsyncWriteStream* stream, ErrorCallback callback)
+        : stream(stream), callback(callback) {}
+    Response() {}
+  };
   typedef StaticFunction<
-    void (const gsl::cstring_span&, ErrorCallback)> CommandFunction;
+    void (const gsl::cstring_span&, const Response&)> CommandFunction;
 
   void Register(const gsl::cstring_span& name, CommandFunction);
 

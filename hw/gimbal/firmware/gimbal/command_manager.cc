@@ -78,8 +78,8 @@ class CommandManager::Impl {
 
     CommandFunction command;
     if (element == nullptr) {
-      command = [this](const gsl::cstring_span& line, ErrorCallback callback) {
-        this->UnknownGroup(line, callback);
+      command = [this](const gsl::cstring_span& line, Response response) {
+        this->UnknownGroup(line, response.callback);
       };
     } else {
       command = element->ptr->command_function;
@@ -97,7 +97,9 @@ class CommandManager::Impl {
           this->current_command_ = CommandFunction();
           auto args = this->group_arguments_;
           this->group_arguments_ = gsl::cstring_span();
-          callback(args, release);
+
+          Response context{&this->stream_, release};
+          callback(args, context);
         });
   }
 

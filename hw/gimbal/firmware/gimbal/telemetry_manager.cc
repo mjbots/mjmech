@@ -22,9 +22,8 @@
 
 class TelemetryManager::Impl {
  public:
-  Impl(Pool& pool, AsyncWriteStream& stream, LockManager& lock_manager)
+  Impl(Pool& pool, LockManager& lock_manager)
       : pool_(pool),
-        stream_(stream),
         lock_manager_(lock_manager) {}
 
   struct Element {
@@ -32,6 +31,7 @@ class TelemetryManager::Impl {
     int next = 1;
     bool to_send = false;
     bool text = false;
+    AsyncWriteStream* stream = nullptr;
     SerializableHandlerBase* base = nullptr;
   };
 
@@ -79,7 +79,9 @@ class TelemetryManager::Impl {
         // Start sending this guy out.
         LockManager::LockCallback work =
             [this, i](LockManager::ReleaseCallback release) {
-          this->EmitData(&this->elements_[i], release);
+          CommandManager::Response response(
+              this->elements_[i].ptr->stream, release);
+          this->EmitData(&this->elements_[i], response);
         };
         lock_manager_.Lock(LockManager::kTelemetryManager, work);
         return;
@@ -89,33 +91,36 @@ class TelemetryManager::Impl {
     maybe_need_to_send_ = false;
   }
 
-  void Get(const gsl::cstring_span& name, ErrorCallback callback) {
+  void Get(const gsl::cstring_span& name,
+           const CommandManager::Response& response) {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), response);
       return;
     }
 
-    EmitData(element, callback);
+    EmitData(element, response);
   }
 
-  void Enumerate(NamedRegistry::Element* element, ErrorCallback callback) {
-    current_callback_ = callback;
+  void Enumerate(NamedRegistry::Element* element,
+                 const CommandManager::Response& response) {
+    current_response_ = response;
 
     element->ptr->base->Enumerate(
         &enumerate_context_,
         send_buffer_,
         element->name,
-        stream_,
+        *response.stream,
         [this](int err) {
-          this->WriteOK(current_callback_);
+          this->WriteOK(current_response_);
         });
   }
 
-  void EmitData(NamedRegistry::Element* element, ErrorCallback callback) {
+  void EmitData(NamedRegistry::Element* element,
+                const CommandManager::Response& response) {
     if (element->ptr->text) {
-      Enumerate(element, callback);
+      Enumerate(element, response);
     } else {
       Emit(
           gsl::ensure_z("emit "),
@@ -123,7 +128,7 @@ class TelemetryManager::Impl {
           [](NamedRegistry::Element* element, SimpleOStream* ostream) {
             element->ptr->base->WriteBinary(*ostream);
           },
-          callback);
+          response);
     }
   }
 
@@ -132,7 +137,7 @@ class TelemetryManager::Impl {
   void Emit(const gsl::cstring_span& prefix,
             NamedRegistry::Element* element,
             WorkFunction work,
-            ErrorCallback callback) {
+            const CommandManager::Response& response) {
     SimpleOStream ostream(send_buffer_, sizeof(send_buffer_));
     ostream.write(prefix);
     ostream.write(element->name);
@@ -150,27 +155,27 @@ class TelemetryManager::Impl {
                       (size_position + sizeof(uint32_t))));
 
     AsyncWrite(
-        stream_,
+        *response.stream,
         gsl::cstring_span(send_buffer_, send_buffer_ + ostream.position()),
-        callback);
+        response.callback);
   }
 
-  void List(ErrorCallback callback) {
-    current_callback_ = callback;
+  void List(const CommandManager::Response& response) {
+    current_response_ = response;
     current_list_index_ = 0;
     ListCallback(0);
   }
 
   void ListCallback(int error) {
-    if (error) { current_callback_(error); return; }
+    if (error) { current_response_.callback(error); return; }
 
     if (current_list_index_ >= elements_.size()) {
-      WriteOK(current_callback_);
+      WriteOK(current_response_);
       return;
     }
     auto* const element = &elements_[current_list_index_];
     if (element->name.size() == 0) {
-      WriteOK(current_callback_);
+      WriteOK(current_response_);
       return;
     }
 
@@ -183,15 +188,17 @@ class TelemetryManager::Impl {
     ptr++;
     *ptr = '\n';
     ptr++;
-    AsyncWrite(stream_, gsl::cstring_span(send_buffer_, ptr),
+    AsyncWrite(*current_response_.stream,
+               gsl::cstring_span(send_buffer_, ptr),
                [this](int error) { ListCallback(error); });
   }
 
-  void Schema(const gsl::cstring_span& name, ErrorCallback callback) {
+  void Schema(const gsl::cstring_span& name,
+              const CommandManager::Response& response) {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), response);
       return;
     }
 
@@ -200,10 +207,11 @@ class TelemetryManager::Impl {
         element, [](NamedRegistry::Element* element, SimpleOStream* ostream) {
           element->ptr->base->WriteSchema(*ostream);
         },
-        callback);
+        response);
   }
 
-  void Rate(const gsl::cstring_span& command, ErrorCallback callback) {
+  void Rate(const gsl::cstring_span& command,
+            const CommandManager::Response& response) {
     Tokenizer tokenizer(command, " ");
     auto name = tokenizer.next();
     auto rate_str = tokenizer.next();
@@ -211,7 +219,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), response);
       return;
     }
 
@@ -228,11 +236,13 @@ class TelemetryManager::Impl {
     } else {
       element->ptr->next = rate;
     }
+    element->ptr->stream = response.stream;
 
-    WriteOK(callback);
+    WriteOK(response);
   }
 
-  void Format(const gsl::cstring_span& command, ErrorCallback callback) {
+  void Format(const gsl::cstring_span& command,
+              const CommandManager::Response& response) {
     Tokenizer tokenizer(command, " ");
     auto name = tokenizer.next();
     auto format_str = tokenizer.next();
@@ -240,7 +250,7 @@ class TelemetryManager::Impl {
     auto* const element =
         elements_.FindOrCreate(name, NamedRegistry::kFindOnly);
     if (!element) {
-      WriteMessage(gsl::ensure_z("unknown name\r\n"), callback);
+      WriteMessage(gsl::ensure_z("unknown name\r\n"), response);
       return;
     }
 
@@ -250,50 +260,49 @@ class TelemetryManager::Impl {
     const long format = strtol(buffer, nullptr, 0);
     element->ptr->text = format != 0;
 
-    WriteOK(callback);
+    WriteOK(response);
   }
 
-  void Stop(ErrorCallback callback) {
+  void Stop(const CommandManager::Response& response) {
     for (size_t i = 0; i < elements_.size(); i++) {
       if (elements_[i].name.size() == 0) { break; }
       elements_[i].ptr->to_send = false;
       elements_[i].ptr->rate = 0;
     }
 
-    WriteOK(callback);
+    WriteOK(response);
   }
 
-  void Text(ErrorCallback callback) {
+  void Text(const CommandManager::Response& response) {
     for (size_t i = 0; i < elements_.size(); i++) {
       if (elements_[i].name.size() == 0) { break; }
       elements_[i].ptr->text = true;
     }
 
-    WriteOK(callback);
+    WriteOK(response);
   }
 
   void UnknownCommand(const gsl::cstring_span& command,
-                      ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("unknown command\r\n"), callback);
+                      const CommandManager::Response& response) {
+    WriteMessage(gsl::ensure_z("unknown command\r\n"), response);
   }
 
-  void WriteOK(ErrorCallback callback) {
-    WriteMessage(gsl::ensure_z("OK\r\n"), callback);
+  void WriteOK(const CommandManager::Response& response) {
+    WriteMessage(gsl::ensure_z("OK\r\n"), response);
   }
 
   void WriteMessage(const gsl::cstring_span& message,
-                    ErrorCallback callback) {
-    AsyncWrite(stream_, message, callback);
+                    const CommandManager::Response& response) {
+    AsyncWrite(*response.stream, message, response.callback);
   }
 
 
   Pool& pool_;
-  AsyncWriteStream& stream_;
   LockManager& lock_manager_;
 
   NamedRegistry elements_;
 
-  ErrorCallback current_callback_;
+  CommandManager::Response current_response_;
   char send_buffer_[1024] = {};
   std::size_t current_list_index_ = 0;
   detail::EnumerateArchive::Context enumerate_context_;
@@ -301,31 +310,31 @@ class TelemetryManager::Impl {
 };
 
 TelemetryManager::TelemetryManager(
-    Pool& pool, AsyncWriteStream& stream, LockManager& lock_manager)
-    : impl_(&pool, pool, stream, lock_manager) {}
+    Pool& pool, LockManager& lock_manager)
+    : impl_(&pool, pool, lock_manager) {}
 
 TelemetryManager::~TelemetryManager() {}
 
 void TelemetryManager::Command(const gsl::cstring_span& command,
-                               ErrorCallback callback) {
+                               const CommandManager::Response& response) {
   Tokenizer tokenizer(command, " ");
   auto cmd = tokenizer.next();
   if (cmd == gsl::ensure_z("get")) {
-    impl_->Get(tokenizer.remaining(), callback);
+    impl_->Get(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("list")) {
-    impl_->List(callback);
+    impl_->List(response);
   } else if (cmd == gsl::ensure_z("schema")) {
-    impl_->Schema(tokenizer.remaining(), callback);
+    impl_->Schema(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("rate")) {
-    impl_->Rate(tokenizer.remaining(), callback);
+    impl_->Rate(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("fmt")) {
-    impl_->Format(tokenizer.remaining(), callback);
+    impl_->Format(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("stop")) {
-    impl_->Stop(callback);
+    impl_->Stop(response);
   } else if (cmd == gsl::ensure_z("text")) {
-    impl_->Text(callback);
+    impl_->Text(response);
   } else {
-    impl_->UnknownCommand(cmd, callback);
+    impl_->UnknownCommand(cmd, response);
   }
 }
 

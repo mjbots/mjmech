@@ -28,9 +28,10 @@ BOOST_AUTO_TEST_CASE(CommandManagerTest) {
   std::string dut_message = "";
   ErrorCallback dut_callback;
   dut.Register(gsl::ensure_z("test1"),
-               [&](const gsl::cstring_span& message, ErrorCallback cbk) {
+               [&](const gsl::cstring_span& message,
+                   CommandManager::Response response) {
                  dut_message = std::string(message.data(), message.size());
-                 dut_callback = cbk;
+                 dut_callback = response.callback;
                });
 
   BOOST_CHECK_EQUAL(stream.read_callback_.valid(), false);

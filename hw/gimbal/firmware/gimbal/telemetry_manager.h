@@ -18,6 +18,7 @@
 #include "base/telemetry_archive.h"
 
 #include "async_stream.h"
+#include "command_manager.h"
 #include "pool_ptr.h"
 #include "serializable_handler.h"
 #include "simple_stream.h"
@@ -31,7 +32,7 @@ class LockManager;
 /// serializable structures.
 class TelemetryManager {
  public:
-  TelemetryManager(Pool&, AsyncWriteStream&, LockManager&);
+  TelemetryManager(Pool&, LockManager&);
   ~TelemetryManager();
 
   /// Associate the serializable with the given name.
@@ -50,7 +51,7 @@ class TelemetryManager {
   }
 
   /// This should be invoked by CommandManager.
-  void Command(const gsl::cstring_span&, ErrorCallback);
+  void Command(const gsl::cstring_span&, const CommandManager::Response&);
 
   /// This should be invoked every millisecond.
   void PollMillisecond();

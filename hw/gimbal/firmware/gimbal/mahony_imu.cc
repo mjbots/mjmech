@@ -147,6 +147,10 @@ MahonyImu::MahonyImu(Pool& pool,
 
 MahonyImu::~MahonyImu() {}
 
+const AhrsData& MahonyImu::data() const {
+  return impl_->data_.ahrs;
+}
+
 AhrsDataSignal* MahonyImu::data_signal() {
   return &impl_->data_signal_;
 }
