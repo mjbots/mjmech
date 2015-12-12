@@ -1,0 +1,63 @@
+Networking info (current):
+
+Note:
+  server = mj mech (sends video)
+  client = controlling laptop (receives video)
+
+GOAL:
+
+(1) System should auto-configure itself and it should work with any wifi
+router. You cannot rely on the fact that hostname 'odroid' resolves
+properly. We cannot expect to know the IP of the odroid computer.
+
+(2) We should do the best to save log output from server side. We want to do
+this while server's disk is read-only.
+
+
+Active connections:
+ (*) UdpAnnouncer.PORT / UdpAnnounceReceiver.PORT = 13355
+ (*) 'a-port' logged by vclient.UdpAnnounceReceiver
+  Sent by: vserver.UdpAnnouncer, continously at 2Hz
+  Received by: UdpAnnounceReceiver.PORT
+               first packet received starts up video window using
+               packet's source IP and 'cport' from packet.
+  Connection: UDP *:(a-port) -> broadcast:UdpAnnouncer.PORT
+  Contents: json, including 'cport' value and vserver start time
+            source address is used to detect server IP
+
+ (*) 'c-port', default is ControlInterface.PORT = 13356
+  Sent by: vclient.ControlInterface continously at 4Hz + at many UI events
+  Received by: vserver.ControlInterface
+  Contents: json, main control commands (movement, turret move, fire...)
+            includes 'video_port' value, client boot_time
+  Note: No packets for 1.0 seconds generates a warning. 3 warnings
+        reset vclient address (this stops video sending and some servoes).
+        Same thing happens when boot_time changes.
+
+ (*) 'video-port', default is ControlInterface.VIDEO_PORT = 13357
+  Sent by: gst-launch from vserver/send-video.sh from vserver.py
+           at every video frame (very high rate)
+  Received by: vclient.VideoWindow
+  Contents: RTP packets with video data
+
+ (*) video-port + 1
+  Sent by: gst-launch ... from vserver.py
+  Received by: vclient.VideoWindow
+  Contents: RTCP replies for video stream
+
+ (*) video-port + 2
+  Sent by: vclient.VideoWindow
+  Received by: gst-launch ... from vserver.py
+  Contents: RTCP packets (request packet retransmission)
+
+
+
+
+Current setup:
+
+(1) deploy-vserver.sh (on client) uses sshd to upload/run vserver.py on server
+(this violates goal 1)
+
+(2) vserver.py has ... TODO theamk finish paragraph
+
+(3) vclient.py has ... TODO theamk finish paragraph
