@@ -94,15 +94,16 @@ void cpp_gimbal_main() {
   auto& debug_stream = uart2;
   auto& time_stream = usb_cdc;
 
+  Stm32Clock clock;
+
   SizedPool<> pool;
-  Stm32RawI2C i2c1(pool, 1, Stm32RawI2C::Parameters());
+  Stm32RawI2C i2c1(pool, 1, Stm32RawI2C::Parameters(), clock);
   Stm32HalSPI spi1(pool, 1, GPIOE, GPIO_PIN_3);
   Stm32Flash flash;
   PersistentConfig config(pool, flash);
   LockManager lock_manager;
   TelemetryManager telemetry(pool, lock_manager);
   CommandManager command_manager(pool, debug_stream, lock_manager);
-  Stm32Clock clock;
   SystemInfo system_info(pool, telemetry, clock);
   Stm32AnalogSampler analog_sampler(pool, clock, config, telemetry);
   Bmi160Driver bmi160(pool, gsl::ensure_z("pimu"),

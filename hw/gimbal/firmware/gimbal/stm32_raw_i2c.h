@@ -17,11 +17,13 @@
 #include "async_i2c.h"
 #include "pool_ptr.h"
 
+class Clock;
+
 class Stm32RawI2C : public AsyncI2C {
  public:
   struct Parameters;
 
-  Stm32RawI2C(Pool&, int i2c_number, const Parameters&);
+  Stm32RawI2C(Pool&, int i2c_number, const Parameters&, Clock&);
   virtual ~Stm32RawI2C();
 
   void AsyncRead(uint8_t device_address,

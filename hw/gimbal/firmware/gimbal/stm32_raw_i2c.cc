@@ -17,6 +17,9 @@
 #include <assert.h>
 
 #include "stm32f4xx.h"
+#include "gpio.h"
+
+#include "clock.h"
 
 // TODO jpieper: Use DMA for the bulk transfers to reduce overhead.
 
@@ -66,12 +69,24 @@ I2C_TypeDef* GetI2C(int i2c_number) {
   assert(false);
   return nullptr;
 }
+
+const int kResetTimeoutCount = 1000;
+const int kTransferTimeoutMilliseconds = 2;
+const int kStopTimeoutMilliseconds = 4;
+
+template <typename Predicate>
+bool TestTimeout(Predicate p) {
+  for (int i = 0; i < kResetTimeoutCount; i++) {
+    if (p()) { return true; }
+  }
+  return false;
+}
 }
 
 class Stm32RawI2C::Impl {
  public:
-  Impl(int i2c_number, const Parameters& parameters)
-      : i2c_(GetI2C(i2c_number)) {
+  Impl(int i2c_number, const Parameters& parameters, Clock& clock)
+      : i2c_(GetI2C(i2c_number)), clock_(clock) {
     assert(i2c_number >= 1 && i2c_number <= 3);
 
     uint32_t pclk1 = HAL_RCC_GetPCLK1Freq();
@@ -79,6 +94,10 @@ class Stm32RawI2C::Impl {
 
     // Start out with the peripheral disabled.
     i2c_->CR1 = 0;
+
+    // Disable analog filters, as they seemingly can cause things to
+    // get stuck beyond repair.
+    i2c_->FLTR |= I2C_FLTR_ANOFF;
 
     i2c_->CR2 = freqrange;
 
@@ -102,19 +121,55 @@ class Stm32RawI2C::Impl {
   }
 
   void ResetBus() {
-    for (int i = 0; i < 1000; i++) {
-      // Hmmm.  Try resetting things.
-      i2c_->CR1 |= I2C_CR1_SWRST;
-    }
+    i2c_->CR1 &= ~I2C_CR1_PE;
 
-    for (int i = 0; i < 1000; i++) {
-      i2c_->CR1 &= ~I2C_CR1_SWRST;
-    }
+    // Switch the pins into output mode and cycle them through a
+    // simulated stop condition.  Procedure from STM32F10xx errata, on
+    // the assumption that the I2C peripherals are similar enough.
+
+    // TODO jpieper: Don't hard code these pin addresses.
+    const int pin_sda = 6;
+    const int pin_scl = 9;
+    const uint32_t pin_mode = (0x3 << (pin_sda * 2)) | (0x3 << (pin_scl * 2));
+    const uint32_t pin_output = (0x1 << (pin_sda * 2)) | (0x1 << (pin_scl * 2));
+    const uint32_t pin_af = (0x2 << (pin_sda * 2)) | (0x2 << (pin_scl * 2));
+    GPIOB->MODER = (GPIOB->MODER & ~pin_mode) | pin_output;
+
+    const uint32_t pin_data = (0x1 << pin_sda) | (0x1 << pin_scl);
+    const uint32_t sda_data = 1 << pin_sda;
+    const uint32_t scl_data = 1 << pin_scl;
+
+    GPIOB->ODR |= pin_data;
+    TestTimeout([&]() { return (GPIOB->IDR & pin_data) == pin_data; });
+
+    GPIOB->ODR &= ~sda_data;
+    TestTimeout([&]() { return (GPIOB->IDR & sda_data) == 0; });
+
+    GPIOB->ODR &= ~scl_data;
+    TestTimeout([&]() { return (GPIOB->IDR & scl_data) == 0; });
+
+    GPIOB->ODR |= scl_data;
+    TestTimeout([&]() { return (GPIOB->IDR & scl_data) != 0; });
+
+    GPIOB->ODR |= sda_data;
+    TestTimeout([&]() { return (GPIOB->IDR & sda_data) != 0; });
+
+    GPIOB->MODER = (GPIOB->MODER & ~pin_mode) | pin_af;
+
+    // Now toggle the SWRST bit, then re-enable the peripheral.
+    i2c_->CR1 |= I2C_CR1_SWRST;
+    i2c_->CR1 &= ~I2C_CR1_SWRST;
+
+    i2c_->CR1 |= I2C_CR1_PE;
+
+    assert((i2c_->SR2 & I2C_SR2_BUSY) == 0);
   }
 
   void Poll() {
     const uint16_t sr1 = i2c_->SR1;
     __attribute__((unused)) const uint16_t sr2 = i2c_->SR2;
+
+    assert(i2c_->CR1 & I2C_CR1_PE);
 
     // Check for errors or early exits.
     switch (state_) {
@@ -133,7 +188,11 @@ class Stm32RawI2C::Impl {
               (static_cast<int>(state_) << 16) | (sr1 & kSr1Errors);
 
           i2c_->SR1 = 0;
-          i2c_->CR1 |= I2C_CR1_STOP;
+          if (!(sr1 & I2C_SR1_ARLO) &&
+              (sr2 & I2C_SR2_BUSY) &&
+              (sr2 & I2C_SR2_MSL)) {
+            i2c_->CR1 |= I2C_CR1_STOP;
+          }
 
           state_ = kStop;
           return;
@@ -144,11 +203,21 @@ class Stm32RawI2C::Impl {
         // We ignore errors while waiting for a stop condition.
         break;
       }
+      case kError: {
+        // Ensure that we are enabled.
+        state_ = kIdle;
+        auto callback = context_.callback;
+        auto error_result = context_.error_result;
+        context_ = Context();
+        callback(error_result);
+        return;
+      }
     }
 
     // Now actually look for state transitions.
     switch (state_) {
-      case kIdle: {
+      case kIdle:
+      case kError: {
         assert(false);
         break;
       }
@@ -222,6 +291,42 @@ class Stm32RawI2C::Impl {
         break;
       }
     }
+
+    // Finally, check for timeouts.
+    switch (state_) {
+      case kIdle:
+      case kError: {
+        assert(false);
+        break;
+      }
+      case kDeviceAddress:
+      case kReadRestart:
+      case kTransferRead:
+      case kTransferWrite: {
+        const uint32_t delta = clock_.timestamp() - start_time_;
+        if (delta > (kTransferTimeoutMilliseconds * 10)) {
+          context_.error_result = (18 << 16) | i2c_->SR1;
+          if ((sr2 & I2C_SR2_BUSY) &&
+              (sr2 & I2C_SR2_MSL)) {
+            i2c_->CR1 |= I2C_CR1_STOP;
+          } else {
+            ResetBus();
+          }
+          state_ = kStop;
+        }
+        break;
+      }
+      case kStop: {
+        const uint32_t delta = clock_.timestamp() - start_time_;
+        if (delta > (kStopTimeoutMilliseconds * 10)) {
+          context_.error_result = (19 << 16) | i2c_->SR1;
+          // We can't send a stop, so just reset the peripheral.
+          ResetBus();
+          state_ = kError;
+        }
+        break;
+      }
+    }
   }
 
   void AssertIdle() {
@@ -229,16 +334,15 @@ class Stm32RawI2C::Impl {
   }
 
   void SelectDevice() {
-    if (i2c_->SR2 & I2C_SR2_BUSY) {
+    const uint16_t sr1 = i2c_->SR1;
+    const uint16_t sr2 = i2c_->SR2;
+
+    if (sr2 & I2C_SR2_BUSY) {
+      context_.error_result = (16 << 16) | sr1;
+      state_ = kError;
+
       // Hmmph, guess we can try the reset trick again.
       ResetBus();
-    }
-
-    if (i2c_->SR2 & I2C_SR2_BUSY) {
-      auto callback = context_.callback;
-      context_ = Context();
-      uint16_t error_result = i2c_->SR1;
-      callback(error_result);
       return;
     }
 
@@ -253,30 +357,26 @@ class Stm32RawI2C::Impl {
     i2c_->CR1 |= I2C_CR1_START;
 
     // Wait only a short while for the start bit to be set.
-    bool start_bit = false;
-    for (int i = 0; i < 1000; i++) {
-      if (i2c_->SR1 & I2C_SR1_SB) {
-        start_bit = true;
-        break;
-      }
-    }
+    const bool start_bit =
+        TestTimeout([&](){ return (i2c_->SR1 & I2C_SR1_SB) != 0; });
     if (!start_bit) {
-      // Send a stop bit and report an error.
-      i2c_->CR1 |= I2C_CR1_STOP;
-      auto callback = context_.callback;
-      context_ = Context();
-      uint16_t error_result = i2c_->SR1;
-      callback(error_result);
+      // Report an error.  No need to send a stop bit, as we never
+      // sent a start.
+      context_.error_result = (17 << 16) | i2c_->SR1;
+      state_ = kError;
       return;
     }
 
     // Start sending the address.
     i2c_->DR = context_.device_address & ~(0x01);
 
+    start_time_ = clock_.timestamp();
     state_ = kDeviceAddress;
   }
 
   I2C_TypeDef* const i2c_;
+  Clock& clock_;
+  uint32_t start_time_ = 0;
 
   enum State {
     kIdle,
@@ -285,6 +385,7 @@ class Stm32RawI2C::Impl {
     kTransferRead,
     kTransferWrite,
     kStop,
+    kError,
   } state_ = kIdle;
 
   struct Context {
@@ -300,8 +401,9 @@ class Stm32RawI2C::Impl {
 
 Stm32RawI2C::Stm32RawI2C(Pool& pool,
                          int i2c_number,
-                         const Parameters& parameters)
-: impl_(&pool, i2c_number, parameters) {}
+                         const Parameters& parameters,
+                         Clock& clock)
+: impl_(&pool, i2c_number, parameters, clock) {}
 
 Stm32RawI2C::~Stm32RawI2C() {}
 
