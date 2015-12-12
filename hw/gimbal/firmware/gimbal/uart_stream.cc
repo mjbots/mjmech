@@ -197,6 +197,9 @@ void UartStream::Interrupt() {
   if (sr & USART_SR_RXNE ||
       sr & USART_SR_ORE) {
     const uint8_t data = huart_->Instance->DR;
+    if (sr & USART_SR_ORE) {
+      rx_overflow_ = true;
+    }
     if (!buffer_.full()) {
       buffer_.push_back(data);
     } else {
