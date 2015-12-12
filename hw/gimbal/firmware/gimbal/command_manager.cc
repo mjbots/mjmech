@@ -89,6 +89,9 @@ class CommandManager::Impl {
     auto args = tokenizer.remaining();
     std::memcpy(arguments_, args.data(), args.size());
     group_arguments_ = gsl::cstring_span(arguments_, args.size());
+    // We're done with line_buffer_ now, so clear it out to make
+    // debugging easier.
+    std::memset(line_buffer_, 0, sizeof(line_buffer_));
 
     lock_manager_.Lock(
         LockManager::kCommandManager,
@@ -120,6 +123,7 @@ class CommandManager::Impl {
   ErrorCallback start_callback_;
   char line_buffer_[100] = {};
   char arguments_[100] = {};
+  bool started_ = false;
 
   gsl::cstring_span group_arguments_;
   CommandFunction current_command_;
@@ -150,7 +154,8 @@ void CommandManager::AsyncStart(ErrorCallback callback) {
 }
 
 void CommandManager::Poll() {
-  if (impl_->start_callback_.valid()) {
+  if (!impl_->started_) {
+    impl_->started_ = true;
     auto callback = impl_->start_callback_;
     impl_->start_callback_ = ErrorCallback();
     callback(0);
