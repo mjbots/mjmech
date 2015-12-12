@@ -27,6 +27,7 @@ class Stm32Clock : public Clock {
   virtual ~Stm32Clock() {}
 
   virtual uint32_t timestamp() const {
+    __HAL_DBGMCU_FREEZE_TIM5();
     return __HAL_TIM_GET_COUNTER(&htim5);
   }
 
