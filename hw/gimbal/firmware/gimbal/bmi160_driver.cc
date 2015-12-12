@@ -112,7 +112,7 @@ class Bmi160Driver::Impl {
   }
 
   void AsyncStart(ErrorCallback callback) {
-    min_operational_delay_ = std::max(0, 10000 / config_.rate_hz - 1);
+    min_operational_delay_ = std::max(0, 10000 / config_.rate_hz - 2);
     start_callback_ = callback;
     ConfigCallback(0);
   }
@@ -298,10 +298,14 @@ class Bmi160Driver::Impl {
   }
 
   void HandleStatusRead(int error) {
+    operational_busy_ = false;
+
     if (error) {
       data_.i2c_last_error = 0x30000000 | error;
+      if (data_.i2c_first_error == 0) {
+        data_.i2c_first_error = data_.i2c_last_error;
+      }
       data_.i2c_errors++;
-      operational_busy_ = false;
       return;
     }
 
@@ -316,24 +320,28 @@ class Bmi160Driver::Impl {
   }
 
   void StartDataRead() {
+    operational_busy_ = true;
+    last_data_start_ = clock_.timestamp();
     AsyncRead(BMI160::DATA_GYR, sizeof(buffer_),
               [this](int error) { this->HandleDataRead(error); });
   }
 
   void HandleDataRead(int error) {
+    operational_busy_ = false;
+
     if (error) {
       data_.i2c_last_error = 0x40000000 | error;
+      if (data_.i2c_first_error == 0) {
+        data_.i2c_first_error = data_.i2c_last_error;
+      }
       data_.i2c_errors++;
-      operational_busy_ = false;
       return;
     }
 
-    last_data_read_ = clock_.timestamp();
+    last_data_read_ = last_data_start_;
 
     // Actually handle the data.
     HandleData();
-
-    operational_busy_ = false;
   }
 
   void Fault(int error) {
@@ -416,6 +424,7 @@ class Bmi160Driver::Impl {
   bool operational_busy_ = false;
   int min_operational_delay_ = 0;
   uint32_t last_data_read_ = 0;
+  uint32_t last_data_start_ = 0;
   uint8_t config_index_ = 0;
 
   ErrorCallback delay_callback_;

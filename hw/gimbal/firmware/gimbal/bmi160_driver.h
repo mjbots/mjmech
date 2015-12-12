@@ -89,6 +89,7 @@ class Bmi160Driver {
 
     uint32_t i2c_errors = 0;
     int32_t i2c_last_error = 0;
+    int32_t i2c_first_error = 0;
 
     ImuData imu;
 
@@ -101,6 +102,7 @@ class Bmi160Driver {
       a->Visit(MJ_NVP(rate_hz));
       a->Visit(MJ_NVP(i2c_errors));
       a->Visit(MJ_NVP(i2c_last_error));
+      a->Visit(MJ_NVP(i2c_first_error));
       a->Visit(MJ_NVP(imu));
     }
   };
