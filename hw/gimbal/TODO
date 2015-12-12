@@ -6,11 +6,6 @@
      * close loop using absolute encoders
      * add support for second IMU
 
-   * make I2C more robust... jiggle connections and ensure it keeps
-     working, although it should log errors somehow
-     * ARLO can trigger spuriously, need to be able to clear error and
-       have bmi160 driver try again in this case
-
    * make UI for debugging
      * window with serial terminal
      * tree view for configuration
@@ -81,6 +76,15 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-12
+ * make I2C more robust... jiggle connections and ensure it keeps
+   working, although it should log errors somehow
+   * ARLO can trigger spuriously, need to be able to clear error and
+     have bmi160 driver try again in this case
+
+DONE 2015-12-11
+ * began work on debugging UI
 
 DONE 2015-12-10
  * first, do a basic version just like the open-loop brugi
