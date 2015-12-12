@@ -56,10 +56,10 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
   assert(false);
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+void UART_Stream_IRQHandler(UART_HandleTypeDef* huart) {
   for (const auto& item: g_stream_registry) {
     if (item.huart == huart) {
-      item.stream->ReceiveComplete();
+      item.stream->Interrupt();
       return;
     }
   }
@@ -80,15 +80,19 @@ UartStream::UartStream(UART_HandleTypeDef* huart,
     (*gpio_conf_register_) &= ~gpio_input_mask_;
   }
 
-  for (auto& item: g_stream_registry) {
-    if (item.huart == nullptr) {
-      item.huart = huart;
-      item.stream = this;
-      return;
+  [&]() {
+    for (auto& item: g_stream_registry) {
+      if (item.huart == nullptr) {
+        item.huart = huart;
+        item.stream = this;
+        return;
+      }
     }
-  }
 
-  assert(false);
+    assert(false);
+  }();
+
+  huart_->Instance->CR1 |= USART_CR1_RXNEIE;
 }
 
 UartStream::~UartStream() {
@@ -108,10 +112,23 @@ void UartStream::AsyncReadSome(const gsl::string_span& buffer,
 
   // We only ever ask for 1 byte at a time from the serial port.
   rx_callback_ = callback;
-  HAL_UART_Receive_IT(
-      huart_,
-      reinterpret_cast<uint8_t*>(buffer.data()),
-      1);
+  rx_buffer_ = buffer;
+}
+
+namespace {
+class InterruptGuard {
+ public:
+  InterruptGuard(UART_HandleTypeDef* uart) : uart_(uart) {
+    uart_->Instance->CR1 &= ~USART_CR1_RXNEIE;
+  }
+
+  ~InterruptGuard() {
+    uart_->Instance->CR1 |= USART_CR1_RXNEIE;
+  }
+
+ private:
+  UART_HandleTypeDef* const uart_;
+};
 }
 
 void UartStream::Poll() {
@@ -136,20 +153,23 @@ void UartStream::Poll() {
     }
   }
 
-  if (rx_complete_) {
-    rx_complete_ = false;
-
+  if (!buffer_.empty()) {
     if (rx_callback_.valid()) {
+      Expects(rx_buffer_.size() != 0);
+
+      std::size_t pos = 0;
+      while (!buffer_.empty() && pos < rx_buffer_.size()) {
+        rx_buffer_.data()[pos] = buffer_.front();
+        buffer_.pop_front();
+        pos++;
+      }
+
       auto callback = rx_callback_;
       rx_callback_ = SizeCallback();
-      callback(0, 1);
+      callback(0, pos);
       assert(rx_callback_.valid());
     }
   }
-}
-
-void UartStream::ReceiveComplete() {
-  rx_complete_ = true;
 }
 
 void UartStream::AsyncWriteSome(const gsl::cstring_span& buffer,
@@ -170,4 +190,17 @@ void UartStream::AsyncWriteSome(const gsl::cstring_span& buffer,
 
 void UartStream::TransmitComplete() {
   tx_complete_ = true;
+}
+
+void UartStream::Interrupt() {
+  const uint32_t sr = huart_->Instance->SR;
+  if (sr & USART_SR_RXNE ||
+      sr & USART_SR_ORE) {
+    const uint8_t data = huart_->Instance->DR;
+    if (!buffer_.full()) {
+      buffer_.push_back(data);
+    } else {
+      rx_overflow_ = true;
+    }
+  }
 }

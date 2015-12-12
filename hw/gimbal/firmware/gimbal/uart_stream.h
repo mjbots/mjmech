@@ -17,6 +17,7 @@
 #include "usart.h"
 
 #include "async_stream.h"
+#include "circular_buffer.h"
 
 class UartStream : public AsyncStream {
  public:
@@ -32,7 +33,7 @@ class UartStream : public AsyncStream {
 
   // The following are used internally only.
   void TransmitComplete();
-  void ReceiveComplete();
+  void Interrupt();
 
  private:
   UART_HandleTypeDef* const huart_;
@@ -42,9 +43,11 @@ class UartStream : public AsyncStream {
   const uint32_t gpio_input_mask_;
   const uint32_t gpio_output_bits_;
 
+  circular_buffer<char, 16> buffer_;
 
-  volatile bool rx_complete_ = false;
   volatile bool tx_complete_ = false;
+  volatile bool rx_overflow_ = false;
 
   SizeCallback rx_callback_;
+  gsl::string_span rx_buffer_;
 };
