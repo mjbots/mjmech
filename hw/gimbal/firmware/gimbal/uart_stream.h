@@ -43,7 +43,7 @@ class UartStream : public AsyncStream {
   const uint32_t gpio_input_mask_;
   const uint32_t gpio_output_bits_;
 
-  circular_buffer<char, 16> buffer_;
+  circular_buffer<char, 32> buffer_;
 
   volatile bool tx_complete_ = false;
   volatile bool rx_overflow_ = false;
