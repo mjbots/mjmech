@@ -7,12 +7,15 @@
      * add support for second IMU
 
    * make UI for debugging
-     * window with serial terminal
-     * tree view for configuration
-     * tree view for telemetry
      * real-time line plots of arbitrary values
+     * be able to tweak rate at which things update
+       * maybe just global, or maybe per-record
      * maybe special pages to pull out specific config or telemetry
-      values
+       values
+       * AHRS orientation
+     * easy to reach button for torque off
+     * restore debugging state when device restarts
+     * device should use unique prefixes for binary vs text config
 
    * initialize the AHRS with the accelerometer rather than making it
      slew there
@@ -23,6 +26,7 @@
 
    * get watchdog working
 
+   * make IMU work at rates above 800Hz
    * make I2C rates above 400kHz work
 
    * wishlist
@@ -76,6 +80,14 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-13
+ * actually made I2C robust by getting bus reset procedure to work
+ * tview
+   * got serial console and telemetry tree working
+   * tree view for configuration
+   * more appropriate default size for overall window, and for
+     columns in tree view
 
 DONE 2015-12-12
  * make I2C more robust... jiggle connections and ensure it keeps
