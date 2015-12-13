@@ -121,7 +121,13 @@ class ReadArchivePython(object):
             result['children'] = [
                 self._read_field_record(stream, field_flags, field_name)]
         elif ft == Format.kEnum:
-            raise NotImplementedError()
+            nvalues = stream.read_uint32()
+            enum_map = {}
+            for i in range(nvalues):
+                key = stream.read_uint32()
+                name = stream.read_pstring()
+                enum_map[key] = name
+            result['enum_map'] = enum_map
         elif ft == Format.kFinal:
             pass
         else:
@@ -218,7 +224,7 @@ class ReadArchivePython(object):
                 return None
             return list_result[0]
         elif ft == Format.kEnum:
-            raise NotImplementedError()
+            return data_stream.read_uint32()
         elif ft == Format.kFinal:
             pass
 
