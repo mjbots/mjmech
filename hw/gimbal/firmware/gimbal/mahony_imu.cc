@@ -96,8 +96,7 @@ class MahonyImu::Impl {
         o.attitude *
         Quaternion::IntegrateRotationRate(cg, 1.0f / data->rate_hz);
 
-    // TODO jpieper: Add in the integrative term here.
-    o.body_rate_dps = g.scaled(1.0f / kDegToRad);
+    o.body_rate_dps = (g + data_.integral_rps).scaled(1.0f / kDegToRad);
     o.euler_deg = o.attitude.euler_rad().scaled(1.0f / kDegToRad);
   }
 

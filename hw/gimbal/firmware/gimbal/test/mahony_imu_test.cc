@@ -77,4 +77,8 @@ BOOST_AUTO_TEST_CASE(BasicMahonyImuTest) {
   }
 
   BOOST_CHECK_SMALL(ahrs_data.euler_deg.roll + 5.73, 1e-2);
+  // And the final reported roll rate should be small.
+  BOOST_CHECK_SMALL(ahrs_data.body_rate_dps.x, 1e-2f);
+  BOOST_CHECK_SMALL(ahrs_data.body_rate_dps.y, 1e-2f);
+  BOOST_CHECK_SMALL(ahrs_data.body_rate_dps.z, 1e-2f);
 }
