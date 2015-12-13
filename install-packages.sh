@@ -39,7 +39,7 @@ PKGLIST=(
 if [[ "$do_system" == "1" ]]; then
     PKGLIST=( "${PKGLIST[@]}"
         ifplugd iw wireless-tools wpasupplicant git lsof
-        htop strace ltrace build-essential dkms
+        htop strace ltrace build-essential dkms tcpdump
     )
 fi
 
