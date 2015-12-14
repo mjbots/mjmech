@@ -57,24 +57,67 @@ class MahonyImu::Impl {
 
     data_.ahrs.timestamp = clock_.timestamp();
     data_updater_();
-    data_signal_(&data_.ahrs);
   }
 
   void DoInitialBias(const ImuData* data) {
-    data_.state = kOperating;
+    const auto now = clock_.timestamp();
+
+    if (data_.start_timestamp == 0) {
+      data_.start_timestamp = now;
+      return;
+    }
+
+    data_.bias_count++;
+
+    const float t = data_.bias_count;
+    data_.integral_dps =
+        data_.integral_dps.scaled((t - 1) / t) +
+        data->gyro_dps.scaled(-1.0 / t);
+
+    const uint32_t delta = now - data_.start_timestamp;
+    const float delta_s = static_cast<float>(delta) / clock_.ticks_per_second();
+
+    if (delta_s >= config_.bias_period_s) {
+      // Initialize our attitude with the current accelerometer
+      // reading.
+      const auto& a = data->accel_g;
+
+      const float roll_rad = std::atan2(-a.x, a.z);
+      const float pitch_rad =
+          std::atan2(a.y, std::sqrt(a.x * a.x + a.z * a.z));
+
+      Euler euler_rad;
+      euler_rad.roll = roll_rad;
+      euler_rad.pitch = pitch_rad;
+      data_.ahrs.attitude = Quaternion::FromEuler(euler_rad);
+
+      data_.bias_count = 0;
+      data_.start_timestamp = now;
+
+      data_.state = kOperating;
+    }
   }
 
   void DoOperating(const ImuData* data) {
+    const auto now = clock_.timestamp();
+
+    const float kDegToRad = mjmech::base::kPi / 180.0;
+    const float kRadToDeg = 1.0f / kDegToRad;
+
     const Point3D a_g = data->accel_g;
     const Point3D a = a_g.scaled(1.0 / a_g.length());
 
-    const float kDegToRad = mjmech::base::kPi / 180.0;
-    // TODO jpieper: Apply initial bias estimate.
-    const Point3D g = data->gyro_dps.scaled(kDegToRad);
+    const Point3D g_dps = data->gyro_dps;
 
     // Start initializing our output structure.
     auto& o = data_.ahrs;
-    o.rate_hz = data->rate_hz;
+    if (data->rate_hz != o.rate_hz) {
+      // If the rate changed, then we need to start re-measuring our
+      // actual rate.
+      o.rate_hz = data->rate_hz;
+      data_.bias_count = 0;
+      data_.start_timestamp = now;
+    }
 
     // Estimate the direction of gravity.
     Point3D rotated = o.attitude.conjugated().
@@ -82,22 +125,41 @@ class MahonyImu::Impl {
 
     // Then, the error between that estimate, and what we actually
     // saw.
-    const Point3D err = a.cross(rotated);
+    const Point3D err_dps = a.cross(rotated).scaled(kRadToDeg);
 
     // Determine integrative terms.
-    data_.integral_rps += err.scaled(config_.ki / data->rate_hz);
+    data_.integral_dps += err_dps.scaled(config_.ki / data->rate_hz);
 
     // Apply the corrections.
-    const Point3D cg = g + err.scaled(config_.kp) + data_.integral_rps;
+    const Point3D cg_dps = g_dps + err_dps.scaled(config_.kp) + data_.integral_dps;
 
     // Now, multiply our existing quaternion with the integrated rate
     // of change.
     o.attitude =
         o.attitude *
-        Quaternion::IntegrateRotationRate(cg, 1.0f / data->rate_hz);
+        Quaternion::IntegrateRotationRate(cg_dps.scaled(kDegToRad),
+                                          1.0f / data->rate_hz);
 
-    o.body_rate_dps = (g + data_.integral_rps).scaled(1.0f / kDegToRad);
-    o.euler_deg = o.attitude.euler_rad().scaled(1.0f / kDegToRad);
+    o.body_rate_dps = g_dps + data_.integral_dps;
+    o.euler_deg = o.attitude.euler_rad().scaled(kRadToDeg);
+
+    data_signal_(&data_.ahrs);
+
+    // Update our measured rate output.
+    data_.bias_count++;
+    const auto ticks_per_second = clock_.ticks_per_second();
+    if ((now - data_.start_timestamp) > ticks_per_second) {
+      data_.start_timestamp += ticks_per_second;
+      data_.measured_rate_hz = data_.bias_count;
+      data_.bias_count = 0;
+
+      if ((data_.measured_rate_hz < (3 * o.rate_hz / 4)) ||
+          (data_.measured_rate_hz > (5 * o.rate_hz / 4))) {
+        // If we ever see a bad rate, just latch the error to force a
+        // restart.
+        o.error = 1;
+      }
+    }
   }
 
   Clock& clock_;
@@ -117,16 +179,19 @@ class MahonyImu::Impl {
 
   struct Data {
     State state;
-    Point3D integral_rps;
-    float integral_x = 0.0f;
-    float integral_y = 0.0f;
-    float integral_z = 0.0f;
+    uint32_t start_timestamp = 0;
+    uint32_t bias_count = 0;
+    uint32_t measured_rate_hz = 0;
+    Point3D integral_dps;
     AhrsData ahrs;
 
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(MJ_ENUM(state, StateMapper));
-      a->Visit(MJ_NVP(integral_rps));
+      a->Visit(MJ_NVP(start_timestamp));
+      a->Visit(MJ_NVP(bias_count));
+      a->Visit(MJ_NVP(measured_rate_hz));
+      a->Visit(MJ_NVP(integral_dps));
       a->Visit(MJ_NVP(ahrs));
     }
   };

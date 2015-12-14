@@ -107,6 +107,10 @@ class Quaternion {
             Quaternion::FromAxisAngle(roll_rad, 0.0f, 1.0f, 0.0f));
   }
 
+  static Quaternion FromEuler(const Euler& euler_rad) {
+    return FromEuler(euler_rad.roll, euler_rad.pitch, euler_rad.yaw);
+  }
+
   static Quaternion FromAxisAngle(
       float angle_rad, float x, float y, float z) {
     float c = std::cos(angle_rad / 2.0f);
