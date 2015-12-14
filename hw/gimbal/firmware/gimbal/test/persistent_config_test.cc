@@ -160,9 +160,14 @@ struct PersistentConfigFixture {
   BigStruct bs;
   OtherStruct os;
 
+  int bs_updated_count = 0;
+  int os_updated_count = 0;
+
   PersistentConfigFixture() {
-    config.Register(gsl::ensure_z("bigs"), &bs);
-    config.Register(gsl::ensure_z("other"), &os);
+    config.Register(gsl::ensure_z("bigs"), &bs,
+                    [this](){ bs_updated_count++; });
+    config.Register(gsl::ensure_z("other"), &os,
+                    [this](){ os_updated_count++; });
   }
 };
 }
@@ -182,12 +187,14 @@ BOOST_FIXTURE_TEST_CASE(PersistentConfigTest, PersistentConfigFixture) {
   count = 0;
   test_stream.ostr.str("");
   BOOST_REQUIRE_EQUAL(os.vfloat, 3.5);
+  BOOST_REQUIRE_EQUAL(os_updated_count, 0);
   config.Command(gsl::ensure_z("set other.vfloat 4.5"), response);
 
   BOOST_CHECK_EQUAL(count, 1);
   BOOST_CHECK_EQUAL(error, 0);
   BOOST_CHECK_EQUAL(StripCR(test_stream.ostr.str()), "OK\n");
   BOOST_CHECK_EQUAL(os.vfloat, 4.5);
+  BOOST_CHECK_EQUAL(os_updated_count, 1);
 
   count = 0;
   test_stream.ostr.str("");

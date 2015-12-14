@@ -107,12 +107,11 @@ class Bmi160Driver::Impl {
        PersistentConfig& config,
        TelemetryManager& telemetry)
       : async_i2c_(async_i2c), clock_(clock) {
-    config.Register(name, &config_);
+    config.Register(name, &config_, [this](){ config_needs_update_ = true; });
     data_updater_ = telemetry.Register(name, &data_);
   }
 
   void AsyncStart(ErrorCallback callback) {
-    min_operational_delay_ = std::max(0, 10000 / config_.rate_hz - 2);
     start_callback_ = callback;
     ConfigCallback(0);
   }
@@ -139,6 +138,14 @@ class Bmi160Driver::Impl {
       }
       case kOperational: {
         if (operational_busy_) { return; }
+
+        if (config_needs_update_) {
+          config_needs_update_ = false;
+          data_.state = kInitial;
+          ConfigCallback(0);
+          return;
+        }
+
         const uint32_t timestamp = clock_.timestamp();
         const int32_t delta = timestamp - last_data_read_;
         if (delta < min_operational_delay_) { break; }
@@ -169,6 +176,9 @@ class Bmi160Driver::Impl {
 
     switch (data_.state) {
       case kInitial: {
+        // Select how long in advance to start asking for data.
+        min_operational_delay_ = std::max(0, 10000 / config_.rate_hz - 2);
+
         // Verify that the correct device is present.
         data_.state = kIdentifying;
         AsyncRead(BMI160::CHIP_ID, 1, callback);
@@ -429,6 +439,7 @@ class Bmi160Driver::Impl {
 
   ErrorCallback delay_callback_;
   uint32_t delay_end_ = 0;
+  bool config_needs_update_ = false;
 
   enum {
     kBufferSize = (static_cast<int>(BMI160::STATUS) -

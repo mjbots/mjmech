@@ -122,7 +122,7 @@ class GimbalStabilizer::Impl {
         motor_enable_(motor_enable),
         motor1_(motor1),
         motor2_(motor2) {
-    config.Register(gsl::ensure_z("gimbal"), &config_);
+    config.Register(gsl::ensure_z("gimbal"), &config_, [](){});
     data_updater_ = telemetry.Register(gsl::ensure_z("gimbal"), &data_);
     ahrs_signal.Connect(
         [this](const AhrsData* data) { this->HandleAhrs(data); });

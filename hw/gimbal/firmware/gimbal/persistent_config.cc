@@ -40,6 +40,13 @@ class PersistentConfig::Impl {
   Impl(Pool& pool, FlashInterface& flash)
       : pool_(pool), flash_(flash) {}
 
+  struct Element {
+    SerializableHandlerBase* serializable = nullptr;
+    StaticFunction<void ()> updated;
+  };
+
+  typedef NamedRegistryBase<Element, 8> NamedRegistry;
+
   void Enumerate(const CommandManager::Response& response) {
     current_response_ = response;
     current_enumerate_index_ = 0;
@@ -63,11 +70,12 @@ class PersistentConfig::Impl {
 
     current_enumerate_index_++;
 
-    element->ptr->Enumerate(&this->enumerate_context_,
-                            this->send_buffer_,
-                            element->name,
-                            *current_response_.stream,
-                            [this](int err) { this->EnumerateCallback(err); });
+    element->ptr->serializable->Enumerate(
+        &this->enumerate_context_,
+        this->send_buffer_,
+        element->name,
+        *current_response_.stream,
+        [this](int err) { this->EnumerateCallback(err); });
   }
 
   void Get(const gsl::cstring_span& field,
@@ -81,7 +89,7 @@ class PersistentConfig::Impl {
     } else {
       current_response_ = response;
       int err =
-          element->ptr->Read(
+          element->ptr->serializable->Read(
               send_buffer_,
               tokenizer.remaining(),
               *current_response_.stream,
@@ -111,8 +119,9 @@ class PersistentConfig::Impl {
       Tokenizer name_value(tokenizer.remaining(), " ");
       auto key = name_value.next();
       auto value = name_value.remaining();
-      int result = element->ptr->Set(key, value);
+      int result = element->ptr->serializable->Set(key, value);
       if (result == 0) {
+        element->ptr->updated();
         WriteOK(response);
       } else {
         WriteMessage(gsl::ensure_z("error setting\r\n"), response);
@@ -157,7 +166,7 @@ class PersistentConfig::Impl {
         continue;
       }
 
-      const uint32_t actual_crc = CalculateSchemaCrc(element->ptr);
+      const uint32_t actual_crc = CalculateSchemaCrc(element->ptr->serializable);
       if (actual_crc != expected_crc) {
         // TODO jpieper: It would be nice to warn about situations like
         // this.
@@ -165,7 +174,7 @@ class PersistentConfig::Impl {
         continue;
       }
 
-      element->ptr->ReadBinary(flash_stream);
+      element->ptr->serializable->ReadBinary(flash_stream);
     }
   }
 
@@ -190,12 +199,13 @@ class PersistentConfig::Impl {
     for (size_t i = 0; i < elements_.size(); i++) {
       if (elements_[i].name.size() == 0) { break; }
       stream.Write(elements_[i].name);
-      stream.Write(static_cast<uint32_t>(CalculateSchemaCrc(elements_[i].ptr)));
+      stream.Write(static_cast<uint32_t>(
+                       CalculateSchemaCrc(elements_[i].ptr->serializable)));
 
       char* const data_size_position = flash_stream.position();
       flash_stream.skip(sizeof(uint32_t)); // size
       char* const data_start = flash_stream.position();
-      elements_[i].ptr->WriteBinary(flash_stream);
+      elements_[i].ptr->serializable->WriteBinary(flash_stream);
 
       const uint32_t data_size = flash_stream.position() - data_start;
       {
@@ -216,7 +226,7 @@ class PersistentConfig::Impl {
   void Default(const CommandManager::Response& response) {
     for (size_t i = 0; i < elements_.size(); i++) {
       if (elements_[i].name.size() == 0) { break; }
-      elements_[i].ptr->SetDefault();
+      elements_[i].ptr->serializable->SetDefault();
     }
     WriteOK(response);
   }
@@ -238,7 +248,6 @@ class PersistentConfig::Impl {
   Pool& pool_;
   FlashInterface& flash_;
 
-  typedef NamedRegistryBase<SerializableHandlerBase, 8> NamedRegistry;
   NamedRegistry elements_;
 
   // TODO jpieper: This buffer could be shared with other things that
@@ -285,10 +294,14 @@ void PersistentConfig::Load() {
 }
 
 void PersistentConfig::RegisterDetail(
-    const gsl::cstring_span& name, SerializableHandlerBase* base) {
+    const gsl::cstring_span& name, SerializableHandlerBase* base,
+    StaticFunction<void ()> updated) {
   auto* const element = impl_->elements_.FindOrCreate(
       name, Impl::NamedRegistry::kAllowCreate);
-  element->ptr = base;
+  PoolPtr<Impl::Element> item(&impl_->pool_);
+  element->ptr = item.get();
+  element->ptr->serializable = base;
+  element->ptr->updated = updated;
 }
 
 Pool* PersistentConfig::pool() const { return &impl_->pool_; }

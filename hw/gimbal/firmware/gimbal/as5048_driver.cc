@@ -67,7 +67,7 @@ class As5048Driver::Impl {
       : async_i2c_(async_i2c),
         async_spi_(async_spi),
         clock_(clock) {
-    config.Register(name, &config_);
+    config.Register(name, &config_, [](){});
     data_updater_ = telemetry.Register(name, &data_);
     const bool i2c = async_i2c_ != nullptr;
     const bool spi = async_spi_ != nullptr;

@@ -36,10 +36,11 @@ class PersistentConfig {
   /// Both @p name and @p serializable are aliased internally and must
   /// remain valid forever.
   template <typename Serializable>
-  void Register(const gsl::cstring_span& name, Serializable* serializable) {
+  void Register(const gsl::cstring_span& name, Serializable* serializable,
+                StaticFunction<void ()> updated) {
     PoolPtr<SerializableHandler<Serializable> > concrete(
         pool(), serializable);
-    RegisterDetail(name, concrete.get());
+    RegisterDetail(name, concrete.get(), updated);
   }
 
   /// Process the given command, responding on the given asynchronous
@@ -56,7 +57,8 @@ class PersistentConfig {
  private:
   /// This aliases Base, which must remain valid for the lifetime of
   /// the PersistentConfig.
-  void RegisterDetail(const gsl::cstring_span& name, SerializableHandlerBase*);
+  void RegisterDetail(const gsl::cstring_span& name, SerializableHandlerBase*,
+                      StaticFunction<void ()> updated);
 
   Pool* pool() const;
 

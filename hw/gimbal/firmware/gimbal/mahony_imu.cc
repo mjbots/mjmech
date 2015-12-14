@@ -45,7 +45,7 @@ class MahonyImu::Impl {
     data_updater_ = telemetry.Register(gsl::ensure_z("ahrs"), &data_);
     imu_signal.Connect([this](const ImuData* data) { this->HandleImu(data); });
 
-    config.Register(gsl::ensure_z("mahony"), &config_);
+    config.Register(gsl::ensure_z("mahony"), &config_, [](){});
   }
 
   void HandleImu(const ImuData* data) {
