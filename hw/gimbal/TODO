@@ -6,8 +6,6 @@
      * close loop using absolute encoders
      * add support for second IMU
 
-   * switch serial ports to put debugging on USB and herkulex on UART
-
    * make UI for debugging
      * be able to pause plotting
      * record tlog files
@@ -78,6 +76,8 @@ DONE 2015-12-14
  * report current heap size in system_info
  * allow things which register with PersistentConfig to get notified
    when their config changes for explicit live updating
+ * switch serial ports to put debugging on USB and herkulex on UART
+
 
 DONE 2015-12-13
  * actually made I2C robust by getting bus reset procedure to work

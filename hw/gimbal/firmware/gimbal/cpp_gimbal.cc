@@ -91,8 +91,8 @@ void cpp_gimbal_main() {
   UsbCdcStream usb_cdc;
   UartStream uart2(&huart2, GPIOA, GPIO_PIN_2);
 
-  auto& debug_stream = uart2;
-  auto& time_stream = usb_cdc;
+  auto& debug_stream = usb_cdc;
+  auto& time_stream = uart2;
 
   Stm32Clock clock;
 
