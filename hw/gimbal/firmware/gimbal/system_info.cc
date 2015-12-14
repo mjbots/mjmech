@@ -26,6 +26,7 @@ struct SystemInfoData {
   uint32_t main_loops_per_10ms = 0;
   uint32_t pool_size = 0;
   uint32_t pool_available = 0;
+  uint32_t heap_size = 0;
 
   template <typename Archive>
   void Serialize(Archive* a) {
@@ -33,6 +34,7 @@ struct SystemInfoData {
     a->Visit(MJ_NVP(main_loops_per_10ms));
     a->Visit(MJ_NVP(pool_size));
     a->Visit(MJ_NVP(pool_available));
+    a->Visit(MJ_NVP(heap_size));
   }
 };
 }
@@ -59,6 +61,11 @@ class SystemInfo::Impl {
     data_.timestamp = clock_.timestamp();
     data_.pool_size = pool_.size();
     data_.pool_available = pool_.available();
+
+    extern char _heap_start;
+    extern char* heap_end;
+
+    data_.heap_size = heap_end - &_heap_start;
 
     data_updater_();
   }
