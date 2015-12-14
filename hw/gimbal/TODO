@@ -7,15 +7,12 @@
      * add support for second IMU
 
    * make UI for debugging
-     * real-time line plots of arbitrary values
-     * be able to tweak rate at which things update
-       * maybe just global, or maybe per-record
-     * maybe special pages to pull out specific config or telemetry
-       values
-       * AHRS orientation
+     * copy paste values from the telemetry tree
+     * be able to pause plotting
+     * record tlog files
+     * menus to toggle the different dock windows
      * easy to reach button for torque off
      * restore debugging state when device restarts
-     * device should use unique prefixes for binary vs text config
 
    * initialize the AHRS with the accelerometer rather than making it
      slew there
@@ -30,6 +27,7 @@
    * make I2C rates above 400kHz work
 
    * wishlist
+     * profile main loop and make it poll faster when idle
      * get I2C DMA working
      * report current heap size in system_info
      * allow things which register with PersistentConfig to get notified
@@ -80,6 +78,12 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-14
+ * tview
+   * real-time line plots of arbitrary values
+   * plot on either left or right axis
+
 
 DONE 2015-12-13
  * actually made I2C robust by getting bus reset procedure to work
