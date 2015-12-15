@@ -29,6 +29,16 @@ uint8_t GimbalHerkulexOperations::address() const {
   return 98;
 }
 
+namespace {
+float MakeDegrees(uint32_t value) {
+  int32_t signed_value = value;
+  if (signed_value >= 0x8000000) {
+    signed_value = signed_value - 0x10000000;
+  }
+  return static_cast<float>(signed_value) / 1000.0;
+}
+}
+
 void GimbalHerkulexOperations::WriteRam(uint8_t addr, uint8_t val) {
   switch (addr) {
     case 0x34: {
@@ -49,14 +59,14 @@ void GimbalHerkulexOperations::WriteRam(uint8_t addr, uint8_t val) {
     case 0x56: { shadow_ |= static_cast<uint32_t>(val & 0x7f) << 14; break; }
     case 0x53: {
       shadow_ |= static_cast<uint32_t>(val & 0x7f) << 21;
-      const float pitch_deg = shadow_ / 1000.0f;
+      const float pitch_deg = MakeDegrees(shadow_);
       stabilizer_.SetImuAttitude(
           pitch_deg, stabilizer_.data().desired_deg.yaw);
       break;
     }
     case 0x57: {
       shadow_ |= static_cast<uint32_t>(val & 0x7f) << 21;
-      const float yaw_deg = shadow_ / 1000.0f;
+      const float yaw_deg = MakeDegrees(shadow_);
       stabilizer_.SetImuAttitude(
           stabilizer_.data().desired_deg.pitch, yaw_deg);
       break;
@@ -104,19 +114,19 @@ void GimbalHerkulexOperations::Reboot() {
 }
 
 uint32_t GimbalHerkulexOperations::int_desired_pitch() const {
-  return static_cast<uint32_t>(
+  return static_cast<int32_t>(
       stabilizer_.data().desired_deg.pitch * 1000.0f);
 }
 
 uint32_t GimbalHerkulexOperations::int_desired_yaw() const {
-  return static_cast<uint32_t>(
+  return static_cast<int32_t>(
       stabilizer_.data().desired_deg.yaw * 1000.0f);
 }
 
 uint32_t GimbalHerkulexOperations::int_actual_pitch() const {
-  return static_cast<uint32_t>(imu_.data().euler_deg.pitch * 1000.0f);
+  return static_cast<int32_t>(imu_.data().euler_deg.pitch * 1000.0f);
 }
 
 uint32_t GimbalHerkulexOperations::int_actual_yaw() const {
-  return static_cast<uint32_t>(imu_.data().euler_deg.yaw * 1000.0f);
+  return static_cast<int32_t>(imu_.data().euler_deg.yaw * 1000.0f);
 }

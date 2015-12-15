@@ -28,7 +28,9 @@
 
 #include "bmi160_driver.h"
 #include "command_manager.h"
+#include "gimbal_herkulex_operations.h"
 #include "gimbal_stabilizer.h"
+#include "herkulex_protocol.h"
 #include "lock_manager.h"
 #include "mahony_imu.h"
 #include "persistent_config.h"
@@ -55,6 +57,8 @@ struct SystemStatus {
   bool command_manager_init = false;
   bool bmi160_init = false;
   int32_t bmi160_error = 0;
+  bool herkulex_init = false;
+  int32_t herkulex_error = 0;
 
   template <typename Archive>
   void Serialize(Archive* a) {
@@ -62,6 +66,8 @@ struct SystemStatus {
     a->Visit(MJ_NVP(command_manager_init));
     a->Visit(MJ_NVP(bmi160_init));
     a->Visit(MJ_NVP(bmi160_error));
+    a->Visit(MJ_NVP(herkulex_init));
+    a->Visit(MJ_NVP(herkulex_error));
   }
 };
 
@@ -92,7 +98,7 @@ void cpp_gimbal_main() {
   UartStream uart2(&huart2, GPIOA, GPIO_PIN_2);
 
   auto& debug_stream = usb_cdc;
-  auto& time_stream = uart2;
+  auto& herkulex_stream = uart2;
 
   Stm32Clock clock;
 
@@ -120,6 +126,9 @@ void cpp_gimbal_main() {
   GimbalStabilizer stabilizer(pool, clock, config, telemetry,
                               *imu.data_signal(),
                               motor_enable, motor1, motor2);
+
+  GimbalHerkulexOperations operations(stabilizer, imu);
+  HerkulexProtocol herkulex(pool, herkulex_stream, operations);
 
   command_manager.Register(
       gsl::ensure_z("conf"),
@@ -158,14 +167,12 @@ void cpp_gimbal_main() {
       }
     });
 
-  char buffer[100] = {};
-  bool uart_write = false;
-
-  bool spi_write = false;
-  int spi_count = 0;
-  int spi_error = 0;
-  char spi_write_buf[2] = { 0xcf, 0x00 };
-  char spi_read_buf[2] = {};
+  herkulex.AsyncStart([&](int error) {
+      if (!error) {
+        system_status.herkulex_init = true;
+        system_status.herkulex_error = error;
+      }
+    });
 
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
 
@@ -181,27 +188,6 @@ void cpp_gimbal_main() {
       system_status.timestamp = clock.timestamp();
 
       if ((new_tick % 1000) == 0) {
-        snprintf(buffer, sizeof(buffer) - 1, "%lu: spic=%d spie=%d spid=%02X\r\n",
-                 clock.timestamp(),
-                 spi_count,
-                 spi_error,
-                 static_cast<int>(static_cast<uint8_t>(spi_read_buf[1])));
-        if (!uart_write) {
-          uart_write = true;
-          AsyncWrite(time_stream, gsl::ensure_z(buffer),
-                     [&](int error){ uart_write = false; });
-        }
-
-        if (!spi_write) {
-          spi_write = true;
-          std::memset(spi_read_buf, 0, sizeof(spi_read_buf));
-          spi1.AsyncTransaction(spi_write_buf, spi_read_buf, [&](int error) {
-              spi_write = false;
-              spi_error = error;
-              spi_count++;
-            });
-        }
-
         TIM1->CCR2 = (new_tick / 10 + 100) % 2048;
       }
 
