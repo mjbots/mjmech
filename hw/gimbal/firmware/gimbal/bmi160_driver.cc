@@ -177,7 +177,7 @@ class Bmi160Driver::Impl {
     switch (data_.state) {
       case kInitial: {
         // Select how long in advance to start asking for data.
-        min_operational_delay_ = std::max(0, 10000 / config_.rate_hz - 2);
+        min_operational_delay_ = std::max(0, (10000 / config_.rate_hz) - 1);
 
         // Verify that the correct device is present.
         data_.state = kIdentifying;

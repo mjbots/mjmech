@@ -103,7 +103,9 @@ void cpp_gimbal_main() {
   Stm32Clock clock;
 
   SizedPool<> pool;
-  Stm32RawI2C i2c1(pool, 1, Stm32RawI2C::Parameters(), clock);
+  Stm32RawI2C::Parameters parameters;
+  parameters.speed = 400000;
+  Stm32RawI2C i2c1(pool, 1, parameters, clock);
   Stm32HalSPI spi1(pool, 1, GPIOE, GPIO_PIN_3);
   Stm32Flash flash;
   PersistentConfig config(pool, flash);

@@ -29,7 +29,7 @@ typedef Stm32RawI2C::Parameters Parameters;
 
 const int kResetTimeoutCount = 1000;
 const int kTransferTimeoutMilliseconds = 2;
-const int kErrorTimeoutMilliseconds = 10;
+const int kErrorTimeoutMilliseconds = 1;
 
 const uint16_t kSr1Errors = (
             I2C_SR1_TIMEOUT |
