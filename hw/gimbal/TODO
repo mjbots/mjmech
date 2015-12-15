@@ -2,7 +2,6 @@
    * driver for AS5048 (test existing driver)
 
    * gimbal control software
-     * connect up herkulex protocol
      * close loop using absolute encoders
      * add support for second IMU
 
@@ -63,6 +62,10 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-15
+ * connect up herkulex protocol
+
 
 DONE 2015-12-14
  * tview
