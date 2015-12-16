@@ -4,6 +4,9 @@
    * gimbal control software
      * close loop using absolute encoders
      * add support for second IMU
+     * wire up motor fault signals
+
+   * fire control
 
    * make UI for debugging
      * be able to pause plotting
@@ -17,12 +20,15 @@
 
    * I was able to lock up the I2C bus by resetting the controller
      with st-util
-   * make IMU work at rates above 800Hz
-   * make I2C rates above 400kHz work
 
    * wishlist
-     * profile main loop and make it poll faster when idle
      * get I2C DMA working
+
+ * r2 TODO
+   * ensure all r1 defects fixed
+   * initial silk placement
+   * autoroute
+   * final silk placement
 
 
  * r1 defects
@@ -56,8 +62,6 @@
    * indicator for serial comms
 
  * mounted on gimbal platform immediately above yaw motor
- * Make the yaw measurement actually compensated for pitch properly
-   * only worth doing once I re-write it all to use quaternions
  * 3D printed gimbal is missing center holes for both the swivel hub
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
@@ -65,7 +69,9 @@
 
 DONE 2015-12-15
  * connect up herkulex protocol
-
+ * no obvious low-hanging fruit for improving main loop speed
+ * I2C "works" above 400kHz, but on discovery board, error rates are
+   too high to be usable... this limits IMU to 800Hz.
 
 DONE 2015-12-14
  * tview
