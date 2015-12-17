@@ -872,7 +872,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <class number="0" name="default" width="0" drill="0">
 </class>
 </classes>
-<designrules name="MF_2_Layer">
+<designrules name="MF_2_Layer *">
 <description language="en">&lt;b&gt;EAGLE Design Rules&lt;/b&gt;
 &lt;p&gt;
 The default Design Rules have been set to cover
@@ -1187,7 +1187,7 @@ design rules under a new name.</description>
 </element>
 <element name="U1" library="gimbal" package="LQFP64" value="STM32F4R_64PIN" x="17.5" y="32.5" smashed="yes" rot="R180">
 <attribute name="DPN" value="497-14909-ND" x="17.5" y="32.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="11.725" y="37.725" size="0.8" layer="25" ratio="10"/>
+<attribute name="NAME" x="12.225" y="37.625" size="0.8" layer="25" ratio="10"/>
 </element>
 <element name="R1" library="mfpassives" package="R0603" value="10" x="20" y="26.65" smashed="yes" rot="MR0">
 <attribute name="TOLERANCE" value="N/A" x="20" y="26.65" size="1.778" layer="28" rot="MR0" display="off"/>
@@ -1238,28 +1238,28 @@ design rules under a new name.</description>
 <attribute name="DPN" value="401-2002-1-ND" x="5" y="1.2" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="9.2" y="4" size="1" layer="21" ratio="10"/>
 </element>
-<element name="D1" library="mfleds" package="LED0603" value="" x="9.35" y="34" smashed="yes" rot="R180">
-<attribute name="MFG#" value="N/A" x="9.35" y="34" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="AMFPN" value="MF-LED-0603-GREEN" x="9.35" y="34" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="9.95" y="33.1" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
+<element name="D1" library="mfleds" package="LED0603" value="" x="9.35" y="34.05" smashed="yes" rot="R180">
+<attribute name="MFG#" value="N/A" x="9.35" y="34.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="AMFPN" value="MF-LED-0603-GREEN" x="9.35" y="34.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="8.25" y="35.15" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="D2" library="mfleds" package="LED0603" value="" x="9.35" y="35.7" smashed="yes" rot="R180">
 <attribute name="MFG#" value="N/A" x="9.35" y="35.7" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="AMFPN" value="MF-LED-0603-RED" x="9.35" y="35.7" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="7.85" y="36.6" size="0.7" layer="25" font="vector" ratio="10" rot="R180"/>
+<attribute name="NAME" x="11.15" y="36.4" size="0.7" layer="25" font="vector" ratio="10"/>
 </element>
 <element name="D3" library="mfleds" package="LED0603" value="" x="10.5" y="40.3" smashed="yes" rot="R90">
 <attribute name="MFG#" value="N/A" x="10.5" y="40.3" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="AMFPN" value="MF-LED-0603-RED" x="10.5" y="40.3" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="9.8" y="41.7" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="R2" library="mfpassives" package="R0603" value="560" x="9.2" y="28.8" smashed="yes" rot="R180">
-<attribute name="TOLERANCE" value="N/A" x="9.2" y="28.8" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MFG#" value="N/A" x="9.2" y="28.8" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="N/A" x="9.2" y="28.8" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="WATTAGE" value="N/A" x="9.2" y="28.8" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="AMFPN" value="MF-RES-0603-560" x="9.2" y="28.8" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="10.9" y="28" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
+<element name="R2" library="mfpassives" package="R0603" value="560" x="8.95" y="32.45" smashed="yes">
+<attribute name="TOLERANCE" value="N/A" x="8.95" y="32.45" size="1.778" layer="27" display="off"/>
+<attribute name="MFG#" value="N/A" x="8.95" y="32.45" size="1.778" layer="27" display="off"/>
+<attribute name="VOLTAGE" value="N/A" x="8.95" y="32.45" size="1.778" layer="27" display="off"/>
+<attribute name="WATTAGE" value="N/A" x="8.95" y="32.45" size="1.778" layer="27" display="off"/>
+<attribute name="AMFPN" value="MF-RES-0603-560" x="8.95" y="32.45" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="10.35" y="31.55" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="R3" library="mfpassives" package="R0603" value="560" x="10.6" y="37.6" smashed="yes">
 <attribute name="TOLERANCE" value="N/A" x="10.6" y="37.6" size="1.778" layer="27" display="off"/>
@@ -1267,7 +1267,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="10.6" y="37.6" size="1.778" layer="27" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="10.6" y="37.6" size="1.778" layer="27" display="off"/>
 <attribute name="AMFPN" value="MF-RES-0603-560" x="10.6" y="37.6" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="10.2" y="39.2" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
+<attribute name="NAME" x="9.8" y="39.2" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="R4" library="mfpassives" package="R0603" value="560" x="12.2" y="40.4" smashed="yes" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="12.2" y="40.4" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1275,7 +1275,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="12.2" y="40.4" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="12.2" y="40.4" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="AMFPN" value="MF-RES-0603-560" x="12.2" y="40.4" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="11.4" y="41.9" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="12.5" y="39" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="C22" library="mfpassives" package="C0603" value="0.1uF" x="51.2" y="1.8" smashed="yes" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="51.2" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1293,13 +1293,13 @@ design rules under a new name.</description>
 <attribute name="AMFPN" value="MF-CAP-0603-0.01uF" x="49.5" y="1.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="48.6" y="0.5" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
 </element>
-<element name="C26" library="mfpassives" package="C0603" value="0.1uF" x="34" y="21" smashed="yes" rot="MR270">
-<attribute name="TOLERANCE" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
-<attribute name="MFG#" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
-<attribute name="VOLTAGE" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
-<attribute name="TEMP_COF" value="N/A" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
-<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="34" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
-<attribute name="NAME" x="35" y="20" size="0.8" layer="26" font="vector" ratio="10" rot="MR90"/>
+<element name="C26" library="mfpassives" package="C0603" value="0.1uF" x="33.5" y="21" smashed="yes" rot="MR270">
+<attribute name="TOLERANCE" value="N/A" x="33.5" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="MFG#" value="N/A" x="33.5" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="VOLTAGE" value="N/A" x="33.5" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="TEMP_COF" value="N/A" x="33.5" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="33.5" y="21" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="NAME" x="34.5" y="20" size="0.8" layer="26" font="vector" ratio="10" rot="MR90"/>
 </element>
 <element name="C24" library="mfpassives" package="C0603" value="0.1uF" x="33.7" y="1.8" smashed="yes" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="33.7" y="1.8" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1371,7 +1371,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="13.8" y="40.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="13.8" y="40.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF" x="13.8" y="40.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="13.4" y="41.9" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="13.7" y="39" size="0.8" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="C5" library="mfpassives" package="C0603" value="0.1uF" x="21.15" y="39.65" smashed="yes">
 <attribute name="TOLERANCE" value="N/A" x="21.15" y="39.65" size="1.778" layer="27" display="off"/>
@@ -1403,7 +1403,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="15.4" y="40.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TEMP_COF" value="N/A" x="15.4" y="40.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="DPN" value="311-1455-1-ND" x="15.4" y="40.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="16.2" y="39.7" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="16.3" y="39.1" size="0.8" layer="25" font="vector" ratio="10"/>
 </element>
 <element name="C14" library="mfpassives" package="C0603" value="0.1uF" x="46.5" y="25.5" smashed="yes" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="46.5" y="25.5" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1499,7 +1499,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="6.55" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.55" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.55" y="32.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="7.35" y="32.4" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="6.6" y="34.35" size="0.8" layer="25" font="vector" ratio="10" rot="R90"/>
 </element>
 <element name="R18" library="mfpassives" package="R0603" value="1.69k" x="6.55" y="29.8" smashed="yes" rot="R270">
 <attribute name="TOLERANCE" value="N/A" x="6.55" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1507,7 +1507,7 @@ design rules under a new name.</description>
 <attribute name="VOLTAGE" value="N/A" x="6.55" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="N/A" x="6.55" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.55" y="29.8" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="7.35" y="29.8" size="0.8" layer="25" font="vector" ratio="10"/>
+<attribute name="NAME" x="7.55" y="28.4" size="0.8" layer="25" font="vector" ratio="10"/>
 </element>
 <element name="R15" library="mfpassives" package="R0603" value="1.69k" x="6.55" y="22.5" smashed="yes" rot="R90">
 <attribute name="TOLERANCE" value="N/A" x="6.55" y="22.5" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1525,10 +1525,10 @@ design rules under a new name.</description>
 <attribute name="AMFPN" value="MF-RES-0603-1.69K" x="6.55" y="19.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="6.15" y="18" size="0.7" layer="25" font="vector" ratio="10" rot="R270"/>
 </element>
-<element name="TP1" library="testpad" package="P1-13" value="TPPAD1-13" x="37.2" y="20.9" smashed="yes">
-<attribute name="TP_SIGNAL_NAME" value="" x="35.93" y="18.36" size="1" layer="37"/>
-<attribute name="NAME" x="38.716" y="19.63" size="1" layer="25" ratio="10" rot="R180"/>
-<attribute name="VALUE" x="37.2" y="20.9" size="0.0254" layer="27"/>
+<element name="TP1" library="testpad" package="P1-13" value="TPPAD1-13" x="8.8" y="6.6" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="7.53" y="4.06" size="1" layer="37"/>
+<attribute name="NAME" x="7.284" y="7.77" size="1" layer="25" ratio="10"/>
+<attribute name="VALUE" x="8.8" y="6.6" size="0.0254" layer="27"/>
 </element>
 <element name="TP2" library="testpad" package="P1-13" value="TPPAD1-13" x="45.1" y="16" smashed="yes">
 <attribute name="TP_SIGNAL_NAME" value="" x="43.83" y="13.46" size="1" layer="37"/>
@@ -1540,10 +1540,10 @@ design rules under a new name.</description>
 <attribute name="NAME" x="29.484" y="3.77" size="1" layer="25" ratio="10"/>
 <attribute name="VALUE" x="28.5" y="3" size="0.0254" layer="27"/>
 </element>
-<element name="TP4" library="testpad" package="P1-13" value="TPPAD1-13" x="34.5" y="17.5" smashed="yes">
-<attribute name="TP_SIGNAL_NAME" value="" x="33.23" y="14.96" size="1" layer="37"/>
-<attribute name="NAME" x="34.584" y="15.17" size="1" layer="25" ratio="10"/>
-<attribute name="VALUE" x="34.5" y="17.5" size="0.0254" layer="27"/>
+<element name="TP4" library="testpad" package="P1-13" value="TPPAD1-13" x="11.3" y="6.6" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="10.03" y="4.06" size="1" layer="37"/>
+<attribute name="NAME" x="9.984" y="7.77" size="1" layer="25" ratio="10"/>
+<attribute name="VALUE" x="11.3" y="6.6" size="0.0254" layer="27"/>
 </element>
 <element name="U8" library="mfdiscrete" package="SOT-23-3" value="" x="10.6" y="11.5" smashed="yes">
 <attribute name="NAME" x="9.1" y="13.5" size="0.8" layer="25" font="vector" ratio="10"/>
@@ -1890,9 +1890,9 @@ design rules under a new name.</description>
 <wire x1="23.25" y1="34.25" x2="20.8" y2="35.85" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="LASER_EN">
-<contactref element="U1" pad="28"/>
 <contactref element="U8" pad="P$1"/>
-<wire x1="9.65" y1="10.5" x2="15.75" y2="38.25" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="43"/>
+<wire x1="9.65" y1="10.5" x2="11.75" y2="31.25" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$2">
 <contactref element="U4" pad="12"/>
@@ -2042,25 +2042,25 @@ design rules under a new name.</description>
 <wire x1="11.35" y1="37.6" x2="12.2" y2="39.65" width="0" layer="19" extent="1-1"/>
 <wire x1="9.5" y1="41.4" x2="12.2" y2="39.65" width="0" layer="19" extent="1-16"/>
 <wire x1="6.55" y1="33.55" x2="1.95" y2="33.55" width="0" layer="19" extent="1-1"/>
-<wire x1="6.55" y1="29.05" x2="6.55" y2="33.55" width="0" layer="19" extent="1-1"/>
-<wire x1="8.45" y1="28.8" x2="6.55" y2="29.05" width="0" layer="19" extent="1-1"/>
-<wire x1="11.75" y1="28.75" x2="8.45" y2="28.8" width="0" layer="19" extent="1-1"/>
+<wire x1="9.7" y1="32.45" x2="6.55" y2="33.55" width="0" layer="19" extent="1-1"/>
+<wire x1="11.75" y1="28.75" x2="9.7" y2="32.45" width="0" layer="19" extent="1-1"/>
 <wire x1="12.75" y1="26.45" x2="11.75" y2="28.75" width="0" layer="19" extent="1-1"/>
+<wire x1="6.55" y1="29.05" x2="6.55" y2="33.55" width="0" layer="19" extent="1-1"/>
 <wire x1="6.55" y1="23.25" x2="6.55" y2="29.05" width="0" layer="19" extent="1-1"/>
 <wire x1="6.55" y1="18.75" x2="6.55" y2="23.25" width="0" layer="19" extent="1-1"/>
 <wire x1="9.1" y1="17.9" x2="6.55" y2="18.75" width="0" layer="19" extent="1-1"/>
 <wire x1="6.55" y1="12.95" x2="9.1" y2="17.9" width="0" layer="19" extent="1-1"/>
 <wire x1="6.55" y1="8.45" x2="6.55" y2="12.95" width="0" layer="19" extent="1-1"/>
+<wire x1="8.8" y1="6.6" x2="6.55" y2="8.45" width="0" layer="19" extent="1-1"/>
 <wire x1="1.95" y1="12.95" x2="6.55" y2="12.95" width="0" layer="19" extent="1-1"/>
-<wire x1="30.65" y1="23.9178" x2="23.25" y2="28.75" width="0" layer="19" extent="1-16"/>
-<wire x1="34" y1="21.75" x2="30.65" y2="23.9178" width="0" layer="19" extent="16-16"/>
-<wire x1="37.2" y1="20.9" x2="34" y2="21.75" width="0" layer="19" extent="16-16"/>
-<wire x1="16.37" y1="12.87" x2="9.1" y2="17.9" width="0" layer="19" extent="1-1"/>
+<wire x1="15.65" y1="5.6" x2="8.8" y2="6.6" width="0" layer="19" extent="1-1"/>
+<wire x1="16.37" y1="12.87" x2="15.65" y2="5.6" width="0" layer="19" extent="1-1"/>
 <wire x1="20.17" y1="12.42" x2="16.37" y2="12.87" width="0" layer="19" extent="1-1"/>
-<wire x1="15.65" y1="5.6" x2="16.37" y2="12.87" width="0" layer="19" extent="1-1"/>
 <wire x1="26.07" y1="7.32" x2="20.2" y2="12.42" width="0" layer="19" extent="1-1"/>
 <wire x1="27.35" y1="7.3" x2="26.07" y2="7.32" width="0" layer="19" extent="1-1"/>
 <wire x1="30.1" y1="6.3" x2="27.35" y2="7.3" width="0" layer="19" extent="1-1"/>
+<wire x1="30.65" y1="23.9178" x2="23.25" y2="28.75" width="0" layer="19" extent="1-16"/>
+<wire x1="33.5" y1="21.75" x2="30.65" y2="23.9178" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="MOTOR_SF">
 <contactref element="R13" pad="P$1"/>
@@ -2079,8 +2079,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="MOTOR_D1">
 <contactref element="U4" pad="26"/>
-<contactref element="U1" pad="53"/>
-<wire x1="20.17" y1="5.42" x2="15.75" y2="26.75" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="3"/>
+<wire x1="20.17" y1="5.42" x2="23.25" y2="29.75" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOTOR_EN">
 <contactref element="U4" pad="10"/>
@@ -2359,24 +2359,24 @@ design rules under a new name.</description>
 </signal>
 <signal name="AS5048_SCK">
 <contactref element="U7" pad="2"/>
-<contactref element="U1" pad="55"/>
-<wire x1="16.75" y1="26.75" x2="31.3" y2="18.0822" width="0" layer="19" extent="1-16"/>
+<contactref element="U1" pad="51"/>
+<wire x1="14.75" y1="26.75" x2="31.3" y2="18.0822" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="AS5048_MISO">
 <contactref element="U7" pad="3"/>
-<contactref element="U1" pad="56"/>
-<wire x1="17.25" y1="26.75" x2="30.65" y2="18.0822" width="0" layer="19" extent="1-16"/>
+<contactref element="U1" pad="52"/>
+<wire x1="15.25" y1="26.75" x2="30.65" y2="18.0822" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="AS5048_MOSI">
 <contactref element="U7" pad="4"/>
-<contactref element="U1" pad="57"/>
-<wire x1="17.75" y1="26.75" x2="30" y2="18.0822" width="0" layer="19" extent="1-16"/>
+<contactref element="U1" pad="53"/>
+<wire x1="15.75" y1="26.75" x2="30" y2="18.0822" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="PIMU_SDA">
 <contactref element="PI" pad="2"/>
-<contactref element="U1" pad="59"/>
 <contactref element="R17" pad="P$1"/>
-<wire x1="6.55" y1="32.05" x2="18.75" y2="26.75" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="40"/>
+<wire x1="6.55" y1="32.05" x2="11.75" y2="32.75" width="0" layer="19" extent="1-1"/>
 <wire x1="1.95" y1="32.05" x2="6.55" y2="32.05" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SIMU_SDA">
@@ -2395,23 +2395,23 @@ design rules under a new name.</description>
 </signal>
 <signal name="PABS_SCL">
 <contactref element="PABS" pad="3"/>
-<contactref element="U1" pad="41"/>
 <contactref element="R16" pad="P$1"/>
-<wire x1="6.55" y1="20.25" x2="11.75" y2="32.25" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="58"/>
+<wire x1="6.55" y1="20.25" x2="18.25" y2="26.75" width="0" layer="19" extent="1-1"/>
 <wire x1="1.95" y1="20.25" x2="6.55" y2="20.25" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="PABS_SDA">
 <contactref element="PABS" pad="2"/>
-<contactref element="U1" pad="61"/>
 <contactref element="R15" pad="P$1"/>
-<wire x1="6.55" y1="21.75" x2="19.75" y2="26.75" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="59"/>
+<wire x1="6.55" y1="21.75" x2="18.75" y2="26.75" width="0" layer="19" extent="1-1"/>
 <wire x1="1.95" y1="21.75" x2="6.55" y2="21.75" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="PIMU_SCL">
 <contactref element="PI" pad="3"/>
-<contactref element="U1" pad="58"/>
 <contactref element="R18" pad="P$1"/>
-<wire x1="6.55" y1="30.55" x2="18.25" y2="26.75" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="41"/>
+<wire x1="6.55" y1="30.55" x2="11.75" y2="32.25" width="0" layer="19" extent="1-1"/>
 <wire x1="1.95" y1="30.55" x2="6.55" y2="30.55" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="USB_DM">
@@ -2421,9 +2421,9 @@ design rules under a new name.</description>
 <wire x1="5.25" y1="36.95" x2="5.7" y2="36.5" width="0.16" layer="1"/>
 <wire x1="5.7" y1="36.5" x2="6.9" y2="36.5" width="0.16" layer="1"/>
 <wire x1="6.9" y1="36.5" x2="7.65" y2="35.7" width="0.16" layer="1"/>
-<wire x1="7.65" y1="35.7" x2="7.65" y2="32.9" width="0.16" layer="1"/>
-<wire x1="7.65" y1="32.9" x2="9.85" y2="30.75" width="0.16" layer="1"/>
-<wire x1="9.85" y1="30.75" x2="11.75" y2="30.75" width="0.16" layer="1"/>
+<wire x1="7.65" y1="35.7" x2="7.65" y2="31.55" width="0.16" layer="1"/>
+<wire x1="7.65" y1="31.55" x2="8.55" y2="30.75" width="0.16" layer="1"/>
+<wire x1="8.55" y1="30.75" x2="11.75" y2="30.75" width="0.16" layer="1"/>
 </signal>
 <signal name="USB_DP">
 <contactref element="USB" pad="3"/>
@@ -2432,9 +2432,11 @@ design rules under a new name.</description>
 <wire x1="4.6" y1="37" x2="5.5" y2="36.1" width="0.16" layer="1"/>
 <wire x1="5.5" y1="36.1" x2="6.7" y2="36.1" width="0.16" layer="1"/>
 <wire x1="6.7" y1="36.1" x2="7.3" y2="35.5" width="0.16" layer="1"/>
-<wire x1="7.3" y1="35.5" x2="7.3" y2="32.65" width="0.16" layer="1"/>
-<wire x1="7.3" y1="32.65" x2="9.7" y2="30.25" width="0.16" layer="1"/>
-<wire x1="9.7" y1="30.25" x2="11.75" y2="30.25" width="0.16" layer="1"/>
+<wire x1="7.3" y1="35.5" x2="7.3" y2="31.4" width="0.16" layer="1"/>
+<wire x1="7.3" y1="31.4" x2="8.45" y2="30.4" width="0.16" layer="1"/>
+<wire x1="8.45" y1="30.4" x2="10.8" y2="30.4" width="0.16" layer="1"/>
+<wire x1="10.8" y1="30.4" x2="10.95" y2="30.25" width="0.16" layer="1"/>
+<wire x1="10.95" y1="30.25" x2="11.75" y2="30.25" width="0.16" layer="1"/>
 </signal>
 <signal name="USB_VBUS">
 <contactref element="USB" pad="1"/>
@@ -2572,34 +2574,20 @@ design rules under a new name.</description>
 <signal name="BLDC_FAULT2">
 <contactref element="U6" pad="18"/>
 </signal>
-<signal name="MOTOR1_EN">
-<contactref element="U5" pad="26"/>
-<contactref element="U5" pad="24"/>
-<contactref element="U5" pad="22"/>
-<wire x1="53.275" y1="10.8" x2="54.575" y2="10.8" width="0" layer="19" extent="1-1"/>
-<wire x1="51.975" y1="10.8" x2="53.275" y2="10.8" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="MOTOR2_EN">
-<contactref element="U6" pad="26"/>
-<contactref element="U6" pad="24"/>
-<contactref element="U6" pad="22"/>
-<wire x1="37.175" y1="10.8" x2="35.875" y2="10.8" width="0" layer="19" extent="1-1"/>
-<wire x1="34.575" y1="10.8" x2="35.875" y2="10.8" width="0" layer="19" extent="1-1"/>
-</signal>
 <signal name="MOTOR1_IN1">
 <contactref element="U5" pad="27"/>
-<contactref element="U1" pad="37"/>
-<wire x1="11.75" y1="34.25" x2="51.325" y2="10.8" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="55"/>
+<wire x1="16.75" y1="26.75" x2="51.325" y2="10.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOTOR1_IN2">
 <contactref element="U5" pad="25"/>
-<contactref element="U1" pad="38"/>
-<wire x1="11.75" y1="33.75" x2="52.625" y2="10.8" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="56"/>
+<wire x1="17.25" y1="26.75" x2="52.625" y2="10.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOTOR1_IN3">
 <contactref element="U5" pad="23"/>
-<contactref element="U1" pad="39"/>
-<wire x1="11.75" y1="33.25" x2="53.925" y2="10.8" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="57"/>
+<wire x1="17.75" y1="26.75" x2="53.925" y2="10.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOTOR2_IN1">
 <contactref element="U6" pad="27"/>
@@ -2613,8 +2601,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="MOTOR2_IN3">
 <contactref element="U6" pad="23"/>
-<contactref element="U1" pad="40"/>
-<wire x1="11.75" y1="32.75" x2="36.525" y2="10.8" width="0" layer="19" extent="1-1"/>
+<contactref element="U1" pad="61"/>
+<wire x1="19.75" y1="26.75" x2="36.525" y2="10.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$23">
 <contactref element="U1" pad="30"/>
@@ -2674,7 +2662,7 @@ design rules under a new name.</description>
 <signal name="N$39">
 <contactref element="R2" pad="P$1"/>
 <contactref element="D1" pad="ANODE"/>
-<wire x1="9.95" y1="28.8" x2="8.6" y2="34" width="0" layer="19" extent="1-1"/>
+<wire x1="8.2" y1="32.45" x2="8.6" y2="34.05" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$40">
 <contactref element="R3" pad="P$1"/>
@@ -2699,7 +2687,7 @@ design rules under a new name.</description>
 <signal name="N$43">
 <contactref element="D1" pad="CATHODE"/>
 <contactref element="U1" pad="36"/>
-<wire x1="10.1" y1="34" x2="11.75" y2="34.75" width="0" layer="19" extent="1-1"/>
+<wire x1="10.1" y1="34.05" x2="11.75" y2="34.75" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$19">
 <contactref element="R12" pad="P$1"/>
@@ -2708,8 +2696,23 @@ design rules under a new name.</description>
 </signal>
 <signal name="AS5048_CS">
 <contactref element="U7" pad="1"/>
-<contactref element="U1" pad="52"/>
-<wire x1="15.25" y1="26.75" x2="31.95" y2="18.0822" width="0" layer="19" extent="1-16"/>
+<contactref element="U1" pad="4"/>
+<wire x1="31.95" y1="18.0822" x2="23.25" y2="30.25" width="0" layer="19" extent="1-16"/>
+</signal>
+<signal name="BLDC_EN">
+<contactref element="U5" pad="26"/>
+<contactref element="U5" pad="22"/>
+<contactref element="U5" pad="24"/>
+<contactref element="U6" pad="26"/>
+<contactref element="U6" pad="24"/>
+<contactref element="U6" pad="22"/>
+<contactref element="U1" pad="54"/>
+<wire x1="53.275" y1="10.8" x2="54.575" y2="10.8" width="0" layer="19" extent="1-1"/>
+<wire x1="51.975" y1="10.8" x2="53.275" y2="10.8" width="0" layer="19" extent="1-1"/>
+<wire x1="37.175" y1="10.8" x2="51.975" y2="10.8" width="0" layer="19" extent="1-1"/>
+<wire x1="35.875" y1="10.8" x2="37.175" y2="10.8" width="0" layer="19" extent="1-1"/>
+<wire x1="34.575" y1="10.8" x2="35.875" y2="10.8" width="0" layer="19" extent="1-1"/>
+<wire x1="16.25" y1="26.75" x2="34.575" y2="10.8" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>

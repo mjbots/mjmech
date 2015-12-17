@@ -1,5 +1,4 @@
  * r1 bringup
-   * 12v boost converter
    * MC33926 fire control driver
    * laser control
    * DRV8313 driver
@@ -37,6 +36,7 @@
 
  * r2 TODO
    * ensure all r1 defects fixed
+   * ensure that I can configure all pins properly
    * initial silk placement
    * autoroute
    * final silk placement
@@ -50,6 +50,7 @@
      * C24/25 C22/23
    * right angle JST header has rear flanges that extend beyond its
      silkscreen
+   * MOTOR1_EN and MOTOR2_EN aren't connected to anything!
 
  * BOM
    * power in + serial connector
@@ -83,6 +84,7 @@
 DONE 2015-12-17
  * r1 bringup
    * 3.3v converter
+   * 12v boost converter
 
 DONE 2015-12-15
  * connect up herkulex protocol
