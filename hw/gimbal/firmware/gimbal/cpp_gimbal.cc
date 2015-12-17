@@ -132,24 +132,9 @@ void cpp_gimbal_main() {
   GimbalHerkulexOperations operations(stabilizer, imu);
   HerkulexProtocol herkulex(pool, herkulex_stream, operations);
 
-  command_manager.Register(
-      gsl::ensure_z("conf"),
-      [&](const gsl::cstring_span& args,
-          const CommandManager::Response& response) {
-        config.Command(args, response);
-      });
-  command_manager.Register(
-      gsl::ensure_z("tel"),
-      [&](const gsl::cstring_span& args,
-          const CommandManager::Response& response) {
-        telemetry.Command(args, response);
-      });
-  command_manager.Register(
-      gsl::ensure_z("gim"),
-      [&](const gsl::cstring_span& args,
-          const CommandManager::Response& response) {
-        stabilizer.Command(args, response);
-      });
+  command_manager.RegisterHandler(gsl::ensure_z("conf"), config);
+  command_manager.RegisterHandler(gsl::ensure_z("tel"), telemetry);
+  command_manager.RegisterHandler(gsl::ensure_z("gim"), stabilizer);
 
   SystemStatus system_status;
   telemetry.Register(gsl::ensure_z("system_status"), &system_status);

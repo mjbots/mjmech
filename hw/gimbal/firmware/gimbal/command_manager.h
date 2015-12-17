@@ -44,6 +44,15 @@ class CommandManager {
 
   void Register(const gsl::cstring_span& name, CommandFunction);
 
+  template <typename Handler>
+  void RegisterHandler(const gsl::cstring_span& name,
+                       Handler& handler) {
+    Register(name, [handler=&handler](const gsl::cstring_span& args,
+                                      const Response& response) {
+               handler->Command(args, response);
+             });
+  }
+
   void AsyncStart(ErrorCallback);
 
   void Poll();
