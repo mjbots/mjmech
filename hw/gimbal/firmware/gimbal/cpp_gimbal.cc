@@ -28,6 +28,7 @@
 
 #include "bmi160_driver.h"
 #include "command_manager.h"
+#include "fire_control.h"
 #include "gimbal_herkulex_operations.h"
 #include "gimbal_stabilizer.h"
 #include "herkulex_protocol.h"
@@ -43,6 +44,7 @@
 #include "stm32_hal_i2c.h"
 #include "stm32_hal_spi.h"
 #include "stm32_raw_i2c.h"
+#include "stm32_timex_complement_pwm.h"
 #include "system_info.h"
 #include "telemetry_manager.h"
 #include "uart_stream.h"
@@ -129,12 +131,20 @@ void cpp_gimbal_main() {
                               *imu.data_signal(),
                               motor_enable, motor1, motor2);
 
+  Stm32GpioPin laser_enable(GPIOB, GPIO_PIN_2);
+  Stm32GpioPin pwm_enable(GPIOC, GPIO_PIN_3, true);
+  Stm32TimexComplementPwm aeg_pwm(&htim1, TIM_CHANNEL_2);
+  Stm32TimexComplementPwm agitator_pwm(&htim1, TIM_CHANNEL_3);
+  FireControl fire_control(pool, clock, config, telemetry,
+                           laser_enable, pwm_enable, aeg_pwm, agitator_pwm);
+
   GimbalHerkulexOperations operations(stabilizer, imu);
   HerkulexProtocol herkulex(pool, herkulex_stream, operations);
 
   command_manager.RegisterHandler(gsl::ensure_z("conf"), config);
   command_manager.RegisterHandler(gsl::ensure_z("tel"), telemetry);
   command_manager.RegisterHandler(gsl::ensure_z("gim"), stabilizer);
+  command_manager.RegisterHandler(gsl::ensure_z("fire"), fire_control);
 
   SystemStatus system_status;
   telemetry.Register(gsl::ensure_z("system_status"), &system_status);
@@ -161,8 +171,6 @@ void cpp_gimbal_main() {
       }
     });
 
-  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
-
   uint32_t old_tick = 0;
   while (1) {
     uint32_t new_tick = HAL_GetTick();
@@ -172,11 +180,8 @@ void cpp_gimbal_main() {
       system_info.PollMillisecond();
       analog_sampler.PollMillisecond();
       stabilizer.PollMillisecond();
+      fire_control.PollMillisecond();
       system_status.timestamp = clock.timestamp();
-
-      if ((new_tick % 1000) == 0) {
-        TIM1->CCR2 = (new_tick / 10 + 100) % 2048;
-      }
 
       UpdateLEDs(new_tick);
     }

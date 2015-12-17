@@ -14,27 +14,9 @@
 
 #pragma once
 
-#include "gpio_pin.h"
-
-#include "gpio.h"
-
-class Stm32GpioPin : public GpioPin {
+class PwmPin {
  public:
-  Stm32GpioPin(GPIO_TypeDef* gpio, uint16_t pin, bool invert=false)
-      : gpio_(gpio), pin_(pin), invert_(invert) {}
-  virtual ~Stm32GpioPin() {}
+  virtual ~PwmPin() {}
 
-  void Set(bool value) override {
-    HAL_GPIO_WritePin(
-        gpio_, pin_, (value ^ invert_) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-  }
-
-  bool Read() const override {
-    return (HAL_GPIO_ReadPin(gpio_, pin_) ? true : false) ^ invert_;
-  }
-
- private:
-  GPIO_TypeDef* const gpio_;
-  const uint16_t pin_;
-  const bool invert_;
+  virtual void Set(uint16_t) = 0;
 };
