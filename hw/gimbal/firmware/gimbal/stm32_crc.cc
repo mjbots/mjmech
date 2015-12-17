@@ -14,6 +14,11 @@
 
 #include "crc.h"
 
+#include "Inc/crc.h"
+
 uint32_t CalculateCrc(const char* start, std::size_t length) {
-  return 0;
+  return HAL_CRC_Calculate(
+      &hcrc,
+      const_cast<uint32_t*>(reinterpret_cast<const uint32_t*>(start)),
+      length);
 }
