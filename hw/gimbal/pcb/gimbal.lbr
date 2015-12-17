@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="mm" altunit="mm"/>
+<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -530,9 +530,17 @@ MAX3223-MAX3243.pdf</description>
 <smd name="1" x="-3" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
 <text x="-6.2" y="5.5" size="1.27" layer="21">&gt;NAME</text>
 <wire x1="-6.3" y1="-5.1" x2="-6.3" y2="1.5" width="0.127" layer="21"/>
-<wire x1="-6.3" y1="1.5" x2="6.3" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-6.3" y1="1.5" x2="-5.6" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-5.6" y1="1.5" x2="5.6" y2="1.5" width="0.127" layer="21"/>
+<wire x1="5.6" y1="1.5" x2="6.3" y2="1.5" width="0.127" layer="21"/>
 <wire x1="6.3" y1="1.5" x2="6.3" y2="-5.1" width="0.127" layer="21"/>
 <wire x1="6.3" y1="-5.1" x2="-6.3" y2="-5.1" width="0.127" layer="21"/>
+<wire x1="-6.3" y1="1.5" x2="-6.3" y2="3.2" width="0.127" layer="21"/>
+<wire x1="-6.3" y1="3.2" x2="-5.6" y2="3.2" width="0.127" layer="21"/>
+<wire x1="-5.6" y1="3.2" x2="-5.6" y2="1.5" width="0.127" layer="21"/>
+<wire x1="6.3" y1="1.5" x2="6.3" y2="3.1" width="0.127" layer="21"/>
+<wire x1="6.3" y1="3.1" x2="5.6" y2="3.1" width="0.127" layer="21"/>
+<wire x1="5.6" y1="3.1" x2="5.6" y2="1.5" width="0.127" layer="21"/>
 </package>
 <package name="JST_ZH_SMT_VERT_4">
 <smd name="SHLD1" x="-4.3" y="1" dx="2.3" dy="1.5" layer="1" rot="R90"/>

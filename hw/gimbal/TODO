@@ -1,6 +1,11 @@
  * r1 bringup
-   * MC33926 fire control driver
    * laser control
+     * add blue wire to laser enable line
+   * MC33926 fire control driver
+     * add wires to act as arm switch
+     * add blue wire to D1 line
+     * add blue wire to AEG PWM
+     * add blue wire to agitator PWM
    * DRV8313 driver
    * AS5048
    * try mounting in gimbal frame
@@ -37,6 +42,20 @@
  * r2 TODO
    * ensure all r1 defects fixed
    * ensure that I can configure all pins properly
+     * MOTOR1_IN1 -   TIM2_1 / PA0
+     * MOTOR1_IN2 -   TIM2_2 / PA1
+     * MOTOR1_IN2 -   TIM2_3 / PA2
+     * MOTOR2_IN1 -   TIM3_1 / PB4
+     * MOTOR2_IN2 -   TIM3_2 / PB5
+     * AEG_PWM -      TIM3_3 / PB0
+     * AGITATOR_PWM - TIM3_4 / PB1
+     * MOTOR2_IN3 -   TIM4_3 / PB8
+     * PABS_SDA   -   I2C1_SDA / PB7
+     * PABS_SCL   -   I2C1_SCL / PB6
+     * SIMU_SDA   -   I2C2_SDA / PB9
+     * SIMU_SCL   -   I2C2_SCL / PB10
+     * PIMU_SDA   -   I2C3_SDA / PC9
+     * PIMU_SCL   -   I2C3_SCL / PA8
    * initial silk placement
    * autoroute
    * final silk placement
@@ -85,6 +104,13 @@ DONE 2015-12-17
  * r1 bringup
    * 3.3v converter
    * 12v boost converter
+ * r2 fixes
+   * selected correct digikey part number for ARM switch
+   * added rear flanges on RA JST PH connector
+   * adjusted silks to be clear with current layout
+   * connected up BLDC_EN (the formerly unconnected MOTOR1_EN and
+     MOTOR2_EN)
+   * found that BLDC_FAULT2 wasn't properly connected in schematic
 
 DONE 2015-12-15
  * connect up herkulex protocol
