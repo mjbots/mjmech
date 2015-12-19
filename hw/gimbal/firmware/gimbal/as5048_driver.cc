@@ -36,6 +36,7 @@ enum AS5048 {
   REG_MAG = 0xfc,
   REG_ANGLE = 0xfe,
 
+  SPI_NOP = 0x0000,
   SPI_AGC = 0x3ffd,
   SPI_MAG = 0x3ffe,
   SPI_ANGLE = 0x3fff,
@@ -46,7 +47,7 @@ void MakeSpiRead(char* buffer, uint16_t addr) {
 
   uint8_t* const u8 = reinterpret_cast<uint8_t*>(buffer);
   const uint8_t lsb = addr & 0xff;
-  const uint8_t msb = ((addr >> 8) & 0xff) | 0x4000;
+  const uint8_t msb = ((addr >> 8) & 0xff) | 0x40;
 
   uint8_t parity = lsb ^ msb;
   parity = parity ^ (parity >> 4);
@@ -54,7 +55,7 @@ void MakeSpiRead(char* buffer, uint16_t addr) {
   parity = parity ^ (parity >> 1);
 
   // Ensure even parity.
-  u8[0] = msb | (parity ? 0x80 : 0x00);
+  u8[0] = msb | ((parity & 0x01) ? 0x80 : 0x00);
   u8[1] = lsb;
 }
 }
@@ -77,6 +78,7 @@ class As5048Driver::Impl {
     MakeSpiRead(&spi_tx_buffer_[0], SPI_AGC);
     MakeSpiRead(&spi_tx_buffer_[2], SPI_MAG);
     MakeSpiRead(&spi_tx_buffer_[4], SPI_ANGLE);
+    MakeSpiRead(&spi_tx_buffer_[6], SPI_NOP);
   }
 
   void AsyncRead(Data* data, ErrorCallback callback) {
@@ -120,19 +122,29 @@ class As5048Driver::Impl {
   }
 
   void ReadSPI() {
-    async_spi_->AsyncTransaction(
-        gsl::cstring_span(spi_tx_buffer_),
-        gsl::string_span(buffer_, 8),
-        [this](int error) { this->HandleReadSPI(error); });
+    assert(!spi_in_progress_);
+    assert(spi_read_position_ == -1);
+    spi_read_position_ = 0;
   }
 
   void HandleReadSPI(int error) {
+    spi_in_progress_ = false;
     if (error) {
       UserCallback(error);
       return;
     }
 
-    HandleBuffer(&buffer_[2]);
+    if (spi_read_position_ == 8) {
+      spi_read_position_ = -1;
+      // Byte swap all the 16 bit values to be the same as I2C.
+      std::swap(buffer_[2], buffer_[3]);
+      std::swap(buffer_[4], buffer_[5]);
+      std::swap(buffer_[6], buffer_[7]);
+      HandleBuffer(&buffer_[2]);
+      std::memset(buffer_, 0, sizeof(buffer_));
+    } else {
+      // The next poll will start another read.
+    }
   }
 
   void Emit() {
@@ -150,6 +162,21 @@ class As5048Driver::Impl {
     callback(error);
   }
 
+  void Poll() {
+    if (spi_read_position_ < 0) { return; }
+    if (spi_in_progress_) { return; }
+
+    const int8_t this_read = spi_read_position_;
+    spi_read_position_ += 2;
+    spi_in_progress_ = true;
+    async_spi_->AsyncTransaction(
+        gsl::cstring_span(spi_tx_buffer_ + this_read,
+                          spi_tx_buffer_ + this_read + 2),
+        gsl::string_span(buffer_ + this_read,
+                         buffer_ + this_read + 2),
+        [this](int error) { this->HandleReadSPI(error); });
+}
+
   AsyncI2C* const async_i2c_;
   AsyncSPI* const async_spi_;
 
@@ -164,6 +191,8 @@ class As5048Driver::Impl {
   ErrorCallback user_callback_;
 
   char spi_tx_buffer_[8] = {};
+  int8_t spi_read_position_ = -1;
+  bool spi_in_progress_ = false;
   char buffer_[8] = {};
 };
 
@@ -179,4 +208,8 @@ As5048Driver::~As5048Driver() {}
 
 void As5048Driver::AsyncRead(Data* data, ErrorCallback callback) {
   impl_->AsyncRead(data, callback);
+}
+
+void As5048Driver::Poll() {
+  impl_->Poll();
 }

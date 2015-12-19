@@ -50,6 +50,7 @@ class As5048Driver {
   };
 
   void AsyncRead(Data*, ErrorCallback);
+  void Poll();
 
  private:
   class Impl;

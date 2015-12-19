@@ -26,6 +26,7 @@
 
 #include "stm32f4xx_hal_tim_ex.h"
 
+#include "as5048_driver.h"
 #include "bmi160_driver.h"
 #include "command_manager.h"
 #include "fire_control.h"
@@ -108,7 +109,7 @@ void cpp_gimbal_main() {
   Stm32RawI2C::Parameters parameters;
   parameters.speed = 400000;
   Stm32RawI2C i2c1(pool, 1, parameters, clock);
-  Stm32HalSPI spi1(pool, 1, GPIOE, GPIO_PIN_3);
+  Stm32HalSPI spi1(pool, 1, GPIOC, GPIO_PIN_11);
   Stm32Flash flash;
   PersistentConfig config(pool, flash);
   LockManager lock_manager;
@@ -118,6 +119,8 @@ void cpp_gimbal_main() {
   Stm32AnalogSampler analog_sampler(pool, clock, config, telemetry);
   Bmi160Driver bmi160(pool, gsl::ensure_z("pimu"),
                       i2c1, clock, config, telemetry);
+  As5048Driver as5048(pool, gsl::ensure_z("yawenc"),
+                      nullptr, &spi1, clock, config, telemetry);
   Stm32BldcPwm motor1(&htim3, TIM_CHANNEL_1,
                       &htim3, TIM_CHANNEL_2,
                       &htim3, TIM_CHANNEL_3);
@@ -141,6 +144,8 @@ void cpp_gimbal_main() {
   GimbalHerkulexOperations operations(stabilizer, imu);
   HerkulexProtocol herkulex(pool, herkulex_stream, operations);
 
+  As5048Driver::Data as5048_data;
+
   command_manager.RegisterHandler(gsl::ensure_z("conf"), config);
   command_manager.RegisterHandler(gsl::ensure_z("tel"), telemetry);
   command_manager.RegisterHandler(gsl::ensure_z("gim"), stabilizer);
@@ -150,6 +155,8 @@ void cpp_gimbal_main() {
   telemetry.Register(gsl::ensure_z("system_status"), &system_status);
 
   config.Load();
+
+  bool as5048_read = false;
 
   command_manager.AsyncStart([&](int error) {
       if (!error) {
@@ -183,6 +190,12 @@ void cpp_gimbal_main() {
       fire_control.PollMillisecond();
       system_status.timestamp = clock.timestamp();
 
+      if (!as5048_read) {
+        as5048_read = true;
+        as5048.AsyncRead(&as5048_data,
+                         [&](int error) { as5048_read = false; });
+      }
+
       UpdateLEDs(new_tick);
     }
     old_tick = new_tick;
@@ -195,6 +208,7 @@ void cpp_gimbal_main() {
     telemetry.Poll();
     command_manager.Poll();
     bmi160.Poll();
+    as5048.Poll();
     system_info.MainLoopCount();
   }
 }
