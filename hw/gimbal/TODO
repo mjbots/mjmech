@@ -1,20 +1,12 @@
  * r1 bringup
-   * laser control
-     * add blue wire to laser enable line
-   * MC33926 fire control driver
-     * add wires to act as arm switch
-     * add blue wire to D1 line
-     * add blue wire to AEG PWM
-     * add blue wire to agitator PWM
-   * DRV8313 driver
-   * AS5048
    * try mounting in gimbal frame
+   * verify vertical USB PH works and has valid pinout
+   * verify RA SMT ARM switch works
    * try to solder on an STM32...
-
- * driver for AS5048 (test existing driver)
 
  * gimbal control software
    * close loop using absolute encoders
+     * fault if encoder has problems
    * add support for second IMU
    * wire up motor fault signals
 
@@ -41,6 +33,8 @@
 
  * r2 TODO
    * ensure all r1 defects fixed
+   * switch TP names to be something usable
+   * update weapon header silk labels
    * ensure that I can configure all pins properly
      * MOTOR1_IN1 -   TIM2_1 / PA0
      * MOTOR1_IN2 -   TIM2_2 / PA1
@@ -56,6 +50,7 @@
      * SIMU_SCL   -   I2C2_SCL / PB10
      * PIMU_SDA   -   I2C3_SDA / PC9
      * PIMU_SCL   -   I2C3_SCL / PA8
+   * make cubemx config for desired pinout
    * initial silk placement
    * autoroute
    * final silk placement
@@ -63,13 +58,15 @@
 
  * r1 defects
    * STM32 footprint is too small! :(
+   * MOTOR1_EN and MOTOR2_EN aren't connected to anything!
+   * BLDC_FAULT2 isn't connected to anything!
    * ARM switch selection (both digikey and MF), don't match footprint
    * USBO connector has correct DPN, but had wrong MPN transcribed to MF
    * some of the capacitors have silkscreens in the wrong place
      * C24/25 C22/23
    * right angle JST header has rear flanges that extend beyond its
      silkscreen
-   * MOTOR1_EN and MOTOR2_EN aren't connected to anything!
+   * silk letter labels on weapon 8 pin connector don't match reality
 
  * BOM
    * power in + serial connector
@@ -99,6 +96,16 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-19
+ * r1 bringup
+   * AS5048A
+
+DONE 2015-12-18
+ * r1 bringup
+   * DRV8313 driver
+   * laser control
+   * MC33926 fire control driver
 
 DONE 2015-12-17
  * r1 bringup
