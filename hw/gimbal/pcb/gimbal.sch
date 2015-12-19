@@ -3485,10 +3485,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R16" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
 <attribute name="AMFPN" value="MF-RES-0603-1.69K"/>
 </part>
-<part name="TP1" library="testpad" deviceset="TP" device="PAD1-13"/>
-<part name="TP2" library="testpad" deviceset="TP" device="PAD1-13"/>
-<part name="TP3" library="testpad" deviceset="TP" device="PAD1-13"/>
-<part name="TP4" library="testpad" deviceset="TP" device="PAD1-13"/>
+<part name="T3" library="testpad" deviceset="TP" device="PAD1-13"/>
+<part name="T12" library="testpad" deviceset="TP" device="PAD1-13"/>
+<part name="T8" library="testpad" deviceset="TP" device="PAD1-13"/>
+<part name="TG" library="testpad" deviceset="TP" device="PAD1-13"/>
 <part name="U8" library="mfdiscrete" deviceset="N-CHANNEL_FET" device="_SOT-23-3"/>
 <part name="C27" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
@@ -3750,10 +3750,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="R16" gate="G$1" x="35.56" y="-312.42" rot="R90">
 <attribute name="AMFPN" x="35.56" y="-312.42" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
-<instance part="TP1" gate="G$1" x="83.82" y="71.12"/>
-<instance part="TP2" gate="G$1" x="264.16" y="86.36"/>
-<instance part="TP3" gate="G$1" x="-20.32" y="71.12"/>
-<instance part="TP4" gate="G$1" x="81.28" y="40.64"/>
+<instance part="T3" gate="G$1" x="83.82" y="71.12"/>
+<instance part="T12" gate="G$1" x="264.16" y="86.36"/>
+<instance part="T8" gate="G$1" x="-20.32" y="71.12"/>
+<instance part="TG" gate="G$1" x="81.28" y="40.64"/>
 <instance part="U8" gate="G$1" x="203.2" y="-63.5"/>
 <instance part="C27" gate="G$1" x="58.42" y="-325.12">
 <attribute name="AMFPN" x="58.42" y="-325.12" size="1.778" layer="96" display="off"/>
@@ -3850,7 +3850,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <junction x="-5.08" y="50.8"/>
 <pinref part="C11" gate="G$1" pin="P$2"/>
 <wire x1="73.66" y1="35.56" x2="73.66" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="TP4" gate="G$1" pin="TP"/>
+<pinref part="TG" gate="G$1" pin="TP"/>
 <wire x1="73.66" y1="35.56" x2="81.28" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="35.56" x2="81.28" y2="38.1" width="0.1524" layer="91"/>
 <junction x="73.66" y="35.56"/>
@@ -4199,7 +4199,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <junction x="73.66" y="66.04"/>
 <pinref part="C11" gate="G$1" pin="P$1"/>
 <junction x="73.66" y="60.96"/>
-<pinref part="TP1" gate="G$1" pin="TP"/>
+<pinref part="T3" gate="G$1" pin="TP"/>
 <wire x1="73.66" y1="66.04" x2="83.82" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="83.82" y1="66.04" x2="83.82" y2="68.58" width="0.1524" layer="91"/>
 </segment>
@@ -4516,7 +4516,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="-5.08" y1="66.04" x2="-5.08" y2="60.96" width="0.1524" layer="91"/>
 <junction x="-5.08" y="66.04"/>
 <pinref part="C10" gate="G$1" pin="P$1"/>
-<pinref part="TP3" gate="G$1" pin="TP"/>
+<pinref part="T8" gate="G$1" pin="TP"/>
 <wire x1="-20.32" y1="68.58" x2="-20.32" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="-20.32" y1="66.04" x2="-10.16" y2="66.04" width="0.1524" layer="91"/>
 <junction x="-10.16" y="66.04"/>
@@ -4620,7 +4620,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="223.52" y1="78.74" x2="223.52" y2="63.5" width="0.1524" layer="91"/>
 <junction x="223.52" y="78.74"/>
 <pinref part="C16" gate="G$1" pin="P$1"/>
-<pinref part="TP2" gate="G$1" pin="TP"/>
+<pinref part="T12" gate="G$1" pin="TP"/>
 <wire x1="256.54" y1="78.74" x2="264.16" y2="78.74" width="0.1524" layer="91"/>
 <wire x1="264.16" y1="78.74" x2="264.16" y2="83.82" width="0.1524" layer="91"/>
 <junction x="256.54" y="78.74"/>
