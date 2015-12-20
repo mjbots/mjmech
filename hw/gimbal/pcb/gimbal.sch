@@ -3235,48 +3235,62 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </classes>
 <parts>
 <part name="U4" library="gimbal" deviceset="MC33926" device="">
+<attribute name="AMFPN" value="MC33926PNBR2"/>
 <attribute name="DPN" value="MC33926PNBR2CT-ND"/>
 </part>
 <part name="U7" library="gimbal" deviceset="AS5048A" device="">
+<attribute name="AMFPN" value="AS5048A-HTSP-500"/>
 <attribute name="DPN" value="AS5048A-HTSP-500CT-ND"/>
 </part>
 <part name="U3" library="gimbal" deviceset="TPS55330" device="PQFN16">
+<attribute name="AMFPN" value="TPS55330RTET"/>
 <attribute name="DPN" value="296-36219-1-ND"/>
 </part>
 <part name="U2" library="gimbal" deviceset="TPS62172" device="PWSON8">
+<attribute name="AMFPN" value="TPS62172DSGT"/>
 <attribute name="DPN" value="296-29879-1-ND"/>
 </part>
 <part name="J1" library="gimbal" deviceset="JST-XH4" device="SMT_RA">
+<attribute name="AMFPN" value="S4B-XH-SM4-TB(LF)(SN)"/>
 <attribute name="DPN" value="455-2262-1-ND"/>
 </part>
 <part name="PABS" library="gimbal" deviceset="JST-ZH4" device="">
+<attribute name="AMFPN" value="B4B-ZR-SM4-TF(LF)(SN)"/>
 <attribute name="DPN" value="455-1683-1-ND "/>
 </part>
 <part name="PI" library="gimbal" deviceset="JST-ZH4" device="">
+<attribute name="AMFPN" value="B4B-ZR-SM4-TF(LF)(SN)"/>
 <attribute name="DPN" value="455-1683-1-ND"/>
 </part>
 <part name="SIMU" library="gimbal" deviceset="JST-ZH4" device="">
+<attribute name="AMFPN" value="B4B-ZR-SM4-TF(LF)(SN)"/>
 <attribute name="DPN" value="455-1683-1-ND"/>
 </part>
 <part name="PGM" library="gimbal" deviceset="JST-PH6" device="JST-PH6">
+<attribute name="AMFPN" value="B6B-PH-K-S(LF)(SN)"/>
 <attribute name="DPN" value="455-1708-ND"/>
 </part>
 <part name="M1" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="M2" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="J2" library="pinhead" deviceset="PINHD-2X4" device=""/>
 <part name="USBI" library="gimbal" deviceset="JST-PH4" device="RA">
+<attribute name="AMFPN" value="S4B-PH-SM4-TB(LF)(SN)"/>
 <attribute name="DPN" value="455-1751-1-ND"/>
 </part>
 <part name="USBO" library="gimbal" deviceset="JST-PH4" device="SMT_VERT">
+<attribute name="AMFPN" value="B4B-PH-SM4-TB(LF)(SN)"/>
 <attribute name="DPN" value="455-1736-1-ND"/>
 </part>
 <part name="USB" library="gimbal" deviceset="MICRO-USB" device="">
+<attribute name="AMFPN" value="10118194-0001LF"/>
 <attribute name="DPN" value="609-4618-1-ND"/>
 </part>
 <part name="U5" library="gimbal" deviceset="DRV8313" device="">
+<attribute name="AMFPN" value="DRV8313PWP"/>
 <attribute name="DPN" value="296-35540-5-ND"/>
 </part>
 <part name="U6" library="gimbal" deviceset="DRV8313" device="">
+<attribute name="AMFPN" value="DRV8313PWP"/>
 <attribute name="DPN" value="296-35540-5-ND"/>
 </part>
 <part name="MOUNT1" library="gimbal" deviceset="M3_MOTOR_MOUNT" device=""/>
@@ -3285,39 +3299,48 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
 <part name="R13" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
+<attribute name="AMFPN" value="ERJ-3EKF1003V"/>
 <attribute name="DPN" value="P100KHCT-ND"/>
 </part>
 <part name="R14" library="mfpassives" deviceset="RESISTOR" device="_0603" value="220">
+<attribute name="AMFPN" value="ERJ-3EKF2200V"/>
 <attribute name="DPN" value="P220HCT-ND"/>
 </part>
 <part name="SUPPLY1" library="supply2" deviceset="+8V" device=""/>
 <part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="L1" library="gimbal" deviceset="IND" device="L1212" value="2.2uH">
+<attribute name="AMFPN" value="LQH3NPN2R2MJ0L"/>
 <attribute name="DPN" value="490-6638-1-ND"/>
 </part>
 <part name="C15" library="mfpassives" deviceset="CAPACITOR_P" device="_6.3MM" value="100uF">
 <attribute name="AMFPN" value="MF-CAP-6.3MM-100uF"/>
 </part>
 <part name="L2" library="gimbal" deviceset="IND" device="ASPI-6045S" value="2.2uH">
+<attribute name="AMFPN" value="ASPI-6045S-2R2N-T"/>
 <attribute name="DPN" value="ASPI-6045S-2R2N-TCT-ND"/>
 </part>
 <part name="SUPPLY2" library="supply2" deviceset="+8V" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="D4" library="gimbal" deviceset="DIODE" device="B520C">
+<attribute name="AMFPN" value="B520C-13-F"/>
 <attribute name="DPN" value="B520C-FDICT-ND"/>
 </part>
 <part name="P+1" library="supply1" deviceset="+12V" device=""/>
 <part name="R11" library="mfpassives" deviceset="RESISTOR" device="_0603" value="78.7k">
+<attribute name="AMFPN" value="ERJ-3EKF7872V"/>
 <attribute name="DPN" value="P78.7KHCT-ND"/>
 </part>
 <part name="R12" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.87k">
+<attribute name="AMFPN" value="ERJ-3EKF1871V"/>
 <attribute name="DPN" value="P1.87KHCT-ND"/>
 </part>
 <part name="R9" library="mfpassives" deviceset="RESISTOR" device="_0603" value="88.7k">
+<attribute name="AMFPN" value="ERJ-3EKF8872V"/>
 <attribute name="DPN" value="P88.7KHCT-ND"/>
 </part>
 <part name="R10" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="AMFPN" value="P10.0KHCT-ND"/>
 <attribute name="DPN" value="P10.0KHCT-ND"/>
 </part>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
@@ -3338,6 +3361,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="P+3" library="supply1" deviceset="+12V" device=""/>
 <part name="+3V7" library="supply1" deviceset="+3V3" device=""/>
 <part name="U1" library="gimbal" deviceset="STM32F4R_64PIN" device="">
+<attribute name="AMFPN" value="STM32F411RET6"/>
 <attribute name="DPN" value="497-14909-ND"/>
 </part>
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
@@ -3349,6 +3373,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="AMFPN" value="MF-RES-0603-10"/>
 </part>
 <part name="Q1" library="gimbal" deviceset="CRYSTAL" device="ABM3B">
+<attribute name="AMFPN" value="ABM3B-8.000MHZ-10-1-U-T"/>
 <attribute name="DPN" value="535-9721-1-ND"/>
 </part>
 <part name="GND17" library="supply1" deviceset="GND" device=""/>
@@ -3356,18 +3381,23 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="P+4" library="supply1" deviceset="+12V" device=""/>
 <part name="GND18" library="supply1" deviceset="GND" device=""/>
 <part name="R5" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
+<attribute name="AMFPN" value="ERJ-3EKF1003V"/>
 <attribute name="DPN" value="P100KHCT-ND"/>
 </part>
 <part name="R6" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="AMFPN" value="ERJ-3EKF1002V"/>
 <attribute name="DPN" value="P10.0KHCT-ND"/>
 </part>
 <part name="R7" library="mfpassives" deviceset="RESISTOR" device="_0603" value="100k">
+<attribute name="AMFPN" value="ERJ-3EKF1003V"/>
 <attribute name="DPN" value="P100KHCT-ND"/>
 </part>
 <part name="R8" library="mfpassives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="AMFPN" value="ERJ-3EKF1002V"/>
 <attribute name="DPN" value="P10.0KHCT-ND"/>
 </part>
 <part name="ARM" library="gimbal" deviceset="SLIDE_SWITCH" device="JS_SUB_SWITCH">
+<attribute name="AMFPN" value="JS102011SAQN"/>
 <attribute name="DPN" value="401-1999-1-ND"/>
 </part>
 <part name="GND19" library="supply1" deviceset="GND" device=""/>
@@ -3434,15 +3464,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
 </part>
 <part name="C1" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF">
+<attribute name="AMFPN" value="CC0603KRX5R6BB475"/>
 <attribute name="DPN" value="311-1455-1-ND"/>
 </part>
 <part name="C7" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="4.7uF">
+<attribute name="AMFPN" value="CC0603KRX5R6BB475"/>
 <attribute name="DPN" value="311-1455-1-ND"/>
 </part>
 <part name="C14" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
 </part>
 <part name="C13" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.047uF">
+<attribute name="AMFPN" value="GRM188R71E473KA01D"/>
 <attribute name="DPN" value="490-1522-1-ND"/>
 </part>
 <part name="C16" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF">
@@ -3455,15 +3488,19 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="AMFPN" value="MF-CAP-1206-10uF"/>
 </part>
 <part name="C11" library="mfpassives" deviceset="CAPACITOR_NP" device="_1210" value="22uF 16V">
+<attribute name="AMFPN" value="C3225X7R1C226M250AC"/>
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
 <part name="C17" library="mfpassives" deviceset="CAPACITOR_NP" device="_1210" value="22uF 16V">
+<attribute name="AMFPN" value="C3225X7R1C226M250AC"/>
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
 <part name="C18" library="mfpassives" deviceset="CAPACITOR_NP" device="_1210" value="22uF 16V">
+<attribute name="AMFPN" value="C3225X7R1C226M250AC"/>
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
 <part name="C19" library="mfpassives" deviceset="CAPACITOR_NP" device="_1210" value="22uF 16V">
+<attribute name="AMFPN" value="C3225X7R1C226M250AC"/>
 <attribute name="DPN" value="445-3955-1-ND"/>
 </part>
 <part name="SUPPLY5" library="supply2" deviceset="+8V" device=""/>
@@ -3489,7 +3526,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="T12" library="testpad" deviceset="TP" device="PAD1-13"/>
 <part name="T8" library="testpad" deviceset="TP" device="PAD1-13"/>
 <part name="TG" library="testpad" deviceset="TP" device="PAD1-13"/>
-<part name="U8" library="mfdiscrete" deviceset="N-CHANNEL_FET" device="_SOT-23-3"/>
+<part name="U8" library="mfdiscrete" deviceset="N-CHANNEL_FET" device="_SOT-23-3">
+<attribute name="AMFPN" value="MF-DSC-SOT233-BSS138"/>
+</part>
 <part name="C27" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="AMFPN" value="MF-CAP-0603-0.1uF"/>
 </part>
@@ -3501,48 +3540,62 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instances>
 <instance part="U4" gate="G$1" x="134.62" y="-45.72">
 <attribute name="DPN" x="134.62" y="-45.72" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="134.62" y="-45.72" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U7" gate="G$1" x="101.6" y="-251.46">
 <attribute name="DPN" x="101.6" y="-251.46" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="101.6" y="-251.46" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U3" gate="G$1" x="175.26" y="45.72">
 <attribute name="DPN" x="175.26" y="45.72" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="175.26" y="45.72" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U2" gate="G$1" x="27.94" y="60.96">
 <attribute name="DPN" x="27.94" y="60.96" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="27.94" y="60.96" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="J1" gate="G$1" x="81.28" y="-388.62">
 <attribute name="DPN" x="81.28" y="-388.62" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="81.28" y="-388.62" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="PABS" gate="G$1" x="12.7" y="-325.12">
 <attribute name="DPN" x="12.7" y="-325.12" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="12.7" y="-325.12" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="PI" gate="G$1" x="73.66" y="-327.66">
 <attribute name="DPN" x="73.66" y="-327.66" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="73.66" y="-327.66" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="SIMU" gate="G$1" x="127" y="-327.66">
 <attribute name="DPN" x="127" y="-327.66" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="127" y="-327.66" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="PGM" gate="G$1" x="-35.56" y="236.22">
 <attribute name="DPN" x="-35.56" y="236.22" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="-35.56" y="236.22" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="M1" gate="A" x="88.9" y="-154.94"/>
 <instance part="M2" gate="A" x="246.38" y="-152.4"/>
 <instance part="J2" gate="A" x="182.88" y="-50.8"/>
 <instance part="USBI" gate="G$1" x="7.62" y="-391.16">
 <attribute name="DPN" x="7.62" y="-391.16" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="7.62" y="-391.16" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="USBO" gate="G$1" x="50.8" y="-388.62" rot="R180">
 <attribute name="DPN" x="50.8" y="-388.62" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="AMFPN" x="50.8" y="-388.62" size="1.778" layer="96" rot="R180" display="off"/>
 </instance>
 <instance part="USB" gate="G$1" x="175.26" y="-388.62">
 <attribute name="DPN" x="175.26" y="-388.62" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="175.26" y="-388.62" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U5" gate="G$1" x="35.56" y="-165.1">
 <attribute name="DPN" x="35.56" y="-165.1" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="35.56" y="-165.1" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U6" gate="G$1" x="195.58" y="-167.64">
 <attribute name="DPN" x="195.58" y="-167.64" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="195.58" y="-167.64" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="MOUNT1" gate="G$1" x="-22.86" y="-383.54"/>
 <instance part="MOUNT2" gate="G$1" x="-22.86" y="-398.78"/>
@@ -3551,39 +3604,48 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="+3V1" gate="G$1" x="96.52" y="0"/>
 <instance part="R13" gate="G$1" x="114.3" y="-27.94" rot="R90">
 <attribute name="DPN" x="114.3" y="-27.94" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="114.3" y="-27.94" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R14" gate="G$1" x="109.22" y="-68.58" rot="R90">
 <attribute name="DPN" x="109.22" y="-68.58" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="109.22" y="-68.58" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="SUPPLY1" gate="+8V" x="-10.16" y="76.2"/>
 <instance part="+3V2" gate="G$1" x="73.66" y="78.74"/>
 <instance part="GND3" gate="1" x="30.48" y="33.02"/>
 <instance part="L1" gate="L$1" x="58.42" y="66.04">
 <attribute name="DPN" x="58.42" y="66.04" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="58.42" y="66.04" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C15" gate="G$1" x="236.22" y="63.5">
 <attribute name="AMFPN" x="236.22" y="63.5" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="L2" gate="L$1" x="157.48" y="78.74">
 <attribute name="DPN" x="157.48" y="78.74" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="157.48" y="78.74" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="SUPPLY2" gate="+8V" x="124.46" y="83.82"/>
 <instance part="GND4" gate="1" x="167.64" y="15.24"/>
 <instance part="D4" gate="G$1" x="215.9" y="78.74">
 <attribute name="DPN" x="215.9" y="78.74" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="215.9" y="78.74" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="P+1" gate="1" x="256.54" y="86.36"/>
 <instance part="R11" gate="G$1" x="134.62" y="35.56" rot="R90">
 <attribute name="DPN" x="134.62" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="134.62" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R12" gate="G$1" x="149.86" y="33.02" rot="R90">
 <attribute name="DPN" x="149.86" y="33.02" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="149.86" y="33.02" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R9" gate="G$1" x="223.52" y="58.42" rot="R90">
 <attribute name="DPN" x="223.52" y="58.42" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="223.52" y="58.42" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R10" gate="G$1" x="223.52" y="30.48" rot="R90">
 <attribute name="DPN" x="223.52" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="223.52" y="30.48" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="GND5" gate="1" x="101.6" y="-274.32"/>
 <instance part="+3V3" gate="G$1" x="76.2" y="-238.76"/>
@@ -3604,6 +3666,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="+3V7" gate="G$1" x="172.72" y="-25.4"/>
 <instance part="U1" gate="G$1" x="106.68" y="195.58">
 <attribute name="DPN" x="106.68" y="195.58" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="106.68" y="195.58" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND14" gate="1" x="157.48" y="246.38"/>
 <instance part="+3V8" gate="G$1" x="73.66" y="276.86"/>
@@ -3615,6 +3678,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </instance>
 <instance part="Q1" gate="G$1" x="203.2" y="165.1">
 <attribute name="DPN" x="203.2" y="165.1" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="203.2" y="165.1" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND17" gate="1" x="203.2" y="142.24"/>
 <instance part="SUPPLY4" gate="+8V" x="226.06" y="236.22"/>
@@ -3622,18 +3686,23 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="GND18" gate="1" x="238.76" y="198.12"/>
 <instance part="R5" gate="G$1" x="226.06" y="226.06" rot="R90">
 <attribute name="DPN" x="226.06" y="226.06" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="226.06" y="226.06" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R6" gate="G$1" x="226.06" y="210.82" rot="R90">
 <attribute name="DPN" x="226.06" y="210.82" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="226.06" y="210.82" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R7" gate="G$1" x="243.84" y="226.06" rot="R90">
 <attribute name="DPN" x="243.84" y="226.06" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="243.84" y="226.06" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R8" gate="G$1" x="243.84" y="210.82" rot="R90">
 <attribute name="DPN" x="243.84" y="210.82" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="AMFPN" x="243.84" y="210.82" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="ARM" gate="G$1" x="104.14" y="-101.6">
 <attribute name="DPN" x="104.14" y="-101.6" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="104.14" y="-101.6" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND19" gate="1" x="121.92" y="-106.68"/>
 <instance part="+3V10" gate="G$1" x="121.92" y="-88.9"/>
@@ -3700,15 +3769,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </instance>
 <instance part="C1" gate="G$1" x="73.66" y="261.62">
 <attribute name="DPN" x="73.66" y="261.62" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="73.66" y="261.62" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C7" gate="G$1" x="149.86" y="256.54">
 <attribute name="DPN" x="149.86" y="256.54" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="149.86" y="256.54" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C14" gate="G$1" x="149.86" y="22.86">
 <attribute name="AMFPN" x="149.86" y="22.86" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C13" gate="G$1" x="139.7" y="22.86">
 <attribute name="DPN" x="139.7" y="22.86" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="139.7" y="22.86" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C16" gate="G$1" x="246.38" y="63.5">
 <attribute name="AMFPN" x="246.38" y="63.5" size="1.778" layer="96" display="off"/>
@@ -3721,15 +3793,19 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </instance>
 <instance part="C11" gate="G$1" x="73.66" y="55.88">
 <attribute name="DPN" x="73.66" y="55.88" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="73.66" y="55.88" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C17" gate="G$1" x="38.1" y="-48.26">
 <attribute name="DPN" x="38.1" y="-48.26" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="38.1" y="-48.26" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C18" gate="G$1" x="50.8" y="-48.26">
 <attribute name="DPN" x="50.8" y="-48.26" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="50.8" y="-48.26" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C19" gate="G$1" x="60.96" y="-48.26">
 <attribute name="DPN" x="60.96" y="-48.26" size="1.778" layer="96" display="off"/>
+<attribute name="AMFPN" x="60.96" y="-48.26" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="SUPPLY5" gate="+8V" x="43.18" y="-17.78"/>
 <instance part="R19" gate="G$1" x="144.78" y="-314.96" rot="R90">
@@ -3754,7 +3830,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="T12" gate="G$1" x="264.16" y="86.36"/>
 <instance part="T8" gate="G$1" x="-20.32" y="71.12"/>
 <instance part="TG" gate="G$1" x="81.28" y="40.64"/>
-<instance part="U8" gate="G$1" x="203.2" y="-63.5"/>
+<instance part="U8" gate="G$1" x="203.2" y="-63.5">
+<attribute name="AMFPN" x="203.2" y="-63.5" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C27" gate="G$1" x="58.42" y="-325.12">
 <attribute name="AMFPN" x="58.42" y="-325.12" size="1.778" layer="96" display="off"/>
 </instance>
