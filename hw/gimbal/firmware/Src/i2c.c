@@ -115,9 +115,13 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     PB6     ------> I2C1_SCL
     PB7     ------> I2C1_SDA
     */
+#ifdef MJMECH_DISCOVERY
     /* TODO jpieper: On the actual gimbal board, this will be pins 6
      * and 7. However, on the discovery board, it is pins 6 and 9. */
     GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
+#else
+    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
+#endif
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
@@ -129,8 +133,8 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 
     /* Peripheral DMA init*/
 
-    hdma_i2c1_tx.Instance = DMA1_Stream1;
-    hdma_i2c1_tx.Init.Channel = DMA_CHANNEL_0;
+    hdma_i2c1_tx.Instance = DMA1_Stream6;
+    hdma_i2c1_tx.Init.Channel = DMA_CHANNEL_1;
     hdma_i2c1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
     hdma_i2c1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_i2c1_tx.Init.MemInc = DMA_MINC_ENABLE;
@@ -183,16 +187,17 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     GPIO_InitStruct.Alternate = GPIO_AF4_I2C2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* TODO jpieper: On the actual gimbal board this needs to be
-     * enabled.  However, on the discovery board, we don't have an
-     * I2C2, so we just disable this pin for now. */
-
-    /* GPIO_InitStruct.Pin = GPIO_PIN_9; */
-    /* GPIO_InitStruct.Mode = GPIO_MODE_AF_OD; */
-    /* GPIO_InitStruct.Pull = GPIO_PULLUP; */
-    /* GPIO_InitStruct.Speed = GPIO_SPEED_HIGH; */
-    /* GPIO_InitStruct.Alternate = GPIO_AF9_I2C2; */
-    /* HAL_GPIO_Init(GPIOB, &GPIO_InitStruct); */
+#ifdef MJMECH_DISCOVERY
+    /* NOTE jpieper: On the discovery board, we don't have an I2C2, so
+     * we just disable this pin for now. */
+#else
+    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF9_I2C2;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#endif
 
     /* Peripheral clock enable */
     __I2C2_CLK_ENABLE();
@@ -243,9 +248,16 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
   /* USER CODE END I2C3_MspInit 0 */
 
     /**I2C3 GPIO Configuration
+    PC9     ------> I2C3_SDA
     PA8     ------> I2C3_SCL
-    PB8     ------> I2C3_SDA
     */
+    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF4_I2C3;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
     GPIO_InitStruct.Pin = GPIO_PIN_8;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
@@ -253,20 +265,13 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     GPIO_InitStruct.Alternate = GPIO_AF4_I2C3;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_8;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_I2C3;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
     /* Peripheral clock enable */
     __I2C3_CLK_ENABLE();
 
     /* Peripheral DMA init*/
 
-    hdma_i2c3_rx.Instance = DMA1_Stream2;
-    hdma_i2c3_rx.Init.Channel = DMA_CHANNEL_3;
+    hdma_i2c3_rx.Instance = DMA1_Stream1;
+    hdma_i2c3_rx.Init.Channel = DMA_CHANNEL_1;
     hdma_i2c3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_i2c3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_i2c3_rx.Init.MemInc = DMA_MINC_ENABLE;
@@ -303,6 +308,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
   /* USER CODE END I2C3_MspInit 1 */
   }
 }
+
 void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c)
 {
 
@@ -369,12 +375,12 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c)
     __I2C3_CLK_DISABLE();
 
     /**I2C3 GPIO Configuration
+    PC9     ------> I2C3_SDA
     PA8     ------> I2C3_SCL
-    PB8     ------> I2C3_SDA
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_9);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_8);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8);
 
     /* Peripheral DMA DeInit*/
     HAL_DMA_DeInit(hi2c->hdmarx);

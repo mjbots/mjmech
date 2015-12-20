@@ -49,6 +49,8 @@ targetenv.Append(CXXFLAGS=['-ffunction-sections'])
 targetenv.Append(CXXFLAGS=['-fno-rtti'])
 targetenv.Append(LINKFLAGS=['-fno-rtti'])
 
+targetenv.Append(CPPDEFINES=['MJMECH_DISCOVERY'])
+
 Export('targetenv')
 Export('hostenv')
 

@@ -20,7 +20,7 @@
 
 namespace {
 SPI_HandleTypeDef* SelectSPI(int n) {
-  if (n == 1) { return &hspi1; }
+  if (n == 3) { return &hspi3; }
   assert(false);
 }
 

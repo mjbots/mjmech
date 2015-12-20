@@ -98,10 +98,10 @@ extern "C" {
 
 void cpp_gimbal_main() {
   UsbCdcStream usb_cdc;
-  UartStream uart2(&huart2, GPIOA, GPIO_PIN_2);
+  UartStream uart(&huart6, GPIOC, GPIO_PIN_6);
 
   auto& debug_stream = usb_cdc;
-  auto& herkulex_stream = uart2;
+  auto& herkulex_stream = uart;
 
   Stm32Clock clock;
 
@@ -109,7 +109,7 @@ void cpp_gimbal_main() {
   Stm32RawI2C::Parameters parameters;
   parameters.speed = 400000;
   Stm32RawI2C i2c1(pool, 1, parameters, clock);
-  Stm32HalSPI spi1(pool, 1, GPIOC, GPIO_PIN_11);
+  Stm32HalSPI spi1(pool, 3, GPIOC, GPIO_PIN_15);
   Stm32Flash flash;
   PersistentConfig config(pool, flash);
   LockManager lock_manager;
@@ -121,23 +121,23 @@ void cpp_gimbal_main() {
                       i2c1, clock, config, telemetry);
   As5048Driver as5048(pool, gsl::ensure_z("yawenc"),
                       nullptr, &spi1, clock, config, telemetry);
-  Stm32BldcPwm motor1(&htim3, TIM_CHANNEL_1,
-                      &htim3, TIM_CHANNEL_2,
-                      &htim3, TIM_CHANNEL_3);
-  Stm32BldcPwm motor2(&htim2, TIM_CHANNEL_1,
+  Stm32BldcPwm motor1(&htim2, TIM_CHANNEL_1,
                       &htim2, TIM_CHANNEL_2,
-                      &htim3, TIM_CHANNEL_4);
+                      &htim2, TIM_CHANNEL_3);
+  Stm32BldcPwm motor2(&htim3, TIM_CHANNEL_1,
+                      &htim3, TIM_CHANNEL_2,
+                      &htim4, TIM_CHANNEL_3);
   MahonyImu imu(pool, clock, config, telemetry, *bmi160.data_signal());
 
-  Stm32GpioPin motor_enable(GPIOA, GPIO_PIN_6);
+  Stm32GpioPin motor_enable(GPIOC, GPIO_PIN_13);
   GimbalStabilizer stabilizer(pool, clock, config, telemetry,
                               *imu.data_signal(),
                               motor_enable, motor1, motor2);
 
-  Stm32GpioPin laser_enable(GPIOB, GPIO_PIN_2);
-  Stm32GpioPin pwm_enable(GPIOC, GPIO_PIN_3, true);
-  Stm32TimexComplementPwm aeg_pwm(&htim1, TIM_CHANNEL_2);
-  Stm32TimexComplementPwm agitator_pwm(&htim1, TIM_CHANNEL_3);
+  Stm32GpioPin laser_enable(GPIOA, GPIO_PIN_10);
+  Stm32GpioPin pwm_enable(GPIOB, GPIO_PIN_12, true);
+  Stm32TimexComplementPwm aeg_pwm(&htim3, TIM_CHANNEL_3);
+  Stm32TimexComplementPwm agitator_pwm(&htim3, TIM_CHANNEL_4);
   FireControl fire_control(pool, clock, config, telemetry,
                            laser_enable, pwm_enable, aeg_pwm, agitator_pwm);
 
@@ -202,7 +202,7 @@ void cpp_gimbal_main() {
 
     HAL_IWDG_Refresh(&hiwdg);
     usb_cdc.Poll();
-    uart2.Poll();
+    uart.Poll();
     i2c1.Poll();
     spi1.Poll();
     telemetry.Poll();

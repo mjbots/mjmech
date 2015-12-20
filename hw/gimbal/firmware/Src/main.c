@@ -136,12 +136,12 @@ int main(void)
   MX_I2C3_Init();
   /* TODO jpieper: Re-enable this when we want watchdog support. */
   /* MX_IWDG_Init(); */
-  MX_SPI1_Init();
-  MX_TIM1_Init();
+  MX_SPI3_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
   MX_TIM5_Init();
-  MX_USART2_UART_Init();
+  MX_USART6_UART_Init();
   MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 2 */
