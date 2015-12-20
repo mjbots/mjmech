@@ -1,10 +1,10 @@
  * r1 bringup
-   * try mounting in gimbal frame
    * verify vertical USB PH works and has valid pinout
    * verify RA SMT ARM switch works
    * try to solder on an STM32...
 
  * gimbal control software
+   * add configurable mounting orientation for each IMU
    * close loop using absolute encoders
      * fault if encoder has problems
    * add support for second IMU
@@ -33,8 +33,6 @@
 
  * r2 TODO
    * ensure all r1 defects fixed
-   * switch TP names to be something usable
-   * update weapon header silk labels
    * ensure that I can configure all pins properly
      * MOTOR1_IN1 -   TIM2_1 / PA0
      * MOTOR1_IN2 -   TIM2_2 / PA1
@@ -100,6 +98,14 @@
 DONE 2015-12-19
  * r1 bringup
    * AS5048A
+ * r2
+   * switch TP names to be something usable
+   * update weapon header silk labels
+   * mounted in gimbal frame, works acceptably, although as expected
+     the pitch down angle is limited by interference with the
+     board... an updated bracket could put the entire weapon up a bit,
+     which would remove this limitation.  As is, it can still probably
+     look low enough to be workable.
 
 DONE 2015-12-18
  * r1 bringup
