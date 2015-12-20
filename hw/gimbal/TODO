@@ -1,3 +1,6 @@
+ * r2 TODO
+   * ensure all r1 defects fixed
+
  * r1 bringup
    * verify vertical USB PH works and has valid pinout
    * verify RA SMT ARM switch works
@@ -29,30 +32,6 @@
 
  * wishlist
    * get I2C DMA working
-
-
- * r2 TODO
-   * ensure all r1 defects fixed
-   * ensure that I can configure all pins properly
-     * MOTOR1_IN1 -   TIM2_1 / PA0
-     * MOTOR1_IN2 -   TIM2_2 / PA1
-     * MOTOR1_IN2 -   TIM2_3 / PA2
-     * MOTOR2_IN1 -   TIM3_1 / PB4
-     * MOTOR2_IN2 -   TIM3_2 / PB5
-     * AEG_PWM -      TIM3_3 / PB0
-     * AGITATOR_PWM - TIM3_4 / PB1
-     * MOTOR2_IN3 -   TIM4_3 / PB8
-     * PABS_SDA   -   I2C1_SDA / PB7
-     * PABS_SCL   -   I2C1_SCL / PB6
-     * SIMU_SDA   -   I2C2_SDA / PB9
-     * SIMU_SCL   -   I2C2_SCL / PB10
-     * PIMU_SDA   -   I2C3_SDA / PC9
-     * PIMU_SCL   -   I2C3_SCL / PA8
-   * make cubemx config for desired pinout
-   * initial silk placement
-   * autoroute
-   * final silk placement
-
 
  * r1 defects
    * STM32 footprint is too small! :(
@@ -94,6 +73,14 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-20
+ * r2
+   * make cubemx config for desired pinout
+   * ensure I can configure all pins properly
+   * initial silk placement
+   * autoroute
+   * final silk placement
 
 DONE 2015-12-19
  * r1 bringup
