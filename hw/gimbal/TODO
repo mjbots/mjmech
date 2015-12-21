@@ -7,7 +7,6 @@
    * try to solder on an STM32...
 
  * gimbal control software
-   * add configurable mounting orientation for each IMU
    * close loop using absolute encoders
      * fault if encoder has problems
    * add support for second IMU
@@ -18,12 +17,8 @@
    * wire up AEG fault signal
 
  * make UI for debugging
-   * be able to pause plotting
    * record tlog files
-   * menus to toggle the different dock windows
    * easy to reach button for torque off
-   * restore debugging state when device restarts, or just a button
-     to restart things
 
  * get watchdog working
 
@@ -73,6 +68,13 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2015-12-21
+ * add configurable mounting orientation for each IMU
+ * tview
+   * restore debugging state when device restarts, or just a button
+     to restart things
+   * be able to pause plotting
 
 DONE 2015-12-20
  * r2
