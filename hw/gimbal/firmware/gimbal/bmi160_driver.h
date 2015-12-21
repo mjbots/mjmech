@@ -15,6 +15,7 @@
 #pragma once
 
 #include "async_types.h"
+#include "euler.h"
 #include "imu_data.h"
 #include "pool_ptr.h"
 
@@ -40,12 +41,15 @@ class Bmi160Driver {
     uint16_t gyro_max_dps = 1000;
     uint8_t accel_max_g = 4;
 
+    Euler offset_deg;
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(MJ_NVP(address));
       a->Visit(MJ_NVP(rate_hz));
       a->Visit(MJ_NVP(gyro_max_dps));
       a->Visit(MJ_NVP(accel_max_g));
+      a->Visit(MJ_NVP(offset_deg));
     }
   };
 

@@ -19,6 +19,7 @@
 #include "async_i2c.h"
 #include "clock.h"
 #include "persistent_config.h"
+#include "quaternion.h"
 #include "telemetry_manager.h"
 
 namespace {
@@ -278,7 +279,8 @@ class Bmi160Driver::Impl {
                          gsl::string_span(buffer_, size), callback);
   }
 
-  void AsyncWrite(BMI160 reg, uint8_t size, int delay_ms, ErrorCallback callback) {
+  void AsyncWrite(BMI160 reg, uint8_t size, int delay_ms,
+                  ErrorCallback callback) {
     delay_callback_ = callback;
     this->delay_end_ = 0;
     async_i2c_.AsyncWrite(
@@ -389,15 +391,20 @@ class Bmi160Driver::Impl {
     const int acc_y = data(8);
     const int acc_z = data(10);
 
+    const float kDegToRad = mjmech::base::kPi / 180.0f;
+    const Quaternion offset =
+        Quaternion::FromEuler(config_.offset_deg.scaled(kDegToRad));
     const float gyro_scale = FindGyroScale();
-    data_.imu.gyro_dps.x = gyr_x * gyro_scale;
-    data_.imu.gyro_dps.y = gyr_y * gyro_scale;
-    data_.imu.gyro_dps.z = gyr_z * gyro_scale;
+    const Point3D gyro_dps(gyr_x * gyro_scale,
+                           gyr_y * gyro_scale,
+                           gyr_z * gyro_scale);
+    data_.imu.gyro_dps = offset.Rotate(gyro_dps);
 
     const float accel_scale = FindAccelScale();
-    data_.imu.accel_g.x = acc_x * accel_scale;
-    data_.imu.accel_g.y = acc_y * accel_scale;
-    data_.imu.accel_g.z = acc_z * accel_scale;
+    const Point3D accel_g(acc_x * accel_scale,
+                          acc_y * accel_scale,
+                          acc_z * accel_scale);
+    data_.imu.accel_g = offset.Rotate(accel_g);
 
     data_.imu.rate_hz = data_.rate_hz;
 
