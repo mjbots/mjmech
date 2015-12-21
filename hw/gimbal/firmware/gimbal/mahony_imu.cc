@@ -101,11 +101,11 @@ class MahonyImu::Impl {
   void DoOperating(const ImuData* data) {
     const auto now = clock_.timestamp();
 
-    const float kDegToRad = mjmech::base::kPi / 180.0;
+    const float kDegToRad = mjmech::base::kPi / 180.0f;
     const float kRadToDeg = 1.0f / kDegToRad;
 
     const Point3D a_g = data->accel_g;
-    const Point3D a = a_g.scaled(1.0 / a_g.length());
+    const Point3D a = a_g.scaled(1.0f / a_g.length());
 
     const Point3D g_dps = data->gyro_dps;
 
@@ -131,7 +131,8 @@ class MahonyImu::Impl {
     data_.integral_dps += err_dps.scaled(config_.ki / data->rate_hz);
 
     // Apply the corrections.
-    const Point3D cg_dps = g_dps + err_dps.scaled(config_.kp) + data_.integral_dps;
+    const Point3D cg_dps =
+        g_dps + err_dps.scaled(config_.kp) + data_.integral_dps;
 
     // Now, multiply our existing quaternion with the integrated rate
     // of change.
