@@ -46,8 +46,14 @@ class NamedRegistryBase {
         return &element;
       }
     }
-    // Whoops, we ran out of space.
-    Expects(false);
+
+    switch (create_mode) {
+      case kFindOnly: { break; }
+      case kAllowCreate: {
+        // Whoops, we ran out of space.
+        Expects(false);
+      }
+    }
     return nullptr;
   }
 
