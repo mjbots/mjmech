@@ -37,6 +37,8 @@
 
 /* USER CODE BEGIN 0 */
 
+extern void UART_Stream_IRQHandler(UART_HandleTypeDef*);
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -332,6 +334,8 @@ void USART6_IRQHandler(void)
   /* USER CODE END USART6_IRQn 0 */
   HAL_UART_IRQHandler(&huart6);
   /* USER CODE BEGIN USART6_IRQn 1 */
+
+  UART_Stream_IRQHandler(&huart6);
 
   /* USER CODE END USART6_IRQn 1 */
 }
