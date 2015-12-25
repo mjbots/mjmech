@@ -40,7 +40,7 @@ Export('canonenv')
 import os
 variant_suffix = '-' + os.uname()[4]
 
-subdirs = ['base', 'mech', 'python', 'legtool', 'tools']
+subdirs = ['base', 'mech', 'python', 'legtool', 'tools', 'simulator']
 for subdir in subdirs:
     SConscript(subdir + '/SConscript',
                variant_dir=subdir + '/build' + variant_suffix,
