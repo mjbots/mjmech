@@ -50,3 +50,7 @@ bpenv.ParseConfig('pkg-config --cflags --libs python')
 pylegtool = bpenv.SharedLibrary(
     '_legtool', PY_SOURCES,
     LIBPREFIX='')
+
+# Verify that we can load this library.
+env.Command('py_legtool.passed', File('test/py_legtool_test.py'),
+            '$SOURCE && touch $TARGET')
