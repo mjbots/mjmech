@@ -168,7 +168,8 @@ class Selector : boost::noncopyable {
       opt->find("tcp.host", false).semantic()
           ->notify(host_target.substr(0, colon));
       opt->find("tcp.port", false).semantic()
-          ->notify(host_target.substr(colon + 1));
+          ->notify(boost::lexical_cast<int>(
+                       host_target.substr(colon + 1)));
     } else {
       opt->find("type", false).semantic()->notify(std::string("serial"));
       opt->find("serial.serial_port", false).semantic()->notify(serial_port);
