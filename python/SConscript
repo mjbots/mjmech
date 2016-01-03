@@ -52,5 +52,6 @@ pylegtool = bpenv.SharedLibrary(
     LIBPREFIX='')
 
 # Verify that we can load this library.
-env.Command('py_legtool.passed', File('test/py_legtool_test.py'),
-            '$SOURCE && touch $TARGET')
+legtool_test = File('test/py_legtool_test.py')
+env.Depends(legtool_test, pylegtool)
+env.Command('py_legtool.passed', legtool_test, '$SOURCE && touch $TARGET')
