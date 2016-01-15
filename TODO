@@ -1,7 +1,6 @@
 Movement
 ~~~~~~~~
 
- * Make a simulator
  * Make AHRS actually work
    * Possibly switch to Mahony IMU instead of UKF for easier tuning and stability
  * Try balancing on two feet
@@ -12,6 +11,9 @@ Movement
 
 History
 ~~~~~~~
+DONE 2016-01-14
+ * Calling the simulator working enough for now
+
 DONE 2015-03-11:
  * Log stdout/stderr of external processes of vserver
 
