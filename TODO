@@ -1,3 +1,26 @@
+Preparing for RoboGames
+
+ * Populate additional scoring transponder
+   * order any necessary parts
+ * Make mammal walking be stable
+   * probably just limit translation acceleration
+   * possibly reduce walk height as well
+ * Drill holes to mount turret yaw motor on plate and mount
+ * Mount scoring transponder
+ * Build power/data harness to go from top plate to turret
+ * Build USB harness to go from top plate to turret
+ * Re-do harnesses for new control board
+   * motor wires
+   * weapon wires
+   * camera USB cable chop and re-connector
+ * Make walking logic such that "forward" drives toward the camera and
+   rotates to go forward
+ * Design and print new turret gimbal
+   * protect new gimbal board
+   * add a little bit of extra height to restore freedom of movement
+     to weapon
+
+
 Movement
 ~~~~~~~~
 
@@ -11,6 +34,9 @@ Movement
 
 History
 ~~~~~~~
+DONE 2016-01-17
+ * Designed a got quote for panel mount L brackets
+
 DONE 2016-01-14
  * Calling the simulator working enough for now
 
