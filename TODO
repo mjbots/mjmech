@@ -17,6 +17,14 @@ Preparing for RoboGames
    * add a little bit of extra height to restore freedom of movement
      to weapon
 
+ * video: finish McastVideoLink
+  - packetize frames into packets, merge them back
+  - send on fixed schedule (but apply corrections if this is too slow)
+  - ensure we log all packets
+ * control: bring in joystick control code to video_controller_app process.
+ * control: make sure we are using multicasts for control commands
+ * control: make sure agitator control works properly preserved
+ * control: deploy/launch script. Must also collect logs.
 
 Movement
 ~~~~~~~~
@@ -28,6 +36,25 @@ Movement
  * Try making legs set down more gently
  * Switch gait engine to be one that selects foot placements
  * Make tplot be able to 3d render the mech
+
+Video/Control
+~~~~~~~~~~~~~
+
+ * Status reporting from the robot
+ * Logs collection from the robot
+ * OSD -- targeting grid(s) (which ones?)
+ * OSD -- text status output (battery, temperature, # shots fired)
+ * OSD -- general logging
+ * control: ability to click on screen and start shooting there
+ * control: ability to lock on / detect the target
+ * video: dynamically control frame parameters, # of retransmissions
+ * video: mjpeg mode for times when link is really bad
+ * video: forward error correction / network coding
+ * general: remove all address smarts from udp_data_link and udp_socket.
+   It is perfectly ok (and more predicable) to specify all paramters
+   by hand.
+ * control: detect if bullet actually went out
+
 
 History
 ~~~~~~~
