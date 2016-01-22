@@ -1,11 +1,8 @@
 Preparing for RoboGames
 
  * Re-do harnesses for new control board
-   * motor wires
-   * weapon wires
    * camera USB cable chop and re-connector
- * Build power/data harness to go from top plate to turret
- * Build USB harness to go from top plate to turret
+ * Test mount bottom plate and battery
  * Populate additional scoring transponder
  * Mount scoring transponder
  * Mount and wire scoring panels
@@ -16,6 +13,7 @@ Preparing for RoboGames
    * protect new gimbal board
    * add a little bit of extra height to restore freedom of movement
      to weapon
+ * Assemble spare weapon
 
  * video: finish McastVideoLink
   - packetize frames into packets, merge them back
@@ -58,6 +56,18 @@ Video/Control
 
 History
 ~~~~~~~
+DONE 2016-01-21
+ * Build power/data harness to go from top plate to turret
+ * Build USB harness to go from top plate to turret
+
+
+DONE 2016-01-20
+ * gimbal harness rebuilds
+   * motor wires
+   * weapon wires
+   * Build final IMU harness and mount
+ * tested BMI160 breakout board on discovery platform
+
 DONE 2016-01-19
  * Ordered second set of 3d printed parts for weapon
  * Drilled holes to mount turret yaw motor on plate and mounted
