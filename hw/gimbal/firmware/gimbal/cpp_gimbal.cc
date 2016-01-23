@@ -44,6 +44,7 @@
 #include "stm32_gpio_pin.h"
 #include "stm32_hal_i2c.h"
 #include "stm32_hal_spi.h"
+#include "stm32_pwm.h"
 #include "stm32_raw_i2c.h"
 #include "stm32_timex_complement_pwm.h"
 #include "system_info.h"
@@ -135,9 +136,9 @@ void cpp_gimbal_main() {
                               motor_enable, motor1, motor2);
 
   Stm32GpioPin laser_enable(GPIOA, GPIO_PIN_10);
-  Stm32GpioPin pwm_enable(GPIOB, GPIO_PIN_12, true);
-  Stm32TimexComplementPwm aeg_pwm(&htim3, TIM_CHANNEL_3);
-  Stm32TimexComplementPwm agitator_pwm(&htim3, TIM_CHANNEL_4);
+  Stm32GpioPin pwm_enable(GPIOB, GPIO_PIN_12);
+  Stm32Pwm aeg_pwm(&htim3, TIM_CHANNEL_3);
+  Stm32Pwm agitator_pwm(&htim3, TIM_CHANNEL_4);
   FireControl fire_control(pool, clock, config, telemetry,
                            laser_enable, pwm_enable, aeg_pwm, agitator_pwm);
 

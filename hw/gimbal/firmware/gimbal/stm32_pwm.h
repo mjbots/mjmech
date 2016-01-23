@@ -1,4 +1,4 @@
-// Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
+// Copyright 2015-2016 Josh Pieper, jjp@pobox.com.  All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@
 
 #include "pwm_pin.h"
 
-class Stm32TimexComplementPwm : public PwmPin {
+class Stm32Pwm : public PwmPin {
  public:
-  Stm32TimexComplementPwm(TIM_HandleTypeDef* htim, uint16_t channel)
+  Stm32Pwm(TIM_HandleTypeDef* htim, uint16_t channel)
       : ccr_(FindCCR(htim, channel)) {
-    HAL_TIMEx_PWMN_Start(htim, channel);
+    assert(htim->Instance != TIM1); // TIM1 needs special handling
+    HAL_TIM_PWM_Start(htim, channel);
   }
 
-  virtual ~Stm32TimexComplementPwm() {}
+  virtual ~Stm32Pwm() {}
 
   virtual void Set(uint16_t value) {
     *ccr_ = value >> 5;
