@@ -87,8 +87,13 @@ class CommandManager::Impl {
 
     current_command_ = command;
     auto args = tokenizer.remaining();
+
+    // Clear out anything that was previously in our arguments, then
+    // fill it in with our new stuff.
+    std::memset(arguments_, 0, sizeof(arguments_));
     std::memcpy(arguments_, args.data(), args.size());
     group_arguments_ = gsl::cstring_span(arguments_, args.size());
+
     // We're done with line_buffer_ now, so clear it out to make
     // debugging easier.
     std::memset(line_buffer_, 0, sizeof(line_buffer_));
