@@ -63,8 +63,8 @@ class FireControl::Impl {
     pwm_enable_.Set(data_.fire_pwm || data_.agitator_pwm);
 
     laser_enable_.Set(data_.laser_enabled != 0);
-    aeg_pwm_.Set(data_.fire_pwm);
-    agitator_pwm_.Set(data_.agitator_pwm);
+    aeg_pwm_.Set(data_.fire_pwm * 257);
+    agitator_pwm_.Set(data_.agitator_pwm * 257);
 
     Emit();
   }
