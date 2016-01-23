@@ -130,10 +130,16 @@ void cpp_gimbal_main() {
                       &htim4, TIM_CHANNEL_3);
   MahonyImu imu(pool, clock, config, telemetry, *bmi160.data_signal());
 
+  Stm32GpioPin bldc_sleep(GPIOA, GPIO_PIN_6, true);
+  Stm32GpioPin bldc_reset(GPIOA, GPIO_PIN_7, true);
+  bldc_sleep.Set(false);
+  bldc_reset.Set(false);
+
+  Stm32GpioPin boost_enable(GPIOC, GPIO_PIN_3);
   Stm32GpioPin motor_enable(GPIOC, GPIO_PIN_13);
   GimbalStabilizer stabilizer(pool, clock, config, telemetry,
                               *imu.data_signal(),
-                              motor_enable, motor1, motor2);
+                              boost_enable, motor_enable, motor1, motor2);
 
   Stm32GpioPin laser_enable(GPIOA, GPIO_PIN_10);
   Stm32GpioPin pwm_enable(GPIOB, GPIO_PIN_12);

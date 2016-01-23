@@ -52,6 +52,7 @@ class BldcPwmTest : public BldcPwm {
 BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
   test::Context ctx;
 
+  GpioPinTest boost_enable;
   GpioPinTest motor_enable;
   BldcPwmTest motor1;
   BldcPwmTest motor2;
@@ -61,8 +62,13 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
   AhrsDataSignal ahrs_signal;
   GimbalStabilizer dut(ctx.pool, ctx.clock, ctx.config, ctx.telemetry,
                        ahrs_signal,
+                       boost_enable,
                        motor_enable,
                        motor1, motor2);
+
+  ctx.config.Command(
+      gsl::ensure_z("set gimbal.power 1.0"),
+      CommandManager::Response(&ctx.test_stream, [](int){}));
 
   BOOST_CHECK_EQUAL(dut.data().state, GimbalStabilizer::kInitializing);
 

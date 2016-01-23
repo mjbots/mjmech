@@ -82,6 +82,7 @@ struct Config {
   float initialization_period_s = 1.0f;
   float watchdog_period_s = 0.1f;
   float power = 0.1f;
+  bool boost = false;
   ChannelConfig pitch;
   ChannelConfig yaw;
 
@@ -93,6 +94,7 @@ struct Config {
     a->Visit(MJ_NVP(initialization_period_s));
     a->Visit(MJ_NVP(watchdog_period_s));
     a->Visit(MJ_NVP(power));
+    a->Visit(MJ_NVP(boost));
     a->Visit(MJ_NVP(pitch));
     a->Visit(MJ_NVP(yaw));
     a->Visit(MJ_NVP(pitch_limit));
@@ -115,10 +117,12 @@ class GimbalStabilizer::Impl {
        PersistentConfig& config,
        TelemetryManager& telemetry,
        AhrsDataSignal& ahrs_signal,
+       GpioPin& boost_enable,
        GpioPin& motor_enable,
        BldcPwm& motor1,
        BldcPwm& motor2)
       : clock_(clock),
+        boost_enable_(boost_enable),
         motor_enable_(motor_enable),
         motor1_(motor1),
         motor2_(motor2) {
@@ -140,6 +144,7 @@ class GimbalStabilizer::Impl {
   }
 
   void DoInitializing(const AhrsData* data) {
+    boost_enable_.Set(false);
     motor_enable_.Set(false);
 
     if (data->error) {
@@ -179,6 +184,7 @@ class GimbalStabilizer::Impl {
     }
 
     data_.last_ahrs_update = data->timestamp;
+    boost_enable_.Set(config_.boost);
     motor_enable_.Set(data_.torque_on);
 
     data_.desired_deg.pitch += data_.desired_body_rate_dps.x / data->rate_hz;
@@ -234,6 +240,7 @@ class GimbalStabilizer::Impl {
   void DoFault() {
     data_.state = kFault;
     data_.torque_on = false;
+    boost_enable_.Set(false);
     motor_enable_.Set(false);
     data_.desired_body_rate_dps = Point3D();
     motor1_.Set(0, 0, 0);
@@ -352,6 +359,7 @@ class GimbalStabilizer::Impl {
   }
 
   Clock& clock_;
+  GpioPin& boost_enable_;
   GpioPin& motor_enable_;
   BldcPwm& motor1_;
   BldcPwm& motor2_;
@@ -370,10 +378,12 @@ GimbalStabilizer::GimbalStabilizer(
     PersistentConfig& config,
     TelemetryManager& telemetry,
     AhrsDataSignal& ahrs_signal,
+    GpioPin& boost_enable,
     GpioPin& motor_enable,
     BldcPwm& motor1,
     BldcPwm& motor2)
-    : impl_(&pool, clock, config, telemetry, ahrs_signal, motor_enable,
+    : impl_(&pool, clock, config, telemetry, ahrs_signal,
+            boost_enable, motor_enable,
             motor1, motor2) {}
 
 GimbalStabilizer::~GimbalStabilizer() {}

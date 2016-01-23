@@ -30,6 +30,7 @@ class GimbalStabilizer {
  public:
   GimbalStabilizer(Pool&, Clock&, PersistentConfig&,
                    TelemetryManager&, AhrsDataSignal&,
+                   GpioPin& boost_enable,
                    GpioPin& motor_enable,
                    BldcPwm& motor1, BldcPwm& motor2);
   ~GimbalStabilizer();
