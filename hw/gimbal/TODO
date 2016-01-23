@@ -1,15 +1,13 @@
- * r2 TODO
-   * ensure all r1 defects fixed
-
- * r1 bringup
-   * verify vertical USB PH works and has valid pinout
-   * verify RA SMT ARM switch works
-   * try to solder on an STM32...
+ * r2 bringup
+   * the boost regulator works
+   * each drv8313 works
 
  * gimbal control software
+   * using the PIMU on i2c3 appears to be flaky, but i2c1 works just
+     fine
+   * connect up fire control to herkulex protocol
    * close loop using absolute encoders
      * fault if encoder has problems
-   * add support for second IMU
    * wire up motor fault signals
 
  * fire control
@@ -25,8 +23,12 @@
  * I was able to lock up the I2C bus by resetting the controller
    with st-util
 
- * wishlist
-   * get I2C DMA working
+
+ * r2 defects
+   * alignment pins for ARM switch don't match
+     * spacing is 7.2 instead of the required 6.8
+   * programming header has scrambled pin order
+   * usb connector didn't have front alignment pins soldered
 
  * r1 defects
    * STM32 footprint is too small! :(
@@ -68,6 +70,24 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2016-12-23
+ * starting bringing up r2
+   * no power shorts
+   * applying power works
+   * discovered programming connector has crazy pinout
+     1. VESC seems to use a different PH pinout convention than me
+     2. I also just screwed up the pinout for the JST-PH6
+   * programming STM32 works
+   * debugging USB port works
+   * the primary encoder seems to work
+   * the primary IMU works on i2c1, but not i2c3... or rather it
+     works for a short while, but then wedges in an error state that
+     isn't reported properly
+   * serial herkulex protocol works
+   * the weapon output works, fires the AEG, drives the agitator and
+     laser
+
 
 DONE 2015-12-21
  * add configurable mounting orientation for each IMU
