@@ -241,7 +241,7 @@ class Stm32RawI2C::Impl {
         }
 
         if (i2c_->CR1 & I2C_CR1_ACK) {
-            // We are already receiving things.
+          // We are already receiving things.
           i2c_->CR1 &= ~I2C_CR1_ACK;
           need_to_read_ = (sr1 & I2C_SR1_BTF) ? 2 : 1;
           return;
