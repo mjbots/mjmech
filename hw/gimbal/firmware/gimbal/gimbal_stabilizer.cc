@@ -40,7 +40,7 @@ T Limit(T value, T min, T max) {
 struct ChannelConfig {
   uint8_t motor = -1;
   PID::Config pid;
-  float max_slew_dps = 45.0;
+  float max_slew_dps = 45.0f;
 
   template <typename Archive>
   void Serialize(Archive* a) {
@@ -50,20 +50,20 @@ struct ChannelConfig {
   }
 
   ChannelConfig() {
-    pid.kp = 0.01;
-    pid.ki = 0.1;
-    pid.kd = 0.01;
-    pid.ilimit = 1000.0;
+    pid.kp = 0.01f;
+    pid.ki = 0.1f;
+    pid.kd = 0.01f;
+    pid.ilimit = 1000.0f;
     pid.sign = -1;
   }
 };
 
 struct LimitConfig {
-  float min_deg = 0.0;
-  float max_deg = 0.0;
+  float min_deg = 0.0f;
+  float max_deg = 0.0f;
 
   bool empty() const {
-    return min_deg == 0.0 && max_deg == 0.0;
+    return min_deg == 0.0f && max_deg == 0.0f;
   }
 
   void Limit(float* value) const {
@@ -79,9 +79,9 @@ struct LimitConfig {
 };
 
 struct Config {
-  float initialization_period_s = 1.0;
-  float watchdog_period_s = 0.1;
-  float power = 1.0;
+  float initialization_period_s = 1.0f;
+  float watchdog_period_s = 0.1f;
+  float power = 0.1f;
   ChannelConfig pitch;
   ChannelConfig yaw;
 
@@ -102,8 +102,8 @@ struct Config {
   Config() {
     pitch.motor = 1;
     yaw.motor = 2;
-    pitch_limit.min_deg = -30.0;
-    pitch_limit.max_deg = 30.0;
+    pitch_limit.min_deg = -15.0f;
+    pitch_limit.max_deg = 30.0f;
   }
 };
 
