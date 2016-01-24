@@ -1,17 +1,13 @@
- * r2 bringup
-   * the boost regulator works
-   * each drv8313 works
+ * connect up fire control to herkulex protocol
 
  * gimbal control software
-   * using the PIMU on i2c3 appears to be flaky, but i2c1 works just
-     fine
-   * connect up fire control to herkulex protocol
    * close loop using absolute encoders
      * fault if encoder has problems
+   * using the PIMU on i2c3 appears to be flaky, but i2c1 works just
+     fine
    * wire up motor fault signals
 
  * fire control
-   * make LED flash when enable signal sensed
    * wire up AEG fault signal
 
  * make UI for debugging
@@ -71,7 +67,14 @@
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
 
-DONE 2016-12-23
+DONE 2016-01-24
+ * persistent config for the gimbal didn't seem to be persisting,
+   although things for the imu were
+ * make LED flash when enable signal sensed
+ * made another LED show torque status
+
+
+DONE 2016-01-23
  * starting bringing up r2
    * no power shorts
    * applying power works
@@ -87,6 +90,8 @@ DONE 2016-12-23
    * serial herkulex protocol works
    * the weapon output works, fires the AEG, drives the agitator and
      laser
+   * the boost regulator works
+   * each drv8313 works
 
 
 DONE 2015-12-21
