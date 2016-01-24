@@ -137,9 +137,11 @@ void cpp_gimbal_main() {
 
   Stm32GpioPin boost_enable(GPIOC, GPIO_PIN_3);
   Stm32GpioPin motor_enable(GPIOC, GPIO_PIN_13);
+  Stm32GpioPin torque_led(GPIOB, GPIO_PIN_14, true);
   GimbalStabilizer stabilizer(pool, clock, config, telemetry,
                               *imu.data_signal(),
-                              boost_enable, motor_enable, motor1, motor2);
+                              boost_enable, motor_enable, motor1, motor2,
+                              torque_led);
 
   Stm32GpioPin laser_enable(GPIOA, GPIO_PIN_10);
   Stm32GpioPin pwm_enable(GPIOC, GPIO_PIN_14, true);

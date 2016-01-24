@@ -32,7 +32,8 @@ class GimbalStabilizer {
                    TelemetryManager&, AhrsDataSignal&,
                    GpioPin& boost_enable,
                    GpioPin& motor_enable,
-                   BldcPwm& motor1, BldcPwm& motor2);
+                   BldcPwm& motor1, BldcPwm& motor2,
+                   GpioPin& torque_led);
   ~GimbalStabilizer();
 
   /// Clear all fault states and start again.

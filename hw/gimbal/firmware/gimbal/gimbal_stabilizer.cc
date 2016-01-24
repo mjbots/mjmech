@@ -120,16 +120,19 @@ class GimbalStabilizer::Impl {
        GpioPin& boost_enable,
        GpioPin& motor_enable,
        BldcPwm& motor1,
-       BldcPwm& motor2)
+       BldcPwm& motor2,
+       GpioPin& torque_led)
       : clock_(clock),
         boost_enable_(boost_enable),
         motor_enable_(motor_enable),
         motor1_(motor1),
-        motor2_(motor2) {
+        motor2_(motor2),
+        torque_led_(torque_led) {
     config.Register(gsl::ensure_z("gimbal"), &config_, [](){});
     data_updater_ = telemetry.Register(gsl::ensure_z("gimbal"), &data_);
     ahrs_signal.Connect(
         [this](const AhrsData* data) { this->HandleAhrs(data); });
+    torque_led_.Set(false);
   }
 
   void HandleAhrs(const AhrsData* data) {
@@ -186,6 +189,7 @@ class GimbalStabilizer::Impl {
     data_.last_ahrs_update = data->timestamp;
     boost_enable_.Set(config_.boost);
     motor_enable_.Set(data_.torque_on);
+    torque_led_.Set(data_.torque_on);
 
     data_.desired_deg.pitch += data_.desired_body_rate_dps.x / data->rate_hz;
     config_.pitch_limit.Limit(&data_.desired_deg.pitch);
@@ -245,6 +249,7 @@ class GimbalStabilizer::Impl {
     data_.desired_body_rate_dps = Point3D();
     motor1_.Set(0, 0, 0);
     motor2_.Set(0, 0, 0);
+    torque_led_.Set(false);
   }
 
   void PollMillisecond() {
@@ -363,6 +368,7 @@ class GimbalStabilizer::Impl {
   GpioPin& motor_enable_;
   BldcPwm& motor1_;
   BldcPwm& motor2_;
+  GpioPin& torque_led_;
 
   Config config_;
 
@@ -381,10 +387,11 @@ GimbalStabilizer::GimbalStabilizer(
     GpioPin& boost_enable,
     GpioPin& motor_enable,
     BldcPwm& motor1,
-    BldcPwm& motor2)
+    BldcPwm& motor2,
+    GpioPin& torque_led)
     : impl_(&pool, clock, config, telemetry, ahrs_signal,
             boost_enable, motor_enable,
-            motor1, motor2) {}
+            motor1, motor2, torque_led) {}
 
 GimbalStabilizer::~GimbalStabilizer() {}
 

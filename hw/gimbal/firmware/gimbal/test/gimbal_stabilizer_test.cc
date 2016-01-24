@@ -56,6 +56,7 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
   GpioPinTest motor_enable;
   BldcPwmTest motor1;
   BldcPwmTest motor2;
+  GpioPinTest torque_led;
 
   AhrsData ahrs_data;
   ahrs_data.rate_hz = 100;
@@ -64,7 +65,8 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
                        ahrs_signal,
                        boost_enable,
                        motor_enable,
-                       motor1, motor2);
+                       motor1, motor2,
+                       torque_led);
 
   ctx.config.Command(
       gsl::ensure_z("set gimbal.power 1.0"),
