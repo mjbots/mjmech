@@ -21,6 +21,8 @@
 #include "telemetry_manager.h"
 
 namespace {
+const auto u8 = [](char c) { return static_cast<uint8_t>(c); };
+
 struct Config {
   uint8_t i2c_address = 0x40;
 
@@ -45,7 +47,7 @@ enum AS5048 {
 void MakeSpiRead(char* buffer, uint16_t addr) {
   assert(addr <= 0x3fff);
 
-  uint8_t* const u8 = reinterpret_cast<uint8_t*>(buffer);
+  uint8_t* const out = reinterpret_cast<uint8_t*>(buffer);
   const uint8_t lsb = addr & 0xff;
   const uint8_t msb = ((addr >> 8) & 0xff) | 0x40;
 
@@ -55,8 +57,8 @@ void MakeSpiRead(char* buffer, uint16_t addr) {
   parity = parity ^ (parity >> 1);
 
   // Ensure even parity.
-  u8[0] = msb | ((parity & 0x01) ? 0x80 : 0x00);
-  u8[1] = lsb;
+  out[0] = msb | ((parity & 0x01) ? 0x80 : 0x00);
+  out[1] = lsb;
 }
 }
 
@@ -110,13 +112,21 @@ class As5048Driver::Impl {
   }
 
   void HandleBuffer(const char* buf) {
-    const auto u8 = [](char c) { return static_cast<uint8_t>(c); };
-
     data_.timestamp = clock_.timestamp();
     data_.agc = u8(buf[0]);
     data_.diagnostics = u8(buf[1]);
     data_.magnitude = u8(buf[2]) << 6 | (u8(buf[3]) & 0x3f);
     data_.angle = u8(buf[4]) << 6 | (u8(buf[5]) & 0x3f);
+
+    Emit();
+  }
+
+  void HandleSPIBuffer(const char* buf) {
+    data_.timestamp = clock_.timestamp();
+    data_.diagnostics = u8(buf[0] & 0x0f);
+    data_.agc = u8(buf[1]);
+    data_.magnitude = ((u8(buf[2]) & 0x3f) << 8) | u8(buf[3]);
+    data_.angle = ((u8(buf[4]) & 0x3f) << 8) | u8(buf[5]);
 
     Emit();
   }
@@ -136,11 +146,7 @@ class As5048Driver::Impl {
 
     if (spi_read_position_ == 8) {
       spi_read_position_ = -1;
-      // Byte swap all the 16 bit values to be the same as I2C.
-      std::swap(buffer_[2], buffer_[3]);
-      std::swap(buffer_[4], buffer_[5]);
-      std::swap(buffer_[6], buffer_[7]);
-      HandleBuffer(&buffer_[2]);
+      HandleSPIBuffer(&buffer_[2]);
       std::memset(buffer_, 0, sizeof(buffer_));
     } else {
       // The next poll will start another read.
@@ -175,7 +181,7 @@ class As5048Driver::Impl {
         gsl::string_span(buffer_ + this_read,
                          buffer_ + this_read + 2),
         [this](int error) { this->HandleReadSPI(error); });
-}
+  }
 
   AsyncI2C* const async_i2c_;
   AsyncSPI* const async_spi_;
