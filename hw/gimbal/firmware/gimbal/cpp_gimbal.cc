@@ -142,11 +142,14 @@ void cpp_gimbal_main() {
                               boost_enable, motor_enable, motor1, motor2);
 
   Stm32GpioPin laser_enable(GPIOA, GPIO_PIN_10);
-  Stm32GpioPin pwm_enable(GPIOB, GPIO_PIN_12);
+  Stm32GpioPin pwm_enable(GPIOC, GPIO_PIN_14, true);
   Stm32Pwm aeg_pwm(&htim3, TIM_CHANNEL_3);
   Stm32Pwm agitator_pwm(&htim3, TIM_CHANNEL_4);
+  Stm32GpioPin arm_switch(GPIOB, GPIO_PIN_12);
+  Stm32GpioPin arm_led(GPIOB, GPIO_PIN_13, true);
   FireControl fire_control(pool, clock, config, telemetry,
-                           laser_enable, pwm_enable, aeg_pwm, agitator_pwm);
+                           laser_enable, pwm_enable, aeg_pwm, agitator_pwm,
+                           arm_switch, arm_led);
 
   GimbalHerkulexOperations operations(stabilizer, imu);
   HerkulexProtocol herkulex(pool, herkulex_stream, operations);

@@ -29,7 +29,9 @@ class FireControl {
               GpioPin& laser_enable,
               GpioPin& pwm_enable,
               PwmPin& aeg_pwm,
-              PwmPin& agitator_pwm);
+              PwmPin& agitator_pwm,
+              GpioPin& arm_switch,
+              GpioPin& arm_led);
   ~FireControl();
 
   void SetLaser(bool);

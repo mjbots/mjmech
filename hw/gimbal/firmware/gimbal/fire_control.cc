@@ -28,12 +28,16 @@ class FireControl::Impl {
        GpioPin& laser_enable,
        GpioPin& pwm_enable,
        PwmPin& aeg_pwm,
-       PwmPin& agitator_pwm)
+       PwmPin& agitator_pwm,
+       GpioPin& arm_switch,
+       GpioPin& arm_led)
       : clock_(clock),
         laser_enable_(laser_enable),
         pwm_enable_(pwm_enable),
         aeg_pwm_(aeg_pwm),
-        agitator_pwm_(agitator_pwm) {
+        agitator_pwm_(agitator_pwm),
+        arm_switch_(arm_switch),
+        arm_led_(arm_led) {
     data_updated_ = telemetry.Register(gsl::ensure_z("fire_control"), &data_);
   }
 
@@ -43,6 +47,23 @@ class FireControl::Impl {
   }
 
   void Poll100ms() {
+    data_.armed = arm_switch_.Read() ? 1 : 0;
+
+    data_.flash_count = (data_.flash_count + 1) % 10;
+
+    if (data_.armed) {
+      arm_led_.Set(
+          [&]() {
+            switch (data_.flash_count) {
+              case 0:
+              case 2: { return true; }
+              default: { return false; }
+            }
+          }());
+    } else {
+      arm_led_.Set(false);
+    }
+
     if (data_.fire_time_100ms) {
       data_.fire_time_100ms--;
     } else {
@@ -92,6 +113,8 @@ class FireControl::Impl {
     uint8_t agitator_pwm = 0;
     uint8_t laser_time_100ms = 0;
     uint8_t laser_enabled = 0;
+    uint8_t armed = 0;
+    uint8_t flash_count = 0;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -103,6 +126,8 @@ class FireControl::Impl {
       a->Visit(MJ_NVP(agitator_pwm));
       a->Visit(MJ_NVP(laser_time_100ms));
       a->Visit(MJ_NVP(laser_enabled));
+      a->Visit(MJ_NVP(armed));
+      a->Visit(MJ_NVP(flash_count));
     }
   };
 
@@ -111,6 +136,8 @@ class FireControl::Impl {
   GpioPin& pwm_enable_;
   PwmPin& aeg_pwm_;
   PwmPin& agitator_pwm_;
+  GpioPin& arm_switch_;
+  GpioPin& arm_led_;
 
   Data data_;
   StaticFunction<void ()> data_updated_;
@@ -120,9 +147,11 @@ FireControl::FireControl(
     Pool& pool, Clock& clock, PersistentConfig& config,
     TelemetryManager& telemetry,
     GpioPin& laser_enable, GpioPin& pwm_enable,
-    PwmPin& aeg_pwm, PwmPin& agitator_pwm)
+    PwmPin& aeg_pwm, PwmPin& agitator_pwm,
+    GpioPin& arm_switch, GpioPin& arm_led)
     : impl_(&pool, clock, config, telemetry,
-            laser_enable, pwm_enable, aeg_pwm, agitator_pwm) {
+            laser_enable, pwm_enable, aeg_pwm, agitator_pwm,
+            arm_switch, arm_led) {
 }
 
 FireControl::~FireControl() {}

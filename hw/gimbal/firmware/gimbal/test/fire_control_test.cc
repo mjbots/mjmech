@@ -46,6 +46,9 @@ BOOST_AUTO_TEST_CASE(BasicFireControlTest) {
   TestGpio pwm_enable;
   TestPwm aeg_pwm;
   TestPwm agitator_pwm;
+  TestGpio arm_switch;
+  TestGpio arm_led;
   FireControl dut(ctx.pool, ctx.clock, ctx.config, ctx.telemetry,
-                  laser_enable, pwm_enable, aeg_pwm, agitator_pwm);
+                  laser_enable, pwm_enable, aeg_pwm, agitator_pwm,
+                  arm_switch, arm_led);
 }
