@@ -14,11 +14,22 @@
 
 #include "crc.h"
 
-#include "Inc/crc.h"
+#include <boost/crc.hpp>
+
+//#include "Inc/crc.h"
 
 uint32_t CalculateCrc(const char* start, std::size_t length) {
-  return HAL_CRC_Calculate(
-      &hcrc,
-      const_cast<uint32_t*>(reinterpret_cast<const uint32_t*>(start)),
-      length);
+  boost::crc_32_type crc;
+  crc.process_bytes(start, length);
+  return crc.checksum();
+
+  // NOTE jpieper 2016-01-24: For some reason, which I don't feel like
+  // debugging, the HAL accelerated version of this gives random
+  // results on large data.  Instead, we just use the boost CRC
+  // version above, which is correct, if slower.
+
+  // return HAL_CRC_Calculate(
+  //     &hcrc,
+  //     const_cast<uint32_t*>(reinterpret_cast<const uint32_t*>(start)),
+  //     length);
 }
