@@ -35,7 +35,7 @@ class TelemetryManager::Impl {
     SerializableHandlerBase* base = nullptr;
   };
 
-  typedef NamedRegistryBase<Element, 8> NamedRegistry;
+  typedef NamedRegistryBase<Element, 16> NamedRegistry;
 
   void UpdateItem(NamedRegistry::Element* element) {
     // If we are in the mode where we emit on updates, mark this guy

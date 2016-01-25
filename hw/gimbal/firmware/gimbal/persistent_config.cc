@@ -45,7 +45,7 @@ class PersistentConfig::Impl {
     StaticFunction<void ()> updated;
   };
 
-  typedef NamedRegistryBase<Element, 8> NamedRegistry;
+  typedef NamedRegistryBase<Element, 16> NamedRegistry;
 
   void Enumerate(const CommandManager::Response& response) {
     current_response_ = response;
