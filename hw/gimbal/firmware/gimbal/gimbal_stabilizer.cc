@@ -271,7 +271,7 @@ class GimbalStabilizer::Impl {
         const float elapsed_s = static_cast<float>(
             clock_.timestamp() -
             data_.last_ahrs_update) / clock_.ticks_per_second();
-        if (elapsed_s > config_.watchdog_period_s) {
+        if (elapsed_s > config_.watchdog_period_s && data_.torque_on) {
           DoFault();
         }
         break;
@@ -428,6 +428,11 @@ void GimbalStabilizer::SetTorque(bool v) {
     // so we make a smooth motion when turning on.
     impl_->data_.target_deg.pitch = impl_->ahrs_data_.euler_deg.pitch;
     impl_->data_.target_deg.yaw = impl_->ahrs_data_.euler_deg.yaw;
+  }
+
+  if (!v && impl_->data_.state == kFault) {
+    impl_->data_.state = kInitializing;
+    impl_->data_.start_timestamp = impl_->clock_.timestamp();
   }
 }
 
