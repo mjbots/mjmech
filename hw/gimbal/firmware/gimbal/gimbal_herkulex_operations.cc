@@ -14,14 +14,17 @@
 
 #include "gimbal_herkulex_operations.h"
 
+#include "fire_control.h"
 #include "gimbal_stabilizer.h"
 #include "mahony_imu.h"
 
 GimbalHerkulexOperations::GimbalHerkulexOperations(
     GimbalStabilizer& stabilizer,
-    MahonyImu& imu)
+    MahonyImu& imu,
+    FireControl& fire_control)
     : stabilizer_(stabilizer),
-      imu_(imu) {}
+      imu_(imu),
+      fire_control_(fire_control) {}
 
 GimbalHerkulexOperations::~GimbalHerkulexOperations() {}
 
@@ -81,6 +84,22 @@ void GimbalHerkulexOperations::WriteRam(uint8_t addr, uint8_t val) {
       }
       break;
     }
+    case 0x70: { // fire_time
+      fire_time_ = val;
+      break;
+    }
+    case 0x71: { // fire_pwm
+      fire_control_.SetFire(val, fire_time_);
+      break;
+    }
+    case 0x72: { // agitator_pwm
+      fire_control_.SetAgitator(val);
+      break;
+    }
+    case 0x73: {
+      fire_control_.SetLaser(val != 0);
+      break;
+    }
   }
 }
 
@@ -106,6 +125,10 @@ uint8_t GimbalHerkulexOperations::ReadRam(uint8_t addr) {
     case 0x5d: { return (int_actual_yaw() >> 7) & 0x7f; }
     case 0x5e: { return (int_actual_yaw() >> 14) & 0x7f; }
     case 0x5f: { return (int_actual_yaw() >> 21) & 0x7f; }
+    case 0x70: { return fire_control_.fire_time_100ms(); }
+    case 0x71: { return fire_control_.fire_pwm(); }
+    case 0x72: { return fire_control_.agitator_pwm(); }
+    case 0x73: { return fire_control_.laser() ? 1 : 0; }
   }
   return 0;
 }

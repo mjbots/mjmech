@@ -153,7 +153,7 @@ void cpp_gimbal_main() {
                            laser_enable, pwm_enable, aeg_pwm, agitator_pwm,
                            arm_switch, arm_led);
 
-  GimbalHerkulexOperations operations(stabilizer, imu);
+  GimbalHerkulexOperations operations(stabilizer, imu, fire_control);
   HerkulexProtocol herkulex(pool, herkulex_stream, operations);
 
   As5048Driver::Data as5048_data;

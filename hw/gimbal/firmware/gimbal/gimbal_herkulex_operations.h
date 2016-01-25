@@ -16,13 +16,15 @@
 
 #include "herkulex_protocol.h"
 
+class FireControl;
 class GimbalStabilizer;
 class MahonyImu;
 
 class GimbalHerkulexOperations : public HerkulexProtocol::Operations {
  public:
   GimbalHerkulexOperations(GimbalStabilizer&,
-                           MahonyImu&);
+                           MahonyImu&,
+                           FireControl&);
   virtual ~GimbalHerkulexOperations();
 
   uint8_t address() const override;
@@ -38,6 +40,8 @@ class GimbalHerkulexOperations : public HerkulexProtocol::Operations {
 
   GimbalStabilizer& stabilizer_;
   MahonyImu& imu_;
+  FireControl& fire_control_;
 
   uint32_t shadow_ = 0;
+  uint8_t fire_time_ = 0;
 };
