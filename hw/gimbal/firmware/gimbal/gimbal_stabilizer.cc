@@ -136,6 +136,8 @@ class GimbalStabilizer::Impl {
   }
 
   void HandleAhrs(const AhrsData* data) {
+    ahrs_data_ = *data;
+
     switch (data_.state) {
       case kInitializing: { DoInitializing(data); break; }
       case kOperating: { DoOperating(data); break; }
@@ -167,6 +169,8 @@ class GimbalStabilizer::Impl {
     if (elapsed_s > config_.initialization_period_s) {
       data_.desired_deg.pitch = 0.0f;
       data_.desired_deg.yaw = data->euler_deg.yaw;
+      data_.target_deg.pitch = data->euler_deg.pitch;
+      data_.target_deg.yaw = data->euler_deg.yaw;
       data_.last_ahrs_update = now;
       data_.state = kOperating;
       return;
@@ -378,6 +382,7 @@ class GimbalStabilizer::Impl {
   StaticFunction<void ()> data_updater_;
   PID pitch_pid_{&config_.pitch.pid, &data_.pitch};
   PID yaw_pid_{&config_.yaw.pid, &data_.yaw};
+  AhrsData ahrs_data_;
 };
 
 GimbalStabilizer::GimbalStabilizer(
@@ -410,7 +415,14 @@ void GimbalStabilizer::Reset() {
 }
 
 void GimbalStabilizer::SetTorque(bool v) {
+  const bool old_torque = impl_->data_.torque_on;
   impl_->data_.torque_on = v;
+  if (!old_torque && v) {
+    // Always start with the target yaw and pitch where they are now,
+    // so we make a smooth motion when turning on.
+    impl_->data_.target_deg.pitch = impl_->ahrs_data_.euler_deg.pitch;
+    impl_->data_.target_deg.yaw = impl_->ahrs_data_.euler_deg.yaw;
+  }
 }
 
 const GimbalStabilizer::Data& GimbalStabilizer::data() const {
