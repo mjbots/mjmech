@@ -316,7 +316,7 @@ class GimbalStabilizer::Impl {
     // conversion errors when dealing with non-null terminated
     // strings.  Thus, ignore errors.
     const float pitch_deg = std::strtod(pitch_str.data(), nullptr);
-    const float yaw_deg = std::strtod(pitch_str.data(), nullptr);
+    const float yaw_deg = std::strtod(yaw_str.data(), nullptr);
 
     SetImuAttitude(pitch_deg, yaw_deg);
 
