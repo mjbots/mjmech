@@ -56,12 +56,14 @@ Video/Control
 
 History
 ~~~~~~~
+DONE 2016-01-25
+ * ordered spare gimbal motors
+
 DONE 2016-01-21
  * Build power/data harness to go from top plate to turret
  * Build USB harness to go from top plate to turret
  * Test mount bottom plate and battery
  * Mostly populated a new transponder board
-
 
 DONE 2016-01-20
  * gimbal harness rebuilds
