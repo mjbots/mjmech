@@ -1,18 +1,28 @@
  * connect up fire control to herkulex protocol
+ * provide a software command to restart things
+ * add version number or date to image somehow
+ * for some reason, gimbal rate commands from mw_command have the
+   opposite sign when run through the whole system
 
  * gimbal control software
+   * when we are limiting the target due to max_slew, the target
+     body_dps should be non-zero?  More likely it should have an accel
+     and decel profile of some sort.
    * close loop using absolute encoders
      * fault if encoder has problems
    * using the PIMU on i2c3 appears to be flaky, but i2c1 works just
      fine
    * wire up motor fault signals
 
- * fire control
-   * wire up AEG fault signal
-
  * make UI for debugging
+   * after dragging or zooming plot, need a way to get auto-scrolling
+     working again
+   * would be really nice to be able to drag the axes independently
    * record tlog files
    * easy to reach button for torque off
+
+ * fire control
+   * wire up AEG fault signal
 
  * get watchdog working
 
@@ -72,6 +82,8 @@ DONE 2016-01-24
    although things for the imu were
  * make LED flash when enable signal sensed
  * made another LED show torque status
+ * gimbal shouldn't fault when torque is not on
+ * setting gimbal torque to off should cause it to re-initialize
 
 
 DONE 2016-01-23
