@@ -37,7 +37,7 @@ class Bmi160Driver {
 
   struct Config {
     uint8_t address = 0xd0;
-    uint16_t rate_hz = 100;
+    uint16_t rate_hz = 800;
     uint16_t gyro_max_dps = 1000;
     uint8_t accel_max_g = 4;
 
@@ -50,6 +50,10 @@ class Bmi160Driver {
       a->Visit(MJ_NVP(gyro_max_dps));
       a->Visit(MJ_NVP(accel_max_g));
       a->Visit(MJ_NVP(offset_deg));
+    }
+
+    Config() {
+      offset_deg.yaw = 90.0f;
     }
   };
 
