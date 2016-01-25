@@ -197,7 +197,8 @@ class GimbalStabilizer::Impl {
 
     data_.desired_deg.pitch += data_.desired_body_rate_dps.x / data->rate_hz;
     config_.pitch_limit.Limit(&data_.desired_deg.pitch);
-    data_.desired_deg.yaw += data_.desired_body_rate_dps.z / data->rate_hz;
+    // Body rate Z and yaw have opposite signs.
+    data_.desired_deg.yaw -= data_.desired_body_rate_dps.z / data->rate_hz;
 
     UpdateSlew(&data_.target_deg.pitch, data_.desired_deg.pitch,
                data->rate_hz, config_.pitch.max_slew_dps);
@@ -208,9 +209,12 @@ class GimbalStabilizer::Impl {
         pitch_pid_.Apply(data->euler_deg.pitch, data_.target_deg.pitch,
                          data->body_rate_dps.x, data_.desired_body_rate_dps.x,
                          data->rate_hz);
+    // For yaw, the sign of body rate in Z is opposite that of yaw.
+    // To make the PID controller have the same signs for everything,
+    // we invert it before passing it in.
     const float yaw_command =
         yaw_pid_.Apply(data->euler_deg.yaw, data_.target_deg.yaw,
-                       data->body_rate_dps.z, data_.desired_body_rate_dps.z,
+                       -data->body_rate_dps.z, -data_.desired_body_rate_dps.z,
                        data->rate_hz);
 
     // For the open loop case, our integral should be wrapped to be
