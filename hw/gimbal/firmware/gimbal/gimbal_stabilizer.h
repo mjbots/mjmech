@@ -86,6 +86,7 @@ class GimbalStabilizer {
     Point3D desired_body_rate_dps;
     uint32_t last_ahrs_update = 0;
     bool torque_on = false;
+    uint8_t last_fault_reason = 0;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -98,6 +99,7 @@ class GimbalStabilizer {
       a->Visit(MJ_NVP(desired_body_rate_dps));
       a->Visit(MJ_NVP(last_ahrs_update));
       a->Visit(MJ_NVP(torque_on));
+      a->Visit(MJ_NVP(last_fault_reason));
     }
   };
 
