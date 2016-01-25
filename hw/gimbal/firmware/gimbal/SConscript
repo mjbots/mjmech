@@ -26,6 +26,7 @@ env.Append(CPPPATH=libmiddlewares_include)
 
 SOURCES = [
     'as5048_driver.cc',
+    'bldc_encoder.cc',
     'bmi160_driver.cc',
     'command_manager.cc',
     'cpp_gimbal.cc',
