@@ -39,12 +39,14 @@ T Limit(T value, T min, T max) {
 
 struct ChannelConfig {
   uint8_t motor = -1;
+  float power = 0.1f;
   PID::Config pid;
   float max_slew_dps = 45.0f;
 
   template <typename Archive>
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(motor));
+    a->Visit(MJ_NVP(power));
     a->Visit(MJ_NVP(pid));
     a->Visit(MJ_NVP(max_slew_dps));
   }
@@ -81,7 +83,6 @@ struct LimitConfig {
 struct Config {
   float initialization_period_s = 1.0f;
   float watchdog_period_s = 0.1f;
-  float power = 0.1f;
   bool boost = false;
   ChannelConfig pitch;
   ChannelConfig yaw;
@@ -93,7 +94,6 @@ struct Config {
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(initialization_period_s));
     a->Visit(MJ_NVP(watchdog_period_s));
-    a->Visit(MJ_NVP(power));
     a->Visit(MJ_NVP(boost));
     a->Visit(MJ_NVP(pitch));
     a->Visit(MJ_NVP(yaw));
@@ -218,8 +218,8 @@ class GimbalStabilizer::Impl {
     wrap_integral(&data_.pitch.integral);
     wrap_integral(&data_.yaw.integral);
 
-    const float power = Limit(config_.power, 0.0f, 1.0f);
-    const auto phase = [&](float command, float phase) {
+    const auto phase = [&](float command, float power_in, float phase) {
+      const float power = Limit(power_in, 0.0f, 1.0f);
       const float fresult = (
           (std::sin((command + phase) *
                     2 * mjmech::base::kPi) + 1.0f) *
@@ -229,13 +229,15 @@ class GimbalStabilizer::Impl {
                    std::min(static_cast<uint32_t>(65535),
                             static_cast<uint32_t>(fresult))));
     };
-    const float pitch1 = phase(pitch_command, 0.0f);
-    const float pitch2 = phase(pitch_command, 1.0f / 3.0f);
-    const float pitch3 = phase(pitch_command, 2.0f / 3.0f);
+    const float ppower = config_.pitch.power;
+    const float pitch1 = phase(pitch_command, ppower, 0.0f);
+    const float pitch2 = phase(pitch_command, ppower, 1.0f / 3.0f);
+    const float pitch3 = phase(pitch_command, ppower, 2.0f / 3.0f);
 
-    const float yaw1 = phase(yaw_command, 0.0f);
-    const float yaw2 = phase(yaw_command, 1.0f / 3.0f);
-    const float yaw3 = phase(yaw_command, 2.0f / 3.0f);
+    const float ypower = config_.yaw.power;
+    const float yaw1 = phase(yaw_command, ypower, 0.0f);
+    const float yaw2 = phase(yaw_command, ypower, 1.0f / 3.0f);
+    const float yaw3 = phase(yaw_command, ypower, 2.0f / 3.0f);
 
     pitch_motor().Set(pitch1, pitch2, pitch3);
     yaw_motor().Set(yaw1, yaw2, yaw3);
