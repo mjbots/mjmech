@@ -38,7 +38,7 @@ T Limit(T value, T min, T max) {
 }
 
 struct ChannelConfig {
-  uint8_t motor = -1;
+  int8_t motor = -1;
   float power = 0.1f;
   PID::Config pid;
   float max_slew_dps = 60.0f;
