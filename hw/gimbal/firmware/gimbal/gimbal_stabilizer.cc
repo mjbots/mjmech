@@ -123,6 +123,7 @@ class GimbalStabilizer::Impl {
        GpioPin& motor_enable,
        BldcPwm& motor1,
        BldcPwm& motor2,
+       BldcEncoderDataSignal& yaw_encoder_signal,
        GpioPin& torque_led)
       : clock_(clock),
         boost_enable_(boost_enable),
@@ -134,6 +135,8 @@ class GimbalStabilizer::Impl {
     data_updater_ = telemetry.Register(gsl::ensure_z("gimbal"), &data_);
     ahrs_signal.Connect(
         [this](const AhrsData* data) { this->HandleAhrs(data); });
+    yaw_encoder_signal.Connect(
+        [this](const BldcEncoderData* data) { this->HandleYawEncoder(data); });
     torque_led_.Set(false);
   }
 
@@ -148,6 +151,10 @@ class GimbalStabilizer::Impl {
     }
 
     data_updater_();
+  }
+
+  void HandleYawEncoder(const BldcEncoderData* data) {
+    yaw_encoder_ = *data;
   }
 
   void DoInitializing(const AhrsData* data) {
@@ -200,8 +207,20 @@ class GimbalStabilizer::Impl {
 
     data_.desired_deg.pitch += data_.desired_body_rate_dps.x / data->rate_hz;
     config_.pitch_limit.Limit(&data_.desired_deg.pitch);
+
     // Body rate Z and yaw have opposite signs.
     data_.desired_deg.yaw -= data_.desired_body_rate_dps.z / data->rate_hz;
+    if (CheckYawEncoderRecent() && !config_.abs_yaw_limit.empty()) {
+      const float yaw_min_deg = data->euler_deg.yaw -
+          (yaw_encoder_.position_deg - config_.abs_yaw_limit.min_deg);
+      const float yaw_max_deg = data->euler_deg.yaw +
+          (config_.abs_yaw_limit.max_deg - yaw_encoder_.position_deg);
+      if (data_.desired_deg.yaw < yaw_min_deg) {
+        data_.desired_deg.yaw = yaw_min_deg;
+      } else if (data_.desired_deg.yaw > yaw_max_deg) {
+        data_.desired_deg.yaw = yaw_max_deg;
+      }
+    }
 
     UpdateSlew(&data_.target_deg.pitch, data_.desired_deg.pitch,
                data->rate_hz, config_.pitch.max_slew_dps);
@@ -377,6 +396,12 @@ class GimbalStabilizer::Impl {
     AsyncWrite(*response.stream, message, response.callback);
   }
 
+  bool CheckYawEncoderRecent() const {
+    const auto delta = clock_.timestamp() - yaw_encoder_.timestamp;
+    const auto max_age = clock_.ticks_per_second() / 100;
+    return delta < max_age;
+  }
+
   Clock& clock_;
   GpioPin& boost_enable_;
   GpioPin& motor_enable_;
@@ -391,6 +416,7 @@ class GimbalStabilizer::Impl {
   PID pitch_pid_{&config_.pitch.pid, &data_.pitch};
   PID yaw_pid_{&config_.yaw.pid, &data_.yaw};
   AhrsData ahrs_data_;
+  BldcEncoderData yaw_encoder_;
 };
 
 GimbalStabilizer::GimbalStabilizer(
@@ -403,10 +429,11 @@ GimbalStabilizer::GimbalStabilizer(
     GpioPin& motor_enable,
     BldcPwm& motor1,
     BldcPwm& motor2,
+    BldcEncoderDataSignal& yaw_encoder_signal,
     GpioPin& torque_led)
     : impl_(&pool, clock, config, telemetry, ahrs_signal,
             boost_enable, motor_enable,
-            motor1, motor2, torque_led) {}
+            motor1, motor2, yaw_encoder_signal, torque_led) {}
 
 GimbalStabilizer::~GimbalStabilizer() {}
 

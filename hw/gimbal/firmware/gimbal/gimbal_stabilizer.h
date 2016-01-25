@@ -16,6 +16,7 @@
 
 #include "ahrs_data.h"
 #include "async_types.h"
+#include "bldc_encoder_data.h"
 #include "command_manager.h"
 #include "pid.h"
 #include "pool_ptr.h"
@@ -33,6 +34,7 @@ class GimbalStabilizer {
                    GpioPin& boost_enable,
                    GpioPin& motor_enable,
                    BldcPwm& motor1, BldcPwm& motor2,
+                   BldcEncoderDataSignal&,
                    GpioPin& torque_led);
   ~GimbalStabilizer();
 

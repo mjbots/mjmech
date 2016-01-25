@@ -61,11 +61,13 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
   AhrsData ahrs_data;
   ahrs_data.rate_hz = 100;
   AhrsDataSignal ahrs_signal;
+  BldcEncoderDataSignal yaw_encoder_signal;
   GimbalStabilizer dut(ctx.pool, ctx.clock, ctx.config, ctx.telemetry,
                        ahrs_signal,
                        boost_enable,
                        motor_enable,
                        motor1, motor2,
+                       yaw_encoder_signal,
                        torque_led);
 
   for (auto command: {
