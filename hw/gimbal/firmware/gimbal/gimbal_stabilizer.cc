@@ -52,10 +52,12 @@ struct ChannelConfig {
   }
 
   ChannelConfig() {
-    pid.kp = 0.01f;
+    pid.kp = 0.2f;
     pid.ki = 0.1f;
     pid.kd = 0.01f;
+    pid.iratelimit = 1.0f;
     pid.ilimit = 1000.0f;
+    pid.kpkd_limit = 0.25f;
     pid.sign = -1;
   }
 };

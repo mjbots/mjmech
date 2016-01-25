@@ -68,9 +68,15 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
                        motor1, motor2,
                        torque_led);
 
-  ctx.config.Command(
-      gsl::ensure_z("set gimbal.power 1.0"),
-      CommandManager::Response(&ctx.test_stream, [](int){}));
+  for (auto command: {
+      "set gimbal.pitch.power 1.0",
+          "set gimbal.yaw.power 1.0",
+          "set gimbal.pitch.motor 1",
+          "set gimbal.yaw.motor 2",
+          }) {
+    ctx.config.Command(gsl::ensure_z(command),
+                       CommandManager::Response(&ctx.test_stream, [](int){}));
+  }
 
   BOOST_CHECK_EQUAL(dut.data().state, GimbalStabilizer::kInitializing);
 
@@ -108,30 +114,30 @@ BOOST_AUTO_TEST_CASE(BasicGimbalStabilizerTest) {
 
   // Now if the pitch is a little bit high, we should see our command
   // start to ramp down to correct.
-  ahrs_data.euler_deg.pitch = 1.0;
+  ahrs_data.euler_deg.pitch = 0.1;
   advance();
-  BOOST_CHECK_EQUAL(motor1.a_, 30504);
+  BOOST_CHECK_EQUAL(motor1.a_, 28639);
   BOOST_CHECK_EQUAL(motor2.a_, 32767);
 
   advance();
-  BOOST_CHECK_EQUAL(motor1.a_, 30298);
+  BOOST_CHECK_EQUAL(motor1.a_, 28619);
   BOOST_CHECK_EQUAL(motor2.a_, 32767);
 
   // And when we get back, we stop changing.
   ahrs_data.euler_deg.pitch = 0.0;
 
   advance();
-  BOOST_CHECK_EQUAL(motor1.a_, 32355);
+  BOOST_CHECK_EQUAL(motor1.a_, 32725);
   BOOST_CHECK_EQUAL(motor2.a_, 32767);
 
   advance();
-  BOOST_CHECK_EQUAL(motor1.a_, 32355);
+  BOOST_CHECK_EQUAL(motor1.a_, 32725);
   BOOST_CHECK_EQUAL(motor2.a_, 32767);
 
   // Finally, verify that a yaw disturbance results in any change at
   // all.
-  ahrs_data.euler_deg.yaw = 1.0;
+  ahrs_data.euler_deg.yaw = 0.1;
   advance();
-  BOOST_CHECK_EQUAL(motor1.a_, 32355);
-  BOOST_CHECK_EQUAL(motor2.a_, 30504);
+  BOOST_CHECK_EQUAL(motor1.a_, 32725);
+  BOOST_CHECK_EQUAL(motor2.a_, 28639);
 }
