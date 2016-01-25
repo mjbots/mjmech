@@ -41,7 +41,7 @@ struct ChannelConfig {
   uint8_t motor = -1;
   float power = 0.1f;
   PID::Config pid;
-  float max_slew_dps = 45.0f;
+  float max_slew_dps = 60.0f;
 
   template <typename Archive>
   void Serialize(Archive* a) {
