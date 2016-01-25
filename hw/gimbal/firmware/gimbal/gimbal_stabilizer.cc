@@ -102,8 +102,8 @@ struct Config {
   }
 
   Config() {
-    pitch.motor = 1;
-    yaw.motor = 2;
+    pitch.motor = 2;
+    yaw.motor = 1;
     pitch_limit.min_deg = -15.0f;
     pitch_limit.max_deg = 30.0f;
   }
