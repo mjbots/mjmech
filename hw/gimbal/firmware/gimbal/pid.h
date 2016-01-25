@@ -22,8 +22,9 @@ class PID {
     float kp = 0.0f;
     float ki = 0.0f;
     float kd = 0.0f;
+    float iratelimit = -1.0f;
     float ilimit = 0.0f;
-    float kpkd_limit = -1;
+    float kpkd_limit = -1.0f;
     int8_t sign = 1;
 
     template <typename Archive>
@@ -31,6 +32,7 @@ class PID {
       a->Visit(MJ_NVP(kp));
       a->Visit(MJ_NVP(ki));
       a->Visit(MJ_NVP(kd));
+      a->Visit(MJ_NVP(iratelimit));
       a->Visit(MJ_NVP(ilimit));
       a->Visit(MJ_NVP(kpkd_limit));
       a->Visit(MJ_NVP(sign));
@@ -44,6 +46,10 @@ class PID {
     // present for purposes of being logged with it.
     float error = 0.0f;
     float error_rate = 0.0f;
+
+    float p = 0.0f;
+    float d = 0.0f;
+    float pd = 0.0f;
     float command = 0.0f;
 
     template <typename Archive>
@@ -51,6 +57,9 @@ class PID {
       a->Visit(MJ_NVP(integral));
       a->Visit(MJ_NVP(error));
       a->Visit(MJ_NVP(error_rate));
+      a->Visit(MJ_NVP(p));
+      a->Visit(MJ_NVP(d));
+      a->Visit(MJ_NVP(pd));
       a->Visit(MJ_NVP(command));
     }
   };
@@ -64,26 +73,37 @@ class PID {
     state_->error = measured - desired;
     state_->error_rate = measured_rate - desired_rate;
 
-    state_->integral += state_->error * config_->ki / rate_hz;
+    const float max_i_update = config_->iratelimit / rate_hz;
+    float to_update_i = state_->error * config_->ki / rate_hz;
+    if (max_i_update > 0.0) {
+      if (to_update_i > max_i_update) {
+        to_update_i = max_i_update;
+      } else if (to_update_i < -max_i_update) {
+        to_update_i = -max_i_update;
+      }
+    }
+
+    state_->integral += to_update_i;
+
     if (state_->integral > config_->ilimit) {
       state_->integral = config_->ilimit;
     } else if (state_->integral < -config_->ilimit) {
       state_->integral = -config_->ilimit;
     }
 
-    float kpkd =
-        config_->kp * state_->error +
-        config_->kd * state_->error_rate;
+    state_->p = config_->kp * state_->error;
+    state_->d = config_->kd * state_->error_rate;
+    state_->pd = state_->p + state_->d;
 
     if (config_->kpkd_limit >= 0.0) {
-      if (kpkd > config_->kpkd_limit) {
-        kpkd = config_->kpkd_limit;
-      } else if (kpkd < -config_->kpkd_limit) {
-        kpkd = -config_->kpkd_limit;
+      if (state_->pd > config_->kpkd_limit) {
+        state_->pd = config_->kpkd_limit;
+      } else if (state_->pd < -config_->kpkd_limit) {
+        state_->pd = -config_->kpkd_limit;
       }
     }
 
-    state_->command = config_->sign * (kpkd + state_->integral);
+    state_->command = config_->sign * (state_->pd + state_->integral);
 
     return state_->command;
   }
