@@ -90,6 +90,9 @@ class GimbalStabilizer {
     bool torque_on = false;
     uint8_t last_fault_reason = 0;
 
+    float pitch_command = 0.0f;
+    float yaw_command = 0.0f;
+
     template <typename Archive>
     void Serialize(Archive* a) {
       a->Visit(MJ_ENUM(state, StateMapper));
@@ -102,6 +105,8 @@ class GimbalStabilizer {
       a->Visit(MJ_NVP(last_ahrs_update));
       a->Visit(MJ_NVP(torque_on));
       a->Visit(MJ_NVP(last_fault_reason));
+      a->Visit(MJ_NVP(pitch_command));
+      a->Visit(MJ_NVP(yaw_command));
     }
   };
 

@@ -43,12 +43,18 @@ struct ChannelConfig {
   PID::Config pid;
   float max_slew_dps = 60.0f;
 
+  /// 0 is traditional open loop
+  /// 1 uses bldc encoder to apply fixed torque
+  /// 2 just applies a fixed motor phase based on target
+  uint8_t mode = 0;
+
   template <typename Archive>
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(motor));
     a->Visit(MJ_NVP(power));
     a->Visit(MJ_NVP(pid));
     a->Visit(MJ_NVP(max_slew_dps));
+    a->Visit(MJ_NVP(mode));
   }
 
   ChannelConfig() {
@@ -227,14 +233,14 @@ class GimbalStabilizer::Impl {
     UpdateSlew(&data_.target_deg.yaw, data_.desired_deg.yaw,
                data->rate_hz, config_.yaw.max_slew_dps);
 
-    const float pitch_command =
+    const float pitch_control_command =
         pitch_pid_.Apply(data->euler_deg.pitch, data_.target_deg.pitch,
                          data->body_rate_dps.x, data_.desired_body_rate_dps.x,
                          data->rate_hz);
     // For yaw, the sign of body rate in Z is opposite that of yaw.
     // To make the PID controller have the same signs for everything,
     // we invert it before passing it in.
-    const float yaw_command =
+    const float yaw_control_command =
         yaw_pid_.Apply(data->euler_deg.yaw, data_.target_deg.yaw,
                        -data->body_rate_dps.z, -data_.desired_body_rate_dps.z,
                        data->rate_hz);
@@ -245,10 +251,39 @@ class GimbalStabilizer::Impl {
       *integral = std::fmod(*integral, 1.0f);
       if (*integral < 0.0f) { (*integral) += 1.0f; }
     };
-    wrap_integral(&data_.pitch.integral);
-    wrap_integral(&data_.yaw.integral);
+    if (config_.pitch.mode == 0) {
+      wrap_integral(&data_.pitch.integral);
+    }
+    if (config_.yaw.mode == 0) {
+      wrap_integral(&data_.yaw.integral);
+    }
 
-    const auto phase = [&](float command, float power_in, float phase) {
+    const float pitch_command = [&, mode=config_.pitch.mode]() {
+      if (mode == 0) {
+        return pitch_control_command;
+      } else if (mode == 1) {
+        // TODO jpieper: When we support bldc encoders on pitch, add it
+        // here.
+        return 0.0f;
+      } else if (mode == 2) {
+        return data_.target_deg.pitch / 360.0f;
+      }
+      return 0.0f;
+    }();
+
+    const float yaw_command = [&, mode=config_.yaw.mode]() {
+      if (mode == 0) {
+        return yaw_control_command;
+      } else if (mode == 1) {
+        return yaw_control_command + yaw_encoder_.phase;
+      } else if (mode == 2) {
+        return data_.target_deg.yaw / 360.0f;
+      }
+
+      return 0.0f;
+    }();
+
+    const auto pwm = [&](float command, float power_in, float phase) {
       const float power = Limit(power_in, 0.0f, 1.0f);
       const float fresult = (
           (std::sin((command + phase) *
@@ -260,17 +295,20 @@ class GimbalStabilizer::Impl {
                             static_cast<uint32_t>(fresult))));
     };
     const float ppower = config_.pitch.power;
-    const float pitch1 = phase(pitch_command, ppower, 0.0f);
-    const float pitch2 = phase(pitch_command, ppower, 1.0f / 3.0f);
-    const float pitch3 = phase(pitch_command, ppower, 2.0f / 3.0f);
+    const float pitch1 = pwm(pitch_command, ppower, 0.0f);
+    const float pitch2 = pwm(pitch_command, ppower, 1.0f / 3.0f);
+    const float pitch3 = pwm(pitch_command, ppower, 2.0f / 3.0f);
 
     const float ypower = config_.yaw.power;
-    const float yaw1 = phase(yaw_command, ypower, 0.0f);
-    const float yaw2 = phase(yaw_command, ypower, 1.0f / 3.0f);
-    const float yaw3 = phase(yaw_command, ypower, 2.0f / 3.0f);
+    const float yaw1 = pwm(yaw_command, ypower, 0.0f);
+    const float yaw2 = pwm(yaw_command, ypower, 1.0f / 3.0f);
+    const float yaw3 = pwm(yaw_command, ypower, 2.0f / 3.0f);
 
     pitch_motor().Set(pitch1, pitch2, pitch3);
     yaw_motor().Set(yaw1, yaw2, yaw3);
+
+    data_.pitch_command = pitch_command;
+    data_.yaw_command = yaw_command;
   }
 
   void DoFault() {
