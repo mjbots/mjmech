@@ -15,6 +15,8 @@ Preparing for RoboGames
   - packetize frames into packets, merge them back
   - send on fixed schedule (but apply corrections if this is too slow)
   - ensure we log all packets
+ * video: ensure --camera.write_video on sender produces playable file
+ * video: ensure --display.source=rtsp:// works
  * control: bring in joystick control code to video_controller_app process.
  * control: make sure we are using multicasts for control commands
  * control: make sure agitator control works properly preserved
