@@ -1,4 +1,13 @@
- * gimbal: close loop using absolute encoders
+ * when gait engine is running, the herkulex traffic overloads the CPU
+   and prevents even 400hz operation
+ * there is no way to clear the AHRS rate fault
+ * suitable commands from the mech_warfare process can get it to warp
+   past the absolute yaw limit
+ * turret became disabled while operating... probably need graduated
+   disabling backoff, not 60s on first failure
+
+ * gimbal close loop using absolute encoders
+ * do pitch encoder too
 
  * provide a software command to restart things
  * add version number or date to image somehow
