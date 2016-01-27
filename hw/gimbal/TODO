@@ -5,6 +5,10 @@
    past the absolute yaw limit
  * turret became disabled while operating... probably need graduated
    disabling backoff, not 60s on first failure
+ * provide herkulex mechanism to read absolute yaw
+ * provide herkulex mechanism to position based on absolute yaw
+ * implement herkulex rate commands
+ * make rate commands limited to configured slew rate
 
  * gimbal close loop using absolute encoders
  * do pitch encoder too

@@ -1,10 +1,9 @@
 Preparing for RoboGames
 
- * Re-do harnesses for new control board
-   * camera USB cable chop and re-connector
- * Populate additional scoring transponder
+ * Finish testing scoring transponder
  * Mount scoring transponder
  * Mount and wire scoring panels
+ * Switch turret rate commands to use the onboard rate motion
  * Tune gaits for loaded mech (may need to increase range of joints?)
  * Ensure I have enough weapon plates for a second weapon
  * Make walking logic such that "forward" drives toward the camera and
@@ -56,6 +55,10 @@ Video/Control
 
 History
 ~~~~~~~
+DONE 2016-01-26
+ * mounted savage solder camera and IMU to inside of weapon plate
+ * finished populating second scoring transponder, basic power on test
+
 DONE 2016-01-25
  * ordered spare gimbal motors
 
