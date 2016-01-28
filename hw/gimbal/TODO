@@ -1,8 +1,11 @@
  * when gait engine is running, the herkulex traffic overloads the CPU
    and prevents even 400hz operation
- * there is no way to clear the AHRS rate fault
  * suitable commands from the mech_warfare process can get it to warp
    past the absolute yaw limit
+
+ * when firing, the yaw jumps to the left and doesn't recover, I don't
+   remember that earlier
+ * there is no way to clear the AHRS rate fault
  * turret became disabled while operating... probably need graduated
    disabling backoff, not 60s on first failure
  * provide herkulex mechanism to read absolute yaw
