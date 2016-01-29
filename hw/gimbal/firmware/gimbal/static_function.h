@@ -137,12 +137,16 @@ struct StaticFunction<R(Args...), Size>
   }
 
   const Base& getImpl() const {
-    Expects(valid());
+    // NOTE jpieper: We could verify this here, but it is slow.
+    //
+    // Expects(valid());
     return *static_cast<const Base*>(data());
   }
 
   Base& getImpl() {
-    Expects(valid());
+    // NOTE jpieper: We could verify this here, but it is slow.
+    //
+    // Expects(valid());
     return *static_cast<Base*>(data());
   }
 
