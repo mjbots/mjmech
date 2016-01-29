@@ -16,6 +16,7 @@
 
 #include "herkulex_protocol.h"
 
+class BldcEncoder;
 class FireControl;
 class GimbalStabilizer;
 class MahonyImu;
@@ -24,6 +25,7 @@ class GimbalHerkulexOperations : public HerkulexProtocol::Operations {
  public:
   GimbalHerkulexOperations(GimbalStabilizer&,
                            MahonyImu&,
+                           BldcEncoder& yaw_encoder,
                            FireControl&);
   virtual ~GimbalHerkulexOperations();
 
@@ -37,9 +39,13 @@ class GimbalHerkulexOperations : public HerkulexProtocol::Operations {
   uint32_t int_desired_yaw() const;
   uint32_t int_actual_pitch() const;
   uint32_t int_actual_yaw() const;
+  uint32_t int_absolute_yaw() const;
+  uint32_t int_pitch_rate() const;
+  uint32_t int_yaw_rate() const;
 
   GimbalStabilizer& stabilizer_;
   MahonyImu& imu_;
+  BldcEncoder& yaw_encoder_;
   FireControl& fire_control_;
 
   uint32_t shadow_ = 0;

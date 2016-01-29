@@ -157,7 +157,8 @@ void cpp_gimbal_main() {
                            laser_enable, pwm_enable, aeg_pwm, agitator_pwm,
                            arm_switch, arm_led);
 
-  GimbalHerkulexOperations operations(stabilizer, imu, fire_control);
+  GimbalHerkulexOperations operations(
+      stabilizer, imu, yaw_bldc_encoder, fire_control);
   HerkulexProtocol herkulex(pool, herkulex_stream, operations);
 
   command_manager.RegisterHandler(gsl::ensure_z("conf"), config);

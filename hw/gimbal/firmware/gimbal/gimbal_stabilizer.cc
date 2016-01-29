@@ -17,6 +17,7 @@
 #include "bldc_pwm.h"
 #include "clock.h"
 #include "gpio_pin.h"
+#include "math_util.h"
 #include "persistent_config.h"
 #include "telemetry_manager.h"
 
@@ -368,13 +369,24 @@ class GimbalStabilizer::Impl {
   void SetImuAttitude(float pitch_deg, float yaw_deg) {
     data_.desired_deg.pitch = pitch_deg;
     data_.desired_deg.yaw = yaw_deg;
+    data_.desired_body_rate_dps.x = 0.0f;
+    data_.desired_body_rate_dps.y = 0.0f;
   }
 
   void SetImuRate(float pitch_dps, float yaw_dps) {
     data_.desired_body_rate_dps.x =
         Limit(pitch_dps, config_.pitch.max_slew_dps);
     data_.desired_body_rate_dps.z =
-        Limit(yaw_dps, config_.yaw.max_slew_dps);
+        Limit(-yaw_dps, config_.yaw.max_slew_dps);
+  }
+
+  void SetAbsoluteYaw(float yaw_deg) {
+    data_.desired_deg.yaw =
+        Degrees(
+            WrapNegPiToPi(
+                Radians(yaw_deg - yaw_encoder_.position_deg))) +
+        data_.unwrapped_yaw_deg;
+    data_.desired_body_rate_dps.z = 0.0;
   }
 
   void AttitudeCommand(const gsl::cstring_span& command,
@@ -422,6 +434,22 @@ class GimbalStabilizer::Impl {
     const float yaw_dps = std::strtod(yaw_rate_str.data(), nullptr);
 
     SetImuRate(pitch_dps, yaw_dps);
+
+    WriteOK(response);
+  }
+
+  void AbsoluteYawCommand(const gsl::cstring_span& command,
+                          const CommandManager::Response& response) {
+    Tokenizer tokenizer(command, " ");
+    auto yaw_str = tokenizer.next();
+    if (yaw_str.size() == 0) {
+      BadFormat(response);
+      return;
+    }
+
+    const float yaw_deg = std::strtod(yaw_str.data(), nullptr);
+
+    SetAbsoluteYaw(yaw_deg);
 
     WriteOK(response);
   }
@@ -520,6 +548,14 @@ void GimbalStabilizer::SetImuAttitude(float pitch_deg, float yaw_deg) {
   impl_->SetImuAttitude(pitch_deg, yaw_deg);
 }
 
+void GimbalStabilizer::SetImuRate(float pitch_dps, float yaw_dps) {
+  impl_->SetImuRate(pitch_dps, yaw_dps);
+}
+
+void GimbalStabilizer::SetAbsoluteYaw(float yaw_deg) {
+  impl_->SetAbsoluteYaw(yaw_deg);
+}
+
 void GimbalStabilizer::Command(const gsl::cstring_span& command,
                                const CommandManager::Response& response) {
   Tokenizer tokenizer(command, " ");
@@ -534,6 +570,8 @@ void GimbalStabilizer::Command(const gsl::cstring_span& command,
     impl_->AttitudeCommand(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("rate")) {
     impl_->RateCommand(tokenizer.remaining(), response);
+  } else if (cmd == gsl::ensure_z("ayaw")) {
+    impl_->AbsoluteYawCommand(tokenizer.remaining(), response);
   } else {
     impl_->UnknownCommand(response);
   }
