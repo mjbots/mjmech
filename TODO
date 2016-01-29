@@ -1,10 +1,11 @@
 Preparing for RoboGames
 
- * Switch turret rate commands to use the onboard rate motion
- * Tune gaits for loaded mech (may need to increase range of joints?)
  * Ensure I have enough weapon plates for a second weapon
- * Make walking logic such that "forward" drives toward the camera and
-   rotates to go forward
+ * Update commands for single person operation
+   * right stick controls gimbal
+   * left stick translates
+   * onboard logic tries to keep machine moving in optimal direction
+     without obviously moving camera
  * Design and print new turret gimbal
    * protect new gimbal board
    * add a little bit of extra height to restore freedom of movement
@@ -52,6 +53,10 @@ Video/Control
 
 History
 ~~~~~~~
+DONE 2016-01-29
+ * Switch turret rate commands to use the onboard rate motion
+ * Tune gaits for loaded mech (may need to increase range of joints?)
+
 DONE 2016-01-27
  * Finish testing scoring transponder
  * Mount scoring transponder

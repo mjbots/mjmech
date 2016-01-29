@@ -1,20 +1,14 @@
- * when gait engine is running, the herkulex traffic overloads the CPU
-   and prevents even 400hz operation
- * suitable commands from the mech_warfare process can get it to warp
-   past the absolute yaw limit
-
- * when firing, the yaw jumps to the left and doesn't recover, I don't
-   remember that earlier
- * there is no way to clear the AHRS rate fault
  * turret became disabled while operating... probably need graduated
    disabling backoff, not 60s on first failure
- * provide herkulex mechanism to read absolute yaw
- * provide herkulex mechanism to position based on absolute yaw
- * implement herkulex rate commands
- * make rate commands limited to configured slew rate
+ * when firing, the yaw jumps to the left and doesn't recover, I don't
+   remember that earlier
 
  * gimbal close loop using absolute encoders
  * do pitch encoder too
+
+ * there is no way to clear the AHRS rate fault
+
+ * uart stream rx_overflow needs to flag an error that I can see
 
  * provide a software command to restart things
  * add version number or date to image somehow
@@ -87,6 +81,18 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2016-01-28
+ * when gait engine is running, the herkulex traffic overloads the CPU
+   and prevents even 400hz operation
+   * various optimizations fixed this
+ * suitable commands from the mech_warfare process can get it to warp
+   past the absolute yaw limit
+   * unwrapping yaw fixed this
+ * provide herkulex mechanism to read absolute yaw
+ * provide herkulex mechanism to position based on absolute yaw
+ * implement herkulex rate commands
+ * make rate commands limited to configured slew rate
 
 DONE 2016-01-25
  * for some reason, gimbal rate commands from mw_command have the
