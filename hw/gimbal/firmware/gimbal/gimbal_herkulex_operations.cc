@@ -151,5 +151,5 @@ uint32_t GimbalHerkulexOperations::int_actual_pitch() const {
 }
 
 uint32_t GimbalHerkulexOperations::int_actual_yaw() const {
-  return static_cast<int32_t>(imu_.data().euler_deg.yaw * 1000.0f);
+  return static_cast<int32_t>(stabilizer_.data().unwrapped_yaw_deg * 1000.0f);
 }

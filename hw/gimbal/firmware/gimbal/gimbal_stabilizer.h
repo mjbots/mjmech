@@ -83,6 +83,9 @@ class GimbalStabilizer {
 
     uint32_t start_timestamp = 0;
 
+    float unwrapped_yaw_deg = 0.0f;
+    float wrap_yaw_offset_deg = 0.0f;
+
     Euler desired_deg;
     Euler target_deg;
     Point3D desired_body_rate_dps;
@@ -99,6 +102,8 @@ class GimbalStabilizer {
       a->Visit(MJ_NVP(pitch));
       a->Visit(MJ_NVP(yaw));
       a->Visit(MJ_NVP(start_timestamp));
+      a->Visit(MJ_NVP(unwrapped_yaw_deg));
+      a->Visit(MJ_NVP(wrap_yaw_offset_deg));
       a->Visit(MJ_NVP(desired_deg));
       a->Visit(MJ_NVP(target_deg));
       a->Visit(MJ_NVP(desired_body_rate_dps));

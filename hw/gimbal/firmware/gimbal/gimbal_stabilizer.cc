@@ -147,11 +147,17 @@ class GimbalStabilizer::Impl {
   }
 
   void HandleAhrs(const AhrsData* data) {
+    if (std::abs(data->euler_deg.yaw - ahrs_data_.euler_deg.yaw) > 180.0f) {
+      data_.wrap_yaw_offset_deg +=
+          360.0 * ((data->euler_deg.yaw < ahrs_data_.euler_deg.yaw) ?
+                   1.0 : -1.0);
+    }
     ahrs_data_ = *data;
+    data_.unwrapped_yaw_deg = data->euler_deg.yaw + data_.wrap_yaw_offset_deg;
 
     switch (data_.state) {
-      case kInitializing: { DoInitializing(data); break; }
-      case kOperating: { DoOperating(data); break; }
+      case kInitializing: { DoInitializing(); break; }
+      case kOperating: { DoOperating(); break; }
       case kFault: { DoFault(); break; }
       case kNumStates: { assert(false); break; }
     }
@@ -163,11 +169,11 @@ class GimbalStabilizer::Impl {
     yaw_encoder_ = *data;
   }
 
-  void DoInitializing(const AhrsData* data) {
+  void DoInitializing() {
     boost_enable_.Set(false);
     motor_enable_.Set(false);
 
-    if (data->error) {
+    if (ahrs_data_.error) {
       data_.start_timestamp = 0;
       return;
     }
@@ -183,9 +189,9 @@ class GimbalStabilizer::Impl {
         clock_.ticks_per_second();
     if (elapsed_s > config_.initialization_period_s) {
       data_.desired_deg.pitch = 0.0f;
-      data_.desired_deg.yaw = data->euler_deg.yaw;
-      data_.target_deg.pitch = data->euler_deg.pitch;
-      data_.target_deg.yaw = data->euler_deg.yaw;
+      data_.desired_deg.yaw = data_.unwrapped_yaw_deg;
+      data_.target_deg.pitch = ahrs_data_.euler_deg.pitch;
+      data_.target_deg.yaw = data_.unwrapped_yaw_deg;
       data_.last_ahrs_update = now;
       data_.state = kOperating;
       return;
@@ -199,27 +205,29 @@ class GimbalStabilizer::Impl {
     *target_deg += delta_deg;
   }
 
-  void DoOperating(const AhrsData* data) {
-    if (data->error) {
+  void DoOperating() {
+    if (ahrs_data_.error) {
       data_.last_fault_reason = 1;
       DoFault();
       return;
     }
 
-    data_.last_ahrs_update = data->timestamp;
+    data_.last_ahrs_update = ahrs_data_.timestamp;
     boost_enable_.Set(config_.boost);
     motor_enable_.Set(data_.torque_on);
     torque_led_.Set(data_.torque_on);
 
-    data_.desired_deg.pitch += data_.desired_body_rate_dps.x / data->rate_hz;
+    data_.desired_deg.pitch +=
+        data_.desired_body_rate_dps.x / ahrs_data_.rate_hz;
     config_.pitch_limit.Limit(&data_.desired_deg.pitch);
 
     // Body rate Z and yaw have opposite signs.
-    data_.desired_deg.yaw -= data_.desired_body_rate_dps.z / data->rate_hz;
+    data_.desired_deg.yaw -=
+        data_.desired_body_rate_dps.z / ahrs_data_.rate_hz;
     if (CheckYawEncoderRecent() && !config_.abs_yaw_limit.empty()) {
-      const float yaw_min_deg = data->euler_deg.yaw -
+      const float yaw_min_deg = data_.unwrapped_yaw_deg -
           (yaw_encoder_.position_deg - config_.abs_yaw_limit.min_deg);
-      const float yaw_max_deg = data->euler_deg.yaw +
+      const float yaw_max_deg = data_.unwrapped_yaw_deg +
           (config_.abs_yaw_limit.max_deg - yaw_encoder_.position_deg);
       if (data_.desired_deg.yaw < yaw_min_deg) {
         data_.desired_deg.yaw = yaw_min_deg;
@@ -229,21 +237,23 @@ class GimbalStabilizer::Impl {
     }
 
     UpdateSlew(&data_.target_deg.pitch, data_.desired_deg.pitch,
-               data->rate_hz, config_.pitch.max_slew_dps);
+               ahrs_data_.rate_hz, config_.pitch.max_slew_dps);
     UpdateSlew(&data_.target_deg.yaw, data_.desired_deg.yaw,
-               data->rate_hz, config_.yaw.max_slew_dps);
+               ahrs_data_.rate_hz, config_.yaw.max_slew_dps);
 
     const float pitch_control_command =
-        pitch_pid_.Apply(data->euler_deg.pitch, data_.target_deg.pitch,
-                         data->body_rate_dps.x, data_.desired_body_rate_dps.x,
-                         data->rate_hz);
+        pitch_pid_.Apply(
+            ahrs_data_.euler_deg.pitch, data_.target_deg.pitch,
+            ahrs_data_.body_rate_dps.x, data_.desired_body_rate_dps.x,
+            ahrs_data_.rate_hz);
     // For yaw, the sign of body rate in Z is opposite that of yaw.
     // To make the PID controller have the same signs for everything,
     // we invert it before passing it in.
     const float yaw_control_command =
-        yaw_pid_.Apply(data->euler_deg.yaw, data_.target_deg.yaw,
-                       -data->body_rate_dps.z, -data_.desired_body_rate_dps.z,
-                       data->rate_hz);
+        yaw_pid_.Apply(
+            data_.unwrapped_yaw_deg, data_.target_deg.yaw,
+            -ahrs_data_.body_rate_dps.z, -data_.desired_body_rate_dps.z,
+            ahrs_data_.rate_hz);
 
     // For the open loop case, our integral should be wrapped to be
     // between 0 and 1.0.
@@ -356,7 +366,6 @@ class GimbalStabilizer::Impl {
   }
 
   void SetImuAttitude(float pitch_deg, float yaw_deg) {
-    // TODO jpieper: Make these slew.
     data_.desired_deg.pitch = pitch_deg;
     data_.desired_deg.yaw = yaw_deg;
   }
