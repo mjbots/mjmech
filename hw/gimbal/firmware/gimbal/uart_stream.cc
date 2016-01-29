@@ -110,7 +110,6 @@ void UartStream::AsyncReadSome(const gsl::string_span& buffer,
                                SizeCallback callback) {
   assert(!rx_callback_.valid());
 
-  // We only ever ask for 1 byte at a time from the serial port.
   rx_callback_ = callback;
   rx_buffer_ = buffer;
 }
@@ -153,22 +152,18 @@ void UartStream::Poll() {
     }
   }
 
-  if (!buffer_.empty()) {
-    if (rx_callback_.valid()) {
-      Expects(rx_buffer_.size() != 0);
-
-      std::size_t pos = 0;
-      while (!buffer_.empty() && pos < rx_buffer_.size()) {
-        rx_buffer_.data()[pos] = buffer_.front();
-        buffer_.pop_front();
-        pos++;
-      }
-
-      auto callback = rx_callback_;
-      rx_callback_ = SizeCallback();
-      callback(0, pos);
-      assert(rx_callback_.valid());
+  if (!buffer_.empty() && rx_callback_.valid()) {
+    std::size_t pos = 0;
+    while (!buffer_.empty() && pos < rx_buffer_.size()) {
+      rx_buffer_.data()[pos] = buffer_.front();
+      buffer_.pop_front();
+      pos++;
     }
+
+    auto callback = rx_callback_;
+    rx_callback_ = SizeCallback();
+    callback(0, pos);
+    assert(rx_callback_.valid());
   }
 }
 

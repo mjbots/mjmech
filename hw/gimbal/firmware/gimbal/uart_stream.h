@@ -30,6 +30,7 @@ class UartStream : public AsyncStream {
   virtual void AsyncWriteSome(const gsl::cstring_span&, SizeCallback) override;
 
   void Poll();
+  void PollMillisecond();
 
   // The following are used internally only.
   void TransmitComplete();
