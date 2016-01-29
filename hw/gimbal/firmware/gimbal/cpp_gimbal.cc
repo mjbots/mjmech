@@ -202,12 +202,12 @@ void cpp_gimbal_main() {
       stabilizer.PollMillisecond();
       fire_control.PollMillisecond();
       system_status.timestamp = clock.timestamp();
+      HAL_IWDG_Refresh(&hiwdg);
 
       UpdateLEDs(new_tick);
     }
     old_tick = new_tick;
 
-    HAL_IWDG_Refresh(&hiwdg);
     usb_cdc.Poll();
     uart.Poll();
     i2c1.Poll();
