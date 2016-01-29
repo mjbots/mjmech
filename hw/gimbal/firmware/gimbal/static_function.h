@@ -15,6 +15,7 @@
 #pragma once
 
 #include <array>
+#include <cstring>
 
 #include "base/gsl/gsl-lite.h"
 
@@ -56,7 +57,9 @@ struct StaticFunctionBase {
 template <typename R, typename ...Args, std::size_t Size>
 struct StaticFunction<R(Args...), Size>
     : public StaticFunctionBase<R, Args...> {
-  StaticFunction() : storage_() {}
+  StaticFunction() {
+    std::memset(&storage_[0], 0, sizeof(storage_));
+  }
 
   using Base = typename StaticFunctionBase<R, Args...>::Base;
   template <typename F>
@@ -79,7 +82,8 @@ struct StaticFunction<R(Args...), Size>
     }
   }
 
-  StaticFunction(const StaticFunction& rhs) : storage_() {
+  StaticFunction(const StaticFunction& rhs) {
+    std::memset(&storage_[0], 0, sizeof(storage_));
     if (rhs.valid()) {
       rhs.getImpl().clone(data());
     }
@@ -87,7 +91,7 @@ struct StaticFunction<R(Args...), Size>
 
   StaticFunction& operator=(const StaticFunction& rhs) {
     if (valid()) { getImpl().~Base(); }
-    storage_ = Storage();
+    std::memset(&storage_[0], 0, sizeof(storage_));
     if (rhs.valid()) {
       rhs.getImpl().clone(data());
     }
@@ -95,7 +99,7 @@ struct StaticFunction<R(Args...), Size>
   }
 
   StaticFunction(StaticFunction&& rhs) noexcept : storage_(rhs.storage_) {
-    rhs.storage_ = Storage();
+    std::memset(&rhs.storage_[0], 0, sizeof(rhs.storage_));
   }
 
   template <std::size_t Amount=3>
@@ -115,7 +119,13 @@ struct StaticFunction<R(Args...), Size>
     return getImpl().call(std::forward<Args>(args)...);
   }
 
-  bool valid() const { return storage_ != Storage(); }
+  bool valid() const {
+    for (int i = 0; i < storage_.size(); i++) {
+      if (storage_[i] != 0) { return true; }
+    }
+    return false;
+  }
+
   std::size_t size() const { return getImpl().size(); }
 
   const void* data() const {
