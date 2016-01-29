@@ -43,6 +43,12 @@ class circular_buffer {
 
   size_t capacity() const { return data_.size() - 1; }
 
+  size_t size() const {
+    return (insert_ >= remove_) ?
+        (insert_ - remove_) :
+        (insert_ + Size - remove_);
+  }
+
  private:
   volatile T data_[Size] = {};
   volatile size_t insert_ = 0;
