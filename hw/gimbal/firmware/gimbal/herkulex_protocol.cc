@@ -199,7 +199,11 @@ class HerkulexProtocol::Impl {
     }
 
     for (uint8_t i = 0; i < len; i++) {
-      operations_.WriteRam(addr + i, u8(buffer_[kPacketData + i]));
+      const uint8_t byte = u8(buffer_[kPacketData + i]);
+      operations_.WriteRam(addr + i, byte);
+
+      if ((addr + i) == 43) { status_error_ = byte; }
+      else if ((addr + i) == 44) { status_detail_ = byte; }
     }
   }
 
