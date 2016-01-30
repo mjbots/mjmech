@@ -158,10 +158,10 @@ uint8_t GimbalHerkulexOperations::ReadRam(uint8_t addr) {
     case 0x5d: { return (int_actual_yaw() >> 7) & 0x7f; }
     case 0x5e: { return (int_actual_yaw() >> 14) & 0x7f; }
     case 0x5f: { return (int_actual_yaw() >> 21) & 0x7f; }
-    case 0x68: { return int_absolute_yaw() & 0x7f; }
-    case 0x69: { return (int_absolute_yaw() >> 7) & 0x7f; }
-    case 0x6a: { return (int_absolute_yaw() >> 14) & 0x7f; }
-    case 0x6b: { return (int_absolute_yaw() >> 21) & 0x7f; }
+    case 0x60: { return int_absolute_yaw() & 0x7f; }
+    case 0x61: { return (int_absolute_yaw() >> 7) & 0x7f; }
+    case 0x62: { return (int_absolute_yaw() >> 14) & 0x7f; }
+    case 0x63: { return (int_absolute_yaw() >> 21) & 0x7f; }
     case 0x6c: { return int_pitch_rate() & 0x7f; }
     case 0x6d: { return (int_pitch_rate() >> 7) & 0x7f; }
     case 0x6e: { return (int_pitch_rate() >> 14) & 0x7f; }
