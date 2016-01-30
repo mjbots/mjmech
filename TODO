@@ -1,11 +1,12 @@
 Preparing for RoboGames
 
- * Ensure I have enough weapon plates for a second weapon
  * Update commands for single person operation
    * right stick controls gimbal
    * left stick translates
    * onboard logic tries to keep machine moving in optimal direction
      without obviously moving camera
+ * Ensure I have enough weapon plates for a second weapon
+ * Create/get barrel lock solution, (maybe from jwatte)?
  * Design and print new turret gimbal
    * protect new gimbal board
    * add a little bit of extra height to restore freedom of movement
