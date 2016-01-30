@@ -47,10 +47,10 @@ void ExportTf() {
       .def(self == self)
       ;
 
-  class_<Quaternion::Euler>("QuaternionEuler")
-      .def_readwrite("roll_rad", &Quaternion::Euler::roll_rad)
-      .def_readwrite("pitch_rad", &Quaternion::Euler::pitch_rad)
-      .def_readwrite("yaw_rad", &Quaternion::Euler::yaw_rad)
+  class_<Euler>("Euler")
+      .def_readwrite("roll", &Euler::roll)
+      .def_readwrite("pitch", &Euler::pitch)
+      .def_readwrite("yaw", &Euler::yaw)
       ;
 
   class_<Quaternion>("Quaternion")
@@ -58,7 +58,7 @@ void ExportTf() {
       .def_readwrite("x", &Quaternion::x)
       .def_readwrite("y", &Quaternion::y)
       .def_readwrite("z", &Quaternion::z)
-      .def("euler", &Quaternion::euler)
+      .def("euler_rad", &Quaternion::euler_rad)
       ;
 
   class_<Transform>("Transform")
