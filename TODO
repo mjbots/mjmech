@@ -1,10 +1,7 @@
 Preparing for RoboGames
 
- * Update commands for single person operation
-   * right stick controls gimbal
-   * left stick translates
-   * onboard logic tries to keep machine moving in optimal direction
-     without obviously moving camera
+ * Need to re-calibrate turret gyro any time torque is enabled
+ * rev gimbal board and get 2x of the clean version made
  * Ensure I have enough weapon plates for a second weapon
  * Create/get barrel lock solution, (maybe from jwatte)?
  * Design and print new turret gimbal
@@ -54,6 +51,14 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-01-30
+ * Update commands for single person operation
+   * right stick controls gimbal
+   * left stick translates
+   * onboard logic tries to keep machine moving in optimal direction
+     without obviously moving camera
+
 DONE 2016-01-29
  * Switch turret rate commands to use the onboard rate motion
  * Tune gaits for loaded mech (may need to increase range of joints?)

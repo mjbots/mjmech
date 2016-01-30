@@ -1,12 +1,15 @@
+ * tune controller to have less long-term catchup effect
+
  * when firing, the yaw jumps to the left and doesn't recover, I don't
    remember that earlier
 
  * gimbal close loop using absolute encoders
  * do pitch encoder too
 
- * there is no way to clear the AHRS rate fault
-
- * uart stream rx_overflow needs to flag an error that I can see
+ * provide a mechanism to re-initialize the gyro with arbitrary time
+ * all faults should clear when torque is set off
+   * there is no way to clear the AHRS rate fault
+   * uart stream rx_overflow needs to flag an error that I can see
 
  * provide a software command to restart things
  * add version number or date to image somehow
