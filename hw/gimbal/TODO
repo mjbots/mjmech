@@ -1,8 +1,5 @@
  * tune controller to have less long-term catchup effect
 
- * when firing, the yaw jumps to the left and doesn't recover, I don't
-   remember that earlier
-
  * gimbal close loop using absolute encoders
  * do pitch encoder too
 
@@ -13,6 +10,7 @@
 
  * provide a software command to restart things
  * add version number or date to image somehow
+ * disconnecting the debugging USB cable seems to hose the controller
 
  * gimbal control software
    * when we are limiting the target due to max_slew, the target
@@ -82,6 +80,12 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2016-01-30
+ * jumping when firing was caused by mounting the IMU to the weapon
+   plate... mounting it to the camera had no problem.  it looked like
+   there were rates at > 800Hz or 1000dps on the plate, but the camera
+   is sufficiently isolated that it isn't a problem
 
 DONE 2016-01-29
  * turret became disabled while operating... probably need graduated

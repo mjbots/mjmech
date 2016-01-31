@@ -1,5 +1,6 @@
 Preparing for RoboGames
 
+ * make some sort of protection for weapon IMU board
  * Need to re-calibrate turret gyro any time torque is enabled
  * rev gimbal board and get 2x of the clean version made
  * Ensure I have enough weapon plates for a second weapon
