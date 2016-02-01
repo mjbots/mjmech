@@ -697,8 +697,8 @@ MAX3223-MAX3243.pdf</description>
 <smd name="2" x="0" y="2.75" dx="2.5" dy="1.2" layer="1" rot="R90"/>
 <smd name="3" x="2.5" y="2.75" dx="2.5" dy="1.2" layer="1" rot="R90"/>
 <smd name="1" x="-2.5" y="2.75" dx="2.5" dy="1.2" layer="1" rot="R90"/>
-<pad name="G1" x="3.6" y="0" drill="0.9"/>
-<pad name="G0" x="-3.6" y="0" drill="0.9"/>
+<pad name="G1" x="3.4" y="0" drill="0.9"/>
+<pad name="G0" x="-3.4" y="0" drill="0.9"/>
 <wire x1="-4.5" y1="-1" x2="-4.5" y2="2.6" width="0.127" layer="21"/>
 <wire x1="-4.5" y1="2.6" x2="4.5" y2="2.6" width="0.127" layer="21"/>
 <wire x1="4.5" y1="2.6" x2="4.5" y2="-1" width="0.127" layer="21"/>
