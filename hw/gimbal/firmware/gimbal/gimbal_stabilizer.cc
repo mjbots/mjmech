@@ -225,7 +225,9 @@ class GimbalStabilizer::Impl {
     // Body rate Z and yaw have opposite signs.
     data_.desired_deg.yaw -=
         data_.desired_body_rate_dps.z / ahrs_data_.rate_hz;
-    if (CheckYawEncoderRecent() && !config_.abs_yaw_limit.empty()) {
+    if (CheckYawEncoderRecent() &&
+        !config_.abs_yaw_limit.empty() &&
+        config_.yaw.mode != 2) {
       const float yaw_min_deg = data_.unwrapped_yaw_deg -
           (yaw_encoder_.position_deg - config_.abs_yaw_limit.min_deg);
       const float yaw_max_deg = data_.unwrapped_yaw_deg +
