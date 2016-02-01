@@ -131,6 +131,7 @@ class GimbalStabilizer::Impl {
        BldcPwm& motor1,
        BldcPwm& motor2,
        BldcEncoderDataSignal& yaw_encoder_signal,
+       BldcEncoderDataSignal& pitch_encoder_signal,
        GpioPin& torque_led)
       : clock_(clock),
         boost_enable_(boost_enable),
@@ -144,6 +145,8 @@ class GimbalStabilizer::Impl {
         [this](const AhrsData* data) { this->HandleAhrs(data); });
     yaw_encoder_signal.Connect(
         [this](const BldcEncoderData* data) { this->HandleYawEncoder(data); });
+    pitch_encoder_signal.Connect(
+        [this](const BldcEncoderData* data) { this->HandlePitchEncoder(data); });
     torque_led_.Set(false);
   }
 
@@ -168,6 +171,10 @@ class GimbalStabilizer::Impl {
 
   void HandleYawEncoder(const BldcEncoderData* data) {
     yaw_encoder_ = *data;
+  }
+
+  void HandlePitchEncoder(const BldcEncoderData* data) {
+    pitch_encoder_ = *data;
   }
 
   void DoInitializing() {
@@ -277,9 +284,7 @@ class GimbalStabilizer::Impl {
       if (mode == 0) {
         return pitch_control_command;
       } else if (mode == 1) {
-        // TODO jpieper: When we support bldc encoders on pitch, add it
-        // here.
-        return 0.0f;
+        return pitch_control_command + pitch_encoder_.phase;
       } else if (mode == 2) {
         return data_.target_deg.pitch / 360.0f;
       }
@@ -496,6 +501,7 @@ class GimbalStabilizer::Impl {
   PID yaw_pid_{&config_.yaw.pid, &data_.yaw};
   AhrsData ahrs_data_;
   BldcEncoderData yaw_encoder_;
+  BldcEncoderData pitch_encoder_;
 };
 
 GimbalStabilizer::GimbalStabilizer(
@@ -509,10 +515,13 @@ GimbalStabilizer::GimbalStabilizer(
     BldcPwm& motor1,
     BldcPwm& motor2,
     BldcEncoderDataSignal& yaw_encoder_signal,
+    BldcEncoderDataSignal& pitch_encoder_signal,
     GpioPin& torque_led)
     : impl_(&pool, clock, config, telemetry, ahrs_signal,
             boost_enable, motor_enable,
-            motor1, motor2, yaw_encoder_signal, torque_led) {}
+            motor1, motor2,
+            yaw_encoder_signal, pitch_encoder_signal,
+            torque_led) {}
 
 GimbalStabilizer::~GimbalStabilizer() {}
 

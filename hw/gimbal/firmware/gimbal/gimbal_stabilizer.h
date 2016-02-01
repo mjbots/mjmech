@@ -34,7 +34,8 @@ class GimbalStabilizer {
                    GpioPin& boost_enable,
                    GpioPin& motor_enable,
                    BldcPwm& motor1, BldcPwm& motor2,
-                   BldcEncoderDataSignal&,
+                   BldcEncoderDataSignal& yaw_encoder_signal,
+                   BldcEncoderDataSignal& pitch_encoder_signal,
                    GpioPin& torque_led);
   ~GimbalStabilizer();
 

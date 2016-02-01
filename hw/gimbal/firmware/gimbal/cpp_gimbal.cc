@@ -113,6 +113,10 @@ void cpp_gimbal_main() {
   Stm32GpioPin i2c1_sda(GPIOB, GPIO_PIN_7);
   Stm32GpioPin i2c1_scl(GPIOB, GPIO_PIN_6);
   Stm32RawI2C i2c1(pool, 1, i2c1_scl, i2c1_sda, parameters, clock);
+
+  Stm32GpioPin i2c2_sda(GPIOB, GPIO_PIN_9);
+  Stm32GpioPin i2c2_scl(GPIOB, GPIO_PIN_10);
+  Stm32RawI2C i2c2(pool, 2, i2c2_scl, i2c2_sda, parameters, clock);
   Stm32HalSPI spi1(pool, 3, GPIOC, GPIO_PIN_15);
   Stm32Flash flash;
   PersistentConfig config(pool, flash);
@@ -127,6 +131,10 @@ void cpp_gimbal_main() {
                            nullptr, &spi1, clock, config, telemetry);
   BldcEncoder yaw_bldc_encoder(pool, gsl::ensure_z("yawblenc"),
                                yaw_encoder, clock, config, telemetry);
+  As5048Driver pitch_encoder(pool, gsl::ensure_z("pitchenc"),
+                             &i2c2, nullptr, clock, config, telemetry);
+  BldcEncoder pitch_bldc_encoder(pool, gsl::ensure_z("pitchblenc"),
+                                 pitch_encoder, clock, config, telemetry);
   Stm32BldcPwm motor1(&htim2, TIM_CHANNEL_1,
                       &htim2, TIM_CHANNEL_2,
                       &htim2, TIM_CHANNEL_3);
@@ -147,6 +155,7 @@ void cpp_gimbal_main() {
                               *imu.data_signal(),
                               boost_enable, motor_enable, motor1, motor2,
                               *yaw_bldc_encoder.data_signal(),
+                              *pitch_bldc_encoder.data_signal(),
                               torque_led);
 
   Stm32GpioPin laser_enable(GPIOA, GPIO_PIN_10);
@@ -202,6 +211,7 @@ void cpp_gimbal_main() {
       system_info.PollMillisecond();
       analog_sampler.PollMillisecond();
       yaw_bldc_encoder.PollMillisecond();
+      pitch_bldc_encoder.PollMillisecond();
       stabilizer.PollMillisecond();
       fire_control.PollMillisecond();
       system_status.timestamp = clock.timestamp();
@@ -214,11 +224,13 @@ void cpp_gimbal_main() {
     usb_cdc.Poll();
     uart.Poll();
     i2c1.Poll();
+    i2c2.Poll();
     spi1.Poll();
     telemetry.Poll();
     command_manager.Poll();
     bmi160.Poll();
     yaw_encoder.Poll();
+    pitch_encoder.Poll();
     system_info.MainLoopCount();
   }
 }
