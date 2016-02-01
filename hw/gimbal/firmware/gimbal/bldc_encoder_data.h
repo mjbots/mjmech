@@ -23,11 +23,18 @@ struct BldcEncoderData {
   float position_deg = 0.0f;
   float phase = 0.0f;
 
+  uint32_t raw_errors = 0;
+  uint32_t raw_last_error = 0;
+  uint32_t raw_first_error = 0;
+
   template <typename Archive>
   void Serialize(Archive* a) {
     a->Visit(MJ_NVP(timestamp));
     a->Visit(MJ_NVP(position_deg));
     a->Visit(MJ_NVP(phase));
+    a->Visit(MJ_NVP(raw_errors));
+    a->Visit(MJ_NVP(raw_last_error));
+    a->Visit(MJ_NVP(raw_first_error));
   }
 };
 

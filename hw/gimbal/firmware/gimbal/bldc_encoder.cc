@@ -43,7 +43,19 @@ class BldcEncoder::Impl {
 
   void HandleRawRead(ErrorCode ec) {
     read_outstanding_ = false;
-    if (ec) { return; }
+
+    data_.timestamp = clock_.timestamp();
+
+    if (ec) {
+      data_.raw_errors++;
+      data_.raw_last_error = ec;
+      if (data_.raw_first_error == 0) {
+        data_.raw_first_error = ec;
+      }
+
+      data_updater_();
+      return;
+    }
 
     data_.timestamp = clock_.timestamp();
     const float unwrapped_deg =
