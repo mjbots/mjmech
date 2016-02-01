@@ -1,8 +1,11 @@
 Preparing for RoboGames
 
- * make some sort of protection for weapon IMU board
- * Need to re-calibrate turret gyro any time torque is enabled
  * rev gimbal board and get 2x of the clean version made
+ * make some sort of protection for weapon IMU board
+ * if a servo goes power off, we need to re-enable it after some time
+ * Need to re-calibrate turret gyro any time torque is enabled
+ * it would be nice to have some kind of feet under the bottom plate
+   so that when servos are off, we aren't resting on the target plates
  * Ensure I have enough weapon plates for a second weapon
  * Create/get barrel lock solution, (maybe from jwatte)?
  * Design and print new turret gimbal
@@ -54,6 +57,10 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-01-31
+ * verify that absolute yaw and pitch control work in gimbal
+
 
 DONE 2016-01-30
  * Update commands for single person operation
