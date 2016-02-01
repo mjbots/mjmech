@@ -21,6 +21,7 @@
 #include "gpio.h"
 
 #include "clock.h"
+#include "gpio_pin.h"
 
 // TODO jpieper: Use DMA for the bulk transfers to reduce overhead.
 
@@ -86,8 +87,10 @@ bool TestTimeout(Predicate p) {
 
 class Stm32RawI2C::Impl {
  public:
-  Impl(int i2c_number, const Parameters& parameters, Clock& clock)
-      : i2c_(GetI2C(i2c_number)), parameters_(parameters), clock_(clock) {
+  Impl(int i2c_number, GpioPin& scl, GpioPin& sda,
+       const Parameters& parameters, Clock& clock)
+      : i2c_(GetI2C(i2c_number)), scl_(scl), sda_(sda),
+        parameters_(parameters), clock_(clock) {
     assert(i2c_number >= 1 && i2c_number <= 3);
 
     Init();
@@ -138,48 +141,41 @@ class Stm32RawI2C::Impl {
     i2c_->CR1 |= I2C_CR1_SWRST;
     i2c_->CR1 &= ~I2C_CR1_SWRST;
 
-    const int pin_sda = 6;
-    const int pin_scl = 9;
-    const uint32_t pin_mode = (0x3 << (pin_sda * 2)) | (0x3 << (pin_scl * 2));
-    const uint32_t pin_af = (0x2 << (pin_sda * 2)) | (0x2 << (pin_scl * 2));
-    const uint32_t pin_output = (0x1 << (pin_sda * 2)) | (0x1 << (pin_scl * 2));
-
-    const uint32_t pin_data = (0x1 << pin_sda) | (0x1 << pin_scl);
-    const uint32_t sda_data = 1 << pin_sda;
-    const uint32_t scl_data = 1 << pin_scl;
-
-    const auto set_pin = [](uint32_t pin, bool value) {
-      if (value) { GPIOB->ODR |= pin; } else { GPIOB->ODR &= ~pin; }
-      TestTimeout([&]() { return (GPIOB->IDR & pin) == (value ? pin : 0); });
+    const auto set_pin = [](GpioPin& pin, bool value) {
+      pin.Set(value);
+      TestTimeout([&]() { return pin.Read() == value; });
     };
 
-    set_pin(pin_data, true);
+    set_pin(scl_, true);
+    set_pin(sda_, true);
 
     // Switching the device into output mode will cause the I2C
     // peripheral to report busy, even if the pins did not change
     // state.
-    GPIOB->MODER = (GPIOB->MODER & ~pin_mode) | pin_output;
+    scl_.SetMode(GpioPin::kGeneralOutput);
+    sda_.SetMode(GpioPin::kGeneralOutput);
 
     // Now do stuff to try and unstick external peripherals.
 
-    if ((GPIOB->IDR & scl_data) == 0) {
+    if (!scl_.Read()) {
       // Try to get SCL unstuck.
       for (int i = 0; i < 10; i++) {
-        set_pin(sda_data, false);
-        set_pin(sda_data, true);
-        if ((GPIOB->IDR & scl_data) != 0) { break; }
+        set_pin(sda_, false);
+        set_pin(sda_, true);
+        if (scl_.Read()) { break; }
       }
     }
 
     // Then generate a start and stop condition.
-    set_pin(sda_data, false);
-    set_pin(scl_data, false);
-    set_pin(scl_data, true);
-    set_pin(sda_data, true);
+    set_pin(sda_, false);
+    set_pin(scl_, false);
+    set_pin(scl_, true);
+    set_pin(sda_, true);
 
     // Finally, go back into AF mode (which should cause no external
     // pin change.
-    GPIOB->MODER = (GPIOB->MODER & ~pin_mode) | pin_af;
+    sda_.SetMode(GpioPin::kAlternateFunction);
+    scl_.SetMode(GpioPin::kAlternateFunction);
 
     // Do a final reset to clear the busy flag that our above regular
     // output mode twiddling induced.
@@ -432,6 +428,8 @@ class Stm32RawI2C::Impl {
   }
 
   I2C_TypeDef* const i2c_;
+  GpioPin& scl_;
+  GpioPin& sda_;
   const Parameters parameters_;
   Clock& clock_;
   uint32_t start_time_ = 0;
@@ -460,9 +458,11 @@ class Stm32RawI2C::Impl {
 
 Stm32RawI2C::Stm32RawI2C(Pool& pool,
                          int i2c_number,
+                         GpioPin& scl,
+                         GpioPin& sda,
                          const Parameters& parameters,
                          Clock& clock)
-: impl_(&pool, i2c_number, parameters, clock) {}
+: impl_(&pool, i2c_number, scl, sda, parameters, clock) {}
 
 Stm32RawI2C::~Stm32RawI2C() {}
 
