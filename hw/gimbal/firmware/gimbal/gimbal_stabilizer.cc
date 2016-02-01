@@ -220,7 +220,9 @@ class GimbalStabilizer::Impl {
 
     data_.desired_deg.pitch +=
         data_.desired_body_rate_dps.x / ahrs_data_.rate_hz;
-    config_.pitch_limit.Limit(&data_.desired_deg.pitch);
+    if (config_.pitch.mode != 2) {
+      config_.pitch_limit.Limit(&data_.desired_deg.pitch);
+    }
 
     // Body rate Z and yaw have opposite signs.
     data_.desired_deg.yaw -=
