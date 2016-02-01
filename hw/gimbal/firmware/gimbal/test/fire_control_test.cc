@@ -27,6 +27,7 @@ class TestGpio : public GpioPin {
   virtual ~TestGpio() {}
   void Set(bool v) override { value_ = v; }
   bool Read() const override { return value_; }
+  void SetMode(PinMode) override {}
   bool value_ = false;
 };
 

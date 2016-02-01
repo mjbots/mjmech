@@ -25,8 +25,9 @@ namespace {
 class GpioPinTest : public GpioPin {
  public:
   virtual ~GpioPinTest() {}
-  virtual void Set(bool v) { value_ = v; }
-  virtual bool Read() const { return value_; }
+  void Set(bool v) override { value_ = v; }
+  bool Read() const override { return value_; }
+  void SetMode(PinMode) override {}
 
   bool value_ = false;
 };

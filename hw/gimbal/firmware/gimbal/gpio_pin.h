@@ -20,4 +20,12 @@ class GpioPin {
 
   virtual void Set(bool) = 0;
   virtual bool Read() const = 0;
+
+  enum PinMode {
+    kInput = 0,
+    kGeneralOutput = 1,
+    kAlternateFunction = 2,
+    kAnalog = 3,
+  };
+  virtual void SetMode(PinMode) = 0;
 };
