@@ -149,7 +149,7 @@
 <wire x1="60" y1="0" x2="60" y2="42" width="0" layer="20"/>
 <wire x1="60" y1="42" x2="0" y2="42" width="0" layer="20"/>
 <wire x1="0" y1="42" x2="0" y2="0" width="0" layer="20"/>
-<text x="25.8" y="18.1" size="0.8129" layer="21" ratio="10">(c) 2015
+<text x="25.8" y="18.1" size="0.8129" layer="21" ratio="10">(c) 2016
 jjp@pobox.com</text>
 <text x="25.8" y="20.7" size="0.9" layer="21" ratio="10">mjmech gimbal v3</text>
 <text x="12.5" y="13.3" size="0.8" layer="21" rot="R180">L</text>
