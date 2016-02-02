@@ -2,8 +2,8 @@
  * all faults should clear when torque is set off
    * there is no way to clear the AHRS rate fault
    * uart stream rx_overflow needs to flag an error that I can see
+   * provide a software command to restart things
 
- * provide a software command to restart things
  * add version number or date to image somehow
  * disconnecting the debugging USB cable seems to hose the controller
 
@@ -33,7 +33,7 @@
    * alignment pins for ARM switch don't match
      * spacing is 7.2 instead of the required 6.8
    * programming header has scrambled pin order
-   * usb connector didn't have front alignment pins soldered
+   * usb connector didn't have any of the alignment pins soldered
 
  * r1 defects
    * STM32 footprint is too small! :(
@@ -75,6 +75,11 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2016-02-02
+ * verify that r3 programming connector has correct pinout
+ * switched I2C connector assignments around to what the silks say
+ * uploaded r3 to macrofab and prepped for order
 
 DONE 2016-01-31
  * do pitch encoder too
