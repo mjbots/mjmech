@@ -110,6 +110,7 @@ void cpp_gimbal_main() {
   SizedPool<> pool;
   Stm32RawI2C::Parameters parameters;
   parameters.speed = 400000;
+
   Stm32GpioPin i2c1_sda(GPIOB, GPIO_PIN_7);
   Stm32GpioPin i2c1_scl(GPIOB, GPIO_PIN_6);
   Stm32RawI2C i2c1(pool, 1, i2c1_scl, i2c1_sda, parameters, clock);
@@ -117,7 +118,13 @@ void cpp_gimbal_main() {
   Stm32GpioPin i2c2_sda(GPIOB, GPIO_PIN_9);
   Stm32GpioPin i2c2_scl(GPIOB, GPIO_PIN_10);
   Stm32RawI2C i2c2(pool, 2, i2c2_scl, i2c2_sda, parameters, clock);
+
+  Stm32GpioPin i2c3_sda(GPIOC, GPIO_PIN_9);
+  Stm32GpioPin i2c3_scl(GPIOA, GPIO_PIN_8);
+  Stm32RawI2C i2c3(pool, 3, i2c3_scl, i2c3_sda, parameters, clock);
+
   Stm32HalSPI spi1(pool, 3, GPIOC, GPIO_PIN_15);
+
   Stm32Flash flash;
   PersistentConfig config(pool, flash);
   LockManager lock_manager;
@@ -126,13 +133,13 @@ void cpp_gimbal_main() {
   SystemInfo system_info(pool, telemetry, clock);
   Stm32AnalogSampler analog_sampler(pool, clock, config, telemetry);
   Bmi160Driver bmi160(pool, gsl::ensure_z("pimu"),
-                      i2c1, clock, config, telemetry);
+                      i2c3, clock, config, telemetry);
   As5048Driver yaw_encoder(pool, gsl::ensure_z("yawenc"),
                            nullptr, &spi1, clock, config, telemetry);
   BldcEncoder yaw_bldc_encoder(pool, gsl::ensure_z("yawblenc"),
                                yaw_encoder, clock, config, telemetry);
   As5048Driver pitch_encoder(pool, gsl::ensure_z("pitchenc"),
-                             &i2c2, nullptr, clock, config, telemetry);
+                             &i2c1, nullptr, clock, config, telemetry);
   BldcEncoder pitch_bldc_encoder(pool, gsl::ensure_z("pitchblenc"),
                                  pitch_encoder, clock, config, telemetry);
   Stm32BldcPwm motor1(&htim2, TIM_CHANNEL_1,
@@ -225,6 +232,7 @@ void cpp_gimbal_main() {
     uart.Poll();
     i2c1.Poll();
     i2c2.Poll();
+    i2c3.Poll();
     spi1.Poll();
     telemetry.Poll();
     command_manager.Poll();
