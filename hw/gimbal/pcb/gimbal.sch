@@ -417,13 +417,13 @@ MAX3223-MAX3243.pdf</description>
 <wire x1="-4.934" y1="-1.1" x2="-4.934" y2="-1.7" width="0.127" layer="21"/>
 <wire x1="5.061" y1="-1.1" x2="5.061" y2="-1.7" width="0.127" layer="21"/>
 <wire x1="5.061" y1="-1.1" x2="6.461" y2="-1.1" width="0.127" layer="21"/>
-<pad name="4" x="-3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="3" x="-1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="2" x="1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="1" x="3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="5" x="-3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="4" x="-1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="3" x="1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="2" x="3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
 <text x="-6.884" y="3.3001" size="1.27" layer="25">&gt;NAME</text>
-<pad name="5" x="-5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="6" x="5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="6" x="-5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="1" x="5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
 </package>
 <package name="JST_PH_SMT_RA_4">
 <smd name="3" x="1" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
@@ -4152,10 +4152,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="C1" gate="G$1" pin="P$2"/>
 </segment>
 <segment>
-<pinref part="PGM" gate="G$1" pin="3"/>
 <pinref part="GND16" gate="1" pin="GND"/>
-<wire x1="-30.48" y1="238.76" x2="-20.32" y2="238.76" width="0.1524" layer="91"/>
-<wire x1="-20.32" y1="238.76" x2="-20.32" y2="220.98" width="0.1524" layer="91"/>
+<pinref part="PGM" gate="G$1" pin="4"/>
+<wire x1="-20.32" y1="236.22" x2="-20.32" y2="220.98" width="0.1524" layer="91"/>
+<wire x1="-30.48" y1="236.22" x2="-20.32" y2="236.22" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="182.88" y1="152.4" x2="182.88" y2="144.78" width="0.1524" layer="91"/>
@@ -4401,10 +4401,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <junction x="73.66" y="266.7"/>
 </segment>
 <segment>
-<pinref part="PGM" gate="G$1" pin="1"/>
 <pinref part="+3V9" gate="G$1" pin="+3V3"/>
-<wire x1="-30.48" y1="243.84" x2="-25.4" y2="243.84" width="0.1524" layer="91"/>
-<wire x1="-25.4" y1="243.84" x2="-25.4" y2="251.46" width="0.1524" layer="91"/>
+<wire x1="-25.4" y1="251.46" x2="-25.4" y2="231.14" width="0.1524" layer="91"/>
+<pinref part="PGM" gate="G$1" pin="6"/>
+<wire x1="-25.4" y1="231.14" x2="-30.48" y2="231.14" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="ARM" gate="G$1" pin="1"/>
@@ -5177,29 +5177,29 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="101.6" y1="264.16" x2="101.6" y2="281.94" width="0.1524" layer="91"/>
 <junction x="101.6" y="264.16"/>
 <wire x1="101.6" y1="281.94" x2="-17.78" y2="281.94" width="0.1524" layer="91"/>
-<wire x1="-17.78" y1="281.94" x2="-17.78" y2="233.68" width="0.1524" layer="91"/>
-<pinref part="PGM" gate="G$1" pin="5"/>
-<wire x1="-17.78" y1="233.68" x2="-30.48" y2="233.68" width="0.1524" layer="91"/>
+<wire x1="-17.78" y1="281.94" x2="-17.78" y2="241.3" width="0.1524" layer="91"/>
 <pinref part="C6" gate="G$1" pin="P$1"/>
 <junction x="83.82" y="261.62"/>
+<pinref part="PGM" gate="G$1" pin="2"/>
+<wire x1="-17.78" y1="241.3" x2="-30.48" y2="241.3" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$31" class="0">
 <segment>
-<pinref part="PGM" gate="G$1" pin="2"/>
-<wire x1="-30.48" y1="241.3" x2="-7.62" y2="241.3" width="0.1524" layer="91"/>
-<wire x1="-7.62" y1="241.3" x2="-7.62" y2="190.5" width="0.1524" layer="91"/>
 <pinref part="U1" gate="G$1" pin="PA14/SWCLK"/>
+<wire x1="-7.62" y1="233.68" x2="-7.62" y2="190.5" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="190.5" x2="48.006" y2="190.5" width="0.1524" layer="91"/>
+<pinref part="PGM" gate="G$1" pin="5"/>
+<wire x1="-30.48" y1="233.68" x2="-7.62" y2="233.68" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$32" class="0">
 <segment>
-<wire x1="-15.24" y1="193.04" x2="-15.24" y2="236.22" width="0.1524" layer="91"/>
-<pinref part="PGM" gate="G$1" pin="4"/>
-<wire x1="-15.24" y1="236.22" x2="-30.48" y2="236.22" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="193.04" x2="-15.24" y2="238.76" width="0.1524" layer="91"/>
 <pinref part="U1" gate="G$1" pin="PA13/SWDIO"/>
 <wire x1="-15.24" y1="193.04" x2="48.006" y2="193.04" width="0.1524" layer="91"/>
+<pinref part="PGM" gate="G$1" pin="3"/>
+<wire x1="-15.24" y1="238.76" x2="-30.48" y2="238.76" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$33" class="0">

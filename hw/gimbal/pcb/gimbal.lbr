@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -513,13 +513,13 @@ MAX3223-MAX3243.pdf</description>
 <wire x1="-4.934" y1="-1.1" x2="-4.934" y2="-1.7" width="0.127" layer="21"/>
 <wire x1="5.061" y1="-1.1" x2="5.061" y2="-1.7" width="0.127" layer="21"/>
 <wire x1="5.061" y1="-1.1" x2="6.461" y2="-1.1" width="0.127" layer="21"/>
-<pad name="4" x="-3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="3" x="-1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="2" x="1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="1" x="3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="5" x="-3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="4" x="-1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="3" x="1" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="2" x="3" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
 <text x="-6.884" y="3.3001" size="1.27" layer="25">&gt;NAME</text>
-<pad name="5" x="-5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
-<pad name="6" x="5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="6" x="-5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="1" x="5" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
 </package>
 <package name="JST_PH_SMT_RA_4">
 <smd name="3" x="1" y="2.75" dx="4.5" dy="1" layer="1" rot="R90"/>
