@@ -92,7 +92,7 @@ class GimbalStabilizer {
     Point3D desired_body_rate_dps;
     uint32_t last_ahrs_update = 0;
     bool torque_on = false;
-    uint8_t last_fault_reason = 0;
+    uint32_t last_fault_reason = 0;
 
     float pitch_command = 0.0f;
     float yaw_command = 0.0f;

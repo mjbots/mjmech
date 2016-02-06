@@ -144,7 +144,7 @@ class MahonyImu::Impl {
     o.body_rate_dps = g_dps + data_.integral_dps;
     o.euler_deg = o.attitude.euler_rad().scaled(kRadToDeg);
 
-    data_signal_(&data_.ahrs);
+    o.error = 0;
 
     // Update our measured rate output.
     data_.bias_count++;
@@ -156,11 +156,11 @@ class MahonyImu::Impl {
 
       if ((data_.measured_rate_hz < (3 * o.rate_hz / 4)) ||
           (data_.measured_rate_hz > (5 * o.rate_hz / 4))) {
-        // If we ever see a bad rate, just latch the error to force a
-        // restart.
         o.error = 1;
       }
     }
+
+    data_signal_(&data_.ahrs);
   }
 
   Clock& clock_;

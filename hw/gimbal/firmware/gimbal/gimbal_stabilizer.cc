@@ -215,7 +215,7 @@ class GimbalStabilizer::Impl {
 
   void DoOperating() {
     if (ahrs_data_.error) {
-      data_.last_fault_reason = 1;
+      data_.last_fault_reason = 0x1000 | ahrs_data_.error;
       DoFault();
       return;
     }
@@ -350,7 +350,7 @@ class GimbalStabilizer::Impl {
             clock_.timestamp() -
             data_.last_ahrs_update) / clock_.ticks_per_second();
         if (elapsed_s > config_.watchdog_period_s && data_.torque_on) {
-          data_.last_fault_reason = 2;
+          data_.last_fault_reason = 0x2000;
           DoFault();
         }
         break;
