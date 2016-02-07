@@ -113,7 +113,7 @@ void GimbalHerkulexOperations::WriteRam(uint8_t addr, uint8_t val) {
     }
     case 0x7b: {
       if (val != 0) {
-        // Do a gyro calibration.
+        imu_.RestartBiasInitialization();
       }
       break;
     }

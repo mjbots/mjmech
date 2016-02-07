@@ -398,6 +398,21 @@ class GimbalStabilizer::Impl {
     data_.desired_body_rate_dps.z = 0.0;
   }
 
+  void RestartInitializationCommand(const CommandManager::Response& response) {
+    RestartInitialization();
+
+    WriteOK(response);
+  }
+
+  void RestartInitialization() {
+    // First use DoFault to ensure everything is off.
+    DoFault();
+
+    // Then put us back in the initialization state.
+    data_.state = kInitializing;
+    data_.start_timestamp = 0;
+  }
+
   void AttitudeCommand(const gsl::cstring_span& command,
                        const CommandManager::Response& response) {
     Tokenizer tokenizer(command, " ");
@@ -569,6 +584,10 @@ void GimbalStabilizer::SetAbsoluteYaw(float yaw_deg) {
   impl_->SetAbsoluteYaw(yaw_deg);
 }
 
+void GimbalStabilizer::RestartInitialization() {
+  impl_->RestartInitialization();
+}
+
 void GimbalStabilizer::Command(const gsl::cstring_span& command,
                                const CommandManager::Response& response) {
   Tokenizer tokenizer(command, " ");
@@ -585,6 +604,8 @@ void GimbalStabilizer::Command(const gsl::cstring_span& command,
     impl_->RateCommand(tokenizer.remaining(), response);
   } else if (cmd == gsl::ensure_z("ayaw")) {
     impl_->AbsoluteYawCommand(tokenizer.remaining(), response);
+  } else if (cmd == gsl::ensure_z("restart")) {
+    impl_->RestartInitializationCommand(response);
   } else {
     impl_->UnknownCommand(response);
   }

@@ -58,6 +58,9 @@ class GimbalStabilizer {
   /// the given absolute yaw angle.
   void SetAbsoluteYaw(float yaw_deg);
 
+  /// Re-enter the initialization phase.
+  void RestartInitialization();
+
   void Command(const gsl::cstring_span&, const CommandManager::Response&);
 
   void PollMillisecond();

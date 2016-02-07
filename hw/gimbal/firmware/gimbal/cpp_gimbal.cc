@@ -181,6 +181,7 @@ void cpp_gimbal_main() {
 
   command_manager.RegisterHandler(gsl::ensure_z("conf"), config);
   command_manager.RegisterHandler(gsl::ensure_z("tel"), telemetry);
+  command_manager.RegisterHandler(gsl::ensure_z("imu"), imu);
   command_manager.RegisterHandler(gsl::ensure_z("gim"), stabilizer);
   command_manager.RegisterHandler(gsl::ensure_z("fire"), fire_control);
 

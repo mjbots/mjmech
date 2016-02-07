@@ -15,6 +15,7 @@
 #pragma once
 
 #include "ahrs_data.h"
+#include "command_manager.h"
 #include "imu_data.h"
 #include "pool_ptr.h"
 
@@ -30,6 +31,11 @@ class MahonyImu {
 
   const AhrsData& data() const;
   AhrsDataSignal* data_signal();
+
+  /// Re-enter the initial bias determination mode.
+  void RestartBiasInitialization();
+
+  void Command(const gsl::cstring_span&, const CommandManager::Response&);
 
  private:
   class Impl;

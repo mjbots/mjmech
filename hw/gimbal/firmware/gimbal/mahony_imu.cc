@@ -163,6 +163,19 @@ class MahonyImu::Impl {
     data_signal_(&data_.ahrs);
   }
 
+  void WriteOK(const CommandManager::Response response) {
+    WriteMessage(gsl::ensure_z("OK\r\n"), response);
+  }
+
+  void UnknownCommand(const CommandManager::Response& response) {
+    WriteMessage(gsl::ensure_z("unknown command\r\n"), response);
+  }
+
+  void WriteMessage(const gsl::cstring_span& message,
+                    const CommandManager::Response& response) {
+    AsyncWrite(*response.stream, message, response.callback);
+  }
+
   Clock& clock_;
 
   enum State {
@@ -179,7 +192,7 @@ class MahonyImu::Impl {
   }
 
   struct Data {
-    State state;
+    State state = kInitialBias;
     uint32_t start_timestamp = 0;
     uint32_t bias_count = 0;
     uint32_t measured_rate_hz = 0;
@@ -218,4 +231,20 @@ const AhrsData& MahonyImu::data() const {
 
 AhrsDataSignal* MahonyImu::data_signal() {
   return &impl_->data_signal_;
+}
+
+void MahonyImu::RestartBiasInitialization() {
+  impl_->data_ = Impl::Data();
+}
+
+void MahonyImu::Command(const gsl::cstring_span& command,
+                        const CommandManager::Response& response) {
+  Tokenizer tokenizer(command, " ");
+  auto cmd = tokenizer.next();
+  if (cmd == gsl::ensure_z("restart")) {
+    RestartBiasInitialization();
+    impl_->WriteOK(response);
+  } else {
+    impl_->UnknownCommand(response);
+  }
 }
