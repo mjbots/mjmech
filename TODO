@@ -1,7 +1,5 @@
 Preparing for RoboGames
 
- * it would be nice to have some kind of feet under the bottom plate
-   so that when servos are off, we aren't resting on the target plates
  * Ensure I have enough weapon plates for a second weapon
    * make new design have appropriate mounting for both gimbal motor
      servo city bearing
@@ -13,8 +11,12 @@ Preparing for RoboGames
    * hole for encoder magnet
    * there is no need to be so wide, the camera interference isn't the
      limiting factor when pitching down, the target plates are
+   * appropriate mounting holes for weapon on both sides
+     * mounting holes
+     * AND center hole
 
- * if a servo goes power off, we need to re-enable it after some time
+ * if a servo goes power off, we need to report it in a big way, but
+   not automatically re-enable it
  * Need to re-calibrate turret gyro any time torque is enabled
 
  * make some sort of protection for weapon IMU board
@@ -67,8 +69,14 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2016-02-03
+ * prepared freecad and dxf files for new turret plate, new turret
+   jaws, and new lizard turret adaptor
+
 DONE 2016-02-02
  * rev gimbal board and get 2x of the clean version made
+ * ordered some nylon spacers to use for "feet" under the bottom body
+   plate
 
 DONE 2016-01-31
  * verify that absolute yaw and pitch control work in gimbal

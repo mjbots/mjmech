@@ -1,11 +1,4 @@
- * provide a mechanism to re-initialize the gyro with arbitrary time
- * all faults should clear when torque is set off
-   * there is no way to clear the AHRS rate fault
-   * uart stream rx_overflow needs to flag an error that I can see
-   * provide a software command to restart things
-
  * add version number or date to image somehow
- * disconnecting the debugging USB cable seems to hose the controller
 
  * gimbal control software
    * when we are limiting the target due to max_slew, the target
@@ -22,8 +15,6 @@
 
  * fire control
    * wire up AEG fault signal
-
- * get watchdog working
 
  * I was able to lock up the I2C bus by resetting the controller
    with st-util
@@ -75,6 +66,11 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2016-02-06
+ * Stopped latching forever a fault if the AHRS has a problem
+ * Added a mechanism for re-initializing the gyro bias
+ * Report torque_on correctly
 
 DONE 2016-02-02
  * verify that r3 programming connector has correct pinout
