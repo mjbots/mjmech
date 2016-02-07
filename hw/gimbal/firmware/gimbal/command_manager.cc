@@ -123,7 +123,7 @@ class CommandManager::Impl {
   AsyncStream& stream_;
   LockManager& lock_manager_;
 
-  typedef NamedRegistryBase<Item, 4> Registry;
+  typedef NamedRegistryBase<Item, 16> Registry;
   Registry registry_;
   ErrorCallback start_callback_;
   char line_buffer_[100] = {};
