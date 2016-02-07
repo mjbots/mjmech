@@ -29,6 +29,7 @@ class HerkulexProtocol {
     virtual void WriteRam(uint8_t addr, uint8_t val) = 0;
     virtual uint8_t ReadRam(uint8_t addr) = 0;
     virtual void Reboot() = 0;
+    virtual bool motor_on() const = 0;
   };
 
   HerkulexProtocol(Pool& pool, AsyncStream&, Operations&);

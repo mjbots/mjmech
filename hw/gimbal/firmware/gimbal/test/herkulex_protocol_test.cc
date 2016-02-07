@@ -37,8 +37,11 @@ class TestOperations : public HerkulexProtocol::Operations {
 
   void Reboot() override { reboot_ = true; }
 
+  bool motor_on() const override { return motor_on_; }
+
   std::map<uint8_t, uint8_t> file_;
   bool reboot_ = false;
+  bool motor_on_ = false;
 };
 }
 

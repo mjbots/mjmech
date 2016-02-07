@@ -175,10 +175,14 @@ class HerkulexProtocol::Impl {
   void HandleStat() {
     if (write_outstanding_) { return; }
 
-    tx_buffer_[kPacketData] = status_error_;
-    tx_buffer_[kPacketData + 1] = status_detail_;
+    tx_buffer_[kPacketAddress] = status_error_;
+    tx_buffer_[kPacketAddress + 1] = GetStatusDetail();
 
     SendData(0x47, 2); // STAT_ACK
+  }
+
+  uint8_t GetStatusDetail() const {
+    return status_detail_ | (operations_.motor_on() ? 0x40 : 0x00);
   }
 
   void HandleRamWrite() {
@@ -223,10 +227,15 @@ class HerkulexProtocol::Impl {
     tx_buffer_[kPacketAddress] = address;
     tx_buffer_[kPacketDataLength] = len;
     for (uint8_t i = 0; i < len; i++) {
-      tx_buffer_[kPacketData + i] = operations_.ReadRam(address + i);
+      const uint8_t value = [&]() {
+        if ((address + i) == 43) { return status_error_; }
+        else if ((address + i) == 44) { return GetStatusDetail(); }
+        else { return operations_.ReadRam(address + i); }
+      }();
+      tx_buffer_[kPacketData + i] = value;
     }
     tx_buffer_[kPacketData + 0 + len] = status_error_;
-    tx_buffer_[kPacketData + 1 + len] = status_detail_;
+    tx_buffer_[kPacketData + 1 + len] = GetStatusDetail();
 
     SendData(0x44, len + 4);
   }

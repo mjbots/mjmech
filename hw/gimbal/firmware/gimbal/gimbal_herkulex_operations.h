@@ -33,6 +33,7 @@ class GimbalHerkulexOperations : public HerkulexProtocol::Operations {
   void WriteRam(uint8_t addr, uint8_t val) override;
   uint8_t ReadRam(uint8_t addr) override;
   void Reboot() override;
+  bool motor_on() const override;
 
  private:
   uint32_t int_desired_pitch() const;

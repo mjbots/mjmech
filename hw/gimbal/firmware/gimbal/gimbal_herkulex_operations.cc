@@ -181,6 +181,10 @@ uint8_t GimbalHerkulexOperations::ReadRam(uint8_t addr) {
 void GimbalHerkulexOperations::Reboot() {
 }
 
+bool GimbalHerkulexOperations::motor_on() const {
+  return stabilizer_.data().torque_on;
+}
+
 uint32_t GimbalHerkulexOperations::int_desired_pitch() const {
   return static_cast<int32_t>(
       stabilizer_.data().desired_deg.pitch * 1000.0f);
