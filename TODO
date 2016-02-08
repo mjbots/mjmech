@@ -17,7 +17,6 @@ Preparing for RoboGames
 
  * if a servo goes power off, we need to report it in a big way, but
    not automatically re-enable it
- * Need to re-calibrate turret gyro any time torque is enabled
 
  * make some sort of protection for weapon IMU board
  * make turret rate commands able to operate in a fine mode somehow,
@@ -68,6 +67,9 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-07
+ * Need to re-calibrate turret gyro any time torque is enabled
 
 DONE 2016-02-03
  * prepared freecad and dxf files for new turret plate, new turret

@@ -4,8 +4,6 @@
    * when we are limiting the target due to max_slew, the target
      body_dps should be non-zero?  More likely it should have an accel
      and decel profile of some sort.
-   * using the PIMU on i2c3 appears to be flaky, but i2c1 works just
-     fine
    * wire up motor fault signals
 
  * make UI for debugging
