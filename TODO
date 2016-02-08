@@ -15,14 +15,10 @@ Preparing for RoboGames
      * mounting holes
      * AND center hole
 
- * if a servo goes power off, we need to report it in a big way, but
-   not automatically re-enable it
-
  * make some sort of protection for weapon IMU board
- * make turret rate commands able to operate in a fine mode somehow,
-   either a gradiated rate scheme, or a toggle for fine mode
  * Create/get barrel lock solution, (maybe from jwatte)?
  * Assemble spare weapon
+ * Create toolbox and packing list
 
  * video: finish McastVideoLink
   - packetize frames into packets, merge them back
@@ -67,6 +63,12 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-08
+ * if a servo goes power off, we need to report it in a big way, but
+   not automatically re-enable it
+ * make turret rate commands able to operate in a fine mode somehow,
+   either a gradiated rate scheme, or a toggle for fine mode
 
 DONE 2016-02-07
  * Need to re-calibrate turret gyro any time torque is enabled
