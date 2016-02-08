@@ -206,8 +206,8 @@ class HerkulexProtocol::Impl {
       const uint8_t byte = u8(buffer_[kPacketData + i]);
       operations_.WriteRam(addr + i, byte);
 
-      if ((addr + i) == 43) { status_error_ = byte; }
-      else if ((addr + i) == 44) { status_detail_ = byte; }
+      if ((addr + i) == 48) { status_error_ = byte; }
+      else if ((addr + i) == 49) { status_detail_ = byte; }
     }
   }
 
@@ -228,8 +228,8 @@ class HerkulexProtocol::Impl {
     tx_buffer_[kPacketDataLength] = len;
     for (uint8_t i = 0; i < len; i++) {
       const uint8_t value = [&]() {
-        if ((address + i) == 43) { return status_error_; }
-        else if ((address + i) == 44) { return GetStatusDetail(); }
+        if ((address + i) == 48) { return status_error_; }
+        else if ((address + i) == 49) { return GetStatusDetail(); }
         else { return operations_.ReadRam(address + i); }
       }();
       tx_buffer_[kPacketData + i] = value;
