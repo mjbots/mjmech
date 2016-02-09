@@ -7,7 +7,6 @@
    * wire up motor fault signals
 
  * make UI for debugging
-   * becomes unusable with large trees open
    * record tlog files
    * easy to reach button for torque off
 
@@ -64,6 +63,9 @@
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+DONE 2016-02-08
+ * fixed tview speed problems
 
 DONE 2016-02-06
  * Stopped latching forever a fault if the AHRS has a problem
