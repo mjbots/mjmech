@@ -1,11 +1,5 @@
 Preparing for RoboGames
 
- * Ensure I have enough weapon plates for a second weapon
-   * make new design have appropriate mounting for both gimbal motor
-     servo city bearing
-   * drop some of the metal in the back bottom quadrant to make
-     balance better
-   * no need for herkulex mounting pattern
  * Design and print new turret gimbal
    * have built in standoffs for turret board
    * hole for encoder magnet
@@ -16,9 +10,14 @@ Preparing for RoboGames
      * AND center hole
 
  * make some sort of protection for weapon IMU board
- * Create/get barrel lock solution, (maybe from jwatte)?
+ * install shapeways barrel lock
  * Assemble spare weapon
  * Create toolbox and packing list
+ * tune turret operation
+   * transient performance
+   * absolute yaw limits
+   * alignment of pitch absolute encoder
+   * record full config somewhere
 
  * video: finish McastVideoLink
   - packetize frames into packets, merge them back
@@ -69,6 +68,8 @@ DONE 2016-02-08
    not automatically re-enable it
  * make turret rate commands able to operate in a fine mode somehow,
    either a gradiated rate scheme, or a toggle for fine mode
+ * ordered new versions of weapon plates, jaws, and lizard turret
+   mount from emachineshop
 
 DONE 2016-02-07
  * Need to re-calibrate turret gyro any time torque is enabled
