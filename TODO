@@ -18,6 +18,8 @@ Preparing for RoboGames
    * absolute yaw limits
    * alignment of pitch absolute encoder
    * record full config somewhere
+ * when rotating, limit translation speed
+ * camera based target stabilization/tracking
 
  * video: finish McastVideoLink
   - packetize frames into packets, merge them back
