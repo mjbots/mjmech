@@ -1,13 +1,5 @@
 Preparing for RoboGames
 
- * Need to configure the lower voltage limit in the servos to be
-   lower, which means we need a framework for reconfiguring and
-   verifying the config of each of the servos on startup, or, probably
-   easier, is just the ability to verify the eeprom config.
- * When starting mw_command, the turret kept warping to the rear, then
-   slowly moving back to center again.
- * No way to configure a body offset in mech_warfare, just in mw_command
-
  * Design and print new turret gimbal
    * have built in standoffs for turret board
    * hole for encoder magnet
@@ -21,11 +13,7 @@ Preparing for RoboGames
  * install shapeways barrel lock
  * Assemble spare weapon
  * Create toolbox and packing list
- * tune turret operation
-   * transient performance
-   * absolute yaw limits
-   * alignment of pitch absolute encoder
-   * record full config somewhere
+
  * when rotating, limit translation speed
  * camera based target stabilization/tracking
 
@@ -72,6 +60,11 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-10
+ * added eeprom support to herkulex_tool
+ * made MechWarfare verify minimum voltage configuration on start
+ * recorded full turret config, tuned yaw to have almost no overshoot
 
 DONE 2016-02-08
  * if a servo goes power off, we need to report it in a big way, but
