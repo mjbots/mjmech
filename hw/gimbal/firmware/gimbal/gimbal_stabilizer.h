@@ -99,6 +99,8 @@ class GimbalStabilizer {
 
     float pitch_command = 0.0f;
     float yaw_command = 0.0f;
+    float pitch_power = 0.0f;
+    float yaw_power = 0.0f;
 
     template <typename Archive>
     void Serialize(Archive* a) {
@@ -116,6 +118,8 @@ class GimbalStabilizer {
       a->Visit(MJ_NVP(last_fault_reason));
       a->Visit(MJ_NVP(pitch_command));
       a->Visit(MJ_NVP(yaw_command));
+      a->Visit(MJ_NVP(pitch_power));
+      a->Visit(MJ_NVP(yaw_power));
     }
   };
 

@@ -44,6 +44,10 @@ struct ChannelConfig {
   PID::Config pid;
   float max_slew_dps = 60.0f;
 
+  /// If 0 control is necessary, scale power by this much.  If maximal
+  /// control is necessary, apply full power.
+  float control_derate = 1.0f;
+
   /// 0 is traditional open loop
   /// 1 uses bldc encoder to apply fixed torque
   /// 2 just applies a fixed motor phase based on target
@@ -55,6 +59,7 @@ struct ChannelConfig {
     a->Visit(MJ_NVP(power));
     a->Visit(MJ_NVP(pid));
     a->Visit(MJ_NVP(max_slew_dps));
+    a->Visit(MJ_NVP(control_derate));
     a->Visit(MJ_NVP(mode));
   }
 
@@ -213,6 +218,21 @@ class GimbalStabilizer::Impl {
     *target_deg += delta_deg;
   }
 
+  float CalculatePower(const ChannelConfig& config,
+		       float control_command) const {
+    if (config.mode == 0 ||
+	config.mode == 2) {
+      return config.power;
+    }
+    const float command_ratio =
+      std::abs(control_command) / config.pid.kpkd_limit;
+    const float derate =
+      Limit((command_ratio * (1.0 - config.control_derate) +
+	     config.control_derate),
+	    1.0);
+    return derate * config.power;
+  }
+
   void DoOperating() {
     if (ahrs_data_.error) {
       data_.last_fault_reason = 0x1000 | ahrs_data_.error;
@@ -314,12 +334,12 @@ class GimbalStabilizer::Impl {
                    std::min(static_cast<uint32_t>(65535),
                             static_cast<uint32_t>(fresult))));
     };
-    const float ppower = config_.pitch.power;
+    const float ppower = CalculatePower(config_.pitch, pitch_control_command);
     const float pitch1 = pwm(pitch_command, ppower, 0.0f);
     const float pitch2 = pwm(pitch_command, ppower, 1.0f / 3.0f);
     const float pitch3 = pwm(pitch_command, ppower, 2.0f / 3.0f);
 
-    const float ypower = config_.yaw.power;
+    const float ypower = CalculatePower(config_.yaw, yaw_control_command);
     const float yaw1 = pwm(yaw_command, ypower, 0.0f);
     const float yaw2 = pwm(yaw_command, ypower, 1.0f / 3.0f);
     const float yaw3 = pwm(yaw_command, ypower, 2.0f / 3.0f);
@@ -329,6 +349,8 @@ class GimbalStabilizer::Impl {
 
     data_.pitch_command = pitch_command;
     data_.yaw_command = yaw_command;
+    data_.pitch_power = ppower;
+    data_.yaw_power = ypower;
   }
 
   void DoFault() {
