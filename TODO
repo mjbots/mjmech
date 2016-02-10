@@ -1,5 +1,13 @@
 Preparing for RoboGames
 
+ * Need to configure the lower voltage limit in the servos to be
+   lower, which means we need a framework for reconfiguring and
+   verifying the config of each of the servos on startup, or, probably
+   easier, is just the ability to verify the eeprom config.
+ * When starting mw_command, the turret kept warping to the rear, then
+   slowly moving back to center again.
+ * No way to configure a body offset in mech_warfare, just in mw_command
+
  * Design and print new turret gimbal
    * have built in standoffs for turret board
    * hole for encoder magnet
