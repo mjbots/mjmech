@@ -17,7 +17,6 @@ Preparing for RoboGames
  * when rotating, limit translation speed
  * camera based target stabilization/tracking
 
- * video: decrease the latency of the network link / receiver (currently ~200mS)
  * video: see if we can decrease the camera latency (currently ~200mS for H264)
  * video: ensure --display.source=rtsp:// works
  * control: bring in joystick control code to video_controller_app process.
@@ -39,6 +38,7 @@ Movement
 Video/Control
 ~~~~~~~~~~~~~
 
+ * Fix raw_frames in VideoDisplay::Stats
  * Status reporting from the robot
  * Logs collection from the robot
  * OSD -- targeting grid(s) (which ones?)
@@ -60,6 +60,7 @@ History
 
 DONE 2016-02-11
  * video: ensure --camera.write_video on sender produces playable file
+ * video: decrease the latency of the network link / receiver (currently ~200mS)
 
 DONE 2016-02-10
  * video: finish McastVideoLink
