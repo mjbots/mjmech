@@ -17,11 +17,8 @@ Preparing for RoboGames
  * when rotating, limit translation speed
  * camera based target stabilization/tracking
 
- * video: finish McastVideoLink
-  - packetize frames into packets, merge them back
-  - send on fixed schedule (but apply corrections if this is too slow)
-  - ensure we log all packets
- * video: ensure --camera.write_video on sender produces playable file
+ * video: decrease the latency of the network link / receiver (currently ~200mS)
+ * video: see if we can decrease the camera latency (currently ~200mS for H264)
  * video: ensure --display.source=rtsp:// works
  * control: bring in joystick control code to video_controller_app process.
  * control: make sure we are using multicasts for control commands
@@ -60,6 +57,15 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-11
+ * video: ensure --camera.write_video on sender produces playable file
+
+DONE 2016-02-10
+ * video: finish McastVideoLink
+  - packetize frames into packets, merge them back
+  - send on fixed schedule (but apply corrections if this is too slow)
+  - ensure we log all packets
 
 DONE 2016-02-10
  * added eeprom support to herkulex_tool
