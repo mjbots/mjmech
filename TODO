@@ -17,10 +17,15 @@ Preparing for RoboGames
  * when rotating, limit translation speed
  * camera based target stabilization/tracking
 
- * video: see if we can decrease the camera latency (currently ~200mS for H264)
- * video: ensure --display.source=rtsp:// works
  * control: bring in joystick control code to video_controller_app process.
  * control: make sure we are using multicasts for control commands
+
+ * Status reporting from the robot
+ * OSD -- text status output (battery, temperature, # shots fired)
+ * Logs collection from the robot
+ * OSD -- general logging
+ * OSD -- targeting grid(s) (which ones?)
+
  * control: make sure agitator control works properly preserved
  * control: deploy/launch script. Must also collect logs.
 
@@ -39,11 +44,6 @@ Video/Control
 ~~~~~~~~~~~~~
 
  * Fix raw_frames in VideoDisplay::Stats
- * Status reporting from the robot
- * Logs collection from the robot
- * OSD -- targeting grid(s) (which ones?)
- * OSD -- text status output (battery, temperature, # shots fired)
- * OSD -- general logging
  * control: ability to click on screen and start shooting there
  * control: ability to lock on / detect the target
  * video: dynamically control frame parameters, # of retransmissions
@@ -53,6 +53,9 @@ Video/Control
    It is perfectly ok (and more predicable) to specify all paramters
    by hand.
  * control: detect if bullet actually went out
+ * video: see if we can decrease the camera latency
+  - currently ~200mS for H264 on-camera or ~120mS for H264 on-odroid
+ * video: ensure --display.source=rtsp:// works
 
 
 History
