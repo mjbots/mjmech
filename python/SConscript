@@ -50,6 +50,8 @@ bpenv.ParseConfig('pkg-config --cflags --libs python')
 pylegtool = bpenv.SharedLibrary(
     '_legtool', PY_SOURCES,
     LIBPREFIX='')
+bpenv.Depends(pylegtool, libmech_so)
+bpenv.Depends(pylegtool, libbase_so)
 
 # Verify that we can load this library.
 legtool_test = File('test/py_legtool_test.py')
