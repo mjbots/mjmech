@@ -33,6 +33,7 @@ env.Append(LIBS=['snappy',
                  'boost_date_time'])
 
 env.ParseConfig('pkg-config --cflags --libs eigen3')
+env.ParseConfig('pkg-config --cflags --libs opencv')
 
 canonenv = env
 Export('canonenv')
