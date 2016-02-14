@@ -1,21 +1,16 @@
 Preparing for RoboGames
 
- * Design and print new turret gimbal
-   * have built in standoffs for turret board
-   * hole for encoder magnet
-   * there is no need to be so wide, the camera interference isn't the
-     limiting factor when pitching down, the target plates are
-   * appropriate mounting holes for weapon on both sides
-     * mounting holes
-     * AND center hole
-
- * make some sort of protection for weapon IMU board
- * install shapeways barrel lock
- * Assemble spare weapon
+ * Create gimbal board protective 3D printed cover
+ * get lizard chassis to operate
+ * move weapon IMU board to center of camera
  * Create toolbox and packing list
 
- * when rotating, limit translation speed
+ * Assemble spare weapon
+
+ * test and tune constants for limiting translation when rotating
  * camera based target stabilization/tracking
+ * try making body raise in height during gait to increase total foot
+   separation distance
 
  * control: bring in joystick control code to video_controller_app process.
  * control: make sure we are using multicasts for control commands
@@ -60,6 +55,10 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-13
+ * designed and ordered new turret gimbal
+ * install shapeways barrel lock
 
 DONE 2016-02-11
  * video: ensure --camera.write_video on sender produces playable file
