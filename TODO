@@ -22,7 +22,9 @@ Preparing for RoboGames
  * OSD -- targeting grid(s) (which ones?)
 
  * control: make sure agitator control works properly preserved
- * control: deploy/launch script. Must also collect logs.
+ * control: deploy/launch script. Must also collect logs, including 
+   video stats.
+ * control: some logging that servos/IMU work and are connected.
 
 Movement
 ~~~~~~~~
@@ -51,7 +53,7 @@ Video/Control
  * video: see if we can decrease the camera latency
   - currently ~200mS for H264 on-camera or ~120mS for H264 on-odroid
  * video: ensure --display.source=rtsp:// works
-
+ * fix IMU -- find out the right i2c port
 
 History
 ~~~~~~~
