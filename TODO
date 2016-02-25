@@ -1,10 +1,17 @@
 Preparing for RoboGames
 
- * get lizard chassis to operate
+ * Assemble second weapon
+   * fit 3d parts to gearbox
+   * attach side plates
+   * add JST connector to second webcam
+
  * move weapon IMU board to center of camera
  * Create toolbox and packing list
+ * order additional BBs
 
- * Assemble spare weapon
+ * mech seems to tip to the left when walking on carpet
+ * occasionally when starting, the turret spins all the way to one side,
+   maybe the wrapped yaw is used to initialize?
 
  * test and tune constants for limiting translation when rotating
  * camera based target stabilization/tracking
@@ -56,6 +63,17 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-24
+ * finished assembling all 8 target panels
+
+DONE 2016-02-23
+ * Mostly assembled 4 .1" target panels
+ * Partially assembled 4 JST target panels
+
+DONE 2016-02-22
+ * Got lizard chassis operating using the MechWarfare
+ * assembled third transponder board and remaining 2 LED boards
 
 DONE 2016-02-14
  * Create gimbal board protective 3D printed cover and ordered from
