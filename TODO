@@ -1,15 +1,16 @@
 Preparing for RoboGames
 
  * Assemble second weapon
-   * fit 3d parts to gearbox
-   * attach side plates
    * add JST connector to second webcam
+   * build power/data cable to main chassis
+   * build USB cable to main chassis
 
  * move weapon IMU board to center of camera
  * Create toolbox and packing list
  * order additional BBs
 
  * mech seems to tip to the left when walking on carpet
+   * maybe turret is just heavy on left side?
  * occasionally when starting, the turret spins all the way to one side,
    maybe the wrapped yaw is used to initialize?
 
@@ -22,13 +23,12 @@ Preparing for RoboGames
  * control: make sure we are using multicasts for control commands
 
  * Status reporting from the robot
- * OSD -- text status output (battery, temperature, # shots fired)
  * Logs collection from the robot
  * OSD -- general logging
  * OSD -- targeting grid(s) (which ones?)
 
  * control: make sure agitator control works properly preserved
- * control: deploy/launch script. Must also collect logs, including 
+ * control: deploy/launch script. Must also collect logs, including
    video stats.
  * control: some logging that servos/IMU work and are connected.
 
@@ -63,6 +63,20 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-27
+ * Assembled second weapon
+ * Started filling up toolbox with parts
+   * Ordered more baggies so that I can finish
+ * Built weapon to gimbal stabilizer cable
+ * Built IMU cable
+ * Hot glued laser into place
+ * Populated AS5048B board
+ * built pitch encoder cable
+
+DONE 2016-02-26
+ * Verified that OSD correctly shows voltage and turret
+   position... likely the fire time is correct too
 
 DONE 2016-02-24
  * finished assembling all 8 target panels
