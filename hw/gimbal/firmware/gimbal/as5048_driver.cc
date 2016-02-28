@@ -24,7 +24,7 @@ namespace {
 const auto u8 = [](char c) { return static_cast<uint8_t>(c); };
 
 struct Config {
-  uint8_t i2c_address = 0x40;
+  uint8_t i2c_address = 0x80;
 
   template <typename Archive>
   void Serialize(Archive* a) {
