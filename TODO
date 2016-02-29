@@ -14,6 +14,11 @@ Preparing for RoboGames
  * try making body raise in height during gait to increase total foot
    separation distance
 
+ * start_robot: option to run without recompiliing
+ * usb restart camera if bad device is present
+ * fix video recording
+ * fix memory leak in image processing code
+
  * control: make sure we are using multicasts for control commands
 
  * Logs collection from the robot
