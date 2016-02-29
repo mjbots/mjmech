@@ -22,7 +22,7 @@
 namespace {
 class As5048Simulator : public test::AsyncI2CSimulator {
  public:
-  As5048Simulator() : test::AsyncI2CSimulator(0x40) {}
+  As5048Simulator() : test::AsyncI2CSimulator(0x80) {}
   virtual ~As5048Simulator() {}
 
   uint8_t Read(uint8_t address) override {
