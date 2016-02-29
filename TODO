@@ -19,10 +19,8 @@ Preparing for RoboGames
  * try making body raise in height during gait to increase total foot
    separation distance
 
- * control: bring in joystick control code to video_controller_app process.
  * control: make sure we are using multicasts for control commands
 
- * Status reporting from the robot
  * Logs collection from the robot
  * OSD -- general logging
  * OSD -- targeting grid(s) (which ones?)
@@ -64,6 +62,9 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2016-02-28
+ * control: bring in joystick control code to video_controller_app process.
+
 DONE 2016-02-27
  * Assembled second weapon
  * Started filling up toolbox with parts
@@ -77,6 +78,9 @@ DONE 2016-02-27
 DONE 2016-02-26
  * Verified that OSD correctly shows voltage and turret
    position... likely the fire time is correct too
+
+DONE 2016-02-25
+ * Status reporting from the robot
 
 DONE 2016-02-24
  * finished assembling all 8 target panels
