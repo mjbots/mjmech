@@ -581,7 +581,10 @@ void GimbalStabilizer::SetTorque(bool v) {
     // Always start with the target yaw and pitch where they are now,
     // so we make a smooth motion when turning on.
     impl_->data_.target_deg.pitch = impl_->ahrs_data_.euler_deg.pitch;
-    impl_->data_.target_deg.yaw = impl_->ahrs_data_.euler_deg.yaw;
+    impl_->data_.target_deg.yaw = impl_->data_.unwrapped_yaw_deg;
+
+    // Additionally, we don't warp yaw when turning on torque.
+    impl_->data_.desired_deg.yaw = impl_->data_.unwrapped_yaw_deg;
   }
 
   if (!v && impl_->data_.state == kFault) {
