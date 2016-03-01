@@ -1,6 +1,8 @@
 Preparing for RoboGames
 
- * test lizard robot walking w/ both xbox and logitech joystick
+ * reconnector the lizard scoring harnesses to JST
+ * lizard robot (and probably mammal), takes too long to turn when
+   changing direction or switching to strafing
 
  * move weapon IMU board to center of camera
  * Create toolbox and packing list
@@ -9,7 +11,6 @@ Preparing for RoboGames
  * mech seems to tip to the left when walking on carpet
    * maybe turret is just heavy on left side?
 
- * test and tune constants for limiting translation when rotating
  * camera based target stabilization/tracking
  * try making body raise in height during gait to increase total foot
    separation distance
@@ -63,6 +64,8 @@ History
 DONE 2016-02-29:
  * start_robot: option to run without recompiliing
  * fix video recording
+ * test lizard robot walking w/ both xbox and logitech joystick
+ * test and tune constants for limiting translation when rotating
 
 DONE 2016-02-28
  * control: bring in joystick control code to video_controller_app process.
