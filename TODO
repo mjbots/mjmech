@@ -14,9 +14,7 @@ Preparing for RoboGames
  * try making body raise in height during gait to increase total foot
    separation distance
 
- * start_robot: option to run without recompiliing
  * usb restart camera if bad device is present
- * fix video recording
  * fix memory leak in image processing code
 
  * control: make sure we are using multicasts for control commands
@@ -61,6 +59,10 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-02-29:
+ * start_robot: option to run without recompiliing
+ * fix video recording
 
 DONE 2016-02-28
  * control: bring in joystick control code to video_controller_app process.
