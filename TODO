@@ -1,11 +1,12 @@
 Preparing for RoboGames
 
- * reconnector the lizard scoring harnesses to JST
+ * control: make sure agitator control activates occasionally when
+   firing somehow
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
 
  * move weapon IMU board to center of camera
- * Create toolbox and packing list
+ * Create packing list
  * order additional BBs
 
  * mech seems to tip to the left when walking on carpet
@@ -15,7 +16,6 @@ Preparing for RoboGames
  * try making body raise in height during gait to increase total foot
    separation distance
 
- * usb restart camera if bad device is present
  * fix memory leak in image processing code
 
  * control: make sure we are using multicasts for control commands
@@ -24,7 +24,6 @@ Preparing for RoboGames
  * OSD -- general logging
  * OSD -- targeting grid(s) (which ones?)
 
- * control: make sure agitator control works properly preserved
  * control: deploy/launch script. Must also collect logs, including
    video stats.
  * control: some logging that servos/IMU work and are connected.
@@ -60,6 +59,13 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-03-02
+ * re-routed USB camera harness on first gimbal to reduce likelihood
+   of camera falling off USB bus
+
+DONE 2016-03-01
+ * reconnector the lizard scoring harnesses to JST
 
 DONE 2016-02-29:
  * start_robot: option to run without recompiliing
