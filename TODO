@@ -1,23 +1,16 @@
 Preparing for RoboGames
 
- * implement a minimal simulated turret and enable it by default
+ * USB with wifi and video is unreliable
+ * mech seems to tip to the left when walking on carpet
+   * maybe turret is just heavy on left side?
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
- * add button to prevent rotation from happening temporarily
- * the additional mode buttons appear to apply in parallel with drive mode
+ * try making body raise in height during gait to increase total foot
+   separation distance
 
  * move weapon IMU board to center of camera
  * Create packing list
  * order additional BBs
-
- * mech seems to tip to the left when walking on carpet
-   * maybe turret is just heavy on left side?
-
- * camera based target stabilization/tracking
- * try making body raise in height during gait to increase total foot
-   separation distance
-
- * fix memory leak in image processing code
 
  * control: make sure we are using multicasts for control commands
 
@@ -27,7 +20,7 @@ Preparing for RoboGames
 
  * control: deploy/launch script. Must also collect logs, including
    video stats.
- * control: some logging that servos/IMU work and are connected.
+ * camera based target stabilization/tracking
 
 Movement
 ~~~~~~~~
@@ -60,6 +53,13 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-03-05
+ * add button to prevent rotation from happening temporarily
+ * implement a minimal simulated turret and enable it by default
+
+DONE 2016-03-04
+ * the additional mode buttons appear to apply in parallel with drive mode
 
 DONE 2016-03-03
  * control: make sure agitator control activates occasionally when
