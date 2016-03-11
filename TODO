@@ -54,6 +54,9 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2016-03-10
+ * fixed video recording
+
 DONE 2016-03-05
  * add button to prevent rotation from happening temporarily
  * implement a minimal simulated turret and enable it by default
