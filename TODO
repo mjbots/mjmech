@@ -1,14 +1,9 @@
 Preparing for RoboGames
 
  * USB with wifi and video is unreliable
- * mech seems to tip to the left when walking on carpet
-   * maybe turret is just heavy on left side?
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
- * try making body raise in height during gait to increase total foot
-   separation distance
 
- * move weapon IMU board to center of camera
  * Create packing list
  * order additional BBs
 
@@ -16,7 +11,6 @@ Preparing for RoboGames
 
  * Logs collection from the robot
  * OSD -- general logging
- * OSD -- targeting grid(s) (which ones?)
 
  * control: deploy/launch script. Must also collect logs, including
    video stats.
@@ -56,6 +50,10 @@ History
 
 DONE 2016-03-10
  * fixed video recording
+ * need a way to stop sending commands to robot and to view if it
+   thinks the servos have been idled or not
+ * OSD -- targeting grid, just fixed in the center to make it easier
+   to see where the laser would be
 
 DONE 2016-03-05
  * add button to prevent rotation from happening temporarily
