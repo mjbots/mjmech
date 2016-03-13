@@ -1,11 +1,11 @@
 Preparing for RoboGames
 
+ * build up remaining spare scoring panels
  * USB with wifi and video is unreliable
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
 
  * Create packing list
- * order additional BBs
 
  * control: make sure we are using multicasts for control commands
 
@@ -47,6 +47,14 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-03-12
+ * Connected up scoring LED board on mammal robot
+ * Populated through hole things on spare v3 gimbal board
+ * Moved offset config from mw_command into MechWarfare
+
+DONE 2016-03-11
+ * ordered competition BBs
 
 DONE 2016-03-10
  * fixed video recording
