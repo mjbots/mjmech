@@ -50,7 +50,7 @@ USB_FW_FLAGS = -DATMEL_DFU=1
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC =	$(TARGET).c usb_serial.c util.c enter_bootloader.c
+SRC =	$(TARGET).c usb_serial.c util.c enter_bootloader.c hit.c
 
 
 # MCU name, you MUST set this to match the board you are using

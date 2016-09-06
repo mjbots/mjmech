@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "enter_bootloader.h"
+#include "hit.h"
 #include "hw.h"
 #include "usb_serial.h"
 #include "util.h"
@@ -94,6 +95,14 @@ static uint8_t cmd_tmq(char* extra_args, char* output, uint8_t output_len,
   return 0;
 }
 
+static uint8_t cmd_hit(char* extra_args, char* output, uint8_t output_len,
+                       uint8_t stream) {
+  *output++ = ' ';
+  uint16_to_hex(&output, g_hit_count);
+  *output = 0;
+  return 0;
+}
+
 
 typedef uint8_t (*cmd_func_ptr)(char *, char*, uint8_t, uint8_t);
 
@@ -131,6 +140,7 @@ static const struct fw_command_struct PROGMEM fw_command_table[] = {
   { "RST", cmd_rst, 0 },
   { "BOT", cmd_bot, 0 },
   { "TMQ", cmd_tmq, (1 << CMD_FLAGS_STREAMABLE) },
+  { "HIT", cmd_hit, (1 << CMD_FLAGS_STREAMABLE) },
 };
 
 #define NUM_FW_COMMAND (sizeof(fw_command_table) / sizeof(*fw_command_table))
@@ -481,8 +491,9 @@ int main(void) {
   DDRA = 0x00;
   PORTA = 0xff; // pull-ups all enabled
 
-  PORTD = 0xf0;
-  DDRD = 0xf0;
+  PORTD = 0xff;
+  DDRD = 0x00; // pull-ups all enabled
+
   DDRF = 0x00; // These are ADC lines.
   PORTF = 0x00;
 
@@ -494,7 +505,7 @@ int main(void) {
   TCCR0B = 0x03; // CK/64 (64 * 250 == 16000)
 
   sei();
-  char line_buf[64];
+  char line_buf[128] = {};
   uint8_t line_len = 0;
   uint8_t usb_ready = 0;
   while (1) {
@@ -539,11 +550,13 @@ int main(void) {
       TIFR0 |= (1 << OCF0A);
       g_timer++;
       stream_timer_update();
+      hit_timer_update();
 
       g_main_loop_count = (uint16_t) (((uint32_t) g_main_loop_count) * 7 / 8);
     }
 
     stream_poll();
     usb_poll();
+    hit_poll();
   }
 }
