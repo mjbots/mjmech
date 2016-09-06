@@ -26,11 +26,19 @@
 #include "usb_serial.h"
 #include "util.h"
 
-#define DEV_VERSION "panel-qual" ARR_DBG_FLAG " v0.1 r" ARR_GIT_REV
+#define DEV_VERSION "panel-qual" DBG_FLAG " v0.1 r" GIT_REV
 #define EOL "\r\n"
 
 #define STR_OK " OK"
 #define STR_PARSE_ERROR " could not parse"
+#define STR_CODE_MISMATCH " code mismatch"
+#define STR_UNKNOWN_CMD " unknown cmd"
+#define STR_NOT_STREAMABLE " not streamable"
+#define STR_ID_ZERO " stream id zero"
+#define STR_ID_INVALID " stream id invalid"
+#define STR_STREAM_ID_IN_USE " stream id in use"
+#define STR_STREAM_TABLE_FULL " stream table full"
+#define STR_STREAM_NOT_FOUND " stream not found"
 
 static uint16_t g_timer;
 static uint16_t g_main_loop_count;
@@ -113,7 +121,7 @@ struct fw_command_struct {
 
 #define CMD_FLAGS_STREAMABLE 0
 
-static struct fw_command_struct PROGMEM fw_command_table[] = {
+static const struct fw_command_struct PROGMEM fw_command_table[] = {
   { "PNG", cmd_png, 0 },
   { "STB", cmd_stb, 0 },
   { "STE", cmd_ste, 0 },
@@ -130,7 +138,7 @@ static struct fw_command_struct PROGMEM fw_command_table[] = {
 static int8_t find_message_index(char* code) {
   int8_t index = 0;
   for (; index < NUM_FW_COMMAND; index++) {
-    struct fw_command_struct* fw_command = &fw_command_table[index];
+    const struct fw_command_struct* fw_command = &fw_command_table[index];
     if (strncmp_P(code, fw_command->code, 3) == 0) {
       return index;
     }
@@ -175,7 +183,7 @@ static uint8_t cmd_stb(char* extra_args, char* output, uint8_t output_len,
     return 1;
   }
 
-  struct fw_command_struct* fw_command = &fw_command_table[message_index];
+  const struct fw_command_struct* fw_command = &fw_command_table[message_index];
   uint8_t flags = pgm_read_byte(&fw_command->flags);
   if (!(flags & (1 << CMD_FLAGS_STREAMABLE))) {
     strcpy_P(output, PSTR(STR_NOT_STREAMABLE));
@@ -272,7 +280,7 @@ static uint8_t cmd_ste(char* extra_args, char* output, uint8_t output_len,
 
   for (uint8_t i = 0; i < NUM_STREAM_TABLE; i++) {
     if (g_stream_table[i].stream_id == stream_id) {
-      struct fw_command_struct* fw_command =
+      const struct fw_command_struct* fw_command =
           &fw_command_table[g_stream_table[i].cmd_index];
       if (strncmp_P(code, fw_command->code, 3) != 0) {
         strcpy_P(output, PSTR(STR_CODE_MISMATCH));
@@ -378,7 +386,7 @@ static void stream_poll(void) {
     if (g_stream_table[i].queued_runs) {
       g_stream_table[i].queued_runs--;
 
-      struct fw_command_struct* fw_command =
+      const struct fw_command_struct* fw_command =
           &fw_command_table[g_stream_table[i].cmd_index];
       cmd_func_ptr cmd_func =
           (cmd_func_ptr) pgm_read_word(&fw_command->func);
@@ -432,7 +440,7 @@ static void handle_line(char* line_buf) {
       if (index < 0) {
         strcpy_P(ptr, PSTR("ERR" STR_UNKNOWN_CMD));
       } else {
-        struct fw_command_struct* fw_command = &fw_command_table[index];
+        const struct fw_command_struct* fw_command = &fw_command_table[index];
         memcpy(ptr, line_buf, 3);
         ptr += 3;
         *ptr = 0; // so that commands start with an empty string
@@ -484,8 +492,6 @@ int main(void) {
   OCR0A = 250;
   TCCR0A = 0x02; // CTC
   TCCR0B = 0x03; // CK/64 (64 * 250 == 16000)
-
-  wdt_enable(ARR_WDT_PERIOD);
 
   sei();
   char line_buf[64];

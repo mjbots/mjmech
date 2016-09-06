@@ -1,17 +1,17 @@
 /* USB Serial Example for Teensy USB Development Board
  * http://www.pjrc.com/teensy/usb_serial.html
  * Copyright (c) 2008,2010,2011 PJRC.COM, LLC
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,7 +43,7 @@
 // You can change these to give your code its own name.  On Windows,
 // these are only used before an INF file (driver install) is loaded.
 #define STR_MANUFACTURER	L"JoshPieper"
-#define STR_PRODUCT		L"ARR-firmware" ARR_DBG_FLAG
+#define STR_PRODUCT		L"PQUAL-firmware" DBG_FLAG
 
 // All USB serial devices are supposed to have a serial number
 // (according to Microsoft).  On windows, a new COM port is created
@@ -146,7 +146,7 @@ static const uint8_t PROGMEM endpoint_config_table[] = {
 // in here should only be done by those who've read chapter 9 of the USB
 // spec and relevant portions of any USB class specifications!
 
-static uint8_t PROGMEM device_descriptor[] = {
+static const uint8_t PROGMEM device_descriptor[] = {
 	18,					// bLength
 	1,					// bDescriptorType
 	0x00, 0x02,				// bcdUSB
@@ -164,7 +164,7 @@ static uint8_t PROGMEM device_descriptor[] = {
 };
 
 #define CONFIG1_DESC_SIZE (9+9+5+5+4+5+7+9+7+7)
-static uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
+static const uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
 	// configuration descriptor, USB spec 9.6.3, page 264-266, Table 9-10
 	9, 					// bLength;
 	2,					// bDescriptorType;
@@ -248,22 +248,22 @@ struct usb_string_descriptor_struct {
 	uint8_t bDescriptorType;
 	int16_t wString[];
 };
-static struct usb_string_descriptor_struct PROGMEM string0 = {
+static const struct usb_string_descriptor_struct PROGMEM string0 = {
 	4,
 	3,
 	{0x0409}
 };
-static struct usb_string_descriptor_struct PROGMEM string1 = {
+static const struct usb_string_descriptor_struct PROGMEM string1 = {
 	sizeof(STR_MANUFACTURER),
 	3,
 	STR_MANUFACTURER
 };
-static struct usb_string_descriptor_struct PROGMEM string2 = {
+static const struct usb_string_descriptor_struct PROGMEM string2 = {
 	sizeof(STR_PRODUCT),
 	3,
 	STR_PRODUCT
 };
-static struct usb_string_descriptor_struct PROGMEM string3 = {
+static const struct usb_string_descriptor_struct PROGMEM string3 = {
 	sizeof(STR_SERIAL_NUMBER),
 	3,
 	STR_SERIAL_NUMBER
@@ -271,7 +271,7 @@ static struct usb_string_descriptor_struct PROGMEM string3 = {
 
 // This table defines which descriptor data is sent for each specific
 // request from the host (in wValue and wIndex).
-static struct descriptor_list_struct {
+static const struct descriptor_list_struct {
 	uint16_t	wValue;
 	uint16_t	wIndex;
 	const uint8_t	*addr;
@@ -381,7 +381,7 @@ void usb_serial_flush_input(void)
 	if (usb_configuration) {
 		UENUM = CDC_RX_ENDPOINT;
 		while ((UEINTX & (1<<RWAL))) {
-			UEINTX = 0x6B; 
+			UEINTX = 0x6B;
 		}
 	}
 }
@@ -428,7 +428,7 @@ int8_t usb_serial_putchar(uint8_t c)
 
 
 // transmit a character, but do not wait if the buffer is full,
-//   0 returned on success, -1 on buffer full or error 
+//   0 returned on success, -1 on buffer full or error
 int8_t usb_serial_putchar_nowait(uint8_t c)
 {
 	if (!usb_configuration) return -1;

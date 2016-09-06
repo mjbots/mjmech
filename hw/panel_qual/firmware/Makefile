@@ -43,8 +43,8 @@
 # Target file name (without extension).
 TARGET = panel_qual
 
-ARR_SVN_REV := $(shell svnversion .)
-ARR_DBG_FLAG = #-dbg
+GIT_REV := $(shell git rev-parse HEAD)
+DBG_FLAG = #-dbg
 # Set this for the ATMEL DFU USB Bootloader.  Omit it for the Teensy.
 USB_FW_FLAGS = -DATMEL_DFU=1
 
@@ -163,8 +163,8 @@ CFLAGS += -fno-strict-aliasing
 CFLAGS += -Wa,-adhlns=$(<:%.c=$(OBJDIR)/%.lst)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 CFLAGS += $(CSTANDARD)
-CFLAGS += -DARR_SVN_REV=\"$(ARR_SVN_REV)\"
-CFLAGS += -DARR_DBG_FLAG=\"$(ARR_DBG_FLAG)\"
+CFLAGS += -DGIT_REV=\"$(GIT_REV)\"
+CFLAGS += -DDBG_FLAG=\"$(DBG_FLAG)\"
 
 
 #---------------- Compiler Options C++ ----------------
