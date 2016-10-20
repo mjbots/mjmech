@@ -1,0 +1,21 @@
+ * Initial part selection
+   * 12V->VSYS converter - BQ25892
+   * Fuse
+   * VSYS->5V converter - FAN48623
+   * USB power switch - TPS2553DRVT
+   * SD card
+   * level converter for serial to servos
+   * connector to servos / gimbal drive board
+     * probably have gimbal drive board daisy chain power to compute
+       board
+   * connector for BIOS serial
+   * 2x USB 2.0 connectors of some sort, maybe JST
+   * mounting holes
+   * fan power connector
+   * configuration eeprom
+   * hdmi connector
+   * serial console
+
+ * Questions?
+   * Reset button?
+   * Indicator lights?
