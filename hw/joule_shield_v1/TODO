@@ -1,21 +1,37 @@
  * Initial part selection
    * 12V->VSYS converter - BQ25892
-   * Fuse
    * VSYS->5V converter - FAN48623
+   * VSYS->3.3V converter - TPS63021
+   * VSYS->1.8V converter - TLV62084
    * USB power switch - TPS2553DRVT
-   * SD card
+     * should work with 1.8V logic, no level converter needed for enable
    * level converter for serial to servos
+     * 2x SN74LVC1T45DBVR - 296-16843-1-ND
    * connector to servos / gimbal drive board
+     * 2x JST XH 4 (DPN 455-2261-1-ND)
      * probably have gimbal drive board daisy chain power to compute
        board
-   * connector for BIOS serial
-   * 2x USB 2.0 connectors of some sort, maybe JST
+   * SD card
+     * level converter - TXS0206-29 296-25577-1-ND (only works at SD2.0)
+     * DM3AT-SF-PEJM5 HR1964CT-ND
+   * RTC battery - BK-916-BT-ND
+   * Fuse
+   * I2C level converters ?
+   * BIOS serial - FT231X 768-1128-1-ND
+     * should be able to do direct 1.8V interface without level conversion
+   * USB for camera - 5 pin JST
+   * USB for peripherals - A type female
+   * threaded fasteners for Joule module
    * mounting holes
-   * fan power connector
-   * configuration eeprom
-   * hdmi connector
-   * serial console
+   * fan power connector - a101008ct-nd
+   * configuration eeprom - ?
+   * hdmi connector ? would need level converter and filters
 
  * Questions?
    * Reset button?
    * Indicator lights?
+
+TODO
+ * Complete part selection
+ * Footprints
+ * Initial schematic
