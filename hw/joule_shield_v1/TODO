@@ -37,7 +37,7 @@
      * general purpose - MF-SW-TACT-6MM
    * indicator LEDs
      * main power
-     * 4x GPIO w/ bipolar drivers 568-6488-1-ND
+     * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
  * Footprints / Datasheets
@@ -48,7 +48,7 @@ TODO
    * TPS2553DRVT
    * TXS0206-29 296-25577-1-ND
    * DM3AT-SF-PEJM5 HR1964CT-ND
-   * BK-916-BT-ND
+   * BK-916-CT-ND
    * B520C-FDICT-ND
    * F1400CT-ND
    * 768-1128-1-ND (FT231X)
@@ -56,14 +56,34 @@ TODO
    * 609-4413-ND (USB A receptacle)
    * SMTSO-M1.6-2ET
    * a101008ct-nd (fan power connector)
-   * 497-11600-1-ND (config EEPROM)
-   * 568-6488-1-ND (bipolar drivers) - maybe replace w/ MF part
+   * M24M02 497-11600-1-ND (config EEPROM)
+   * MF-DSC-SOT233-MMBT3904
 
  * Footprints DONE
    * SN74LVC1T45DBVR
    * 455-2261-1-ND (JST-XH4 SMT RA)
    * MF-SW-TACT_6MM
    * MF-CON-MICROUSB-RIGHT
+   * MF-DSC-SOT233-MMBT3904
+
+ * Datasheets DONE
+   * BQ25892
+   * FAN48623
+   * TPS63021
+   * TLV62084
+   * TPS2553DRVT
+   * TXS0206-29
+   * DM3AT-SF-PEJM5
+   * BK-916
+   * B520C
+   * F1400CT-ND
+   * FT231X
+   * 455-1684-1-ND (JST ZH 5 pin SMT vert)
+   * 609-4413-ND (USB A receptacle)
+   * a101008ct-nd
+   * M24M02
+   * MF-DSC-SOT233-MMBT3904
+
 
 
  * Verify orientation and pinout of J6 and J7
