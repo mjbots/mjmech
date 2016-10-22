@@ -19,7 +19,7 @@
      * reverse protection - B520C-FDICT-ND
      * F1400CT-ND
    * BIOS serial - FT231X 768-1128-1-ND
-     * USB mini connector 609-4618-1-ND
+     * USB mini connector MF House part MF-CON-MICROUSB-RIGHT
      * should be able to do direct 1.8V interface without level conversion
    * USB for camera - 5 pin JST ZH  455-1684-1-ND
    * USB for peripherals - A type female 609-4413-ND
@@ -32,9 +32,9 @@
    * I2C0 - VSYS converter and config eeprom
    * hdmi connector ? would need level converter and filters
    * buttons
-     * power - EG4377CT-ND
-     * boot from DNX - EG4377CT-ND
-     * general purpose - EG4377CT-ND
+     * power - MF-SW-TACT-6MM
+     * boot from DNX - MF-SW-TACT-6MM
+     * general purpose - MF-SW-TACT-6MM
    * indicator LEDs
      * main power
      * 4x GPIO w/ bipolar drivers 568-6488-1-ND
@@ -46,22 +46,26 @@ TODO
    * TPS63021
    * TLV62084
    * TPS2553DRVT
-   * SN74LVC1T45DBVR
-   * 455-2261-1-ND
    * TXS0206-29 296-25577-1-ND
    * DM3AT-SF-PEJM5 HR1964CT-ND
    * BK-916-BT-ND
    * B520C-FDICT-ND
    * F1400CT-ND
-   * 768-1128-1-ND
-   * 609-4618-1-ND
-   * 455-1684-1-ND
-   * 609-4413-ND
+   * 768-1128-1-ND (FT231X)
+   * 455-1684-1-ND (JST ZH 5 pin SMT vert)
+   * 609-4413-ND (USB A receptacle)
    * SMTSO-M1.6-2ET
-   * a101008ct-nd
-   * 497-11600-1-ND
-   * EG4377CT-ND
-   * 568-6488-1-ND
+   * a101008ct-nd (fan power connector)
+   * 497-11600-1-ND (config EEPROM)
+   * 568-6488-1-ND (bipolar drivers) - maybe replace w/ MF part
+
+ * Footprints DONE
+   * SN74LVC1T45DBVR
+   * 455-2261-1-ND (JST-XH4 SMT RA)
+   * MF-SW-TACT_6MM
+   * MF-CON-MICROUSB-RIGHT
+
+
  * Verify orientation and pinout of J6 and J7
  * Initial schematic
 
