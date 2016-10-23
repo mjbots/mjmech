@@ -45,8 +45,6 @@ TODO
 
  * Footprints / Datasheets
    * FAN48623 - flip chip
-   * TLV62084
-   * TPS2553DRVT
    * TXS0206-29 296-25577-1-ND - flip chip
    * DM3AT-SF-PEJM5 HR1964CT-ND
    * BK-916-CT-ND
@@ -69,6 +67,7 @@ TODO
    * BQ25892
    * TPS63021
    * TLV62084
+   * TPS2553DRVT
 
 
  * Verify orientation and pinout of J6 and J7
