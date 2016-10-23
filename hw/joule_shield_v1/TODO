@@ -40,13 +40,15 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
+ * Figure out which packages are flip chip/BGA and see if MF can do
+   them.
+
  * Footprints / Datasheets
-   * BQ25892
-   * FAN48623
+   * FAN48623 - flip chip
    * TPS63021
    * TLV62084
    * TPS2553DRVT
-   * TXS0206-29 296-25577-1-ND
+   * TXS0206-29 296-25577-1-ND - flip chip
    * DM3AT-SF-PEJM5 HR1964CT-ND
    * BK-916-CT-ND
    * B520C-FDICT-ND
@@ -65,25 +67,7 @@ TODO
    * MF-SW-TACT_6MM
    * MF-CON-MICROUSB-RIGHT
    * MF-DSC-SOT233-MMBT3904
-
- * Datasheets DONE
    * BQ25892
-   * FAN48623
-   * TPS63021
-   * TLV62084
-   * TPS2553DRVT
-   * TXS0206-29
-   * DM3AT-SF-PEJM5
-   * BK-916
-   * B520C
-   * F1400CT-ND
-   * FT231X
-   * 455-1684-1-ND (JST ZH 5 pin SMT vert)
-   * 609-4413-ND (USB A receptacle)
-   * a101008ct-nd
-   * M24M02
-   * MF-DSC-SOT233-MMBT3904
-
 
 
  * Verify orientation and pinout of J6 and J7
@@ -91,3 +75,4 @@ TODO
 
 DONE 2016-10-22
  * Initial parts selection complete
+ * All datasheets located
