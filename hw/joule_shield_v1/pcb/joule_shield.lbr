@@ -40,8 +40,8 @@
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
 <layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
-<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
-<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="yes" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="yes" active="yes"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
 <layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
@@ -323,6 +323,37 @@
 <wire x1="-2.4" y1="2.4" x2="-2.4" y2="2.6" width="0.127" layer="21"/>
 <text x="-2.6" y="2.8" size="0.8" layer="21">&gt;NAME</text>
 </package>
+<package name="PVSON-14">
+<smd name="4" x="-1.4" y="0" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="3" x="-1.4" y="0.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="2" x="-1.4" y="1" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="1" x="-1.4" y="1.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="5" x="-1.4" y="-0.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="6" x="-1.4" y="-1" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="7" x="-1.4" y="-1.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="14" x="1.4" y="1.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="13" x="1.4" y="1" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="12" x="1.4" y="0.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="11" x="1.4" y="0" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="10" x="1.4" y="-0.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="9" x="1.4" y="-1" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="8" x="1.4" y="-1.5" dx="0.6" dy="0.24" layer="1" roundness="100"/>
+<smd name="G0" x="0" y="0" dx="2.85" dy="1.58" layer="1" rot="R90"/>
+<pad name="G3" x="0" y="0" drill="0.3048" diameter="0.6"/>
+<pad name="G1" x="-0.4" y="0.8" drill="0.3048" diameter="0.6"/>
+<pad name="G2" x="0.4" y="0.8" drill="0.3048" diameter="0.6"/>
+<pad name="G4" x="-0.4" y="-0.8" drill="0.3048" diameter="0.6"/>
+<pad name="G5" x="0.4" y="-0.8" drill="0.3048" diameter="0.6"/>
+<wire x1="-1.9" y1="1.8" x2="-1.7" y2="1.8" width="0.127" layer="21"/>
+<wire x1="-1.7" y1="1.8" x2="1.9" y2="1.8" width="0.127" layer="21"/>
+<wire x1="1.9" y1="1.8" x2="1.9" y2="-1.8" width="0.127" layer="21"/>
+<wire x1="1.9" y1="-1.8" x2="-1.9" y2="-1.8" width="0.127" layer="21"/>
+<wire x1="-1.9" y1="-1.8" x2="-1.9" y2="1.6" width="0.127" layer="21"/>
+<wire x1="-1.9" y1="1.6" x2="-1.9" y2="1.8" width="0.127" layer="21"/>
+<wire x1="-1.9" y1="1.6" x2="-1.7" y2="1.6" width="0.127" layer="21"/>
+<wire x1="-1.7" y1="1.6" x2="-1.7" y2="1.8" width="0.127" layer="21"/>
+<text x="-2" y="2.1" size="0.8" layer="21">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="INTEL_JOULE_J6">
@@ -529,6 +560,25 @@
 <pin name="SDA" x="-22.86" y="-25.4" length="middle"/>
 <pin name="/CE" x="-22.86" y="-27.94" length="middle"/>
 <pin name="GND" x="0" y="-38.1" length="middle" rot="R90"/>
+</symbol>
+<symbol name="TPS63021">
+<wire x1="-12.7" y1="20.32" x2="12.7" y2="20.32" width="0.254" layer="94"/>
+<wire x1="12.7" y1="20.32" x2="12.7" y2="-20.32" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-20.32" x2="-12.7" y2="-20.32" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="-20.32" x2="-12.7" y2="20.32" width="0.254" layer="94"/>
+<text x="-10.16" y="15.24" size="2.54" layer="94">TPS63201</text>
+<text x="-12.7" y="22.86" size="2.54" layer="94">&gt;NAME</text>
+<pin name="L1" x="-17.78" y="12.7" length="middle"/>
+<pin name="VIN" x="-17.78" y="7.62" length="middle"/>
+<pin name="VINA" x="-17.78" y="2.54" length="middle"/>
+<pin name="EN" x="-17.78" y="-2.54" length="middle"/>
+<pin name="GND" x="-17.78" y="-17.78" length="middle"/>
+<pin name="PGND" x="17.78" y="-17.78" length="middle" rot="R180"/>
+<pin name="PG" x="17.78" y="-12.7" length="middle" rot="R180"/>
+<pin name="FB" x="17.78" y="2.54" length="middle" rot="R180"/>
+<pin name="VOUT" x="17.78" y="7.62" length="middle" rot="R180"/>
+<pin name="L2" x="17.78" y="12.7" length="middle" rot="R180"/>
+<pin name="PS/SYNC" x="-17.78" y="-7.62" length="middle"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -774,6 +824,31 @@
 <connect gate="G$1" pin="SYS" pad="15 16"/>
 <connect gate="G$1" pin="TS" pad="11"/>
 <connect gate="G$1" pin="VBUS" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="TPS63201">
+<gates>
+<gate name="G$1" symbol="TPS63021" x="0" y="0"/>
+</gates>
+<devices>
+<device name="PVSON-14" package="PVSON-14">
+<connects>
+<connect gate="G$1" pin="EN" pad="12"/>
+<connect gate="G$1" pin="FB" pad="3"/>
+<connect gate="G$1" pin="GND" pad="2"/>
+<connect gate="G$1" pin="L1" pad="8 9"/>
+<connect gate="G$1" pin="L2" pad="6 7"/>
+<connect gate="G$1" pin="PG" pad="14"/>
+<connect gate="G$1" pin="PGND" pad="G0 G1 G2 G3 G4 G5"/>
+<connect gate="G$1" pin="PS/SYNC" pad="13"/>
+<connect gate="G$1" pin="VIN" pad="10 11"/>
+<connect gate="G$1" pin="VINA" pad="1"/>
+<connect gate="G$1" pin="VOUT" pad="4 5"/>
 </connects>
 <technologies>
 <technology name=""/>
