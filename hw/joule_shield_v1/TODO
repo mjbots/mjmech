@@ -46,7 +46,6 @@ TODO
  * Footprints / Datasheets
    * FAN48623 - flip chip
    * TXS0206-29 296-25577-1-ND - flip chip
-   * DM3AT-SF-PEJM5 HR1964CT-ND
    * BK-916-CT-ND
    * B520C-FDICT-ND
    * F1400CT-ND
@@ -68,8 +67,10 @@ TODO
    * TPS63021
    * TLV62084
    * TPS2553DRVT
+   * DM3AT-SF-PEJM5 HR1964CT-ND
 
 
+ * Get DM3AT sample in house and verify footprint
  * Verify orientation and pinout of J6 and J7
  * Initial schematic
 
