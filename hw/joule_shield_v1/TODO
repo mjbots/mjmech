@@ -46,8 +46,6 @@ TODO
  * Footprints / Datasheets
    * FAN48623 - flip chip
    * TXS0206-29 296-25577-1-ND - flip chip
-   * SMTSO-M1.6-2ET
-   * M24M02 497-11600-1-ND (config EEPROM)
 
  * Footprints DONE
    * SN74LVC1T45DBVR
@@ -68,6 +66,8 @@ TODO
    * 455-1684-1-ND (JST ZH 5 pin SMT vert)
    * 609-4413-ND (USB A receptacle)
    * a101008ct-nd (fan power connector)
+   * M24M02 497-11600-1-ND (config EEPROM)
+   * SMTSO-M1.6-2ET
 
 
  * Get DM3AT sample in house and verify footprint
