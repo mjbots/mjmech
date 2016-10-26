@@ -40,11 +40,7 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Figure out which packages are flip chip/BGA and see if MF can do
-   them.
-
  * Footprints / Datasheets
-   * FAN48623 - flip chip
    * TXS0206-29 296-25577-1-ND - flip chip
 
  * Footprints DONE
@@ -68,14 +64,19 @@ TODO
    * a101008ct-nd (fan power connector)
    * M24M02 497-11600-1-ND (config EEPROM)
    * SMTSO-M1.6-2ET
+   * FAN48623 - flip chip
 
 
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
  * Get JST-ZH5 SMT VERT in house and verify footprint
  * Get 609-4413-ND and verify footprint
+ * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
  * Initial schematic
+
+DONE 2016-10-24
+ * All footprints made except for flip chips
 
 DONE 2016-10-22
  * Initial parts selection complete
