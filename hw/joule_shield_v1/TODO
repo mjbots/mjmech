@@ -41,7 +41,6 @@
 
 TODO
  * Footprints / Datasheets
-   * TXS0206-29 296-25577-1-ND - flip chip
 
  * Footprints DONE
    * SN74LVC1T45DBVR
@@ -65,6 +64,7 @@ TODO
    * M24M02 497-11600-1-ND (config EEPROM)
    * SMTSO-M1.6-2ET
    * FAN48623 - flip chip
+   * TXS0206-29 296-25577-1-ND - flip chip
 
 
  * Get DM3AT sample in house and verify footprint
