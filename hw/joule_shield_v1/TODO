@@ -40,6 +40,8 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
+ * Schematic
+
  * Footprints / Datasheets
 
  * Footprints DONE
@@ -65,6 +67,7 @@ TODO
    * SMTSO-M1.6-2ET
    * FAN48623 - flip chip
    * TXS0206-29 296-25577-1-ND - flip chip
+   * 445-15777-1-ND inductor
 
 
  * Get DM3AT sample in house and verify footprint
@@ -74,6 +77,12 @@ TODO
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
  * Initial schematic
+
+DONE 2016-11-01
+ * Schematic for VSYS regulator
+
+DONE 2016-10-31
+ * Ordered sample parts from digikey to verify footprints
 
 DONE 2016-10-24
  * All footprints made except for flip chips

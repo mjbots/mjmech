@@ -3447,6 +3447,15 @@ Wickmann</description>
 <wire x1="-0.8" y1="0.9" x2="-0.7" y2="1" width="0.05" layer="21"/>
 <text x="-0.8" y="1.2" size="0.4" layer="21">&gt;NAME</text>
 </package>
+<package name="SPM4012">
+<smd name="1" x="-1.65" y="0" dx="1.65" dy="2.3" layer="1"/>
+<smd name="2" x="1.65" y="0" dx="1.65" dy="2.3" layer="1"/>
+<wire x1="-2.2" y1="-2.1" x2="-2.2" y2="2.1" width="0.127" layer="21"/>
+<wire x1="-2.2" y1="2.1" x2="2.2" y2="2.1" width="0.127" layer="21"/>
+<wire x1="2.2" y1="2.1" x2="2.2" y2="-2.1" width="0.127" layer="21"/>
+<wire x1="2.2" y1="-2.1" x2="-2.2" y2="-2.1" width="0.127" layer="21"/>
+<text x="-2" y="2.4" size="0.8" layer="21">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="INTEL_JOULE_J6">
@@ -3880,6 +3889,18 @@ Wickmann</description>
 <pin name="WP/CD" x="17.78" y="-12.7" length="middle" rot="R180"/>
 <pin name="EN" x="-17.78" y="-12.7" length="middle"/>
 <pin name="VBATT" x="-17.78" y="-15.24" length="middle"/>
+</symbol>
+<symbol name="INDUCTOR">
+<wire x1="-8.89" y1="0" x2="-6.35" y2="0" width="0.254" layer="94"/>
+<wire x1="-6.35" y1="0" x2="-3.81" y2="0" width="0.254" layer="94" curve="-270"/>
+<wire x1="-1.27" y1="0" x2="1.27" y2="0" width="0.254" layer="94" curve="-270"/>
+<wire x1="3.81" y1="0" x2="6.35" y2="0" width="0.254" layer="94" curve="-270"/>
+<wire x1="-3.81" y1="0" x2="-1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="3.81" y2="0" width="0.254" layer="94"/>
+<wire x1="6.35" y1="0" x2="8.89" y2="0" width="0.254" layer="94"/>
+<pin name="1" x="-13.97" y="0" visible="off" length="middle"/>
+<pin name="2" x="13.97" y="0" visible="off" length="middle" rot="R180"/>
+<text x="-7.62" y="5.08" size="2.54" layer="94">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -5352,6 +5373,22 @@ Wickmann</description>
 <connect gate="G$1" pin="VCCA" pad="A2"/>
 <connect gate="G$1" pin="VCCB" pad="B3"/>
 <connect gate="G$1" pin="WP/CD" pad="A3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="INDUCTOR">
+<gates>
+<gate name="L$1" symbol="INDUCTOR" x="0" y="0"/>
+</gates>
+<devices>
+<device name="SPM4012" package="SPM4012">
+<connects>
+<connect gate="L$1" pin="1" pad="1"/>
+<connect gate="L$1" pin="2" pad="2"/>
 </connects>
 <technologies>
 <technology name=""/>
