@@ -3456,6 +3456,15 @@ Wickmann</description>
 <wire x1="2.2" y1="-2.1" x2="-2.2" y2="-2.1" width="0.127" layer="21"/>
 <text x="-2" y="2.4" size="0.8" layer="21">&gt;NAME</text>
 </package>
+<package name="DFE252010P">
+<smd name="1" x="-1" y="0" dx="2" dy="0.8" layer="1" rot="R90"/>
+<smd name="2" x="1" y="0" dx="2" dy="0.8" layer="1" rot="R90"/>
+<wire x1="-1.5" y1="1.1" x2="1.5" y2="1.1" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.1" x2="1.5" y2="-1.1" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-1.1" x2="-1.5" y2="-1.1" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.1" x2="-1.5" y2="1.1" width="0.127" layer="21"/>
+<text x="-1.5" y="1.4" size="0.8" layer="21">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="INTEL_JOULE_J6">
@@ -3891,16 +3900,19 @@ Wickmann</description>
 <pin name="VBATT" x="-17.78" y="-15.24" length="middle"/>
 </symbol>
 <symbol name="INDUCTOR">
-<wire x1="-8.89" y1="0" x2="-6.35" y2="0" width="0.254" layer="94"/>
-<wire x1="-6.35" y1="0" x2="-3.81" y2="0" width="0.254" layer="94" curve="-270"/>
-<wire x1="-1.27" y1="0" x2="1.27" y2="0" width="0.254" layer="94" curve="-270"/>
-<wire x1="3.81" y1="0" x2="6.35" y2="0" width="0.254" layer="94" curve="-270"/>
-<wire x1="-3.81" y1="0" x2="-1.27" y2="0" width="0.254" layer="94"/>
-<wire x1="1.27" y1="0" x2="3.81" y2="0" width="0.254" layer="94"/>
-<wire x1="6.35" y1="0" x2="8.89" y2="0" width="0.254" layer="94"/>
-<pin name="1" x="-13.97" y="0" visible="off" length="middle"/>
-<pin name="2" x="13.97" y="0" visible="off" length="middle" rot="R180"/>
-<text x="-7.62" y="5.08" size="2.54" layer="94">&gt;NAME</text>
+<pin name="1" x="-5.08" y="0" visible="off" length="point"/>
+<pin name="2" x="5.08" y="0" visible="off" length="point" rot="R180"/>
+<wire x1="-2.032" y1="0" x2="-0.508" y2="0" width="0.254" layer="94" curve="-233.130102"/>
+<wire x1="0.508" y1="0" x2="2.032" y2="0" width="0.254" layer="94" curve="-233.130102"/>
+<wire x1="3.048" y1="0" x2="4.572" y2="0" width="0.254" layer="94" curve="-233.130102"/>
+<wire x1="-4.572" y1="0" x2="-3.048" y2="0" width="0.254" layer="94" curve="-233.130102"/>
+<wire x1="-5.08" y1="0" x2="-4.572" y2="0" width="0.254" layer="94"/>
+<wire x1="-3.048" y1="0" x2="-2.032" y2="0" width="0.254" layer="94"/>
+<wire x1="-0.508" y1="0" x2="0.508" y2="0" width="0.254" layer="94"/>
+<wire x1="2.032" y1="0" x2="3.048" y2="0" width="0.254" layer="94"/>
+<wire x1="4.572" y1="0" x2="5.08" y2="0" width="0.254" layer="94"/>
+<text x="-5.08" y="2.54" size="0.8" layer="96">&gt;VALUE</text>
+<text x="-5.08" y="4.064" size="0.8" layer="95">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -5380,12 +5392,21 @@ Wickmann</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="INDUCTOR">
+<deviceset name="INDUCTOR" uservalue="yes">
 <gates>
 <gate name="L$1" symbol="INDUCTOR" x="0" y="0"/>
 </gates>
 <devices>
 <device name="SPM4012" package="SPM4012">
+<connects>
+<connect gate="L$1" pin="1" pad="1"/>
+<connect gate="L$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="DFE252010P" package="DFE252010P">
 <connects>
 <connect gate="L$1" pin="1" pad="1"/>
 <connect gate="L$1" pin="2" pad="2"/>

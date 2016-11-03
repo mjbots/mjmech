@@ -41,6 +41,18 @@
 
 TODO
  * Schematic
+   * 3.3V regulator
+   * 1.8V regulator
+   * USB power switch
+   * serial level converter
+   * servo connectors
+   * USB connectors
+   * fan connectors
+   * SD card
+   * Input connectors and fuse
+   * RTC battery
+   * BIOS serial connectors and USB-serial
+   * buttons / LEDs
 
  * Footprints / Datasheets
 
@@ -77,6 +89,9 @@ TODO
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
  * Initial schematic
+
+DONE 2016-11-03
+ * Schematic for 5V regulator
 
 DONE 2016-11-01
  * Schematic for VSYS regulator
