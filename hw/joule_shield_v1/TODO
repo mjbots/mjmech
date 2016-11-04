@@ -41,7 +41,6 @@
 
 TODO
  * Schematic
-   * 3.3V regulator
    * 1.8V regulator
    * USB power switch
    * serial level converter
@@ -92,6 +91,7 @@ TODO
 
 DONE 2016-11-03
  * Schematic for 5V regulator
+ * Schematic for 3.3V regulator
 
 DONE 2016-11-01
  * Schematic for VSYS regulator
