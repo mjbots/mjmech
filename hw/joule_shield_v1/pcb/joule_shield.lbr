@@ -3914,6 +3914,62 @@ Wickmann</description>
 <text x="-5.08" y="2.54" size="0.8" layer="96">&gt;VALUE</text>
 <text x="-5.08" y="4.064" size="0.8" layer="95">&gt;NAME</text>
 </symbol>
+<symbol name="VDD1">
+<pin name="VDD1" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="V1P8V">
+<pin name="V1P8V" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="VSYS">
+<pin name="VSYS" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="VDD3">
+<pin name="VDD3" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="V3P3V">
+<pin name="V3P3V" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="V5P0V">
+<pin name="V5P0V" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="VREGN">
+<pin name="VREGN" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="VIN_CHRG">
+<pin name="VIN_CHRG" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="INTEL_JOULE_J6">
@@ -5411,6 +5467,102 @@ Wickmann</description>
 <connect gate="L$1" pin="1" pad="1"/>
 <connect gate="L$1" pin="2" pad="2"/>
 </connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VDD1">
+<gates>
+<gate name="G$1" symbol="VDD1" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="V1P8V">
+<gates>
+<gate name="G$1" symbol="V1P8V" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VSYS">
+<gates>
+<gate name="G$1" symbol="VSYS" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VDD3">
+<gates>
+<gate name="G$1" symbol="VDD3" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="V3P3V">
+<gates>
+<gate name="G$1" symbol="V3P3V" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="V5P0V">
+<gates>
+<gate name="G$1" symbol="V5P0V" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VREGN">
+<gates>
+<gate name="G$1" symbol="VREGN" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VIN_CHRG">
+<gates>
+<gate name="G$1" symbol="VIN_CHRG" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
 <technologies>
 <technology name=""/>
 </technologies>

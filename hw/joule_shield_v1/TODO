@@ -41,7 +41,6 @@
 
 TODO
  * Schematic
-   * 1.8V regulator
    * USB power switch
    * serial level converter
    * servo connectors
@@ -52,6 +51,7 @@ TODO
    * RTC battery
    * BIOS serial connectors and USB-serial
    * buttons / LEDs
+   * joule connectors
 
  * Footprints / Datasheets
 
@@ -88,6 +88,11 @@ TODO
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
  * Initial schematic
+
+DONE 2016-11-05
+ * Switched all the supply nets to parts with names that match the
+   Joule schematic... stupid eagle.
+ * schematic for 1.8V regulator
 
 DONE 2016-11-03
  * Schematic for 5V regulator
