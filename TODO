@@ -1,11 +1,12 @@
-Preparing for RoboGames
+ * Get prototype Joule shield working
+ * Update gimbal driver to have
+   * mounting location for joule shield
+   * deconflict weapon connector
+ * Modify old odroid shield to disable the servo drivers so as to not
+   conflict with joule servo driver
 
- * build up remaining spare scoring panels
- * USB with wifi and video is unreliable
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
-
- * Create packing list
 
  * control: make sure we are using multicasts for control commands
 
@@ -21,9 +22,6 @@ Movement
 
  * Make AHRS actually work
    * Possibly switch to Mahony IMU instead of UKF for easier tuning and stability
- * Try balancing on two feet
- * Try keeping body level during gait motions
- * Try making legs set down more gently
  * Switch gait engine to be one that selects foot placements
  * Make tplot be able to 3d render the mech
 
@@ -47,6 +45,13 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-11-05
+ * Finalized emachineshop drawing should mammal shoulder bracker
+
+DONE 2016-11-04
+ * Mostly recreated mammal bracket in e-machineshop after windows ate
+   everything
 
 DONE 2016-03-12
  * Connected up scoring LED board on mammal robot
