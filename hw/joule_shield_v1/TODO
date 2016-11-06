@@ -42,7 +42,6 @@
 TODO
  * Schematic
    * figure out where USB power switch fault and enable line should go
-   * serial level converter
    * servo connectors
    * USB connectors
    * fan connectors
@@ -94,6 +93,7 @@ DONE 2016-11-05
    Joule schematic... stupid eagle.
  * schematic for 1.8V regulator
  * schematic USB power switch
+ * schematic serial level converter
 
 DONE 2016-11-03
  * Schematic for 5V regulator
