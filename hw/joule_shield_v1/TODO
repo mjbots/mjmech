@@ -45,7 +45,6 @@ TODO
    * USB connectors
    * fan connectors
    * SD card
-   * Input connectors and fuse
    * RTC battery
    * BIOS serial connectors and USB-serial
    * buttons / LEDs
@@ -93,7 +92,7 @@ DONE 2016-11-05
  * schematic for 1.8V regulator
  * schematic USB power switch
  * schematic serial level converter
- * schematic for servo connectors
+ * schematic for servo connectors + fuse + reverse voltage
 
 DONE 2016-11-03
  * Schematic for 5V regulator

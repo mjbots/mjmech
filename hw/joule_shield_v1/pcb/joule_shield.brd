@@ -421,6 +421,27 @@
 <wire x1="7.6" y1="3.2" x2="7.6" y2="-4.2" width="0.127" layer="21"/>
 <wire x1="7.6" y1="-4.2" x2="-7.5" y2="-4.2" width="0.127" layer="21"/>
 </package>
+<package name="FUSE_467">
+<smd name="2" x="0.889" y="0" dx="1.0922" dy="0.762" layer="1" rot="R90"/>
+<smd name="1" x="-0.889" y="0" dx="1.0922" dy="0.762" layer="1" rot="R90"/>
+<wire x1="-1.27" y1="1.016" x2="1.27" y2="1.016" width="0.127" layer="21"/>
+<wire x1="1.27" y1="1.016" x2="1.27" y2="-1.016" width="0.127" layer="21"/>
+<wire x1="1.27" y1="-1.016" x2="-1.27" y2="-1.016" width="0.127" layer="21"/>
+<wire x1="-1.27" y1="-1.016" x2="-1.27" y2="1.016" width="0.127" layer="21"/>
+<text x="-1.27" y="1.27" size="0.8" layer="21">&gt;NAME</text>
+</package>
+<package name="B520C">
+<smd name="2" x="3.45" y="0" dx="2.5" dy="3.3" layer="1"/>
+<smd name="1" x="-3.45" y="0" dx="2.5" dy="3.3" layer="1"/>
+<wire x1="-4.4" y1="3.3" x2="-3.8" y2="3.3" width="0.127" layer="21"/>
+<wire x1="-3.8" y1="3.3" x2="4.4" y2="3.3" width="0.127" layer="22"/>
+<wire x1="4.4" y1="3.3" x2="4.4" y2="-3.3" width="0.127" layer="21"/>
+<wire x1="4.4" y1="-3.3" x2="-3.8" y2="-3.3" width="0.127" layer="21"/>
+<wire x1="-3.8" y1="-3.3" x2="-4.4" y2="-3.3" width="0.127" layer="21"/>
+<wire x1="-4.4" y1="-3.3" x2="-4.4" y2="3.3" width="0.127" layer="21"/>
+<wire x1="-3.8" y1="3.3" x2="-3.8" y2="-3.3" width="0.127" layer="21"/>
+<text x="-4.1" y="3.8" size="0.8" layer="21">&gt;NAME</text>
+</package>
 </packages>
 </library>
 <library name="mf_passives">
@@ -1192,6 +1213,16 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 </element>
 <element name="JD1" library="joule_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="-170" y="92"/>
 <element name="JD2" library="joule_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="-190" y="92"/>
+<element name="F1" library="joule_shield" package="FUSE_467" value="FUSEFUSE_467" x="-211" y="105">
+<attribute name="DPN" value="F1400CT-ND" x="-211" y="105" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="Littlefuse" x="-211" y="105" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="046703.5NR" x="-211" y="105" size="1.778" layer="27" display="off"/>
+</element>
+<element name="D2" library="joule_shield" package="B520C" value="" x="-209" y="112">
+<attribute name="DPN" value="B520C-FDICT-ND" x="-209" y="112" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="Diodes Incorporated" x="-209" y="112" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="B520C-13-F" x="-209" y="112" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="GND">
@@ -1611,10 +1642,8 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <contactref element="C1" pad="P$1"/>
 <contactref element="C2" pad="P$1"/>
 <contactref element="C3" pad="P$1"/>
-<contactref element="JD1" pad="4"/>
-<contactref element="JD2" pad="4"/>
-<wire x1="-166.25" y1="96.6" x2="-186.25" y2="96.6" width="0" layer="19" extent="1-1"/>
-<wire x1="-23.61" y1="74.93" x2="-166.25" y2="96.6" width="0" layer="19" extent="1-1"/>
+<contactref element="F1" pad="2"/>
+<wire x1="-23.61" y1="74.93" x2="-210.111" y2="105" width="0" layer="19" extent="1-1"/>
 <wire x1="-19.8" y1="74.93" x2="-23.61" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="-15.99" y1="74.93" x2="-19.8" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="-18.485" y1="71.1" x2="-19.8" y2="74.93" width="0" layer="19" extent="1-1"/>
@@ -1660,6 +1689,18 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 </signal>
 <signal name="JOULE_TX_18V">
 <contactref element="U7" pad="4"/>
+</signal>
+<signal name="N$28">
+<contactref element="JD1" pad="4"/>
+<contactref element="JD2" pad="4"/>
+<contactref element="D2" pad="2"/>
+<wire x1="-186.25" y1="96.6" x2="-205.55" y2="112" width="0" layer="19" extent="1-1"/>
+<wire x1="-166.25" y1="96.6" x2="-186.25" y2="96.6" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$31">
+<contactref element="D2" pad="1"/>
+<contactref element="F1" pad="1"/>
+<wire x1="-211.889" y1="105" x2="-212.45" y2="112" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
