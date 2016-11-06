@@ -42,7 +42,6 @@
 TODO
  * Schematic
    * figure out where USB power switch fault and enable line should go
-   * servo connectors
    * USB connectors
    * fan connectors
    * SD card
@@ -94,6 +93,7 @@ DONE 2016-11-05
  * schematic for 1.8V regulator
  * schematic USB power switch
  * schematic serial level converter
+ * schematic for servo connectors
 
 DONE 2016-11-03
  * Schematic for 5V regulator
