@@ -3218,6 +3218,25 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="5" y1="3.6" x2="5" y2="-1.7" width="0.127" layer="21"/>
 <text x="-5.1" y="-2.8" size="0.8" layer="21">&gt;NAME</text>
 </package>
+<package name="BK-916">
+<smd name="3" x="7.65" y="0" dx="5.1" dy="2.5" layer="1" rot="R90"/>
+<smd name="1" x="-7.65" y="0" dx="5.1" dy="2.5" layer="1" rot="R90"/>
+<wire x1="-8.2" y1="7" x2="8.2" y2="7" width="0.127" layer="21"/>
+<wire x1="8.2" y1="7" x2="8.2" y2="-7" width="0.127" layer="21"/>
+<wire x1="8.2" y1="-7" x2="-8.2" y2="-7" width="0.127" layer="21"/>
+<wire x1="-8.2" y1="-7" x2="-8.2" y2="7" width="0.127" layer="21"/>
+<text x="-7.7" y="7.5" size="0.8" layer="21">&gt;NAME</text>
+<smd name="2" x="0" y="0" dx="10.2" dy="10.2" layer="1" roundness="100"/>
+</package>
+<package name="M1005">
+<smd name="P$1" x="-0.4" y="0" dx="0.4" dy="0.5" layer="1" rot="R180"/>
+<smd name="P$2" x="0.4" y="0" dx="0.4" dy="0.5" layer="1" rot="R180"/>
+<wire x1="-0.5" y1="0.3" x2="-0.5" y2="-0.3" width="0.127" layer="21"/>
+<wire x1="-0.5" y1="-0.3" x2="0.5" y2="-0.3" width="0.127" layer="21"/>
+<wire x1="0.5" y1="-0.3" x2="0.5" y2="0.3" width="0.127" layer="21"/>
+<wire x1="0.5" y1="0.3" x2="-0.5" y2="0.3" width="0.127" layer="21"/>
+<text x="-0.7" y="0.5" size="0.6" layer="25">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="BQ25890">
@@ -3622,6 +3641,39 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <pin name="1" x="5.08" y="5.08" visible="pad" length="short" direction="pas" rot="R180"/>
 <pin name="4" x="5.08" y="-2.54" visible="pad" length="short" direction="pas" rot="R180"/>
 <pin name="5" x="5.08" y="-5.08" visible="pad" length="short" direction="pas" rot="R180"/>
+</symbol>
+<symbol name="BK-916">
+<wire x1="-12.7" y1="15.24" x2="-12.7" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="-17.78" x2="12.7" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-17.78" x2="12.7" y2="15.24" width="0.254" layer="94"/>
+<wire x1="12.7" y1="15.24" x2="-12.7" y2="15.24" width="0.254" layer="94"/>
+<text x="-12.7" y="17.78" size="2.54" layer="94">&gt;NAME</text>
+<text x="-7.62" y="10.16" size="2.54" layer="94">BK-916</text>
+<pin name="VBAT" x="17.78" y="5.08" length="middle" rot="R180"/>
+<pin name="GND" x="17.78" y="-7.62" length="middle" rot="R180"/>
+</symbol>
+<symbol name="VRTC">
+<pin name="VRTC" x="0" y="0" visible="off" length="point" direction="sup" rot="R90"/>
+<wire x1="0" y1="0" x2="0" y2="5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-5.08" y="-2.54" size="2.54" layer="96" rot="R90">&gt;VALUE</text>
+</symbol>
+<symbol name="ESD_DIODE">
+<pin name="P$1" x="-10.16" y="0" visible="off" length="middle"/>
+<pin name="P$2" x="10.16" y="0" visible="off" length="middle" rot="R180"/>
+<wire x1="-5.08" y1="0" x2="-2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="0" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="2.54" x2="1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="1.524" y2="0" width="0.254" layer="94"/>
+<wire x1="1.524" y1="0" x2="5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-2.54" x2="5.08" y2="2.54" width="0.254" layer="94"/>
+<wire x1="1.27" y1="2.54" x2="1.27" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="1.27" y1="-2.54" x2="0" y2="-3.81" width="0.254" layer="94"/>
+<wire x1="1.27" y1="2.54" x2="2.54" y2="3.81" width="0.254" layer="94"/>
+<text x="-2.54" y="5.08" size="2.032" layer="95">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -5081,6 +5133,50 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <connect gate="G$1" pin="3" pad="3"/>
 <connect gate="G$1" pin="4" pad="4"/>
 <connect gate="G$1" pin="5" pad="5"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="BK-916">
+<gates>
+<gate name="G$1" symbol="BK-916" x="0" y="0"/>
+</gates>
+<devices>
+<device name="BK-916" package="BK-916">
+<connects>
+<connect gate="G$1" pin="GND" pad="2"/>
+<connect gate="G$1" pin="VBAT" pad="1 3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VRTC">
+<gates>
+<gate name="G$1" symbol="VRTC" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="ESD_DIODE" prefix="D">
+<gates>
+<gate name="G$1" symbol="ESD_DIODE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="M1005" package="M1005">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
+<connect gate="G$1" pin="P$2" pad="P$2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -6870,6 +6966,17 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="J5" library="joule_shield" deviceset="JST-ZH5" device="JST_ZH_SMT_VERT"/>
 <part name="U$33" library="joule_shield" deviceset="V5P0V_USBB" device=""/>
 <part name="GND34" library="supply1" deviceset="GND" device=""/>
+<part name="JRTC" library="joule_shield" deviceset="BK-916" device="BK-916"/>
+<part name="GND35" library="supply1" deviceset="GND" device=""/>
+<part name="R25" library="mf_passives" deviceset="RESISTOR" device="_0603" value="1k">
+<attribute name="MPN" value="MF-RES-0603-1K"/>
+</part>
+<part name="U$37" library="joule_shield" deviceset="VRTC" device=""/>
+<part name="GND36" library="supply1" deviceset="GND" device=""/>
+<part name="D3" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
+<attribute name="DPN" value="490-13209-1-ND"/>
+<attribute name="MPN" value="LXES15AAA1-133"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -8295,6 +8402,56 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="D2" gate="G$1" pin="C"/>
 <pinref part="F1" gate="G$1" pin="1"/>
 <wire x1="55.88" y1="106.68" x2="66.04" y2="106.68" width="0.1524" layer="91"/>
+</segment>
+</net>
+</nets>
+</sheet>
+<sheet>
+<plain>
+</plain>
+<instances>
+<instance part="JRTC" gate="G$1" x="17.78" y="45.72"/>
+<instance part="GND35" gate="1" x="43.18" y="30.48"/>
+<instance part="R25" gate="G$1" x="60.96" y="50.8" rot="R90"/>
+<instance part="U$37" gate="G$1" x="78.74" y="58.42"/>
+<instance part="GND36" gate="1" x="55.88" y="22.86"/>
+<instance part="D3" gate="G$1" x="55.88" y="38.1" rot="R90">
+<attribute name="DPN" x="55.88" y="38.1" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="MPN" x="55.88" y="38.1" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
+</instances>
+<busses>
+</busses>
+<nets>
+<net name="GND" class="0">
+<segment>
+<pinref part="JRTC" gate="G$1" pin="GND"/>
+<wire x1="35.56" y1="38.1" x2="43.18" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="GND35" gate="1" pin="GND"/>
+<wire x1="43.18" y1="38.1" x2="43.18" y2="33.02" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="D3" gate="G$1" pin="P$1"/>
+<pinref part="GND36" gate="1" pin="GND"/>
+<wire x1="55.88" y1="27.94" x2="55.88" y2="25.4" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VRTC" class="0">
+<segment>
+<pinref part="R25" gate="G$1" pin="P$2"/>
+<pinref part="U$37" gate="G$1" pin="VRTC"/>
+<wire x1="66.04" y1="50.8" x2="78.74" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="50.8" x2="78.74" y2="58.42" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$30" class="0">
+<segment>
+<pinref part="R25" gate="G$1" pin="P$1"/>
+<pinref part="JRTC" gate="G$1" pin="VBAT"/>
+<wire x1="55.88" y1="50.8" x2="35.56" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="D3" gate="G$1" pin="P$2"/>
+<wire x1="55.88" y1="48.26" x2="55.88" y2="50.8" width="0.1524" layer="91"/>
+<junction x="55.88" y="50.8"/>
 </segment>
 </net>
 </nets>

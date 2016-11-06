@@ -44,7 +44,6 @@ TODO
    * figure out where USB power switch fault and enable line should go
    * fan connectors
    * SD card
-   * RTC battery
    * BIOS serial connectors and USB-serial
    * buttons / LEDs
 
@@ -62,6 +61,7 @@ TODO
 DONE 2016-11-06
  * Schematic for Joule connectors
  * Schematic for USB connectors
+ * Schematic for RTC battery
 
 DONE 2016-11-05
  * Switched all the supply nets to parts with names that match the
