@@ -8,7 +8,7 @@
    * level converter for serial to servos
      * 2x SN74LVC1T45DBVR - 296-16843-1-ND
    * connector to servos / gimbal drive board
-     * 2x JST XH 4 (DPN 455-2261-1-ND)
+     * 2x JST XH 4 (DPN 455-2262-1-ND)
      * probably have gimbal drive board daisy chain power to compute
        board
    * SD card
@@ -43,7 +43,6 @@ TODO
  * Schematic
    * figure out where USB power switch fault and enable line should go
    * fan connectors
-   * SD card
    * BIOS serial connectors and USB-serial
    * buttons / LEDs
 
@@ -52,16 +51,23 @@ TODO
 
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
+   * figure out how to handle the shield... should it be connected to
+     ground?
  * Get JST-ZH5 SMT VERT in house and verify footprint
  * Get 609-4413-ND and verify footprint
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
+ * Determine what to do with unused sdcard signals
+   * cmd_dir
+   * dat_dir
+   * lvl_sel
  * Initial schematic
 
 DONE 2016-11-06
  * Schematic for Joule connectors
  * Schematic for USB connectors
  * Schematic for RTC battery
+ * Schematic SD card
 
 DONE 2016-11-05
  * Switched all the supply nets to parts with names that match the
