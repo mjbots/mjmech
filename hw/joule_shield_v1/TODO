@@ -42,12 +42,12 @@
 TODO
  * Schematic
    * figure out where USB power switch fault and enable line should go
-   * fan connectors
-   * BIOS serial connectors and USB-serial
-   * buttons / LEDs
+   * Determine what to do with unused sdcard signals
+     * cmd_dir
+     * dat_dir
+     * lvl_sel
 
  * Footprints / Datasheets
-
 
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
@@ -57,11 +57,11 @@ TODO
  * Get 609-4413-ND and verify footprint
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
- * Determine what to do with unused sdcard signals
-   * cmd_dir
-   * dat_dir
-   * lvl_sel
- * Initial schematic
+
+DONE 2016-11-07
+ * schematic for fan connector
+ * schematic for BIOS serial connectors and USB-serial
+ * schematic for buttons / LEDs
 
 DONE 2016-11-06
  * Schematic for Joule connectors
