@@ -47,8 +47,8 @@ TODO
      * dat_dir
      * lvl_sel
 
- * Footprints / Datasheets
-
+ * Ensure Joule mounting holes properly have no solder mask, but also
+   no solder paste
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
    * figure out how to handle the shield... should it be connected to

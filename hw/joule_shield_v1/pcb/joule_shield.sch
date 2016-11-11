@@ -3465,6 +3465,9 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="-1.9" y1="1.9" x2="-1.9" y2="2.1" width="0.127" layer="21"/>
 <text x="-2.2" y="2.8" size="0.8" layer="21">&gt;NAME</text>
 </package>
+<package name="SMTSO-M1.6">
+<pad name="P$1" x="0" y="0" drill="2.5" diameter="4.2" stop="no"/>
+</package>
 </packages>
 <symbols>
 <symbol name="BQ25890">
@@ -3998,6 +4001,11 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <pin name="RXD" x="17.78" y="12.7" length="middle" rot="R180"/>
 <pin name="TXD" x="17.78" y="15.24" length="middle" rot="R180"/>
 <pin name="CBUS3" x="17.78" y="-20.32" length="middle" rot="R180"/>
+</symbol>
+<symbol name="SMTSO">
+<circle x="0" y="0" radius="3.5921" width="0.254" layer="94"/>
+<text x="-5.08" y="5.08" size="2.54" layer="94">SMTSO</text>
+<text x="-5.08" y="10.16" size="2.54" layer="94">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -5628,6 +5636,18 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <connect gate="G$1" pin="VCC" pad="12"/>
 <connect gate="G$1" pin="VCCIO" pad="20"/>
 </connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="SMTSO">
+<gates>
+<gate name="G$1" symbol="SMTSO" x="0" y="0"/>
+</gates>
+<devices>
+<device name="SMTSO-M1.6" package="SMTSO-M1.6">
 <technologies>
 <technology name=""/>
 </technologies>
@@ -7745,14 +7765,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
 </part>
 <part name="U$26" library="joule_shield" deviceset="V1P8V" device=""/>
-<part name="JD1" library="joule_shield" deviceset="JST-XH4" device="SMT_RA">
-<attribute name="DPN" value="455-2262-1-ND"/>
-<attribute name="MF" value="JST Sales America Inc."/>
-<attribute name="MPN" value="S4B-XH-SM4-TB(LF)(SN)"/>
-</part>
 <part name="GND26" library="supply1" deviceset="GND" device=""/>
 <part name="U$28" library="joule_shield" deviceset="VIN_CHRG" device=""/>
-<part name="JD2" library="joule_shield" deviceset="JST-XH4" device="SMT_RA">
+<part name="JD1" library="joule_shield" deviceset="JST-XH4" device="SMT_RA">
 <attribute name="DPN" value="455-2262-1-ND"/>
 <attribute name="MF" value="JST Sales America Inc."/>
 <attribute name="MPN" value="S4B-XH-SM4-TB(LF)(SN)"/>
@@ -7966,6 +7981,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="MF-RES-0603-470"/>
 </part>
 <part name="U$47" library="joule_shield" deviceset="V5P0V" device=""/>
+<part name="U$48" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
+<part name="U$49" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
+<part name="U$50" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
+<part name="U$51" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
 </parts>
 <sheets>
 <sheet>
@@ -7995,6 +8014,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="J5" gate="G$1" x="299.72" y="73.66" rot="R180"/>
 <instance part="U$33" gate="G$1" x="279.4" y="93.98"/>
 <instance part="GND34" gate="1" x="287.02" y="60.96"/>
+<instance part="U$48" gate="G$1" x="-25.4" y="-22.86"/>
+<instance part="U$49" gate="G$1" x="-7.62" y="-22.86"/>
+<instance part="U$50" gate="G$1" x="10.16" y="-22.86"/>
+<instance part="U$51" gate="G$1" x="27.94" y="-22.86"/>
 </instances>
 <busses>
 </busses>
@@ -9494,14 +9517,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <text x="68.58" y="111.76" size="1.778" layer="91">3.5A 32V</text>
 </plain>
 <instances>
-<instance part="JD1" gate="G$1" x="35.56" y="83.82">
-<attribute name="DPN" x="35.56" y="83.82" size="1.778" layer="96" display="off"/>
-<attribute name="MF" x="35.56" y="83.82" size="1.778" layer="96" display="off"/>
-<attribute name="MPN" x="35.56" y="83.82" size="1.778" layer="96" display="off"/>
-</instance>
 <instance part="GND26" gate="1" x="60.96" y="66.04"/>
 <instance part="U$28" gate="G$1" x="96.52" y="111.76"/>
-<instance part="JD2" gate="G$1" x="17.78" y="83.82">
+<instance part="JD1" gate="G$1" x="17.78" y="83.82">
 <attribute name="DPN" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
@@ -9525,39 +9543,27 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="GND26" gate="1" pin="GND"/>
 <wire x1="60.96" y1="68.58" x2="60.96" y2="88.9" width="0.1524" layer="91"/>
 <pinref part="JD1" gate="G$1" pin="1"/>
-<wire x1="60.96" y1="88.9" x2="43.18" y2="88.9" width="0.1524" layer="91"/>
-<pinref part="JD2" gate="G$1" pin="1"/>
-<wire x1="25.4" y1="88.9" x2="43.18" y2="88.9" width="0.1524" layer="91"/>
-<junction x="43.18" y="88.9"/>
+<wire x1="25.4" y1="88.9" x2="60.96" y2="88.9" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="SERVO_TX_5V" class="0">
 <segment>
-<pinref part="JD1" gate="G$1" pin="2"/>
-<wire x1="43.18" y1="86.36" x2="78.74" y2="86.36" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="86.36" x2="78.74" y2="86.36" width="0.1524" layer="91"/>
 <label x="73.66" y="86.36" size="1.778" layer="95"/>
-<pinref part="JD2" gate="G$1" pin="2"/>
-<wire x1="43.18" y1="86.36" x2="25.4" y2="86.36" width="0.1524" layer="91"/>
-<junction x="43.18" y="86.36"/>
+<pinref part="JD1" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="SERVO_RX_5V" class="0">
 <segment>
-<pinref part="JD1" gate="G$1" pin="3"/>
-<wire x1="43.18" y1="83.82" x2="78.74" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="83.82" x2="78.74" y2="83.82" width="0.1524" layer="91"/>
 <label x="73.66" y="83.82" size="1.778" layer="95"/>
-<pinref part="JD2" gate="G$1" pin="3"/>
-<wire x1="25.4" y1="83.82" x2="43.18" y2="83.82" width="0.1524" layer="91"/>
-<junction x="43.18" y="83.82"/>
+<pinref part="JD1" gate="G$1" pin="3"/>
 </segment>
 </net>
 <net name="N$28" class="0">
 <segment>
 <pinref part="JD1" gate="G$1" pin="4"/>
-<wire x1="43.18" y1="81.28" x2="48.26" y2="81.28" width="0.1524" layer="91"/>
-<pinref part="JD2" gate="G$1" pin="4"/>
-<wire x1="25.4" y1="81.28" x2="43.18" y2="81.28" width="0.1524" layer="91"/>
-<junction x="43.18" y="81.28"/>
+<wire x1="25.4" y1="81.28" x2="48.26" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="D2" gate="G$1" pin="A"/>
 <wire x1="50.8" y1="106.68" x2="48.26" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="106.68" x2="48.26" y2="81.28" width="0.1524" layer="91"/>
