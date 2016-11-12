@@ -47,8 +47,6 @@ TODO
      * dat_dir
      * lvl_sel
 
- * Ensure Joule mounting holes properly have no solder mask, but also
-   no solder paste
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
    * figure out how to handle the shield... should it be connected to
@@ -57,6 +55,13 @@ TODO
  * Get 609-4413-ND and verify footprint
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
+
+DONE 2016-11-11
+ * Made primary mounting holes be an actual part instead of just a via
+ * Ensure Joule mounting holes properly have no solder mask, but also
+   no solder paste
+ * Updated J6 and J7 to match picture of Joule's backside
+
 
 DONE 2016-11-07
  * schematic for fan connector
