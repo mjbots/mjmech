@@ -17,6 +17,24 @@
    video stats.
  * camera based target stabilization/tracking
 
+Post-Robotgames 2016 brainstorming
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Want VGA->5.8GHz TX, so we can broadcast our video to other monitors
+ * 5.8GHz recording system, so we can record compeitors video for posterity
+ * Make sure our gun is strong enough
+ * Targeting panel calibration rig: gun with variable FPS, FPS meter
+ * Spare velcro
+ * ser2net on odroid, or some other way to run legtool
+ * big monitor: next match time, or the current score
+ * scoring transponder which does not suck
+ * suggest to forum: no-2.4Ghz system
+ * suggest to forum: new transponder protocol or system
+ * check-in servo manual
+ * make sur the procedure to set up new servo is recorded/clear
+ * make sure it complains loudly when networkmanager is up
+ * simple target panel tester: power + superbright LED with right connector
+ * put sharpie (black + white) in the toolkit
+
 Movement
 ~~~~~~~~
 
