@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import subprocess
+
 env = Environment()
 
 # Set up our global environment.
@@ -35,6 +37,8 @@ env.Append(LIBS=['snappy',
 env.ParseConfig('pkg-config --cflags --libs eigen3')
 env.ParseConfig('pkg-config --cflags --libs opencv')
 
+env['UBUNTU_RELEASE'] = subprocess.check_output(["lsb_release", "-cs"]).strip()
+
 canonenv = env
 Export('canonenv')
 
@@ -43,7 +47,7 @@ variant_suffix = '-' + os.uname()[4]
 
 subdirs = ['base', 'mech', 'python', 'legtool', 'tools']
 
-if not os.uname()[4].startswith('arm'):
+if not os.uname()[4].startswith('arm') and env['UBUNTU_RELEASE'] != 'xenial':
     subdirs += ['simulator']
 
 for subdir in subdirs:
