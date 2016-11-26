@@ -7945,9 +7945,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R29" library="mf_passives" deviceset="RESISTOR" device="_0603" value="27">
 <attribute name="MPN" value="MF-RES-0603-27"/>
 </part>
-<part name="SW1" library="mf_switches" deviceset="TACT" device="_6MM" value="MF-SW-TACT-6MM"/>
-<part name="SW2" library="mf_switches" deviceset="TACT" device="_6MM" value="MF-SW-TACT-6MM"/>
-<part name="SW3" library="mf_switches" deviceset="TACT" device="_6MM" value="MF-SW-TACT-6MM"/>
+<part name="SW1" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
+<part name="SW2" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
+<part name="SW3" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
 <part name="GND48" library="supply1" deviceset="GND" device=""/>
 <part name="D5" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>

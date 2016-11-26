@@ -47,6 +47,9 @@ TODO
      * dat_dir
      * lvl_sel
 
+ * Ensure there is sufficient room around mounting holes for screw
+   heads
+ * Does RTC battery holder schematic mark out how big a battery is?
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
    * figure out how to handle the shield... should it be connected to
@@ -61,7 +64,6 @@ DONE 2016-11-11
  * Ensure Joule mounting holes properly have no solder mask, but also
    no solder paste
  * Updated J6 and J7 to match picture of Joule's backside
-
 
 DONE 2016-11-07
  * schematic for fan connector
