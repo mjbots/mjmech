@@ -3076,7 +3076,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <smd name="2" x="3.45" y="0" dx="2.5" dy="3.3" layer="1"/>
 <smd name="1" x="-3.45" y="0" dx="2.5" dy="3.3" layer="1"/>
 <wire x1="-4.4" y1="3.3" x2="-3.8" y2="3.3" width="0.127" layer="21"/>
-<wire x1="-3.8" y1="3.3" x2="4.4" y2="3.3" width="0.127" layer="22"/>
+<wire x1="-3.8" y1="3.3" x2="4.4" y2="3.3" width="0.127" layer="21"/>
 <wire x1="4.4" y1="3.3" x2="4.4" y2="-3.3" width="0.127" layer="21"/>
 <wire x1="4.4" y1="-3.3" x2="-3.8" y2="-3.3" width="0.127" layer="21"/>
 <wire x1="-3.8" y1="-3.3" x2="-4.4" y2="-3.3" width="0.127" layer="21"/>
@@ -5824,87 +5824,6 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="2.2" y1="1.6" x2="-2.2" y2="1.6" width="0.127" layer="21"/>
 <text x="-2.2" y="1.8" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
 </package>
-<package name="CP4MM">
-<description>&lt;b&gt;Description:&lt;/b&gt; 4MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.&lt;br&gt;</description>
-<smd name="P$2" x="0" y="1.75" dx="2.5" dy="1.6" layer="1" rot="R90"/>
-<smd name="P$1" x="0" y="-1.75" dx="2.5" dy="1.6" layer="1" rot="R90"/>
-<wire x1="-1.2" y1="2.2" x2="-2.2" y2="2.2" width="0.127" layer="21"/>
-<wire x1="-2.2" y1="2.2" x2="-2.2" y2="-1.56360625" width="0.127" layer="21"/>
-<wire x1="-2.2" y1="-1.56360625" x2="-1.56360625" y2="-2.2" width="0.127" layer="21"/>
-<wire x1="-1.56360625" y1="-2.2" x2="-1.1" y2="-2.2" width="0.127" layer="21"/>
-<wire x1="1.2" y1="2.2" x2="2.2" y2="2.2" width="0.127" layer="21"/>
-<wire x1="2.2" y1="2.2" x2="2.2" y2="-1.56360625" width="0.127" layer="21"/>
-<wire x1="2.2" y1="-1.56360625" x2="1.56360625" y2="-2.2" width="0.127" layer="21"/>
-<wire x1="1.56360625" y1="-2.2" x2="1.2" y2="-2.2" width="0.127" layer="21"/>
-<text x="-2.2" y="3.5" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
-<wire x1="1.5" y1="-0.5" x2="1.5" y2="-1.5" width="0.127" layer="21"/>
-<wire x1="2" y1="-1" x2="1" y2="-1" width="0.127" layer="21"/>
-</package>
-<package name="CP6.3MM">
-<description>&lt;b&gt;Description:&lt;/b&gt; 6.3MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.&lt;br&gt;</description>
-<smd name="P$1" x="0" y="-2.7" dx="3.2" dy="1.6" layer="1" rot="R90"/>
-<smd name="P$2" x="0" y="2.7" dx="3.2" dy="1.6" layer="1" rot="R90"/>
-<wire x1="1.1" y1="3.3" x2="3.3" y2="3.3" width="0.127" layer="21"/>
-<wire x1="3.3" y1="3.3" x2="3.3" y2="-2.3" width="0.127" layer="21"/>
-<wire x1="3.3" y1="-2.3" x2="2.3" y2="-3.3" width="0.127" layer="21"/>
-<wire x1="2.3" y1="-3.3" x2="1.1" y2="-3.3" width="0.127" layer="21"/>
-<wire x1="-1.1" y1="3.3" x2="-3.3" y2="3.3" width="0.127" layer="21"/>
-<wire x1="-3.3" y1="3.3" x2="-3.3" y2="-2.3" width="0.127" layer="21"/>
-<wire x1="-3.3" y1="-2.3" x2="-2.3" y2="-3.3" width="0.127" layer="21"/>
-<wire x1="-2.3" y1="-3.3" x2="-1.1" y2="-3.3" width="0.127" layer="21"/>
-<wire x1="2" y1="-1.5" x2="2" y2="-2.5" width="0.127" layer="21"/>
-<wire x1="1.5" y1="-2" x2="2.5" y2="-2" width="0.127" layer="21"/>
-<text x="-3.3" y="5" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
-</package>
-<package name="CP8MM">
-<description>&lt;b&gt;Description:&lt;/b&gt; 8MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.&lt;br&gt;</description>
-<smd name="P$1" x="0" y="-3.1" dx="4" dy="1.6" layer="1" rot="R90"/>
-<smd name="P$2" x="0" y="3.1" dx="4" dy="1.6" layer="1" rot="R90"/>
-<wire x1="-1.5" y1="4.15" x2="-4.15" y2="4.15" width="0.127" layer="21"/>
-<wire x1="-4.15" y1="4.15" x2="-4.15" y2="-2.88" width="0.127" layer="21"/>
-<wire x1="-4.15" y1="-2.88" x2="-2.88" y2="-4.15" width="0.127" layer="21"/>
-<wire x1="-2.88" y1="-4.15" x2="-1.5" y2="-4.15" width="0.127" layer="21"/>
-<wire x1="1.5" y1="-4.15" x2="2.88" y2="-4.15" width="0.127" layer="21"/>
-<wire x1="2.88" y1="-4.15" x2="4.15" y2="-2.88" width="0.127" layer="21"/>
-<wire x1="4.15" y1="-2.88" x2="4.15" y2="4.15" width="0.127" layer="21"/>
-<wire x1="4.15" y1="4.15" x2="1.5" y2="4.15" width="0.127" layer="21"/>
-<wire x1="2.5" y1="-2" x2="2.5" y2="-3" width="0.127" layer="21"/>
-<wire x1="3" y1="-2.5" x2="2" y2="-2.5" width="0.127" layer="21"/>
-<text x="-4.15" y="6" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
-</package>
-<package name="CP10MM">
-<description>&lt;b&gt;Description:&lt;/b&gt; 10MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.
-&lt;br/&gt;</description>
-<smd name="P$1" x="0" y="-4.35" dx="4.1" dy="2" layer="1" rot="R90"/>
-<smd name="P$2" x="0" y="4.35" dx="4.1" dy="2" layer="1" rot="R90"/>
-<text x="-5.15" y="7.5" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
-<wire x1="-1.5" y1="5.15" x2="-5.15" y2="5.15" width="0.127" layer="21"/>
-<wire x1="-5.15" y1="5.15" x2="-5.15" y2="-3.15" width="0.127" layer="21"/>
-<wire x1="-5.15" y1="-3.15" x2="-3.15" y2="-5.15" width="0.127" layer="21"/>
-<wire x1="-3.15" y1="-5.15" x2="-1.5" y2="-5.15" width="0.127" layer="21"/>
-<wire x1="1.5" y1="5.15" x2="5.15" y2="5.15" width="0.127" layer="21"/>
-<wire x1="5.15" y1="5.15" x2="5.15" y2="-3.15" width="0.127" layer="21"/>
-<wire x1="5.15" y1="-3.15" x2="3.15" y2="-5.15" width="0.127" layer="21"/>
-<wire x1="3.15" y1="-5.15" x2="1.5" y2="-5.15" width="0.127" layer="21"/>
-<wire x1="3" y1="-2.5" x2="3" y2="-3.5" width="0.127" layer="21"/>
-<wire x1="2.5" y1="-3" x2="3.5" y2="-3" width="0.127" layer="21"/>
-</package>
-<package name="CP12.5MM">
-<description>&lt;b&gt;Description:&lt;/b&gt; 12.5MM Round Package for Electrolytic Capacitors. Based on Panasonic Electrolytic Capacitors.&lt;br&gt;</description>
-<smd name="P$1" x="0" y="-4.85" dx="5.7" dy="2" layer="1" rot="R90"/>
-<smd name="P$2" x="0" y="4.85" dx="5.7" dy="2" layer="1" rot="R90"/>
-<wire x1="-1.75" y1="6.75" x2="-6.75" y2="6.75" width="0.127" layer="21"/>
-<wire x1="-6.75" y1="6.75" x2="-6.75" y2="-4.25" width="0.127" layer="21"/>
-<wire x1="-6.75" y1="-4.25" x2="-4.25" y2="-6.75" width="0.127" layer="21"/>
-<wire x1="-4.25" y1="-6.75" x2="-1.75" y2="-6.75" width="0.127" layer="21"/>
-<wire x1="1.75" y1="6.75" x2="6.75" y2="6.75" width="0.127" layer="21"/>
-<wire x1="6.75" y1="6.75" x2="6.75" y2="-4.25" width="0.127" layer="21"/>
-<wire x1="6.75" y1="-4.25" x2="4.25" y2="-6.75" width="0.127" layer="21"/>
-<wire x1="4.25" y1="-6.75" x2="1.75" y2="-6.75" width="0.127" layer="21"/>
-<wire x1="4" y1="-3.5" x2="4" y2="-5.5" width="0.127" layer="21"/>
-<wire x1="5" y1="-4.5" x2="3" y2="-4.5" width="0.127" layer="21"/>
-<text x="-6.75" y="9" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
-</package>
 </packages>
 <symbols>
 <symbol name="CAPACITOR_NP">
@@ -5933,21 +5852,6 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="-1.016" y1="-1.016" x2="1.016" y2="-1.651" width="0.1524" layer="94"/>
 <wire x1="1.016" y1="-1.651" x2="-1.016" y2="-2.286" width="0.1524" layer="94"/>
 <wire x1="-1.016" y1="-2.286" x2="0" y2="-2.54" width="0.1524" layer="94"/>
-<text x="2.54" y="1.524" size="1.016" layer="95" font="vector" align="top-left">&gt;NAME</text>
-<text x="2.54" y="-1.524" size="1.016" layer="96" font="vector">&gt;VALUE</text>
-</symbol>
-<symbol name="CAPACITOR_P">
-<description>&lt;b&gt;Library:&lt;/b&gt;  MF_Passives&lt;br/&gt;
-&lt;b&gt;Description:&lt;/b&gt; Symbol for Polarized Capacitors&lt;br/&gt;</description>
-<pin name="P$1" x="0" y="2.54" visible="off" length="point" direction="pas" swaplevel="1" rot="R270"/>
-<pin name="P$2" x="0" y="-2.54" visible="off" length="point" direction="pas" swaplevel="1" rot="R90"/>
-<wire x1="0" y1="2.54" x2="0" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="0" y1="-2.54" x2="0" y2="-0.508" width="0.1524" layer="94"/>
-<wire x1="-2.286" y1="-1.524" x2="2.286" y2="-1.524" width="0.1524" layer="94" curve="-100"/>
-<wire x1="-2.286" y1="0.762" x2="0" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="0" y1="0.762" x2="2.286" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="2.286" x2="1.27" y2="1.27" width="0.1524" layer="94"/>
-<wire x1="1.778" y1="1.778" x2="0.762" y2="1.778" width="0.1524" layer="94"/>
 <text x="2.54" y="1.524" size="1.016" layer="95" font="vector" align="top-left">&gt;NAME</text>
 <text x="2.54" y="-1.524" size="1.016" layer="96" font="vector">&gt;VALUE</text>
 </symbol>
@@ -6146,100 +6050,6 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <attribute name="VALUE" value="" constant="no"/>
 <attribute name="VOLTAGE" value="" constant="no"/>
 <attribute name="WATTAGE" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-<deviceset name="CAPACITOR_P" prefix="C" uservalue="yes">
-<description>&lt;b&gt;Library:&lt;/b&gt;  MF_Passives&lt;br/&gt;
-&lt;b&gt;Description:&lt;/b&gt; Device for Polarized Capacitors. Manufacture part number (MPN), Voltage Rating, and Tolerance can be added via Attributes. Check https://factory.macrofab.com/parts for the house parts list.&lt;br/&gt;</description>
-<gates>
-<gate name="G$1" symbol="CAPACITOR_P" x="0" y="0"/>
-</gates>
-<devices>
-<device name="_4MM" package="CP4MM">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="HOUSEPART" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="POPULATE" value="1" constant="no"/>
-<attribute name="TOLERANCE" value="" constant="no"/>
-<attribute name="URL" value="" constant="no"/>
-<attribute name="VALUE" value="" constant="no"/>
-<attribute name="VOLTAGE" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="_6.3MM" package="CP6.3MM">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="HOUSEPART" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="POPULATE" value="1" constant="no"/>
-<attribute name="TOLERANCE" value="" constant="no"/>
-<attribute name="URL" value="" constant="no"/>
-<attribute name="VALUE" value="" constant="no"/>
-<attribute name="VOTLAGE" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="_8MM" package="CP8MM">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="HOUSEPART" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="POPULATE" value="1" constant="no"/>
-<attribute name="TOLERANCE" value="" constant="no"/>
-<attribute name="URL" value="" constant="no"/>
-<attribute name="VALUE" value="" constant="no"/>
-<attribute name="VOLTAGE" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="_10MM" package="CP10MM">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="HOUSEPART" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="POPULATE" value="1" constant="no"/>
-<attribute name="TOLERANCE" value="" constant="no"/>
-<attribute name="URL" value="" constant="no"/>
-<attribute name="VALUE" value="" constant="no"/>
-<attribute name="VOLTAGE" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="_12.5MM" package="CP12.5MM">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="HOUSEPART" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="POPULATE" value="1" constant="no"/>
-<attribute name="TOLERANCE" value="" constant="no"/>
-<attribute name="URL" value="" constant="no"/>
-<attribute name="VALUE" value="" constant="no"/>
-<attribute name="VOLTAGE" value="" constant="no"/>
 </technology>
 </technologies>
 </device>
@@ -7735,8 +7545,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="MF-RES-0603-15K"/>
 </part>
 <part name="GND22" library="supply1" deviceset="GND" device=""/>
-<part name="C27" library="mf_passives" deviceset="CAPACITOR_P" device="_6.3MM" value="100uF">
-<attribute name="MPN" value="MF-CAP-6.3MM-100uF"/>
+<part name="C27" library="mf_passives" deviceset="CAPACITOR_NP" device="_0805" value="47uF">
+<attribute name="DPN" value="445-8239-1-ND"/>
+<attribute name="MPN" value="C2012X5R1A476M125AC"/>
 </part>
 <part name="C28" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
@@ -7820,8 +7631,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="MF-RES-0603-15K"/>
 </part>
 <part name="GND32" library="supply1" deviceset="GND" device=""/>
-<part name="C31" library="mf_passives" deviceset="CAPACITOR_P" device="_6.3MM" value="100uF">
-<attribute name="MPN" value="MF-CAP-6.3MM-100uF"/>
+<part name="C31" library="mf_passives" deviceset="CAPACITOR_NP" device="_0805" value="47uF">
+<attribute name="DPN" value="445-8239-1-ND"/>
+<attribute name="MPN" value="C2012X5R1A476M125AC"/>
 </part>
 <part name="C32" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
@@ -7988,6 +7800,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$55" library="joule_shield" deviceset="M2.5MOUNT" device=""/>
 <part name="GND52" library="supply1" deviceset="GND" device=""/>
 <part name="U$40" library="joule_shield" deviceset="VSYS" device=""/>
+<part name="C41" library="mf_passives" deviceset="CAPACITOR_NP" device="_0805" value="47uF">
+<attribute name="DPN" value="445-8239-1-ND"/>
+<attribute name="MPN" value="C2012X5R1A476M125AC"/>
+</part>
+<part name="C42" library="mf_passives" deviceset="CAPACITOR_NP" device="_0805" value="47uF">
+<attribute name="DPN" value="445-8239-1-ND"/>
+<attribute name="MPN" value="C2012X5R1A476M125AC"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -9192,7 +9012,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="GND21" gate="1" x="96.52" y="38.1"/>
 <instance part="R21" gate="G$1" x="106.68" y="45.72"/>
 <instance part="GND22" gate="1" x="106.68" y="33.02"/>
-<instance part="C27" gate="G$1" x="124.46" y="53.34"/>
+<instance part="C27" gate="G$1" x="124.46" y="53.34">
+<attribute name="DPN" x="124.46" y="53.34" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C28" gate="G$1" x="137.16" y="53.34"/>
 <instance part="GND23" gate="1" x="129.54" y="43.18"/>
 <instance part="U$22" gate="G$1" x="149.86" y="58.42"/>
@@ -9211,10 +9033,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="GND31" gate="1" x="96.52" y="-15.24"/>
 <instance part="R24" gate="G$1" x="106.68" y="-7.62"/>
 <instance part="GND32" gate="1" x="106.68" y="-20.32"/>
-<instance part="C31" gate="G$1" x="124.46" y="0"/>
+<instance part="C31" gate="G$1" x="124.46" y="0">
+<attribute name="DPN" x="124.46" y="0" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C32" gate="G$1" x="137.16" y="0"/>
 <instance part="GND33" gate="1" x="129.54" y="-10.16"/>
 <instance part="U$35" gate="G$1" x="149.86" y="5.08"/>
+<instance part="C41" gate="G$1" x="116.84" y="53.34">
+<attribute name="DPN" x="116.84" y="53.34" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C42" gate="G$1" x="116.84" y="0">
+<attribute name="DPN" x="116.84" y="0" size="1.778" layer="96" display="off"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -9288,6 +9118,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="129.54" y1="48.26" x2="137.16" y2="48.26" width="0.1524" layer="91"/>
 <wire x1="137.16" y1="48.26" x2="137.16" y2="50.8" width="0.1524" layer="91"/>
 <junction x="129.54" y="48.26"/>
+<pinref part="C41" gate="G$1" pin="P$2"/>
+<wire x1="116.84" y1="50.8" x2="116.84" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="48.26" x2="124.46" y2="48.26" width="0.1524" layer="91"/>
+<junction x="124.46" y="48.26"/>
 </segment>
 <segment>
 <pinref part="C30" gate="G$1" pin="P$2"/>
@@ -9315,6 +9149,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="129.54" y1="-5.08" x2="137.16" y2="-5.08" width="0.1524" layer="91"/>
 <wire x1="137.16" y1="-5.08" x2="137.16" y2="-2.54" width="0.1524" layer="91"/>
 <junction x="129.54" y="-5.08"/>
+<pinref part="C42" gate="G$1" pin="P$2"/>
+<wire x1="116.84" y1="-2.54" x2="116.84" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="-5.08" x2="124.46" y2="-5.08" width="0.1524" layer="91"/>
+<junction x="124.46" y="-5.08"/>
 </segment>
 </net>
 <net name="N$22" class="0">
@@ -9350,14 +9188,17 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="U5" gate="G$1" pin="OUT"/>
 <pinref part="C27" gate="G$1" pin="P$1"/>
-<wire x1="93.98" y1="55.88" x2="124.46" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="55.88" x2="116.84" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="C28" gate="G$1" pin="P$1"/>
+<wire x1="116.84" y1="55.88" x2="124.46" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="124.46" y1="55.88" x2="137.16" y2="55.88" width="0.1524" layer="91"/>
 <junction x="124.46" y="55.88"/>
 <pinref part="U$22" gate="G$1" pin="V5P0V_USBA"/>
 <wire x1="137.16" y1="55.88" x2="149.86" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="55.88" x2="149.86" y2="58.42" width="0.1524" layer="91"/>
 <junction x="137.16" y="55.88"/>
+<pinref part="C41" gate="G$1" pin="P$1"/>
+<junction x="116.84" y="55.88"/>
 </segment>
 </net>
 <net name="N$32" class="0">
@@ -9393,14 +9234,17 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="U6" gate="G$1" pin="OUT"/>
 <pinref part="C31" gate="G$1" pin="P$1"/>
-<wire x1="93.98" y1="2.54" x2="124.46" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="2.54" x2="116.84" y2="2.54" width="0.1524" layer="91"/>
 <pinref part="C32" gate="G$1" pin="P$1"/>
+<wire x1="116.84" y1="2.54" x2="124.46" y2="2.54" width="0.1524" layer="91"/>
 <wire x1="124.46" y1="2.54" x2="137.16" y2="2.54" width="0.1524" layer="91"/>
 <junction x="124.46" y="2.54"/>
 <wire x1="137.16" y1="2.54" x2="149.86" y2="2.54" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="2.54" x2="149.86" y2="5.08" width="0.1524" layer="91"/>
 <junction x="137.16" y="2.54"/>
 <pinref part="U$35" gate="G$1" pin="V5P0V_USBB"/>
+<pinref part="C42" gate="G$1" pin="P$1"/>
+<junction x="116.84" y="2.54"/>
 </segment>
 </net>
 </nets>

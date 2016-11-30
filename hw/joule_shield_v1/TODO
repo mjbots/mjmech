@@ -47,6 +47,9 @@ TODO
      * dat_dir
      * lvl_sel
 
+ * Layout
+   * esd diodes have a non-fixed width board font
+
  * Ensure there is sufficient room around mounting holes for screw
    heads
  * Does RTC battery holder schematic mark out how big a battery is?
@@ -58,6 +61,8 @@ TODO
  * Get 609-4413-ND and verify footprint
  * Figure out some way to buy SMTSO-M1.6's
  * Verify orientation and pinout of J6 and J7
+
+ * Align all parts and silks
 
 DONE 2016-11-11
  * Made primary mounting holes be an actual part instead of just a via
