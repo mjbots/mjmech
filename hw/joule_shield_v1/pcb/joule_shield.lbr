@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
+<grid distance="0.2" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -418,6 +418,12 @@
 <wire x1="7.4" y1="-16" x2="-6.3" y2="-16" width="0.127" layer="21"/>
 <wire x1="-6.3" y1="-16" x2="-6.3" y2="-0.1" width="0.127" layer="21"/>
 <text x="-5.7" y="1.1" size="0.8" layer="21">&gt;NAME</text>
+<rectangle x1="-6.8" y1="-3.6" x2="-5.8" y2="0.4" layer="43"/>
+<rectangle x1="-6.8" y1="-8.6" x2="-5.8" y2="-5" layer="43"/>
+<rectangle x1="-5.4" y1="-14.4" x2="-4.6" y2="-6.2" layer="43"/>
+<rectangle x1="-4.4" y1="-6.6" x2="3.8" y2="-5" layer="43"/>
+<rectangle x1="3.6" y1="-16" x2="6.4" y2="-14.6" layer="43"/>
+<rectangle x1="-6.8" y1="-16" x2="8" y2="0.6" layer="39"/>
 </package>
 <package name="BK-916">
 <smd name="3" x="7.65" y="0" dx="5.1" dy="2.5" layer="1" rot="R90"/>
