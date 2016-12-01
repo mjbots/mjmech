@@ -838,6 +838,12 @@
 </package>
 <package name="M2.5MOUNT">
 <pad name="P$1" x="0" y="0" drill="2.6"/>
+<polygon width="0.127" layer="39">
+<vertex x="0" y="2.5" curve="-90"/>
+<vertex x="2.5" y="0" curve="-90"/>
+<vertex x="0" y="-2.5" curve="-90"/>
+<vertex x="-2.5" y="0" curve="-90"/>
+</polygon>
 </package>
 </packages>
 </library>
@@ -1254,22 +1260,22 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="WATTAGE" value="" x="79.2" y="49.26" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="NAME" x="57.84" y="33.25" size="1.016" layer="26" font="vector" ratio="16" rot="MR180"/>
 </element>
-<element name="D1" library="mf_leds" package="LED0603" value="MF-LED-0603-RED" x="54.31" y="36.94" smashed="yes" rot="R270">
-<attribute name="HOUSEPART" value="YES" x="53.04" y="9" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="MF-LED-0603-RED" x="53.04" y="9" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="POPULATE" value="1" x="53.04" y="9" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-RED" x="53.04" y="9" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="53.66" y="38.81" size="1.016" layer="25" font="vector" ratio="16"/>
+<element name="D1" library="mf_leds" package="LED0603" value="MF-LED-0603-RED" x="53.81" y="36.94" smashed="yes" rot="R270">
+<attribute name="HOUSEPART" value="YES" x="52.54" y="9" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="MF-LED-0603-RED" x="52.54" y="9" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="POPULATE" value="1" x="52.54" y="9" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-RED" x="52.54" y="9" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="53.16" y="38.81" size="1.016" layer="25" font="vector" ratio="16"/>
 </element>
-<element name="R4" library="mf_passives" package="R0603" value="560" x="54.35" y="33.73" smashed="yes" rot="R90">
-<attribute name="HOUSEPART" value="" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="TOLERANCE" value="" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="MF-RES-0603-560" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="POPULATE" value="1" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VOLTAGE" value="" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="URL" value="" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="WATTAGE" value="" x="70.86" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="55.37" y="32.15" size="1.016" layer="25" font="vector" ratio="16" rot="R180"/>
+<element name="R4" library="mf_passives" package="R0603" value="560" x="53.85" y="33.73" smashed="yes" rot="R90">
+<attribute name="HOUSEPART" value="" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="TOLERANCE" value="" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="MF-RES-0603-560" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VOLTAGE" value="" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="URL" value="" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="WATTAGE" value="" x="70.36" y="60.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="54.87" y="32.15" size="1.016" layer="25" font="vector" ratio="16" rot="R180"/>
 </element>
 <element name="R5" library="mf_passives" package="R0603" value="100k" x="56.34" y="31.16" smashed="yes" rot="MR0">
 <attribute name="HOUSEPART" value="" x="41.1" y="10.84" size="1.778" layer="28" rot="MR0" display="off"/>
@@ -1451,10 +1457,10 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="DPN" value="1276-1274-1-ND" x="7.5" y="7" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="NAME" x="5.9" y="6.1" size="1.016" layer="26" font="vector" ratio="16" rot="MR0"/>
 </element>
-<element name="TP1" library="testpad" package="B1,27" value="TPSQB1,27" x="1.5" y="1.5" smashed="yes" rot="R180">
-<attribute name="TP_SIGNAL_NAME" value="" x="2.135" y="3.405" size="1" layer="37" rot="R180"/>
+<element name="TP1" library="testpad" package="B1,27" value="TPSQB1,27" x="1.5" y="1" smashed="yes" rot="R180">
+<attribute name="TP_SIGNAL_NAME" value="" x="2.135" y="2.905" size="1" layer="37" rot="R180"/>
 <attribute name="NAME" x="2.365" y="0.516" size="1.27" layer="25" ratio="10"/>
-<attribute name="VALUE" x="2.135" y="2.262" size="0.0254" layer="27" rot="R180"/>
+<attribute name="VALUE" x="2.135" y="1.762" size="0.0254" layer="27" rot="R180"/>
 </element>
 <element name="U3" library="joule_shield" package="PVSON-14" value="TPS63201PVSON-14" x="30" y="33.2" smashed="yes" rot="MR90">
 <attribute name="DPN" value="296-27259-1-ND" x="30" y="33.2" size="1.778" layer="28" rot="MR90" display="off"/>
@@ -2127,12 +2133,12 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-GREEN" x="1" y="16.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="1.4" y="18.3" size="1.016" layer="25" font="vector" ratio="16" rot="R90"/>
 </element>
-<element name="D11" library="mf_leds" package="LED0603" value="MF-LED-0603-GREEN" x="1" y="10" smashed="yes" rot="R90">
-<attribute name="HOUSEPART" value="YES" x="1" y="10" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="MF-LED-0603-GREEN" x="1" y="10" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="POPULATE" value="1" x="1" y="10" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-GREEN" x="1" y="10" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="1.4" y="11.8" size="1.016" layer="25" font="vector" ratio="16" rot="R90"/>
+<element name="D11" library="mf_leds" package="LED0603" value="MF-LED-0603-GREEN" x="1" y="10.5" smashed="yes" rot="R90">
+<attribute name="HOUSEPART" value="YES" x="1" y="10.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="MF-LED-0603-GREEN" x="1" y="10.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="1" y="10.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-GREEN" x="1" y="10.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="1.4" y="12.3" size="1.016" layer="25" font="vector" ratio="16" rot="R90"/>
 </element>
 <element name="U11" library="mf_discrete_semiconductor" package="SOT-23-3" value="MF-DSC-SOT233-MMBT3904" x="4" y="28.5" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="YES" x="4" y="28.5" size="1.778" layer="27" rot="R180" display="off"/>
@@ -2155,12 +2161,12 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="URL" value="https://factory.macrofab.com/part/MF-DSC-SOT233-MMBT3904" x="3.9" y="14.9" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="6" y="16.02" size="1.016" layer="25" font="vector" ratio="16"/>
 </element>
-<element name="U14" library="mf_discrete_semiconductor" package="SOT-23-3" value="MF-DSC-SOT233-MMBT3904" x="4" y="8.5" smashed="yes" rot="R180">
-<attribute name="HOUSEPART" value="YES" x="4" y="8.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="MF-DSC-SOT233-MMBT3904" x="4" y="8.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="POPULATE" value="1" x="4" y="8.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="URL" value="https://factory.macrofab.com/part/MF-DSC-SOT233-MMBT3904" x="4" y="8.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="6.2" y="10.12" size="1.016" layer="25" font="vector" ratio="16"/>
+<element name="U14" library="mf_discrete_semiconductor" package="SOT-23-3" value="MF-DSC-SOT233-MMBT3904" x="4" y="9" smashed="yes" rot="R180">
+<attribute name="HOUSEPART" value="YES" x="4" y="9" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="MF-DSC-SOT233-MMBT3904" x="4" y="9" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="1" x="4" y="9" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="URL" value="https://factory.macrofab.com/part/MF-DSC-SOT233-MMBT3904" x="4" y="9" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="6.2" y="10.62" size="1.016" layer="25" font="vector" ratio="16"/>
 </element>
 <element name="R33" library="mf_passives" package="R0603" value="1k" x="7" y="28.5" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="" x="7" y="28.5" size="1.778" layer="27" rot="R270" display="off"/>
@@ -2192,15 +2198,15 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="WATTAGE" value="" x="6.6" y="14.4" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="7.5" y="15.8" size="1.016" layer="25" font="vector" ratio="16" rot="R270"/>
 </element>
-<element name="R36" library="mf_passives" package="R0603" value="1k" x="6.8" y="8.1" smashed="yes" rot="R270">
-<attribute name="HOUSEPART" value="" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="TOLERANCE" value="" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="MF-RES-0603-1K" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="POPULATE" value="1" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="VOLTAGE" value="" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="URL" value="" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="WATTAGE" value="" x="6.8" y="8.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="7.9" y="9.5" size="1.016" layer="25" font="vector" ratio="16" rot="R270"/>
+<element name="R36" library="mf_passives" package="R0603" value="1k" x="6.8" y="9.1" smashed="yes" rot="R270">
+<attribute name="HOUSEPART" value="" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="TOLERANCE" value="" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="MF-RES-0603-1K" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="POPULATE" value="1" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VOLTAGE" value="" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="URL" value="" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="WATTAGE" value="" x="6.8" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="7.9" y="10.5" size="1.016" layer="25" font="vector" ratio="16" rot="R270"/>
 </element>
 <element name="R37" library="mf_passives" package="R0603" value="470" x="3.5" y="31" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="" x="3.5" y="31" size="1.778" layer="27" rot="R180" display="off"/>
@@ -2232,15 +2238,15 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="WATTAGE" value="" x="3.5" y="17.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="5.2" y="17.1" size="1.016" layer="25" font="vector" ratio="16"/>
 </element>
-<element name="R40" library="mf_passives" package="R0603" value="470" x="3.6" y="11.2" smashed="yes" rot="R180">
-<attribute name="HOUSEPART" value="" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="TOLERANCE" value="" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="MF-RES-0603-470" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="POPULATE" value="1" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="URL" value="" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="WATTAGE" value="" x="3.6" y="11.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="5.5" y="11.4" size="1.016" layer="25" font="vector" ratio="16"/>
+<element name="R40" library="mf_passives" package="R0603" value="470" x="3.6" y="11.7" smashed="yes" rot="R180">
+<attribute name="HOUSEPART" value="" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="TOLERANCE" value="" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="MF-RES-0603-470" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="1" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VOLTAGE" value="" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="URL" value="" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="WATTAGE" value="" x="3.6" y="11.7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="5.5" y="11.9" size="1.016" layer="25" font="vector" ratio="16"/>
 </element>
 <element name="U$48" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="8" y="3"/>
 <element name="U$49" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="51" y="22"/>
@@ -2248,7 +2254,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="U$51" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="38" y="3"/>
 <element name="U$52" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="57.5" y="35.5"/>
 <element name="U$53" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="4.5"/>
-<element name="U$54" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="35.5" rot="MR0"/>
+<element name="U$54" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="35.5"/>
 <element name="U$55" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="57.5" y="4.5"/>
 <element name="C41" library="mf_passives" package="C0805" value="47uF" x="15.5" y="30" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="15.5" y="30" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2578,8 +2584,8 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <wire x1="5" y1="29.45" x2="6.05" y2="29.1" width="0" layer="19" extent="1-16"/>
 <wire x1="8.25" y1="7" x2="12.502" y2="4.3" width="0" layer="19" extent="1-16"/>
 <wire x1="8.25" y1="9" x2="8.25" y2="7" width="0" layer="19" extent="16-16"/>
-<wire x1="5" y1="9.45" x2="8.25" y2="9" width="0" layer="19" extent="1-16"/>
-<wire x1="5" y1="11.25" x2="5" y2="9.45" width="0" layer="19" extent="1-16"/>
+<wire x1="5" y1="9.95" x2="8.25" y2="9" width="0" layer="19" extent="1-16"/>
+<wire x1="5" y1="11.25" x2="5" y2="9.95" width="0" layer="19" extent="1-16"/>
 <wire x1="3.4" y1="11.25" x2="5" y2="11.25" width="0" layer="19" extent="16-16"/>
 <wire x1="8.1" y1="12.9" x2="5" y2="11.25" width="0" layer="19" extent="16-16"/>
 <wire x1="8.1" y1="13.3" x2="8.1" y2="12.9" width="0" layer="19" extent="16-16"/>
@@ -2621,12 +2627,12 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <signal name="N$1">
 <contactref element="D1" pad="ANODE"/>
 <contactref element="R4" pad="P$2"/>
-<wire x1="54.35" y1="34.48" x2="54.31" y2="36.19" width="0" layer="19" extent="1-1"/>
+<wire x1="53.85" y1="34.48" x2="53.81" y2="36.19" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$6">
 <contactref element="D1" pad="CATHODE"/>
 <contactref element="U1" pad="3"/>
-<wire x1="51.9" y1="33.485" x2="54.31" y2="37.69" width="0" layer="19" extent="1-16"/>
+<wire x1="51.9" y1="33.485" x2="53.81" y2="37.69" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="I2C_0_SDA">
 <contactref element="U1" pad="5"/>
@@ -2689,7 +2695,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <contactref element="R12" pad="P$2"/>
 <contactref element="TP1" pad="TP"/>
 <wire x1="4.25" y1="14.4" x2="6.9" y2="13.7" width="0" layer="19" extent="16-16"/>
-<wire x1="1.5" y1="1.5" x2="4.25" y2="14.4" width="0" layer="19" extent="1-16"/>
+<wire x1="1.5" y1="1" x2="4.25" y2="14.4" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="N$16">
 <contactref element="U3" pad="8"/>
@@ -2914,10 +2920,10 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <wire x1="11.25" y1="14" x2="11.25" y2="16" width="0" layer="19" extent="16-16"/>
 <wire x1="7.3" y1="13.3" x2="11.25" y2="14" width="0" layer="19" extent="16-16"/>
 <wire x1="7.3" y1="12.9" x2="7.3" y2="13.3" width="0" layer="19" extent="16-16"/>
-<wire x1="4.35" y1="11.2" x2="7.3" y2="12.9" width="0" layer="19" extent="1-16"/>
-<wire x1="6.75" y1="9" x2="4.35" y2="11.2" width="0" layer="19" extent="1-16"/>
+<wire x1="4.35" y1="11.7" x2="7.3" y2="12.9" width="0" layer="19" extent="1-16"/>
+<wire x1="6.75" y1="9" x2="4.35" y2="11.7" width="0" layer="19" extent="1-16"/>
 <wire x1="6.75" y1="7" x2="6.75" y2="9" width="0" layer="19" extent="16-16"/>
-<wire x1="2.75" y1="14.4" x2="4.35" y2="11.2" width="0" layer="19" extent="1-16"/>
+<wire x1="2.75" y1="14.4" x2="4.35" y2="11.7" width="0" layer="19" extent="1-16"/>
 <wire x1="4.25" y1="17.5" x2="2.75" y2="14.4" width="0" layer="19" extent="1-16"/>
 <wire x1="4.25" y1="25.5" x2="4.25" y2="17.5" width="0" layer="19" extent="1-1"/>
 <wire x1="4.25" y1="31" x2="4.25" y2="25.5" width="0" layer="19" extent="1-1"/>
@@ -2931,8 +2937,8 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <contactref element="R4" pad="P$1"/>
 <contactref element="U1" pad="22"/>
 <contactref element="C5" pad="P$1"/>
-<wire x1="54.35" y1="32.98" x2="58.64" y2="27.8" width="0" layer="19" extent="1-16"/>
-<wire x1="50.175" y1="31.76" x2="54.35" y2="32.98" width="0" layer="19" extent="1-16"/>
+<wire x1="53.85" y1="32.98" x2="58.64" y2="27.8" width="0" layer="19" extent="1-16"/>
+<wire x1="50.175" y1="31.76" x2="53.85" y2="32.98" width="0" layer="19" extent="1-16"/>
 <wire x1="48.55" y1="31.04" x2="50.175" y2="31.76" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="VIN_CHRG">
@@ -3260,7 +3266,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <signal name="N$55">
 <contactref element="R40" pad="P$2"/>
 <contactref element="D11" pad="ANODE"/>
-<wire x1="1" y1="10.75" x2="2.85" y2="11.2" width="0" layer="19" extent="1-1"/>
+<wire x1="1" y1="11.25" x2="2.85" y2="11.7" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$56">
 <contactref element="R39" pad="P$2"/>
@@ -3295,7 +3301,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <signal name="N$62">
 <contactref element="D11" pad="CATHODE"/>
 <contactref element="U14" pad="P$3"/>
-<wire x1="1" y1="9.25" x2="3" y2="8.5" width="0" layer="19" extent="1-1"/>
+<wire x1="1" y1="9.75" x2="3" y2="9" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$63">
 <contactref element="R33" pad="P$2"/>
@@ -3315,7 +3321,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <signal name="N$66">
 <contactref element="R36" pad="P$2"/>
 <contactref element="U14" pad="P$1"/>
-<wire x1="5" y1="7.55" x2="6.8" y2="7.35" width="0" layer="19" extent="1-1"/>
+<wire x1="5" y1="8.05" x2="6.8" y2="8.35" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="ISH_GPIO_0">
 <contactref element="R33" pad="P$1"/>
@@ -3335,7 +3341,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <signal name="ISH_GPIO_3">
 <contactref element="R36" pad="P$1"/>
 <contactref element="J6" pad="34"/>
-<wire x1="6.8" y1="8.85" x2="33.602" y2="20.7" width="0" layer="19" extent="1-1"/>
+<wire x1="6.8" y1="9.85" x2="33.602" y2="20.7" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>

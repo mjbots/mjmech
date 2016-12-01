@@ -3480,6 +3480,12 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </package>
 <package name="M2.5MOUNT">
 <pad name="P$1" x="0" y="0" drill="2.6"/>
+<polygon width="0.127" layer="39">
+<vertex x="0" y="2.5" curve="-90"/>
+<vertex x="2.5" y="0" curve="-90"/>
+<vertex x="0" y="-2.5" curve="-90"/>
+<vertex x="-2.5" y="0" curve="-90"/>
+</polygon>
 </package>
 </packages>
 <symbols>
