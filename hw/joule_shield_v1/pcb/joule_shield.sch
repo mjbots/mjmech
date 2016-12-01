@@ -3222,15 +3222,33 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="5" y1="3.6" x2="5" y2="-1.7" width="0.127" layer="21"/>
 <text x="-5.1" y="-2.8" size="0.8" layer="21">&gt;NAME</text>
 </package>
-<package name="BK-916">
-<smd name="3" x="7.65" y="0" dx="5.1" dy="2.5" layer="1" rot="R90"/>
-<smd name="1" x="-7.65" y="0" dx="5.1" dy="2.5" layer="1" rot="R90"/>
-<wire x1="-8.2" y1="7" x2="8.2" y2="7" width="0.127" layer="21"/>
-<wire x1="8.2" y1="7" x2="8.2" y2="-7" width="0.127" layer="21"/>
-<wire x1="8.2" y1="-7" x2="-8.2" y2="-7" width="0.127" layer="21"/>
-<wire x1="-8.2" y1="-7" x2="-8.2" y2="7" width="0.127" layer="21"/>
-<text x="-7.7" y="7.5" size="0.8" layer="21">&gt;NAME</text>
-<smd name="2" x="0" y="0" dx="10.2" dy="10.2" layer="1" roundness="100"/>
+<package name="BC-2009">
+<smd name="P2" x="7.59" y="0" dx="2.6" dy="5.56" layer="1"/>
+<smd name="P1" x="-7.59" y="0" dx="2.6" dy="5.56" layer="1"/>
+<polygon width="0.127" layer="39">
+<vertex x="0" y="7" curve="-90"/>
+<vertex x="7" y="0" curve="-90"/>
+<vertex x="0" y="-7" curve="-90"/>
+<vertex x="-7" y="0" curve="-90"/>
+</polygon>
+<smd name="N1" x="0" y="0" dx="5" dy="5.56" layer="1"/>
+<polygon width="0.127" layer="43">
+<vertex x="0" y="7" curve="-90"/>
+<vertex x="7" y="0" curve="-90"/>
+<vertex x="0" y="-7" curve="-90"/>
+<vertex x="-7" y="0" curve="-90"/>
+</polygon>
+<wire x1="0" y1="7" x2="6" y2="3.5" width="0.127" layer="21" curve="-59.743563"/>
+<wire x1="0" y1="-7" x2="-6" y2="-3.5" width="0.127" layer="21" curve="-59.743563"/>
+<wire x1="0" y1="-7" x2="6" y2="-3.5" width="0.127" layer="21" curve="59.743563"/>
+<wire x1="0" y1="7" x2="-6" y2="3.5" width="0.127" layer="21" curve="59.743563"/>
+<wire x1="-6" y1="3.5" x2="-8.5" y2="3.5" width="0.127" layer="21"/>
+<wire x1="-8.5" y1="3.5" x2="-8.5" y2="-3.5" width="0.127" layer="21"/>
+<wire x1="-8.5" y1="-3.5" x2="-6" y2="-3.5" width="0.127" layer="21"/>
+<wire x1="6" y1="3.5" x2="8.5" y2="3.5" width="0.127" layer="21"/>
+<wire x1="8.5" y1="3.5" x2="8.5" y2="-3.5" width="0.127" layer="21"/>
+<wire x1="8.5" y1="-3.5" x2="6" y2="-3.5" width="0.127" layer="21"/>
+<text x="6" y="5" size="0.8" layer="25" font="vector">&gt;NAME</text>
 </package>
 <package name="M1005">
 <smd name="P$1" x="-0.4" y="0" dx="0.4" dy="0.5" layer="1" rot="R180"/>
@@ -5496,15 +5514,15 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="BK-916">
+<deviceset name="BC-2009">
 <gates>
 <gate name="G$1" symbol="BK-916" x="0" y="0"/>
 </gates>
 <devices>
-<device name="BK-916" package="BK-916">
+<device name="" package="BC-2009">
 <connects>
-<connect gate="G$1" pin="GND" pad="2"/>
-<connect gate="G$1" pin="VBAT" pad="1 3"/>
+<connect gate="G$1" pin="GND" pad="N1"/>
+<connect gate="G$1" pin="VBAT" pad="P1 P2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -7650,10 +7668,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="J5" library="joule_shield" deviceset="JST-ZH5" device="JST_ZH_SMT_VERT"/>
 <part name="U$33" library="joule_shield" deviceset="V5P0V_USBB" device=""/>
 <part name="GND34" library="supply1" deviceset="GND" device=""/>
-<part name="JRTC" library="joule_shield" deviceset="BK-916" device="BK-916">
-<attribute name="DPN" value="BK-916-CT-ND"/>
+<part name="JRTC" library="joule_shield" deviceset="BC-2009" device="">
+<attribute name="DPN" value="BC-2009-ND"/>
 <attribute name="MF" value="MPD (Memory Protection Devices)"/>
-<attribute name="MPN" value="BK-916-TR"/>
+<attribute name="MPN" value="BC-2009"/>
 </part>
 <part name="GND35" library="supply1" deviceset="GND" device=""/>
 <part name="R25" library="mf_passives" deviceset="RESISTOR" device="_0603" value="1k">

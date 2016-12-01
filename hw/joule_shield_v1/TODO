@@ -50,7 +50,6 @@ TODO
  * Layout
    * esd diodes have a non-fixed width board font
 
- * Does RTC battery holder schematic mark out how big a battery is?
  * Get DM3AT sample in house and verify footprint
    * ensure that we actually need no-route lines
    * figure out how to handle the shield... should it be connected to
@@ -66,6 +65,7 @@ DONE 2016-11-30
  * Verify orientation and pinout of J6 and J7
  * Ensure there is sufficient room around mounting holes for screw
    heads
+ * Switched to CR1225 RTC battery
 
 DONE 2016-11-11
  * Made primary mounting holes be an actual part instead of just a via
