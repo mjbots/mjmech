@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -36,7 +36,7 @@
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="yes" active="yes"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="yes" active="yes"/>
 <layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
@@ -3531,6 +3531,157 @@ Wickmann</description>
 <wire x1="8.5" y1="-3.5" x2="6" y2="-3.5" width="0.127" layer="21"/>
 <text x="6" y="5" size="0.8" layer="25" font="vector">&gt;NAME</text>
 </package>
+<package name="S-PBGA-N20">
+<smd name="A3" x="0" y="0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0" y="0.9" curve="-90"/>
+<vertex x="0.15" y="0.75" curve="-90"/>
+<vertex x="0" y="0.6" curve="-90"/>
+<vertex x="-0.15" y="0.75" curve="-90"/>
+</polygon>
+<smd name="B3" x="0" y="0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0" y="0.4" curve="-90"/>
+<vertex x="0.15" y="0.25" curve="-90"/>
+<vertex x="0" y="0.1" curve="-90"/>
+<vertex x="-0.15" y="0.25" curve="-90"/>
+</polygon>
+<smd name="C3" x="0" y="-0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0" y="-0.1" curve="-90"/>
+<vertex x="0.15" y="-0.25" curve="-90"/>
+<vertex x="0" y="-0.4" curve="-90"/>
+<vertex x="-0.15" y="-0.25" curve="-90"/>
+</polygon>
+<smd name="D3" x="0" y="-0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0" y="-0.6" curve="-90"/>
+<vertex x="0.15" y="-0.75" curve="-90"/>
+<vertex x="0" y="-0.9" curve="-90"/>
+<vertex x="-0.15" y="-0.75" curve="-90"/>
+</polygon>
+<smd name="A2" x="-0.5" y="0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-0.5" y="0.9" curve="-90"/>
+<vertex x="-0.35" y="0.75" curve="-90"/>
+<vertex x="-0.5" y="0.6" curve="-90"/>
+<vertex x="-0.65" y="0.75" curve="-90"/>
+</polygon>
+<smd name="B2" x="-0.5" y="0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-0.5" y="0.4" curve="-90"/>
+<vertex x="-0.35" y="0.25" curve="-90"/>
+<vertex x="-0.5" y="0.1" curve="-90"/>
+<vertex x="-0.65" y="0.25" curve="-90"/>
+</polygon>
+<smd name="C2" x="-0.5" y="-0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-0.5" y="-0.1" curve="-90"/>
+<vertex x="-0.35" y="-0.25" curve="-90"/>
+<vertex x="-0.5" y="-0.4" curve="-90"/>
+<vertex x="-0.65" y="-0.25" curve="-90"/>
+</polygon>
+<smd name="D2" x="-0.5" y="-0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-0.5" y="-0.6" curve="-90"/>
+<vertex x="-0.35" y="-0.75" curve="-90"/>
+<vertex x="-0.5" y="-0.9" curve="-90"/>
+<vertex x="-0.65" y="-0.75" curve="-90"/>
+</polygon>
+<smd name="A5" x="1" y="0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="1" y="0.9" curve="-90"/>
+<vertex x="1.15" y="0.75" curve="-90"/>
+<vertex x="1" y="0.6" curve="-90"/>
+<vertex x="0.85" y="0.75" curve="-90"/>
+</polygon>
+<smd name="B5" x="1" y="0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="1" y="0.4" curve="-90"/>
+<vertex x="1.15" y="0.25" curve="-90"/>
+<vertex x="1" y="0.1" curve="-90"/>
+<vertex x="0.85" y="0.25" curve="-90"/>
+</polygon>
+<smd name="C5" x="1" y="-0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="1" y="-0.1" curve="-90"/>
+<vertex x="1.15" y="-0.25" curve="-90"/>
+<vertex x="1" y="-0.4" curve="-90"/>
+<vertex x="0.85" y="-0.25" curve="-90"/>
+</polygon>
+<smd name="D5" x="1" y="-0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="1" y="-0.6" curve="-90"/>
+<vertex x="1.15" y="-0.75" curve="-90"/>
+<vertex x="1" y="-0.9" curve="-90"/>
+<vertex x="0.85" y="-0.75" curve="-90"/>
+</polygon>
+<smd name="A4" x="0.5" y="0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0.5" y="0.9" curve="-90"/>
+<vertex x="0.65" y="0.75" curve="-90"/>
+<vertex x="0.5" y="0.6" curve="-90"/>
+<vertex x="0.35" y="0.75" curve="-90"/>
+</polygon>
+<smd name="B4" x="0.5" y="0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0.5" y="0.4" curve="-90"/>
+<vertex x="0.65" y="0.25" curve="-90"/>
+<vertex x="0.5" y="0.1" curve="-90"/>
+<vertex x="0.35" y="0.25" curve="-90"/>
+</polygon>
+<smd name="C4" x="0.5" y="-0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0.5" y="-0.1" curve="-90"/>
+<vertex x="0.65" y="-0.25" curve="-90"/>
+<vertex x="0.5" y="-0.4" curve="-90"/>
+<vertex x="0.35" y="-0.25" curve="-90"/>
+</polygon>
+<smd name="D4" x="0.5" y="-0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="0.5" y="-0.6" curve="-90"/>
+<vertex x="0.65" y="-0.75" curve="-90"/>
+<vertex x="0.5" y="-0.9" curve="-90"/>
+<vertex x="0.35" y="-0.75" curve="-90"/>
+</polygon>
+<smd name="A1" x="-1" y="0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-1" y="0.9" curve="-90"/>
+<vertex x="-0.85" y="0.75" curve="-90"/>
+<vertex x="-1" y="0.6" curve="-90"/>
+<vertex x="-1.15" y="0.75" curve="-90"/>
+</polygon>
+<smd name="B1" x="-1" y="0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-1" y="0.4" curve="-90"/>
+<vertex x="-0.85" y="0.25" curve="-90"/>
+<vertex x="-1" y="0.1" curve="-90"/>
+<vertex x="-1.15" y="0.25" curve="-90"/>
+</polygon>
+<smd name="C1" x="-1" y="-0.25" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-1" y="-0.1" curve="-90"/>
+<vertex x="-0.85" y="-0.25" curve="-90"/>
+<vertex x="-1" y="-0.4" curve="-90"/>
+<vertex x="-1.15" y="-0.25" curve="-90"/>
+</polygon>
+<smd name="D1" x="-1" y="-0.75" dx="0.25" dy="0.25" layer="1" roundness="100" stop="no"/>
+<polygon width="0" layer="29">
+<vertex x="-1" y="-0.6" curve="-90"/>
+<vertex x="-0.85" y="-0.75" curve="-90"/>
+<vertex x="-1" y="-0.9" curve="-90"/>
+<vertex x="-1.15" y="-0.75" curve="-90"/>
+</polygon>
+<wire x1="-1.5" y1="1.25" x2="1.5" y2="1.25" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.25" x2="1.5" y2="-1.25" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-1.25" x2="-1.5" y2="-1.25" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.25" x2="-1.5" y2="1.25" width="0.127" layer="21"/>
+<text x="-1.5" y="1.6" size="0.8" layer="21" font="vector">&gt;NAME</text>
+<wire x1="-1.75" y1="1" x2="-1.25" y2="1" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="1" x2="-1.25" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="1.5" x2="-1.75" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.75" y1="1.5" x2="-1.75" y2="1" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="INTEL_JOULE_J6">
@@ -4088,6 +4239,33 @@ Wickmann</description>
 <circle x="0" y="0" radius="3.5921" width="0.254" layer="94"/>
 <text x="-2.54" y="5.08" size="2.032" layer="94">&gt;NAME</text>
 <pin name="P$1" x="0" y="-5.08" visible="off" length="middle" rot="R90"/>
+</symbol>
+<symbol name="SN74AVCA406L">
+<wire x1="-12.7" y1="25.4" x2="12.7" y2="25.4" width="0.254" layer="94"/>
+<wire x1="12.7" y1="25.4" x2="12.7" y2="-27.94" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-27.94" x2="-12.7" y2="-27.94" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="-27.94" x2="-12.7" y2="25.4" width="0.254" layer="94"/>
+<pin name="VCCA" x="-17.78" y="17.78" length="middle"/>
+<pin name="DAT0_DIR" x="-17.78" y="12.7" length="middle"/>
+<pin name="DAT0A" x="-17.78" y="10.16" length="middle"/>
+<pin name="DAT123_DIR" x="-17.78" y="5.08" length="middle"/>
+<pin name="DAT1A" x="-17.78" y="2.54" length="middle"/>
+<pin name="DAT2A" x="-17.78" y="0" length="middle"/>
+<pin name="DAT3A" x="-17.78" y="-2.54" length="middle"/>
+<pin name="CMD_DIR" x="-17.78" y="-7.62" length="middle"/>
+<pin name="CMDA" x="-17.78" y="-10.16" length="middle"/>
+<pin name="CLKA" x="-17.78" y="-15.24" length="middle"/>
+<pin name="CLKF" x="-17.78" y="-17.78" length="middle"/>
+<pin name="GND" x="-17.78" y="-22.86" length="middle"/>
+<pin name="VCCB" x="17.78" y="17.78" length="middle" rot="R180"/>
+<pin name="DAT0B" x="17.78" y="10.16" length="middle" rot="R180"/>
+<pin name="DAT1B" x="17.78" y="2.54" length="middle" rot="R180"/>
+<pin name="DAT2B" x="17.78" y="0" length="middle" rot="R180"/>
+<pin name="DAT3B" x="17.78" y="-2.54" length="middle" rot="R180"/>
+<pin name="CMDB" x="17.78" y="-10.16" length="middle" rot="R180"/>
+<pin name="CLKB" x="17.78" y="-17.78" length="middle" rot="R180"/>
+<text x="-12.7" y="27.94" size="2.54" layer="94" font="vector">&gt;NAME</text>
+<text x="-10.16" y="22.86" size="1.778" layer="94" font="vector">SN74AVCA406L</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -5780,6 +5958,39 @@ Wickmann</description>
 <connects>
 <connect gate="G$1" pin="GND" pad="N1"/>
 <connect gate="G$1" pin="VBAT" pad="P1 P2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="SN74AVCA406L">
+<gates>
+<gate name="G$1" symbol="SN74AVCA406L" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="S-PBGA-N20">
+<connects>
+<connect gate="G$1" pin="CLKA" pad="A3"/>
+<connect gate="G$1" pin="CLKB" pad="D3"/>
+<connect gate="G$1" pin="CLKF" pad="A1"/>
+<connect gate="G$1" pin="CMDA" pad="B1"/>
+<connect gate="G$1" pin="CMDB" pad="C2"/>
+<connect gate="G$1" pin="CMD_DIR" pad="B5"/>
+<connect gate="G$1" pin="DAT0A" pad="B2"/>
+<connect gate="G$1" pin="DAT0B" pad="D2"/>
+<connect gate="G$1" pin="DAT0_DIR" pad="C5"/>
+<connect gate="G$1" pin="DAT123_DIR" pad="C1"/>
+<connect gate="G$1" pin="DAT1A" pad="A2"/>
+<connect gate="G$1" pin="DAT1B" pad="D1"/>
+<connect gate="G$1" pin="DAT2A" pad="B4"/>
+<connect gate="G$1" pin="DAT2B" pad="C4"/>
+<connect gate="G$1" pin="DAT3A" pad="A4"/>
+<connect gate="G$1" pin="DAT3B" pad="D4"/>
+<connect gate="G$1" pin="GND" pad="B3 C3"/>
+<connect gate="G$1" pin="VCCA" pad="A5"/>
+<connect gate="G$1" pin="VCCB" pad="D5"/>
 </connects>
 <technologies>
 <technology name=""/>

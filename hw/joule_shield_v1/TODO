@@ -12,7 +12,7 @@
      * probably have gimbal drive board daisy chain power to compute
        board
    * SD card
-     * level converter - TXS0206-29 296-25577-1-ND (only works at SD2.0)
+     * level converter - SN74AVCA406L (only SD 2.0)
      * DM3AT-SF-PEJM5 HR1964CT-ND
    * RTC battery - BK-916-BT-ND
    * Fuse
@@ -42,18 +42,15 @@
 TODO
  * Schematic
    * figure out where USB power switch fault and enable line should go
-   * Determine what to do with unused sdcard signals
-     * cmd_dir
-     * dat_dir
-     * lvl_sel
+
+ * Draw supply polys
+ * Connect up all decoupling caps to ground
+ * Route power for main regulators
+ * Route USB lines
 
  * Layout
    * esd diodes have a non-fixed width board font
 
- * Get DM3AT sample in house and verify footprint
-   * ensure that we actually need no-route lines
-   * figure out how to handle the shield... should it be connected to
-     ground?
  * Get JST-ZH5 SMT VERT in house and verify footprint
  * Get 609-4413-ND and verify footprint
  * Figure out some way to buy SMTSO-M1.6's
@@ -66,6 +63,10 @@ DONE 2016-11-30
  * Ensure there is sufficient room around mounting holes for screw
    heads
  * Switched to CR1225 RTC battery
+ * Get DM3AT sample in house and verify footprint
+   * ensure that we actually need no-route lines - yes, done
+   * figure out how to handle the shield... should it be connected to
+     ground?, decided to leave shield unconnected
 
 DONE 2016-11-11
  * Made primary mounting holes be an actual part instead of just a via
