@@ -3516,6 +3516,20 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="-0.75" y1="-0.4" x2="-0.75" y2="0.4" width="0.127" layer="21"/>
 <text x="-0.85" y="1.1" size="0.8" layer="21" font="vector">&gt;NAME</text>
 </package>
+<package name="JST_ZH_SMT_RA_5">
+<smd name="S0" x="-4.95" y="-0.6" dx="1.1" dy="1.9" layer="1" rot="R180"/>
+<smd name="S1" x="4.95" y="-0.6" dx="1.1" dy="1.9" layer="1" rot="R180"/>
+<smd name="3" x="0" y="3.25" dx="0.7" dy="2" layer="1" rot="R180"/>
+<smd name="2" x="-1.5" y="3.25" dx="0.7" dy="2" layer="1" rot="R180"/>
+<smd name="1" x="-3" y="3.25" dx="0.7" dy="2" layer="1" rot="R180"/>
+<smd name="4" x="1.5" y="3.25" dx="0.7" dy="2" layer="1" rot="R180"/>
+<smd name="5" x="3" y="3.25" dx="0.7" dy="2" layer="1" rot="R180"/>
+<wire x1="5" y1="-1.9" x2="-5" y2="-1.9" width="0.127" layer="21"/>
+<wire x1="-5" y1="-1.9" x2="-5" y2="3.6" width="0.127" layer="21"/>
+<wire x1="-5" y1="3.6" x2="5" y2="3.6" width="0.127" layer="21"/>
+<wire x1="5" y1="3.6" x2="5" y2="-1.9" width="0.127" layer="21"/>
+<text x="-7.7" y="4" size="0.8" layer="21">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="BQ25890">
@@ -5531,6 +5545,18 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </gates>
 <devices>
 <device name="JST_ZH_SMT_VERT" package="JST_ZH_SMT_VERT_5">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+<connect gate="G$1" pin="5" pad="5"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SMT_RA" package="JST_ZH_SMT_RA_5">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -7629,7 +7655,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="GND33" library="supply1" deviceset="GND" device=""/>
 <part name="U$35" library="joule_shield" deviceset="V5P0V_USBB" device=""/>
 <part name="U$36" library="joule_shield" deviceset="V5P0V_USBA" device=""/>
-<part name="J5" library="joule_shield" deviceset="JST-ZH5" device="JST_ZH_SMT_VERT"/>
+<part name="J5" library="joule_shield" deviceset="JST-ZH5" device="SMT_RA" value="JST-ZH5SMT_RA"/>
 <part name="U$33" library="joule_shield" deviceset="V5P0V_USBB" device=""/>
 <part name="GND34" library="supply1" deviceset="GND" device=""/>
 <part name="JRTC" library="joule_shield" deviceset="BC-2009" device="">

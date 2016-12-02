@@ -21,7 +21,7 @@
    * BIOS serial - FT231X 768-1128-1-ND
      * USB mini connector MF House part MF-CON-MICROUSB-RIGHT
      * should be able to do direct 1.8V interface without level conversion
-   * USB for camera - 5 pin JST ZH  455-1684-1-ND
+   * USB for camera - 5 pin JST ZH  455-1696-1-ND
    * USB for peripherals - A type female 609-4413-ND
    * threaded fasteners for Joule module
      * I think PEM: SMTSO-M1.6-2ET is the right one, but will need to
@@ -40,8 +40,9 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Get JST-ZH5 SMT VERT in house and verify footprint
- * Get 609-4413-ND and verify footprint
+ * Get JST-ZH5 SMT RA in house and verify footprint
+
+ * ERC
 
  * Board
    * Align all parts to be evenly spaced as I want
@@ -57,8 +58,11 @@ TODO
  * Align all parts and silks
 
 DONE 2016-12-01
-   * Draw supply polys
-   * connected up usb power switch and fault to GPIO pins
+ * Draw supply polys
+ * connected up usb power switch and fault to GPIO pins
+ * Verified footprint of 609-4413-ND
+ * Ordered ZH5 RA connector to test footprint
+ * Made a pass at aligning everything up
 
 DONE 2016-11-30
  * Most of draft routing complete
