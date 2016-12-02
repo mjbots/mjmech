@@ -45,7 +45,6 @@ TODO
  * ERC
 
  * Board
-   * Align all parts to be evenly spaced as I want
    * Route USB lines
    * Connect up all decoupling caps to ground
    * Route power for main regulators
@@ -56,6 +55,7 @@ TODO
  * Figure out some way to buy SMTSO-M1.6's
 
  * Align all parts and silks
+ * DRC
 
 DONE 2016-12-01
  * Draw supply polys
