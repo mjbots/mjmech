@@ -57,6 +57,8 @@ TODO
  * Align all parts and silks
  * DRC
 
+ * Manually placed vias are 0.32mm, auto-router ones 0.3048mm
+
 DONE 2016-12-01
  * Draw supply polys
  * connected up usb power switch and fault to GPIO pins
