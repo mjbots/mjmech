@@ -40,22 +40,25 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Schematic
-   * figure out where USB power switch fault and enable line should go
+ * Get JST-ZH5 SMT VERT in house and verify footprint
+ * Get 609-4413-ND and verify footprint
 
- * Draw supply polys
- * Connect up all decoupling caps to ground
- * Route power for main regulators
- * Route USB lines
+ * Board
+   * Align all parts to be evenly spaced as I want
+   * Route USB lines
+   * Connect up all decoupling caps to ground
+   * Route power for main regulators
 
  * Layout
    * esd diodes have a non-fixed width board font
 
- * Get JST-ZH5 SMT VERT in house and verify footprint
- * Get 609-4413-ND and verify footprint
  * Figure out some way to buy SMTSO-M1.6's
 
  * Align all parts and silks
+
+DONE 2016-12-01
+   * Draw supply polys
+   * connected up usb power switch and fault to GPIO pins
 
 DONE 2016-11-30
  * Most of draft routing complete
