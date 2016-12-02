@@ -7857,6 +7857,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </part>
 <part name="U$56" library="joule_shield" deviceset="VDD1" device=""/>
 <part name="U$57" library="joule_shield" deviceset="VDD1" device=""/>
+<part name="U$58" library="joule_shield" deviceset="VRTC" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7894,6 +7895,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U$53" gate="G$1" x="93.98" y="-17.78"/>
 <instance part="U$54" gate="G$1" x="104.14" y="-17.78"/>
 <instance part="U$55" gate="G$1" x="114.3" y="-17.78"/>
+<instance part="U$58" gate="G$1" x="-10.16" y="172.72"/>
 </instances>
 <busses>
 </busses>
@@ -8082,13 +8084,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="93.98" y="81.28" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="SDCARD_PWR_DOWN_N" class="0">
-<segment>
-<pinref part="J6" gate="G$1" pin="SDCARD_PWR_DOWN_N"/>
-<wire x1="81.28" y1="53.34" x2="101.6" y2="53.34" width="0.1524" layer="91"/>
-<label x="93.98" y="53.34" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="UART2_TX" class="0">
 <segment>
 <pinref part="J6" gate="G$1" pin="UART2_TXD"/>
@@ -8185,6 +8180,42 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="J6" gate="G$1" pin="ISH_GPIO_6"/>
 <wire x1="81.28" y1="88.9" x2="109.22" y2="88.9" width="0.1524" layer="91"/>
 <label x="93.98" y="88.9" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="JOULE_RX_18V" class="0">
+<segment>
+<pinref part="J6" gate="G$1" pin="UART_1_RXD"/>
+<wire x1="81.28" y1="157.48" x2="109.22" y2="157.48" width="0.1524" layer="91"/>
+<label x="93.98" y="157.48" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="JOULE_TX_18V" class="0">
+<segment>
+<pinref part="J6" gate="G$1" pin="UART_1_TXD"/>
+<wire x1="81.28" y1="154.94" x2="109.22" y2="154.94" width="0.1524" layer="91"/>
+<label x="93.98" y="154.94" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="VRTC" class="0">
+<segment>
+<pinref part="U$58" gate="G$1" pin="VRTC"/>
+<pinref part="J6" gate="G$1" pin="VRTC"/>
+<wire x1="20.32" y1="154.94" x2="-10.16" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="-10.16" y1="154.94" x2="-10.16" y2="172.72" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="I2C_0_SCL" class="0">
+<segment>
+<pinref part="J6" gate="G$1" pin="I2C_0_SCL"/>
+<wire x1="81.28" y1="111.76" x2="109.22" y2="111.76" width="0.1524" layer="91"/>
+<label x="93.98" y="111.76" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="I2C_0_SDA" class="0">
+<segment>
+<pinref part="J6" gate="G$1" pin="I2C_0_SDA"/>
+<wire x1="81.28" y1="109.22" x2="109.22" y2="109.22" width="0.1524" layer="91"/>
+<label x="93.98" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
