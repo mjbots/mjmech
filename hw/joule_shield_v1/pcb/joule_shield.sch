@@ -7529,7 +7529,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$10" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="U$11" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="U$12" library="joule_shield" deviceset="V5P0V" device=""/>
-<part name="U$13" library="joule_shield" deviceset="V5P0V" device=""/>
 <part name="U$14" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="U$15" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="U$16" library="joule_shield" deviceset="VSYS" device=""/>
@@ -7787,7 +7786,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R39" library="mf_passives" deviceset="RESISTOR" device="_0603" value="470">
 <attribute name="MPN" value="MF-RES-0603-470"/>
 </part>
-<part name="U$47" library="joule_shield" deviceset="V5P0V" device=""/>
 <part name="U$48" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
 <part name="U$49" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
 <part name="U$50" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
@@ -7858,6 +7856,8 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$56" library="joule_shield" deviceset="VDD1" device=""/>
 <part name="U$57" library="joule_shield" deviceset="VDD1" device=""/>
 <part name="U$58" library="joule_shield" deviceset="VRTC" device=""/>
+<part name="U$47" library="joule_shield" deviceset="VSYS" device=""/>
+<part name="U$13" library="joule_shield" deviceset="VSYS" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -8699,6 +8699,11 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="53.34" y1="10.16" x2="53.34" y2="12.7" width="0.1524" layer="91"/>
 <pinref part="U$11" gate="G$1" pin="VSYS"/>
 </segment>
+<segment>
+<pinref part="R12" gate="G$1" pin="P$1"/>
+<wire x1="127" y1="55.88" x2="127" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="U$13" gate="G$1" pin="VSYS"/>
+</segment>
 </net>
 <net name="V5P0V" class="0">
 <segment>
@@ -8714,11 +8719,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="147.32" y1="63.5" x2="147.32" y2="60.96" width="0.1524" layer="91"/>
 <junction x="142.24" y="63.5"/>
 <pinref part="U$12" gate="G$1" pin="V5P0V"/>
-</segment>
-<segment>
-<pinref part="R12" gate="G$1" pin="P$1"/>
-<wire x1="127" y1="55.88" x2="127" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="U$13" gate="G$1" pin="V5P0V"/>
 </segment>
 </net>
 </nets>
@@ -10318,7 +10318,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="R37" gate="G$1" x="50.8" y="63.5"/>
 <instance part="R38" gate="G$1" x="68.58" y="63.5"/>
 <instance part="R39" gate="G$1" x="91.44" y="63.5"/>
-<instance part="U$47" gate="G$1" x="76.2" y="86.36"/>
 <instance part="Q1" gate="G$1" x="48.26" y="33.02">
 <attribute name="DPN" x="48.26" y="33.02" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="48.26" y="33.02" size="1.778" layer="96" display="off"/>
@@ -10334,6 +10333,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MF" x="88.9" y="5.08" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="88.9" y="5.08" size="1.778" layer="96" display="off"/>
 </instance>
+<instance part="U$47" gate="G$1" x="76.2" y="91.44"/>
 </instances>
 <busses>
 </busses>
@@ -10364,23 +10364,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="R33" gate="G$1" pin="P$1"/>
 <wire x1="38.1" y1="22.86" x2="38.1" y2="-17.78" width="0.1524" layer="91"/>
 <junction x="38.1" y="-17.78"/>
-</segment>
-</net>
-<net name="V5P0V" class="0">
-<segment>
-<wire x1="76.2" y1="78.74" x2="76.2" y2="86.36" width="0.1524" layer="91"/>
-<pinref part="U$47" gate="G$1" pin="V5P0V"/>
-<wire x1="76.2" y1="78.74" x2="68.58" y2="78.74" width="0.1524" layer="91"/>
-<junction x="76.2" y="78.74"/>
-<wire x1="68.58" y1="78.74" x2="50.8" y2="78.74" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="78.74" x2="91.44" y2="78.74" width="0.1524" layer="91"/>
-<pinref part="R37" gate="G$1" pin="P$1"/>
-<wire x1="50.8" y1="78.74" x2="50.8" y2="68.58" width="0.1524" layer="91"/>
-<pinref part="R38" gate="G$1" pin="P$1"/>
-<wire x1="68.58" y1="78.74" x2="68.58" y2="68.58" width="0.1524" layer="91"/>
-<junction x="68.58" y="78.74"/>
-<pinref part="R39" gate="G$1" pin="P$1"/>
-<wire x1="91.44" y1="78.74" x2="91.44" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$56" class="0">
@@ -10453,6 +10436,23 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="33.02" y1="5.08" x2="83.82" y2="5.08" width="0.1524" layer="91"/>
 <pinref part="Q3" gate="G$1" pin="G"/>
 <junction x="33.02" y="5.08"/>
+</segment>
+</net>
+<net name="VSYS" class="0">
+<segment>
+<pinref part="U$47" gate="G$1" pin="VSYS"/>
+<wire x1="76.2" y1="78.74" x2="76.2" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="78.74" x2="68.58" y2="78.74" width="0.1524" layer="91"/>
+<junction x="76.2" y="78.74"/>
+<wire x1="68.58" y1="78.74" x2="50.8" y2="78.74" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="78.74" x2="91.44" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="R37" gate="G$1" pin="P$1"/>
+<wire x1="50.8" y1="78.74" x2="50.8" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="R38" gate="G$1" pin="P$1"/>
+<wire x1="68.58" y1="78.74" x2="68.58" y2="68.58" width="0.1524" layer="91"/>
+<junction x="68.58" y="78.74"/>
+<pinref part="R39" gate="G$1" pin="P$1"/>
+<wire x1="91.44" y1="78.74" x2="91.44" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

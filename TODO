@@ -1,3 +1,5 @@
+ * Verify Joule 5GHz wifi works
+
  * Get prototype Joule shield working
  * Update gimbal driver to have
    * mounting location for joule shield
@@ -63,6 +65,10 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2016-12-02
+ * Verified that UART0 and UART1 work in joule ubuntu, up to 4M baud
+   each
 
 DONE 2016-11-10
  * Sent in order for beefier mammal shoulder bracket to 3dhubs after
