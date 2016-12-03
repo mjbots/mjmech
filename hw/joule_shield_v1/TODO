@@ -45,8 +45,7 @@ TODO
  * ERC
 
  * Board
-   * Route USB lines
-   * Connect up all decoupling caps to ground
+   * ensure all power rails are routed with non minimum width traces
    * Route power for main regulators
 
  * Layout
