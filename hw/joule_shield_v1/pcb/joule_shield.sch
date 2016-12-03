@@ -7309,6 +7309,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <classes>
 <class number="0" name="default" width="0" drill="0">
 </class>
+<class number="1" name="USB" width="0.1524" drill="0.3048">
+<clearance class="1" value="0.0762"/>
+</class>
 </classes>
 <parts>
 <part name="U1" library="joule_shield" deviceset="BQ25892" device="PWQFN-24">
@@ -7980,7 +7983,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="-27.94" y1="43.18" x2="-27.94" y2="63.5" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="USB2_0_N" class="0">
+<net name="USB2_0_N" class="1">
 <segment>
 <pinref part="J6" gate="G$1" pin="USB2_0_DN"/>
 <pinref part="J4" gate="G$1" pin="D-"/>
@@ -7988,7 +7991,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="-15.24" y="38.1" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="USB2_0_P" class="0">
+<net name="USB2_0_P" class="1">
 <segment>
 <pinref part="J4" gate="G$1" pin="D+"/>
 <wire x1="-38.1" y1="33.02" x2="-25.4" y2="33.02" width="0.1524" layer="91"/>
@@ -8006,7 +8009,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="279.4" y1="68.58" x2="294.64" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="USB2_1_N" class="0">
+<net name="USB2_1_N" class="1">
 <segment>
 <pinref part="J7" gate="G$1" pin="USB2_1_DN"/>
 <wire x1="246.38" y1="73.66" x2="256.54" y2="73.66" width="0.1524" layer="91"/>
@@ -8016,7 +8019,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="264.16" y="71.12" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="USB2_1_P" class="0">
+<net name="USB2_1_P" class="1">
 <segment>
 <pinref part="J7" gate="G$1" pin="USB2_1_DP"/>
 <wire x1="246.38" y1="71.12" x2="254" y2="71.12" width="0.1524" layer="91"/>
@@ -10288,14 +10291,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="60.96" y1="66.04" x2="66.04" y2="66.04" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$48" class="0">
+<net name="N$48" class="1">
 <segment>
 <pinref part="R29" gate="G$1" pin="P$1"/>
 <pinref part="J1" gate="G$1" pin="D+"/>
 <wire x1="50.8" y1="66.04" x2="5.08" y2="66.04" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$50" class="0">
+<net name="N$50" class="1">
 <segment>
 <pinref part="R28" gate="G$1" pin="P$1"/>
 <pinref part="J1" gate="G$1" pin="D-"/>
