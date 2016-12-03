@@ -7861,6 +7861,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$58" library="joule_shield" deviceset="VRTC" device=""/>
 <part name="U$47" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="U$13" library="joule_shield" deviceset="VSYS" device=""/>
+<part name="C43" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -9451,6 +9454,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U$25" gate="G$1" x="33.02" y="43.18"/>
 <instance part="C29" gate="G$1" x="25.4" y="27.94"/>
 <instance part="U$26" gate="G$1" x="96.52" y="91.44"/>
+<instance part="C43" gate="G$1" x="27.94" y="81.28"/>
 </instances>
 <busses>
 </busses>
@@ -9467,6 +9471,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="83.82" y1="88.9" x2="83.82" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="U7" gate="G$1" pin="DIR"/>
 <wire x1="83.82" y1="73.66" x2="78.74" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="88.9" x2="27.94" y2="88.9" width="0.1524" layer="91"/>
+<pinref part="C43" gate="G$1" pin="P$1"/>
+<wire x1="27.94" y1="88.9" x2="27.94" y2="83.82" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U$24" gate="G$1" pin="V5P0V"/>
@@ -9478,9 +9485,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <net name="GND" class="0">
 <segment>
 <pinref part="GND24" gate="1" pin="GND"/>
-<wire x1="45.72" y1="60.96" x2="45.72" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="45.72" y1="60.96" x2="45.72" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="U7" gate="G$1" pin="GND"/>
+<wire x1="45.72" y1="63.5" x2="45.72" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="73.66" x2="53.34" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="C43" gate="G$1" pin="P$2"/>
+<wire x1="27.94" y1="78.74" x2="27.94" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="63.5" x2="45.72" y2="63.5" width="0.1524" layer="91"/>
+<junction x="45.72" y="63.5"/>
 </segment>
 <segment>
 <pinref part="GND25" gate="1" pin="GND"/>
