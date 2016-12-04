@@ -7318,6 +7318,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="296-41131-1-ND"/>
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MPN" value="BQ25892RTWT"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="C1" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
@@ -7382,10 +7383,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="L1" library="joule_shield" deviceset="INDUCTOR" device="SPM4012" value="1uH">
 <attribute name="DPN" value="445-15777-1-ND"/>
 <attribute name="MPN" value="SPM4012T-1R0M"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U2" library="joule_shield" deviceset="FAN8623" device="WLCSP16">
 <attribute name="DPN" value="FAN48623UC50XCT-ND"/>
 <attribute name="MPN" value="FAN48623UC50X"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="C9" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="10uF">
 <attribute name="DPN" value="445-9015-1-ND"/>
@@ -7401,6 +7404,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="L2" library="joule_shield" deviceset="INDUCTOR" device="DFE252010P" value="470nH">
 <attribute name="DPN" value="490-10641-1-ND"/>
 <attribute name="MPN" value="DFE252010P-R47M=P2"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="R9" library="mf_passives" deviceset="RESISTOR" device="_0603" value="100k">
 <attribute name="MPN" value="MF-RES-0603-100K"/>
@@ -7425,11 +7429,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="CL10A226MP8NUNE"/>
 </part>
 <part name="GND11" library="supply1" deviceset="GND" device=""/>
-<part name="TP1" library="testpad" deviceset="TPSQ" device="B1,27"/>
+<part name="TP1" library="testpad" deviceset="TPSQ" device="B1,27">
+<attribute name="POPULATE" value="0"/>
+</part>
 <part name="U3" library="joule_shield" deviceset="TPS63201" device="PVSON-14">
 <attribute name="DPN" value="296-27259-1-ND"/>
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MPN" value="TPS63021DSJR"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="C13" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="10uF">
 <attribute name="DPN" value="445-9015-1-ND"/>
@@ -7446,6 +7453,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="L3" library="joule_shield" deviceset="INDUCTOR" device="SPM4012" value="1uH">
 <attribute name="DPN" value="445-15777-1-ND"/>
 <attribute name="MPN" value="SPM4012T-1R0M"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="C16" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
@@ -7473,12 +7481,15 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="C20" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="1uF">
 <attribute name="MPN" value="MF-CAP-0603-1uF"/>
 </part>
-<part name="TP2" library="testpad" deviceset="TPSQ" device="B1,27"/>
+<part name="TP2" library="testpad" deviceset="TPSQ" device="B1,27">
+<attribute name="POPULATE" value="0"/>
+</part>
 <part name="GND15" library="supply1" deviceset="GND" device=""/>
 <part name="U4" library="joule_shield" deviceset="TLV62084" device="PWSON-8">
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MOUSER" value="595-TLV62084DSGR"/>
 <attribute name="MPN" value="TLV62084DSGR"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="C21" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="10uF">
 <attribute name="DPN" value="445-9015-1-ND"/>
@@ -7491,6 +7502,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="L4" library="joule_shield" deviceset="INDUCTOR" device="SPM4012" value="1uH">
 <attribute name="DPN" value="445-15777-1-ND"/>
 <attribute name="MPN" value="SPM4012T-1R0M"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND17" library="supply1" deviceset="GND" device=""/>
 <part name="C23" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="22uF">
@@ -7507,7 +7519,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R15" library="mf_passives" deviceset="RESISTOR" device="_0603" value="100k">
 <attribute name="MPN" value="MF-RES-0603-100K"/>
 </part>
-<part name="TP3" library="testpad" deviceset="TPSQ" device="B1,27"/>
+<part name="TP3" library="testpad" deviceset="TPSQ" device="B1,27">
+<attribute name="POPULATE" value="0"/>
+</part>
 <part name="R16" library="mf_passives" deviceset="RESISTOR" device="_0603" value="110.0k 1%">
 <attribute name="DPN" value="P110KHCT-ND"/>
 <attribute name="MPN" value="ERJ-3EKF1103V"/>
@@ -7543,6 +7557,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="296-23999-1-ND"/>
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MPN" value="TPS2553DRVT"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U$21" library="joule_shield" deviceset="V5P0V" device=""/>
 <part name="C26" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="10uF">
@@ -7574,11 +7589,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="296-16843-1-ND"/>
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MPN" value="SN74LVC1T45DBVR"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U8" library="joule_shield" deviceset="SINGLE-BIT_BUS_TRANSCEIVER" device="">
 <attribute name="DPN" value="296-16843-1-ND"/>
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MPN" value="SN74LVC1T45DBVR"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U$23" library="joule_shield" deviceset="V5P0V" device=""/>
 <part name="U$24" library="joule_shield" deviceset="V5P0V" device=""/>
@@ -7595,26 +7612,31 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="455-2262-1-ND"/>
 <attribute name="MF" value="JST Sales America Inc."/>
 <attribute name="MPN" value="S4B-XH-SM4-TB(LF)(SN)"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="F1" library="joule_shield" deviceset="FUSE" device="FUSE_467">
 <attribute name="DPN" value="F1400CT-ND"/>
 <attribute name="MF" value="Littlefuse"/>
 <attribute name="MPN" value="046703.5NR"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="D2" library="joule_shield" deviceset="DIODE-" device="B520C">
 <attribute name="DPN" value="B520C-FDICT-ND"/>
 <attribute name="MF" value="Diodes Incorporated"/>
 <attribute name="MPN" value="B520C-13-F"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="J6" library="joule_shield" deviceset="INTEL_JOULE_J6" device="">
 <attribute name="DPN" value="H11615CT-ND"/>
 <attribute name="MF" value="Hirose Electric Co Ltd"/>
 <attribute name="MPN" value="DF40C-100DS-0.4V(51)"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="J7" library="joule_shield" deviceset="INTEL_JOULE_J7" device="">
 <attribute name="DPN" value="H11615CT-ND"/>
 <attribute name="MF" value="Hirose Electric Co Ltd"/>
 <attribute name="MPN" value="DF40C-100DS-0.4V(51)"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U$27" library="joule_shield" deviceset="VIN_CHRG" device=""/>
 <part name="U$29" library="joule_shield" deviceset="VSYS" device=""/>
@@ -7623,12 +7645,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$31" library="joule_shield" deviceset="VDD1" device=""/>
 <part name="U$32" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="GND28" library="supply1" deviceset="GND" device=""/>
-<part name="J4" library="joule_shield" deviceset="USB_A" device="USB_A_SMT_RA"/>
+<part name="J4" library="joule_shield" deviceset="USB_A" device="USB_A_SMT_RA">
+<attribute name="DPN" value="609-4413-ND"/>
+<attribute name="MF" value="Amphenol"/>
+<attribute name="MPN" value="87583-2010BLF"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="GND29" library="supply1" deviceset="GND" device=""/>
 <part name="U6" library="joule_shield" deviceset="TPS2553" device="PWSON-6">
 <attribute name="DPN" value="296-23999-1-ND"/>
 <attribute name="MF" value="Texas Instruments"/>
 <attribute name="MPN" value="TPS2553DRVT"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U$34" library="joule_shield" deviceset="V5P0V" device=""/>
 <part name="C30" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="10uF">
@@ -7657,13 +7685,19 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="GND33" library="supply1" deviceset="GND" device=""/>
 <part name="U$35" library="joule_shield" deviceset="V5P0V_USBB" device=""/>
 <part name="U$36" library="joule_shield" deviceset="V5P0V_USBA" device=""/>
-<part name="J5" library="joule_shield" deviceset="JST-ZH5" device="SMT_RA" value="JST-ZH5SMT_RA"/>
+<part name="J5" library="joule_shield" deviceset="JST-ZH5" device="SMT_RA" value="JST-ZH5SMT_RA">
+<attribute name="DPN" value="455-1696-1-ND"/>
+<attribute name="MF" value="JST"/>
+<attribute name="MPN" value="S5B-ZR-SM4A-TF(LF)(SN)"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="U$33" library="joule_shield" deviceset="V5P0V_USBB" device=""/>
 <part name="GND34" library="supply1" deviceset="GND" device=""/>
 <part name="JRTC" library="joule_shield" deviceset="BC-2009" device="">
 <attribute name="DPN" value="BC-2009-ND"/>
 <attribute name="MF" value="MPD (Memory Protection Devices)"/>
 <attribute name="MPN" value="BC-2009"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND35" library="supply1" deviceset="GND" device=""/>
 <part name="R25" library="mf_passives" deviceset="RESISTOR" device="_0603" value="1k">
@@ -7674,11 +7708,22 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="D3" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>
 <attribute name="MPN" value="LXES15AAA1-133"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="U$38" library="joule_shield" deviceset="V1P8V" device=""/>
 <part name="U$39" library="joule_shield" deviceset="V3P3V" device=""/>
-<part name="FB1" library="joule_shield" deviceset="FERRITE_BEAD" device=""/>
-<part name="FB2" library="joule_shield" deviceset="FERRITE_BEAD" device=""/>
+<part name="FB1" library="joule_shield" deviceset="FERRITE_BEAD" device="">
+<attribute name="DPN" value="490-5203-1-ND"/>
+<attribute name="MF" value="Murata"/>
+<attribute name="MPN" value="BLM15PD121SN1D"/>
+<attribute name="POPULATE" value="1"/>
+</part>
+<part name="FB2" library="joule_shield" deviceset="FERRITE_BEAD" device="">
+<attribute name="DPN" value="490-5203-1-ND"/>
+<attribute name="MF" value="Murata"/>
+<attribute name="MPN" value="BLM15PD121SN1D"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="C33" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
 </part>
@@ -7692,7 +7737,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="GND37" library="supply1" deviceset="GND" device=""/>
 <part name="GND38" library="supply1" deviceset="GND" device=""/>
 <part name="GND39" library="supply1" deviceset="GND" device=""/>
-<part name="J8" library="joule_shield" deviceset="DM3AT" device="DM3AT"/>
+<part name="J8" library="joule_shield" deviceset="DM3AT" device="DM3AT">
+<attribute name="DPN" value="HR1964CT-ND"/>
+<attribute name="MF" value="Hirose"/>
+<attribute name="MPN" value="DM3AT-SF-PEJM5"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="GND40" library="supply1" deviceset="GND" device=""/>
 <part name="C36" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
@@ -7701,7 +7751,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R26" library="mf_passives" deviceset="RESISTOR" device="_0603" value="100k">
 <attribute name="MPN" value="MF-RES-0603-100K"/>
 </part>
-<part name="U$41" library="joule_shield" deviceset="AMP_MINI_FAN" device=""/>
+<part name="JFAN" library="joule_shield" deviceset="AMP_MINI_FAN" device="">
+<attribute name="DPN" value="A101008CT-ND"/>
+<attribute name="MF" value="TE Connectivity"/>
+<attribute name="MPN" value="292228-3"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="U$42" library="joule_shield" deviceset="V5P0V" device=""/>
 <part name="C37" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
@@ -7712,7 +7767,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="MF-RES-0603-10K"/>
 </part>
 <part name="GND44" library="supply1" deviceset="GND" device=""/>
-<part name="U10" library="joule_shield" deviceset="FT231X" device="QFN-20"/>
+<part name="U10" library="joule_shield" deviceset="FT231X" device="QFN-20">
+<attribute name="DPN" value="768-1128-1-ND"/>
+<attribute name="MF" value="FTDI"/>
+<attribute name="MPN" value="FT231XQ-R"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="GND45" library="supply1" deviceset="GND" device=""/>
 <part name="J1" library="mf_connectors" deviceset="USB" device="_MICRO_RIGHT" value="MF-CON-MICROUSB-RIGHT"/>
 <part name="U$45" library="joule_shield" deviceset="V1P8V" device=""/>
@@ -7720,8 +7780,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="D4" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>
 <attribute name="MPN" value="LXES15AAA1-133"/>
+<attribute name="POPULATE" value="1"/>
 </part>
-<part name="FB3" library="joule_shield" deviceset="FERRITE_BEAD" device=""/>
+<part name="FB3" library="joule_shield" deviceset="FERRITE_BEAD" device="">
+<attribute name="DPN" value="490-5203-1-ND"/>
+<attribute name="MF" value="Murata"/>
+<attribute name="MPN" value="BLM15PD121SN1D"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="C38" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
 </part>
@@ -7745,6 +7811,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="D5" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>
 <attribute name="MPN" value="LXES15AAA1-133"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="R30" library="mf_passives" deviceset="RESISTOR" device="_0603" value="0">
 <attribute name="MPN" value="MF-RES-0603-0"/>
@@ -7756,6 +7823,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="D6" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>
 <attribute name="MPN" value="LXES15AAA1-133"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND49" library="supply1" deviceset="GND" device=""/>
 <part name="U$46" library="joule_shield" deviceset="VDD1" device=""/>
@@ -7765,6 +7833,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="D7" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>
 <attribute name="MPN" value="LXES15AAA1-133"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND50" library="supply1" deviceset="GND" device=""/>
 <part name="D8" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
@@ -7789,14 +7858,30 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R39" library="mf_passives" deviceset="RESISTOR" device="_0603" value="470">
 <attribute name="MPN" value="MF-RES-0603-470"/>
 </part>
-<part name="U$48" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
-<part name="U$49" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
-<part name="U$50" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
-<part name="U$51" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6"/>
-<part name="U$52" library="joule_shield" deviceset="M2.5MOUNT" device=""/>
-<part name="U$53" library="joule_shield" deviceset="M2.5MOUNT" device=""/>
-<part name="U$54" library="joule_shield" deviceset="M2.5MOUNT" device=""/>
-<part name="U$55" library="joule_shield" deviceset="M2.5MOUNT" device=""/>
+<part name="U$48" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$49" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$50" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$51" library="joule_shield" deviceset="SMTSO" device="SMTSO-M1.6">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$52" library="joule_shield" deviceset="M2.5MOUNT" device="">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$53" library="joule_shield" deviceset="M2.5MOUNT" device="">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$54" library="joule_shield" deviceset="M2.5MOUNT" device="">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="U$55" library="joule_shield" deviceset="M2.5MOUNT" device="">
+<attribute name="POPULATE" value="0"/>
+</part>
 <part name="GND52" library="supply1" deviceset="GND" device=""/>
 <part name="U$40" library="joule_shield" deviceset="VSYS" device=""/>
 <part name="C41" library="mf_passives" deviceset="CAPACITOR_NP" device="_0805" value="47uF">
@@ -7807,7 +7892,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="445-8239-1-ND"/>
 <attribute name="MPN" value="C2012X5R1A476M125AC"/>
 </part>
-<part name="U9" library="joule_shield" deviceset="SN74AVCA406L" device=""/>
+<part name="U9" library="joule_shield" deviceset="SN74AVCA406L" device="">
+<attribute name="DPN" value="296-21023-1-ND"/>
+<attribute name="MF" value="Texas Instruments"/>
+<attribute name="MPN" value="SN74AVCA406LZXYR"/>
+<attribute name="POPULATE" value="1"/>
+</part>
 <part name="R41" library="mf_passives" deviceset="RESISTOR" device="_0603" value="100k">
 <attribute name="MPN" value="MF-RES-0603-100K"/>
 </part>
@@ -7827,26 +7917,31 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="RE1C002UNTCLCT-ND"/>
 <attribute name="MF" value="Rohm Semiconductor"/>
 <attribute name="MPN" value="RE1C002UNTCL"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="Q2" library="joule_shield" deviceset="NFET" device="EMT3F">
 <attribute name="DPN" value="RE1C002UNTCLCT-ND"/>
 <attribute name="MF" value="Rohm Semiconductor"/>
 <attribute name="MPN" value="RE1C002UNTCL"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="Q3" library="joule_shield" deviceset="NFET" device="EMT3F">
 <attribute name="DPN" value="RE1C002UNTCL"/>
 <attribute name="MF" value="Rohm Semiconductor"/>
 <attribute name="MPN" value="RE1C002UNTCL"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="Q4" library="joule_shield" deviceset="NFET" device="EMT3F">
 <attribute name="DPN" value="RE1C002UNTCLCT-ND"/>
 <attribute name="MF" value="Rohm Semiconductor"/>
 <attribute name="MPN" value="RE1C002UNTCL"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="Q5" library="joule_shield" deviceset="NFET" device="EMT3F">
 <attribute name="DPN" value="RE1C002UNTCLCT-ND"/>
 <attribute name="MF" value="Rohm Semiconductor"/>
 <attribute name="MPN" value="RE1C002UNTCL"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND42" library="supply1" deviceset="GND" device=""/>
 <part name="GND53" library="supply1" deviceset="GND" device=""/>
@@ -7874,11 +7969,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="50.8" y="93.98" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="50.8" y="93.98" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="50.8" y="93.98" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="50.8" y="93.98" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="J7" gate="G$1" x="215.9" y="104.14">
 <attribute name="DPN" x="215.9" y="104.14" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="215.9" y="104.14" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="215.9" y="104.14" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="215.9" y="104.14" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$27" gate="G$1" x="-20.32" y="177.8"/>
 <instance part="U$29" gate="G$1" x="-25.4" y="165.1"/>
@@ -7887,20 +7984,46 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U$31" gate="G$1" x="12.7" y="182.88"/>
 <instance part="U$32" gate="G$1" x="180.34" y="170.18"/>
 <instance part="GND28" gate="1" x="162.56" y="152.4"/>
-<instance part="J4" gate="G$1" x="-53.34" y="33.02"/>
+<instance part="J4" gate="G$1" x="-53.34" y="33.02">
+<attribute name="DPN" x="-53.34" y="33.02" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="-53.34" y="33.02" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="-53.34" y="33.02" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="-53.34" y="33.02" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="GND29" gate="1" x="-30.48" y="15.24"/>
 <instance part="U$36" gate="G$1" x="-27.94" y="63.5"/>
-<instance part="J5" gate="G$1" x="299.72" y="73.66" rot="R180"/>
+<instance part="J5" gate="G$1" x="299.72" y="73.66" rot="R180">
+<attribute name="DPN" x="299.72" y="73.66" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="MF" x="299.72" y="73.66" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="MPN" x="299.72" y="73.66" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="POPULATE" x="299.72" y="73.66" size="1.778" layer="96" rot="R180" display="off"/>
+</instance>
 <instance part="U$33" gate="G$1" x="279.4" y="93.98"/>
 <instance part="GND34" gate="1" x="287.02" y="60.96"/>
-<instance part="U$48" gate="G$1" x="-25.4" y="-22.86"/>
-<instance part="U$49" gate="G$1" x="-7.62" y="-22.86"/>
-<instance part="U$50" gate="G$1" x="10.16" y="-22.86"/>
-<instance part="U$51" gate="G$1" x="27.94" y="-22.86"/>
-<instance part="U$52" gate="G$1" x="83.82" y="-17.78"/>
-<instance part="U$53" gate="G$1" x="93.98" y="-17.78"/>
-<instance part="U$54" gate="G$1" x="104.14" y="-17.78"/>
-<instance part="U$55" gate="G$1" x="114.3" y="-17.78"/>
+<instance part="U$48" gate="G$1" x="-25.4" y="-22.86">
+<attribute name="POPULATE" x="-25.4" y="-22.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$49" gate="G$1" x="-7.62" y="-22.86">
+<attribute name="POPULATE" x="-7.62" y="-22.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$50" gate="G$1" x="10.16" y="-22.86">
+<attribute name="POPULATE" x="10.16" y="-22.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$51" gate="G$1" x="27.94" y="-22.86">
+<attribute name="POPULATE" x="27.94" y="-22.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$52" gate="G$1" x="83.82" y="-17.78">
+<attribute name="POPULATE" x="83.82" y="-17.78" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$53" gate="G$1" x="93.98" y="-17.78">
+<attribute name="POPULATE" x="93.98" y="-17.78" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$54" gate="G$1" x="104.14" y="-17.78">
+<attribute name="POPULATE" x="104.14" y="-17.78" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="U$55" gate="G$1" x="114.3" y="-17.78">
+<attribute name="POPULATE" x="114.3" y="-17.78" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="U$58" gate="G$1" x="-10.16" y="172.72"/>
 </instances>
 <busses>
@@ -8234,6 +8357,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="96.52" y="38.1" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="96.52" y="38.1" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="96.52" y="38.1" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="96.52" y="38.1" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C1" gate="G$1" x="71.12" y="96.52"/>
 <instance part="C2" gate="G$1" x="81.28" y="96.52">
@@ -8275,6 +8399,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="L1" gate="L$1" x="152.4" y="96.52">
 <attribute name="DPN" x="152.4" y="96.52" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="152.4" y="96.52" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="152.4" y="96.52" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$14" gate="G$1" x="-2.54" y="27.94"/>
 <instance part="U$15" gate="G$1" x="180.34" y="99.06"/>
@@ -8549,6 +8674,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U2" gate="G$1" x="81.28" y="53.34">
 <attribute name="DPN" x="81.28" y="53.34" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="81.28" y="53.34" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="81.28" y="53.34" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C9" gate="G$1" x="25.4" y="53.34">
 <attribute name="DPN" x="25.4" y="53.34" size="1.778" layer="96" display="off"/>
@@ -8559,6 +8685,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="L2" gate="L$1" x="55.88" y="58.42" rot="R90">
 <attribute name="DPN" x="55.88" y="58.42" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="MPN" x="55.88" y="58.42" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="POPULATE" x="55.88" y="58.42" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="R9" gate="G$1" x="40.64" y="33.02"/>
 <instance part="R10" gate="G$1" x="40.64" y="20.32"/>
@@ -8573,7 +8700,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="147.32" y="58.42" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND11" gate="1" x="142.24" y="50.8"/>
-<instance part="TP1" gate="G$1" x="137.16" y="40.64" rot="R90"/>
+<instance part="TP1" gate="G$1" x="137.16" y="40.64" rot="R90">
+<attribute name="POPULATE" x="137.16" y="40.64" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="U$9" gate="G$1" x="40.64" y="40.64"/>
 <instance part="U$10" gate="G$1" x="20.32" y="71.12"/>
 <instance part="U$11" gate="G$1" x="53.34" y="12.7"/>
@@ -8737,6 +8866,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="78.74" y="63.5" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="78.74" y="63.5" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="78.74" y="63.5" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="78.74" y="63.5" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C13" gate="G$1" x="-2.54" y="66.04">
 <attribute name="DPN" x="-2.54" y="66.04" size="1.778" layer="96" display="off"/>
@@ -8749,6 +8879,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="L3" gate="L$1" x="76.2" y="96.52">
 <attribute name="DPN" x="76.2" y="96.52" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="76.2" y="96.52" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="76.2" y="96.52" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C16" gate="G$1" x="33.02" y="55.88"/>
 <instance part="GND13" gate="1" x="33.02" y="48.26"/>
@@ -8765,7 +8896,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="129.54" y="66.04" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C20" gate="G$1" x="139.7" y="66.04"/>
-<instance part="TP2" gate="G$1" x="152.4" y="38.1" rot="R90"/>
+<instance part="TP2" gate="G$1" x="152.4" y="38.1" rot="R90">
+<attribute name="POPULATE" x="152.4" y="38.1" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="GND15" gate="1" x="124.46" y="58.42"/>
 <instance part="U$5" gate="G$1" x="-5.08" y="78.74"/>
 <instance part="U$6" gate="G$1" x="38.1" y="78.74"/>
@@ -8946,6 +9079,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MF" x="76.2" y="58.42" size="1.778" layer="96" display="off"/>
 <attribute name="MOUSER" x="76.2" y="58.42" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="76.2" y="58.42" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="76.2" y="58.42" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C21" gate="G$1" x="17.78" y="63.5">
 <attribute name="DPN" x="17.78" y="63.5" size="1.778" layer="96" display="off"/>
@@ -8955,6 +9089,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="L4" gate="L$1" x="109.22" y="60.96">
 <attribute name="DPN" x="109.22" y="60.96" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="109.22" y="60.96" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="109.22" y="60.96" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND17" gate="1" x="58.42" y="38.1"/>
 <instance part="C23" gate="G$1" x="132.08" y="55.88">
@@ -8964,7 +9099,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="C25" gate="G$1" x="149.86" y="55.88"/>
 <instance part="GND18" gate="1" x="142.24" y="48.26"/>
 <instance part="R15" gate="G$1" x="101.6" y="73.66"/>
-<instance part="TP3" gate="G$1" x="114.3" y="68.58" rot="R90"/>
+<instance part="TP3" gate="G$1" x="114.3" y="68.58" rot="R90">
+<attribute name="POPULATE" x="114.3" y="68.58" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="R16" gate="G$1" x="121.92" y="48.26">
 <attribute name="DPN" x="121.92" y="48.26" size="1.778" layer="96" display="off"/>
 </instance>
@@ -9122,6 +9259,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="78.74" y="53.34" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="78.74" y="53.34" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="78.74" y="53.34" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="78.74" y="53.34" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$21" gate="G$1" x="27.94" y="68.58"/>
 <instance part="C26" gate="G$1" x="33.02" y="60.96">
@@ -9143,6 +9281,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="78.74" y="0" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="78.74" y="0" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="78.74" y="0" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="78.74" y="0" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$34" gate="G$1" x="27.94" y="15.24"/>
 <instance part="C30" gate="G$1" x="33.02" y="7.62">
@@ -9170,11 +9309,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="-5.08" y="27.94" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="-5.08" y="27.94" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="-5.08" y="27.94" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="-5.08" y="27.94" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="Q5" gate="G$1" x="-5.08" y="-27.94">
 <attribute name="DPN" x="-5.08" y="-27.94" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="-5.08" y="-27.94" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="-5.08" y="-27.94" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="-5.08" y="-27.94" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND42" gate="1" x="-2.54" y="10.16"/>
 <instance part="GND53" gate="1" x="-2.54" y="-45.72"/>
@@ -9441,11 +9582,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="63.5" y="73.66" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="63.5" y="73.66" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="63.5" y="73.66" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="63.5" y="73.66" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U8" gate="G$1" x="63.5" y="17.78">
 <attribute name="DPN" x="63.5" y="17.78" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="63.5" y="17.78" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="63.5" y="17.78" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="63.5" y="17.78" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$23" gate="G$1" x="38.1" y="91.44"/>
 <instance part="U$24" gate="G$1" x="96.52" y="43.18"/>
@@ -9569,16 +9712,19 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="17.78" y="83.82" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="F1" gate="G$1" x="71.12" y="106.68">
 <attribute name="DPN" x="71.12" y="106.68" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="71.12" y="106.68" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="71.12" y="106.68" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="71.12" y="106.68" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="D2" gate="G$1" x="53.34" y="106.68">
 <attribute name="DPN" x="53.34" y="106.68" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="53.34" y="106.68" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="53.34" y="106.68" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="53.34" y="106.68" size="1.778" layer="96" display="off"/>
 </instance>
 </instances>
 <busses>
@@ -9642,6 +9788,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="17.78" y="45.72" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="17.78" y="45.72" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="17.78" y="45.72" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="17.78" y="45.72" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND35" gate="1" x="43.18" y="30.48"/>
 <instance part="R25" gate="G$1" x="60.96" y="50.8" rot="R90"/>
@@ -9650,8 +9797,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="D3" gate="G$1" x="55.88" y="38.1" rot="R90">
 <attribute name="DPN" x="55.88" y="38.1" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="MPN" x="55.88" y="38.1" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="POPULATE" x="55.88" y="38.1" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
-<instance part="U$41" gate="G$1" x="127" y="38.1"/>
+<instance part="JFAN" gate="G$1" x="127" y="38.1">
+<attribute name="DPN" x="127" y="38.1" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="127" y="38.1" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="127" y="38.1" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="127" y="38.1" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="U$42" gate="G$1" x="147.32" y="73.66"/>
 <instance part="C37" gate="G$1" x="157.48" y="55.88"/>
 <instance part="GND43" gate="1" x="157.48" y="48.26"/>
@@ -9665,12 +9818,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="D5" gate="G$1" x="33.02" y="116.84" rot="R90">
 <attribute name="DPN" x="33.02" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="MPN" x="33.02" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="POPULATE" x="33.02" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="U$44" gate="G$1" x="73.66" y="144.78"/>
 <instance part="R31" gate="G$1" x="73.66" y="129.54"/>
 <instance part="D6" gate="G$1" x="106.68" y="116.84" rot="R90">
 <attribute name="DPN" x="106.68" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="MPN" x="106.68" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="POPULATE" x="106.68" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="GND49" gate="1" x="106.68" y="101.6"/>
 <instance part="U$46" gate="G$1" x="144.78" y="144.78"/>
@@ -9678,6 +9833,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="D7" gate="G$1" x="177.8" y="116.84" rot="R90">
 <attribute name="DPN" x="177.8" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="MPN" x="177.8" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="POPULATE" x="177.8" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="GND50" gate="1" x="154.94" y="101.6"/>
 </instances>
@@ -9702,11 +9858,11 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="157.48" y1="53.34" x2="157.48" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$41" gate="G$1" pin="SHLD"/>
+<pinref part="JFAN" gate="G$1" pin="SHLD"/>
 <wire x1="139.7" y1="27.94" x2="149.86" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="GND44" gate="1" pin="GND"/>
 <wire x1="149.86" y1="27.94" x2="149.86" y2="22.86" width="0.1524" layer="91"/>
-<pinref part="U$41" gate="G$1" pin="3"/>
+<pinref part="JFAN" gate="G$1" pin="3"/>
 <wire x1="139.7" y1="35.56" x2="149.86" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="35.56" x2="149.86" y2="27.94" width="0.1524" layer="91"/>
 <junction x="149.86" y="27.94"/>
@@ -9759,7 +9915,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <net name="V5P0V" class="0">
 <segment>
 <pinref part="U$42" gate="G$1" pin="V5P0V"/>
-<pinref part="U$41" gate="G$1" pin="1"/>
+<pinref part="JFAN" gate="G$1" pin="1"/>
 <wire x1="139.7" y1="45.72" x2="147.32" y2="45.72" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="45.72" x2="147.32" y2="63.5" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="63.5" x2="147.32" y2="73.66" width="0.1524" layer="91"/>
@@ -9780,7 +9936,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="R27" gate="G$1" pin="P$2"/>
 <wire x1="180.34" y1="50.8" x2="180.34" y2="40.64" width="0.1524" layer="91"/>
-<pinref part="U$41" gate="G$1" pin="2"/>
+<pinref part="JFAN" gate="G$1" pin="2"/>
 <wire x1="180.34" y1="40.64" x2="139.7" y2="40.64" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -9853,8 +10009,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instances>
 <instance part="U$38" gate="G$1" x="-10.16" y="91.44"/>
 <instance part="U$39" gate="G$1" x="55.88" y="124.46"/>
-<instance part="FB1" gate="G$1" x="0" y="81.28"/>
-<instance part="FB2" gate="G$1" x="73.66" y="116.84" rot="R180"/>
+<instance part="FB1" gate="G$1" x="0" y="81.28">
+<attribute name="DPN" x="0" y="81.28" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="0" y="81.28" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="0" y="81.28" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="0" y="81.28" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="FB2" gate="G$1" x="73.66" y="116.84" rot="R180">
+<attribute name="DPN" x="73.66" y="116.84" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="MF" x="73.66" y="116.84" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="MPN" x="73.66" y="116.84" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="POPULATE" x="73.66" y="116.84" size="1.778" layer="96" rot="R180" display="off"/>
+</instance>
 <instance part="C33" gate="G$1" x="12.7" y="76.2"/>
 <instance part="C34" gate="G$1" x="99.06" y="109.22"/>
 <instance part="C35" gate="G$1" x="88.9" y="109.22">
@@ -9863,12 +10029,22 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="GND37" gate="1" x="12.7" y="68.58"/>
 <instance part="GND38" gate="1" x="93.98" y="93.98"/>
 <instance part="GND39" gate="1" x="40.64" y="10.16"/>
-<instance part="J8" gate="G$1" x="203.2" y="22.86" rot="R180"/>
+<instance part="J8" gate="G$1" x="203.2" y="22.86" rot="R180">
+<attribute name="DPN" x="203.2" y="22.86" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="MF" x="203.2" y="22.86" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="MPN" x="203.2" y="22.86" size="1.778" layer="96" rot="R180" display="off"/>
+<attribute name="POPULATE" x="203.2" y="22.86" size="1.778" layer="96" rot="R180" display="off"/>
+</instance>
 <instance part="GND40" gate="1" x="172.72" y="2.54"/>
 <instance part="C36" gate="G$1" x="198.12" y="58.42"/>
 <instance part="GND41" gate="1" x="198.12" y="50.8"/>
 <instance part="R26" gate="G$1" x="157.48" y="53.34"/>
-<instance part="U9" gate="G$1" x="63.5" y="48.26"/>
+<instance part="U9" gate="G$1" x="63.5" y="48.26">
+<attribute name="DPN" x="63.5" y="48.26" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="63.5" y="48.26" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="63.5" y="48.26" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="63.5" y="48.26" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="R41" gate="G$1" x="116.84" y="53.34"/>
 <instance part="R42" gate="G$1" x="124.46" y="53.34"/>
 <instance part="R43" gate="G$1" x="132.08" y="53.34"/>
@@ -10156,7 +10332,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <plain>
 </plain>
 <instances>
-<instance part="U10" gate="G$1" x="83.82" y="63.5"/>
+<instance part="U10" gate="G$1" x="83.82" y="63.5">
+<attribute name="DPN" x="83.82" y="63.5" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="83.82" y="63.5" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="83.82" y="63.5" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="83.82" y="63.5" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="GND45" gate="1" x="83.82" y="15.24"/>
 <instance part="J1" gate="G$1" x="-2.54" y="66.04"/>
 <instance part="U$45" gate="G$1" x="38.1" y="76.2"/>
@@ -10164,8 +10345,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="D4" gate="G$1" x="17.78" y="96.52" rot="R90">
 <attribute name="DPN" x="17.78" y="96.52" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="MPN" x="17.78" y="96.52" size="1.778" layer="96" rot="R90" display="off"/>
+<attribute name="POPULATE" x="17.78" y="96.52" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
-<instance part="FB3" gate="G$1" x="30.48" y="106.68"/>
+<instance part="FB3" gate="G$1" x="30.48" y="106.68">
+<attribute name="DPN" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="C38" gate="G$1" x="43.18" y="99.06"/>
 <instance part="GND47" gate="1" x="22.86" y="83.82"/>
 <instance part="C39" gate="G$1" x="48.26" y="33.02"/>
@@ -10337,16 +10524,19 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" x="48.26" y="33.02" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="48.26" y="33.02" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="48.26" y="33.02" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="48.26" y="33.02" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="Q2" gate="G$1" x="66.04" y="20.32">
 <attribute name="DPN" x="66.04" y="20.32" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="66.04" y="20.32" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="66.04" y="20.32" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="66.04" y="20.32" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="Q3" gate="G$1" x="88.9" y="5.08">
 <attribute name="DPN" x="88.9" y="5.08" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="88.9" y="5.08" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="88.9" y="5.08" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="88.9" y="5.08" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$47" gate="G$1" x="76.2" y="91.44"/>
 </instances>

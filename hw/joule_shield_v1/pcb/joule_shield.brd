@@ -1199,6 +1199,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MF" value="Texas Instruments" x="52.15" y="31.51" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MPN" value="BQ25892RTWT" x="52.15" y="31.51" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="NAME" x="53.89" y="35.05" size="0.8" layer="22" rot="MR180"/>
+<attribute name="POPULATE" value="1" x="52.15" y="31.51" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="C1" library="mf_passives" package="C0603" value="0.1uF" x="47.53" y="36.15" smashed="yes" rot="MR90">
 <attribute name="HOUSEPART" value="" x="38.64" y="51.39" size="1.778" layer="28" rot="MR90" display="off"/>
@@ -1368,10 +1369,12 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="DPN" value="445-15777-1-ND" x="51.14" y="26.52" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="MPN" value="SPM4012T-1R0M" x="51.14" y="26.52" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="NAME" x="52.74" y="24.12" size="0.8" layer="22" rot="MR180"/>
+<attribute name="POPULATE" value="1" x="51.14" y="26.52" size="1.778" layer="28" rot="MR180" display="off"/>
 </element>
 <element name="U2" library="joule_shield" package="WLCSP16" value="FAN8623WLCSP16" x="6" y="18.5" rot="MR270">
 <attribute name="DPN" value="FAN48623UC50XCT-ND" x="6" y="18.5" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MPN" value="FAN48623UC50X" x="6" y="18.5" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="POPULATE" value="1" x="6" y="18.5" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="C9" library="mf_passives" package="C0603" value="10uF" x="4" y="15.5" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="4" y="15.5" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1408,6 +1411,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="DPN" value="490-10641-1-ND" x="6.5" y="16" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MPN" value="DFE252010P-R47M=P2" x="6.5" y="16" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="NAME" x="8.5" y="17.4" size="0.8" layer="22" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="6.5" y="16" size="1.778" layer="28" rot="MR0" display="off"/>
 </element>
 <element name="R9" library="mf_passives" package="R0603" value="100k" x="3" y="19.6" smashed="yes" rot="MR180">
 <attribute name="HOUSEPART" value="" x="3" y="19.6" size="1.778" layer="28" rot="MR180" display="off"/>
@@ -1475,12 +1479,14 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="TP_SIGNAL_NAME" value="" x="2.135" y="2.905" size="1" layer="37" rot="R180"/>
 <attribute name="NAME" x="2.365" y="0.516" size="1.27" layer="25" ratio="10"/>
 <attribute name="VALUE" x="2.135" y="1.762" size="0.0254" layer="27" rot="R180"/>
+<attribute name="POPULATE" value="0" x="1.5" y="1" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="U3" library="joule_shield" package="PVSON-14" value="TPS63201PVSON-14" x="29.7" y="33.3" smashed="yes" rot="MR90">
 <attribute name="DPN" value="296-27259-1-ND" x="29.7" y="33.3" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="MF" value="Texas Instruments" x="29.7" y="33.3" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="MPN" value="TPS63021DSJR" x="29.7" y="33.3" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="NAME" x="31.7" y="35.1" size="0.8" layer="22" rot="MR180"/>
+<attribute name="POPULATE" value="1" x="29.7" y="33.3" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
 <element name="C13" library="mf_passives" package="C0603" value="10uF" x="28.4" y="37" smashed="yes" rot="MR90">
 <attribute name="HOUSEPART" value="" x="28.4" y="37" size="1.778" layer="28" rot="MR90" display="off"/>
@@ -1518,6 +1524,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MPN" value="SPM4012T-1R0M" x="18.4" y="40.9" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="DPN" value="445-15777-1-ND" x="18.4" y="40.9" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="NAME" x="22.9" y="31.3" size="0.8" layer="22" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="25.4" y="33.9" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="C16" library="mf_passives" package="C0603" value="0.1uF" x="32.4" y="29.7" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="32.4" y="29.7" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1594,12 +1601,14 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 </element>
 <element name="TP2" library="testpad" package="B1,27" value="TPSQB1,27" x="36" y="27.5">
 <attribute name="TP_SIGNAL_NAME" value="" x="36" y="27.5" size="1.778" layer="27" display="off"/>
+<attribute name="POPULATE" value="0" x="36" y="27.5" size="1.778" layer="27" display="off"/>
 </element>
 <element name="U4" library="joule_shield" package="PWSON-8" value="TLV62084PWSON-8" x="32" y="13" smashed="yes" rot="MR180">
 <attribute name="MF" value="Texas Instruments" x="32" y="13" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="MOUSER" value="595-TLV62084DSGR" x="32" y="13" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="MPN" value="TLV62084DSGR" x="32" y="13" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="NAME" x="30.5" y="11.7" size="0.8" layer="22" rot="MR180"/>
+<attribute name="POPULATE" value="1" x="32" y="13" size="1.778" layer="28" rot="MR180" display="off"/>
 </element>
 <element name="C21" library="mf_passives" package="C0603" value="10uF" x="35" y="10.5" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="35" y="10.5" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1626,6 +1635,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MPN" value="SPM4012T-1R0M" x="43.3" y="7.6" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="DPN" value="445-15777-1-ND" x="43.3" y="7.6" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="NAME" x="38" y="17.2" size="0.8" layer="22" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="36.3" y="14.6" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
 <element name="C23" library="mf_passives" package="C0603" value="22uF" x="32.5" y="19.5" smashed="yes" rot="MR0">
 <attribute name="HOUSEPART" value="" x="32.5" y="19.5" size="1.778" layer="28" rot="MR0" display="off"/>
@@ -1672,6 +1682,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="TP_SIGNAL_NAME" value="" x="41.865" y="15.595" size="1" layer="37"/>
 <attribute name="NAME" x="38.365" y="17.016" size="1.27" layer="25" ratio="10"/>
 <attribute name="VALUE" x="41.865" y="16.738" size="0.0254" layer="27"/>
+<attribute name="POPULATE" value="0" x="42.5" y="17.5" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R16" library="mf_passives" package="R0603" value="110.0k 1%" x="28.5" y="14.8" smashed="yes" rot="MR180">
 <attribute name="HOUSEPART" value="" x="28.5" y="14.8" size="1.778" layer="28" rot="MR180" display="off"/>
@@ -1710,6 +1721,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MF" value="Texas Instruments" x="15" y="35" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="TPS2553DRVT" x="15" y="35" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="13.1" y="36.3" size="0.8" layer="21"/>
+<attribute name="POPULATE" value="1" x="15" y="35" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C26" library="mf_passives" package="C0603" value="10uF" x="12.5" y="33.6" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="" x="12.5" y="33.6" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1777,11 +1789,13 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="DPN" value="296-16843-1-ND" x="56" y="29.6" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MF" value="Texas Instruments" x="56" y="29.6" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="SN74LVC1T45DBVR" x="56" y="29.6" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="POPULATE" value="1" x="56" y="29.6" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="U8" library="joule_shield" package="SOT23-6" value="SINGLE-BIT_BUS_TRANSCEIVER" x="56.1" y="25.6" smashed="yes" rot="R270">
 <attribute name="DPN" value="296-16843-1-ND" x="56.1" y="25.6" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MF" value="Texas Instruments" x="56.1" y="25.6" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="SN74LVC1T45DBVR" x="56.1" y="25.6" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="POPULATE" value="1" x="56.1" y="25.6" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C29" library="mf_passives" package="C0603" value="0.1uF" x="59" y="26.1" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="59" y="26.1" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1798,36 +1812,47 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MF" value="JST Sales America Inc." x="45" y="35.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="S4B-XH-SM4-TB(LF)(SN)" x="45" y="35.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="40.2" y="31.7" size="1.27" layer="21" rot="R180"/>
+<attribute name="POPULATE" value="1" x="45" y="35.5" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="F1" library="joule_shield" package="FUSE_467" value="FUSEFUSE_467" x="45.4" y="36.3" smashed="yes" rot="MR270">
 <attribute name="DPN" value="F1400CT-ND" x="45.4" y="36.3" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MF" value="Littlefuse" x="45.4" y="36.3" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MPN" value="046703.5NR" x="45.4" y="36.3" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="NAME" x="44.73" y="34.83" size="0.8" layer="22" rot="MR180"/>
+<attribute name="POPULATE" value="1" x="45.4" y="36.3" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="D2" library="joule_shield" package="B520C" value="" x="40.4" y="34.6" smashed="yes" rot="MR270">
 <attribute name="DPN" value="B520C-FDICT-ND" x="40.4" y="34.6" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MF" value="Diodes Incorporated" x="40.4" y="34.6" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="MPN" value="B520C-13-F" x="40.4" y="34.6" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="NAME" x="38.4" y="39.1" size="0.8" layer="22" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="40.4" y="34.6" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="J6" library="joule_shield" package="HIROSE-40C-100DS" value="INTEL_JOULE_J6" x="37.002" y="22" smashed="yes">
 <attribute name="DPN" value="H11615CT-ND" x="37.002" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="Hirose Electric Co Ltd" x="37.002" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="DF40C-100DS-0.4V(51)" x="37.002" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="26.402" y="24.4" size="0.8128" layer="21"/>
+<attribute name="POPULATE" value="1" x="37.002" y="22" size="1.778" layer="27" display="off"/>
 </element>
 <element name="J7" library="joule_shield" package="HIROSE-40C-100DS" value="INTEL_JOULE_J7" x="21.502" y="3">
 <attribute name="DPN" value="H11615CT-ND" x="21.502" y="3" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="Hirose Electric Co Ltd" x="21.502" y="3" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="DF40C-100DS-0.4V(51)" x="21.502" y="3" size="1.778" layer="27" display="off"/>
+<attribute name="POPULATE" value="1" x="21.502" y="3" size="1.778" layer="27" display="off"/>
 </element>
-<element name="J4" library="joule_shield" package="USB_RECPT_87583" value="USB_AUSB_A_SMT_RA" x="28" y="34" rot="R180"/>
+<element name="J4" library="joule_shield" package="USB_RECPT_87583" value="USB_AUSB_A_SMT_RA" x="28" y="34" rot="R180">
+<attribute name="DPN" value="609-4413-ND" x="28" y="34" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MF" value="Amphenol" x="28" y="34" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="87583-2010BLF" x="28" y="34" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="1" x="28" y="34" size="1.778" layer="27" rot="R180" display="off"/>
+</element>
 <element name="U6" library="joule_shield" package="PWSON-6" value="TPS2553PWSON-6" x="13" y="11.5" smashed="yes" rot="MR0">
 <attribute name="DPN" value="296-23999-1-ND" x="13" y="11.5" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MF" value="Texas Instruments" x="13" y="11.5" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MPN" value="TPS2553DRVT" x="13" y="11.5" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="NAME" x="14.7" y="12.8" size="0.8" layer="22" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="13" y="11.5" size="1.778" layer="28" rot="MR0" display="off"/>
 </element>
 <element name="C30" library="mf_passives" package="C0603" value="10uF" x="10.3" y="11.7" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="3.3" y="11.7" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1891,12 +1916,18 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="URL" value="" x="6.3" y="20.9" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="NAME" x="19.8" y="12.5" size="1.016" layer="26" font="vector" ratio="16" rot="MR180"/>
 </element>
-<element name="J5" library="joule_shield" package="JST_ZH_SMT_RA_5" value="JST-ZH5SMT_RA" x="16.5" y="2" rot="MR0"/>
+<element name="J5" library="joule_shield" package="JST_ZH_SMT_RA_5" value="JST-ZH5SMT_RA" x="16.5" y="2" rot="MR0">
+<attribute name="DPN" value="455-1696-1-ND" x="16.5" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MF" value="JST" x="16.5" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MPN" value="S5B-ZR-SM4A-TF(LF)(SN)" x="16.5" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="POPULATE" value="1" x="16.5" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+</element>
 <element name="JRTC" library="joule_shield" package="BC-2009" value="BC-2009" x="19.2" y="20" smashed="yes" rot="MR0">
 <attribute name="DPN" value="BC-2009-ND" x="19.2" y="20" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MF" value="MPD (Memory Protection Devices)" x="19.2" y="20" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MPN" value="BC-2009" x="19.2" y="20" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="NAME" x="12.7" y="24" size="0.8" layer="26" font="vector" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="19.2" y="20" size="1.778" layer="28" rot="MR0" display="off"/>
 </element>
 <element name="R25" library="mf_passives" package="R0603" value="1k" x="12" y="15" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="12" y="15" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1912,12 +1943,21 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="DPN" value="490-13209-1-ND" x="10.8" y="15.4" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="MPN" value="LXES15AAA1-133" x="10.8" y="15.4" size="1.778" layer="28" rot="MR90" display="off"/>
 <attribute name="NAME" x="9.7" y="15.1" size="0.6" layer="26" rot="MR90"/>
+<attribute name="POPULATE" value="1" x="10.8" y="15.4" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
 <element name="FB1" library="joule_shield" package="R0603" value="FERRITE_BEAD" x="40.5" y="20.7" smashed="yes" rot="MR180">
 <attribute name="NAME" x="36.1" y="21.1" size="1.016" layer="26" font="vector" ratio="16" rot="MR180"/>
+<attribute name="DPN" value="490-5203-1-ND" x="40.5" y="20.7" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="MF" value="Murata" x="40.5" y="20.7" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="MPN" value="BLM15PD121SN1D" x="40.5" y="20.7" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="POPULATE" value="1" x="40.5" y="20.7" size="1.778" layer="28" rot="MR180" display="off"/>
 </element>
 <element name="FB2" library="joule_shield" package="R0603" value="FERRITE_BEAD" x="40.5" y="25" smashed="yes" rot="MR0">
 <attribute name="NAME" x="38.9" y="24.5" size="1.016" layer="26" font="vector" ratio="16" rot="MR0"/>
+<attribute name="DPN" value="490-5203-1-ND" x="40.5" y="25" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MF" value="Murata" x="40.5" y="25" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MPN" value="BLM15PD121SN1D" x="40.5" y="25" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="POPULATE" value="1" x="40.5" y="25" size="1.778" layer="28" rot="MR0" display="off"/>
 </element>
 <element name="C33" library="mf_passives" package="C0603" value="0.1uF" x="40.5" y="19" smashed="yes" rot="MR0">
 <attribute name="HOUSEPART" value="" x="40.5" y="19" size="1.778" layer="28" rot="MR0" display="off"/>
@@ -1952,6 +1992,10 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 </element>
 <element name="J8" library="joule_shield" package="DM3AT" value="DM3ATDM3AT" x="48.5" y="16.2" smashed="yes" rot="MR0">
 <attribute name="NAME" x="55.3" y="15.6" size="0.8" layer="22" rot="MR180"/>
+<attribute name="DPN" value="HR1964CT-ND" x="48.5" y="16.2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MF" value="Hirose" x="48.5" y="16.2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MPN" value="DM3AT-SF-PEJM5" x="48.5" y="16.2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="POPULATE" value="1" x="48.5" y="16.2" size="1.778" layer="28" rot="MR0" display="off"/>
 </element>
 <element name="C36" library="mf_passives" package="C0603" value="0.1uF" x="49.2" y="18.3" smashed="yes" rot="MR90">
 <attribute name="HOUSEPART" value="" x="49.2" y="18.3" size="1.778" layer="28" rot="MR90" display="off"/>
@@ -1973,7 +2017,12 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="WATTAGE" value="" x="57.8" y="10.2" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="NAME" x="56.8" y="11.1" size="1.016" layer="26" font="vector" ratio="16" rot="MR270"/>
 </element>
-<element name="U$41" library="joule_shield" package="AMP_MINI_292228" value="AMP_MINI_FAN" x="29" y="2" rot="MR0"/>
+<element name="JFAN" library="joule_shield" package="AMP_MINI_292228" value="AMP_MINI_FAN" x="29" y="2" rot="MR0">
+<attribute name="DPN" value="A101008CT-ND" x="29" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MF" value="TE Connectivity" x="29" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MPN" value="292228-3" x="29" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="POPULATE" value="1" x="29" y="2" size="1.778" layer="28" rot="MR0" display="off"/>
+</element>
 <element name="C37" library="mf_passives" package="C0603" value="0.1uF" x="33.5" y="6.5" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="33.5" y="6.5" size="1.778" layer="28" rot="MR270" display="off"/>
 <attribute name="TOLERANCE" value="" x="33.5" y="6.5" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -1996,6 +2045,10 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 </element>
 <element name="U10" library="joule_shield" package="QFN-20" value="FT231XQFN-20" x="14.5" y="30.5" smashed="yes" rot="MR90">
 <attribute name="NAME" x="16.8" y="32.2" size="0.8" layer="22" rot="MR180"/>
+<attribute name="DPN" value="768-1128-1-ND" x="14.5" y="30.5" size="1.778" layer="28" rot="MR90" display="off"/>
+<attribute name="MF" value="FTDI" x="14.5" y="30.5" size="1.778" layer="28" rot="MR90" display="off"/>
+<attribute name="MPN" value="FT231XQ-R" x="14.5" y="30.5" size="1.778" layer="28" rot="MR90" display="off"/>
+<attribute name="POPULATE" value="1" x="14.5" y="30.5" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
 <element name="J1" library="mf_connectors" package="MICROUSB-RIGHT" value="MF-CON-MICROUSB-RIGHT" x="10.5" y="37" smashed="yes" rot="MR180">
 <attribute name="HOUSEPART" value="YES" x="10.5" y="37" size="1.778" layer="28" rot="MR180" display="off"/>
@@ -2008,9 +2061,14 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MPN" value="LXES15AAA1-133" x="7.5" y="33.8" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="DPN" value="490-13209-1-ND" x="7.5" y="33.8" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="NAME" x="6.7" y="33.8" size="0.6" layer="26" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="7.5" y="33.8" size="1.778" layer="28" rot="MR180" display="off"/>
 </element>
 <element name="FB3" library="joule_shield" package="R0603" value="FERRITE_BEAD" x="7.5" y="31.8" smashed="yes" rot="MR270">
 <attribute name="NAME" x="6.4" y="32.4" size="1.016" layer="26" font="vector" ratio="16" rot="MR0"/>
+<attribute name="DPN" value="490-5203-1-ND" x="7.5" y="31.8" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="MF" value="Murata" x="7.5" y="31.8" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="MPN" value="BLM15PD121SN1D" x="7.5" y="31.8" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="POPULATE" value="1" x="7.5" y="31.8" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="C38" library="mf_passives" package="C0603" value="0.1uF" x="6.8" y="29.1" smashed="yes" rot="MR0">
 <attribute name="HOUSEPART" value="" x="6.8" y="29.1" size="1.778" layer="28" rot="MR0" display="off"/>
@@ -2087,6 +2145,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MPN" value="LXES15AAA1-133" x="59" y="22" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="DPN" value="490-13209-1-ND" x="59" y="22" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="58.2" y="22" size="0.6" layer="25" rot="R180"/>
+<attribute name="POPULATE" value="1" x="59" y="22" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="R30" library="mf_passives" package="R0603" value="0" x="55.6" y="22" smashed="yes">
 <attribute name="HOUSEPART" value="" x="55.6" y="22" size="1.778" layer="27" display="off"/>
@@ -2112,6 +2171,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MPN" value="LXES15AAA1-133" x="59" y="16.7" size="1.778" layer="27" display="off"/>
 <attribute name="DPN" value="490-13209-1-ND" x="59" y="16.7" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="58.2" y="16.7" size="0.6" layer="25" rot="R180"/>
+<attribute name="POPULATE" value="1" x="59" y="16.7" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R32" library="mf_passives" package="R0603" value="100k" x="55.6" y="11.5" smashed="yes">
 <attribute name="HOUSEPART" value="" x="55.6" y="11.5" size="1.778" layer="27" display="off"/>
@@ -2127,6 +2187,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="MPN" value="LXES15AAA1-133" x="59" y="11.5" size="1.778" layer="27" display="off"/>
 <attribute name="DPN" value="490-13209-1-ND" x="59" y="11.5" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="58.2" y="11.5" size="0.6" layer="25" rot="R180"/>
+<attribute name="POPULATE" value="1" x="59" y="11.5" size="1.778" layer="27" display="off"/>
 </element>
 <element name="D8" library="mf_leds" package="LED0603" value="MF-LED-0603-RED" x="1" y="30" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="YES" x="1" y="30" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2209,14 +2270,30 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="WATTAGE" value="" x="3.5" y="12.8" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="2" y="13.7" size="1.016" layer="25" font="vector" ratio="16"/>
 </element>
-<element name="U$48" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="8" y="3"/>
-<element name="U$49" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="51" y="22"/>
-<element name="U$50" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="8" y="22"/>
-<element name="U$51" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="38" y="3"/>
-<element name="U$52" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="57.5" y="35.5"/>
-<element name="U$53" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="4.5"/>
-<element name="U$54" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="35.5"/>
-<element name="U$55" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="57.5" y="4.5"/>
+<element name="U$48" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="8" y="3">
+<attribute name="POPULATE" value="0" x="8" y="3" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$49" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="51" y="22">
+<attribute name="POPULATE" value="0" x="51" y="22" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$50" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="8" y="22">
+<attribute name="POPULATE" value="0" x="8" y="22" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$51" library="joule_shield" package="SMTSO-M1.6" value="SMTSOSMTSO-M1.6" x="38" y="3">
+<attribute name="POPULATE" value="0" x="38" y="3" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$52" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="57.5" y="35.5">
+<attribute name="POPULATE" value="0" x="57.5" y="35.5" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$53" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="4.5">
+<attribute name="POPULATE" value="0" x="2.5" y="4.5" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$54" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="2.5" y="35.5">
+<attribute name="POPULATE" value="0" x="2.5" y="35.5" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$55" library="joule_shield" package="M2.5MOUNT" value="M2.5MOUNT" x="57.5" y="4.5">
+<attribute name="POPULATE" value="0" x="57.5" y="4.5" size="1.778" layer="27" display="off"/>
+</element>
 <element name="C41" library="mf_passives" package="C0805" value="47uF" x="15.2" y="31" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="" x="15.2" y="31" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TOLERANCE" value="" x="15.2" y="31" size="1.778" layer="27" rot="R180" display="off"/>
@@ -2241,6 +2318,10 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 </element>
 <element name="U9" library="joule_shield" package="S-PBGA-N20" value="SN74AVCA406L" x="45" y="26.7" smashed="yes" rot="MR180">
 <attribute name="NAME" x="43.5" y="25.1" size="0.8" layer="22" font="vector" rot="MR180"/>
+<attribute name="DPN" value="296-21023-1-ND" x="45" y="26.7" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="MF" value="Texas Instruments" x="45" y="26.7" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="MPN" value="SN74AVCA406LZXYR" x="45" y="26.7" size="1.778" layer="28" rot="MR180" display="off"/>
+<attribute name="POPULATE" value="1" x="45" y="26.7" size="1.778" layer="28" rot="MR180" display="off"/>
 </element>
 <element name="R41" library="mf_passives" package="R0603" value="100k" x="47.6" y="18.3" smashed="yes" rot="MR270">
 <attribute name="HOUSEPART" value="" x="47.6" y="18.3" size="1.778" layer="28" rot="MR270" display="off"/>
@@ -2297,30 +2378,35 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <attribute name="DPN" value="RE1C002UNTCLCT-ND" x="3.5" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="Rohm Semiconductor" x="3.5" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="RE1C002UNTCL" x="3.5" y="29" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="3.5" y="29" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="Q2" library="joule_shield" package="EMT3F" value="NFETEMT3F" x="3.5" y="20.7" smashed="yes" rot="R90">
 <attribute name="NAME" x="4.65" y="20" size="0.8" layer="21" font="vector"/>
 <attribute name="DPN" value="RE1C002UNTCLCT-ND" x="3.5" y="20.7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="Rohm Semiconductor" x="3.5" y="20.7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="RE1C002UNTCL" x="3.5" y="20.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="3.5" y="20.7" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="Q3" library="joule_shield" package="EMT3F" value="NFETEMT3F" x="3.5" y="11" smashed="yes" rot="R90">
 <attribute name="NAME" x="4.65" y="10.3" size="0.8" layer="21" font="vector"/>
 <attribute name="DPN" value="RE1C002UNTCL" x="3.5" y="11" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="Rohm Semiconductor" x="3.5" y="11" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="RE1C002UNTCL" x="3.5" y="11" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="3.5" y="11" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="Q4" library="joule_shield" package="EMT3F" value="NFETEMT3F" x="12.1" y="36.7" smashed="yes" rot="R180">
 <attribute name="MPN" value="RE1C002UNTCL" x="12.1" y="36.7" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MF" value="Rohm Semiconductor" x="12.1" y="36.7" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="DPN" value="RE1C002UNTCLCT-ND" x="12.1" y="36.7" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="11.45" y="37.7" size="0.8" layer="21" font="vector"/>
+<attribute name="POPULATE" value="1" x="12.1" y="36.7" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="Q5" library="joule_shield" package="EMT3F" value="NFETEMT3F" x="9" y="8" smashed="yes" rot="MR0">
 <attribute name="MPN" value="RE1C002UNTCL" x="9" y="8" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MF" value="Rohm Semiconductor" x="9" y="8" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="DPN" value="RE1C002UNTCLCT-ND" x="9" y="8" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="NAME" x="9.85" y="9.1" size="0.8" layer="22" font="vector" rot="MR0"/>
+<attribute name="POPULATE" value="1" x="9" y="8" size="1.778" layer="28" rot="MR0" display="off"/>
 </element>
 <element name="R36" library="mf_passives" package="R0603" value="100k" x="10.1" y="37.2" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="" x="10.1" y="37.2" size="1.778" layer="27" rot="R270" display="off"/>
@@ -2489,9 +2575,9 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <contactref element="C34" pad="P$2"/>
 <contactref element="C36" pad="P$2"/>
 <contactref element="C37" pad="P$2"/>
-<contactref element="U$41" pad="S1"/>
-<contactref element="U$41" pad="S2"/>
-<contactref element="U$41" pad="3"/>
+<contactref element="JFAN" pad="S1"/>
+<contactref element="JFAN" pad="S2"/>
+<contactref element="JFAN" pad="3"/>
 <contactref element="U10" pad="3"/>
 <contactref element="U10" pad="13"/>
 <contactref element="U10" pad="G0"/>
@@ -3439,7 +3525,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <contactref element="U8" pad="6"/>
 <contactref element="C30" pad="P$1"/>
 <contactref element="U6" pad="6"/>
-<contactref element="U$41" pad="1"/>
+<contactref element="JFAN" pad="1"/>
 <contactref element="C37" pad="P$1"/>
 <contactref element="R23" pad="P$1"/>
 <contactref element="R20" pad="P$1"/>
@@ -3781,7 +3867,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 </signal>
 <signal name="N$36">
 <contactref element="R27" pad="P$2"/>
-<contactref element="U$41" pad="2"/>
+<contactref element="JFAN" pad="2"/>
 <wire x1="29" y1="7" x2="29.35" y2="9.8" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="N$46">
