@@ -42,21 +42,14 @@
 TODO
  * Get JST-ZH5 SMT RA in house and verify footprint
 
- * ERC
-
- * Board
-   * ensure all power rails are routed with non minimum width traces
-   * Route power for main regulators
-
- * Layout
-   * esd diodes have a non-fixed width board font
-
  * Figure out some way to buy SMTSO-M1.6's
 
- * Align all parts and silks
  * DRC
+ * Get test points for output of each of the voltage regulators
+ * Clear all silks from vias
 
- * Manually placed vias are 0.32mm, auto-router ones 0.3048mm
+DONE 2016-12-04
+ * Get script to undo auto-route so I can save an auto-routed version
 
 DONE 2016-12-01
  * Draw supply polys
