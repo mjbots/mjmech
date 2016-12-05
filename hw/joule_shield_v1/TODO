@@ -47,6 +47,7 @@ TODO
  * DRC
  * Get test points for output of each of the voltage regulators
  * Clear all silks from vias
+ * Verify pinouts on joule connector with Intel expansion board
 
 DONE 2016-12-04
  * Get script to undo auto-route so I can save an auto-routed version
