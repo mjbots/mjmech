@@ -2713,24 +2713,24 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="37" y="8.4"/>
 <vertex x="34.6" y="8.4"/>
 </polygon>
-<via x="35" y="8.8" extent="1-16" drill="0.3048"/>
-<via x="36.6" y="8.8" extent="1-16" drill="0.3048"/>
+<via x="35" y="8.8" extent="1-16" drill="0.32"/>
+<via x="36.6" y="8.8" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="30.4" y="19.9"/>
 <vertex x="32" y="19.9"/>
 <vertex x="32" y="15.7"/>
 <vertex x="30.4" y="15.7"/>
 </polygon>
-<via x="30.8" y="19.2" extent="1-16" drill="0.3048"/>
-<via x="30.8" y="17.8" extent="1-16" drill="0.3048"/>
-<via x="30.8" y="16.2" extent="1-16" drill="0.3048"/>
+<via x="30.8" y="19.2" extent="1-16" drill="0.32"/>
+<via x="30.8" y="17.8" extent="1-16" drill="0.32"/>
+<via x="30.8" y="16.2" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="26.1" y="13.6"/>
 <vertex x="28" y="13.6"/>
 <vertex x="28" y="12.8"/>
 <vertex x="26.1" y="12.8"/>
 </polygon>
-<via x="26.5" y="13.2" extent="1-16" drill="0.3048"/>
+<via x="26.5" y="13.2" extent="1-16" drill="0.32"/>
 <wire x1="31.05" y1="12.75" x2="31.75" y2="12.75" width="0.3" layer="16"/>
 <wire x1="31.75" y1="12.75" x2="32" y2="13" width="0.3" layer="16" curve="90"/>
 <wire x1="31.05" y1="13.25" x2="31.75" y2="13.25" width="0.3" layer="16"/>
@@ -2742,7 +2742,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="17.9" y="37.6"/>
 <vertex x="17.9" y="36.1"/>
 </polygon>
-<via x="17.5" y="37.2" extent="1-16" drill="0.3048"/>
+<via x="17.5" y="37.2" extent="1-16" drill="0.32"/>
 <wire x1="14.45" y1="32.8" x2="15" y2="33.35" width="0.3" layer="1"/>
 <wire x1="15" y1="33.35" x2="15" y2="35" width="0.3" layer="1"/>
 <wire x1="14.45" y1="32.8" x2="14.45" y2="31" width="0.3" layer="1"/>
@@ -2754,7 +2754,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="14.7" y="33.8"/>
 <vertex x="12.1" y="33.8"/>
 </polygon>
-<via x="13.5" y="33.5" extent="1-16" drill="0.3048"/>
+<via x="13.5" y="33.5" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="1">
 <vertex x="9.7" y="36.2"/>
 <vertex x="11.3" y="36.2"/>
@@ -2764,7 +2764,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="10.8" y="37.3"/>
 <vertex x="9.7" y="37.3"/>
 </polygon>
-<via x="10.85" y="37.15" extent="1-16" drill="0.3048"/>
+<via x="10.85" y="37.15" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="19.1" y="7.5"/>
 <vertex x="19.1" y="10.7"/>
@@ -2776,9 +2776,9 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="20.8" y="11.1"/>
 <vertex x="20.8" y="7.5"/>
 </polygon>
-<via x="19.9" y="11.8" extent="1-16" drill="0.3048"/>
-<via x="20.4" y="10.1" extent="1-16" drill="0.3048"/>
-<via x="20.4" y="8.2" extent="1-16" drill="0.3048"/>
+<via x="19.9" y="11.8" extent="1-16" drill="0.32"/>
+<via x="20.4" y="10.1" extent="1-16" drill="0.32"/>
+<via x="20.4" y="8.2" extent="1-16" drill="0.32"/>
 <wire x1="13" y1="11.5" x2="11.95" y2="11.5" width="0.3" layer="16"/>
 <polygon width="0.1" layer="16">
 <vertex x="9.8" y="11.3"/>
@@ -2786,14 +2786,14 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="10.7" y="9.8"/>
 <vertex x="10.7" y="11.3"/>
 </polygon>
-<via x="10.2" y="10.1" extent="1-16" drill="0.3048"/>
+<via x="10.2" y="10.1" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="15.1" y="10"/>
 <vertex x="15.9" y="10"/>
 <vertex x="15.9" y="8.5"/>
 <vertex x="15.1" y="8.5"/>
 </polygon>
-<via x="15.5" y="8.9" extent="1-16" drill="0.3048"/>
+<via x="15.5" y="8.9" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="8.8" y="5.8"/>
 <vertex x="8.8" y="7.8"/>
@@ -2801,15 +2801,15 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="7.3" y="7.7"/>
 <vertex x="7.3" y="5.8"/>
 </polygon>
-<via x="7.6" y="7.4" extent="1-16" drill="0.3048"/>
-<via x="7.6" y="6.3" extent="1-16" drill="0.3048"/>
+<via x="7.6" y="7.4" extent="1-16" drill="0.32"/>
+<via x="7.6" y="6.3" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="1">
 <vertex x="13.9" y="29.6"/>
 <vertex x="14.6" y="29.6"/>
 <vertex x="14.6" y="27.2"/>
 <vertex x="13.9" y="27.2"/>
 </polygon>
-<via x="14.3" y="27.6" extent="1-16" drill="0.3048"/>
+<via x="14.3" y="27.6" extent="1-16" drill="0.32"/>
 <contactref element="C43" pad="P$2"/>
 <polygon width="0.1" layer="1">
 <vertex x="50.8" y="27.7"/>
@@ -2817,7 +2817,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="51.7" y="29.1"/>
 <vertex x="50.8" y="29.1"/>
 </polygon>
-<via x="51.2" y="28.7" extent="1-16" drill="0.3048"/>
+<via x="51.2" y="28.7" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="1">
 <vertex x="55.7" y="30.8"/>
 <vertex x="56.3" y="30.8"/>
@@ -2828,7 +2828,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="56.1" y="31.8"/>
 <vertex x="55.7" y="31.8"/>
 </polygon>
-<via x="56.4" y="32.2" extent="1-16" drill="0.3048"/>
+<via x="56.4" y="32.2" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="1">
 <vertex x="58.6" y="26.6"/>
 <vertex x="59.4" y="26.6"/>
@@ -2836,7 +2836,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="59.5" y="28.6"/>
 <vertex x="58.6" y="28.6"/>
 </polygon>
-<via x="59" y="28.1" extent="1-16" drill="0.3048"/>
+<via x="59" y="28.1" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="1">
 <vertex x="55.7" y="27.2"/>
 <vertex x="55.7" y="25.5"/>
@@ -2849,21 +2849,21 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="49.4" y="34.1"/>
 <vertex x="49.4" y="31.9"/>
 </polygon>
-<via x="48.7" y="33.8" extent="1-16" drill="0.3048"/>
+<via x="48.7" y="33.8" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="1">
 <vertex x="48.1" y="29.7"/>
 <vertex x="49.4" y="29.7"/>
 <vertex x="49.4" y="27.8"/>
 <vertex x="48.1" y="27.8"/>
 </polygon>
-<via x="48.75" y="28.1" extent="1-16" drill="0.3048"/>
+<via x="48.75" y="28.1" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="18.7" y="18"/>
 <vertex x="19.7" y="18"/>
 <vertex x="19.7" y="16.1"/>
 <vertex x="18.7" y="16.1"/>
 </polygon>
-<via x="19.2" y="16.5" extent="1-16" drill="0.3048"/>
+<via x="19.2" y="16.5" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="10.4" y="15.2"/>
 <vertex x="11.2" y="15.2"/>
@@ -2877,8 +2877,8 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="13.9" y="5.6"/>
 <vertex x="13.9" y="7.2"/>
 </polygon>
-<via x="13.5" y="6.9" extent="1-16" drill="0.3048"/>
-<via x="15" y="6.9" extent="1-16" drill="0.3048"/>
+<via x="13.5" y="6.9" extent="1-16" drill="0.32"/>
+<via x="15" y="6.9" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="14.6" y="7.2"/>
 <vertex x="14.6" y="5.6"/>
@@ -2891,29 +2891,29 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="27.9" y="8.1"/>
 <vertex x="27.9" y="9.6"/>
 </polygon>
-<via x="27.5" y="9.3" extent="1-16" drill="0.3048"/>
+<via x="27.5" y="9.3" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="33.1" y="6"/>
 <vertex x="33.9" y="6"/>
 <vertex x="33.9" y="4.5"/>
 <vertex x="33.1" y="4.5"/>
 </polygon>
-<via x="33.5" y="4.8" extent="1-16" drill="0.3048"/>
+<via x="33.5" y="4.8" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16">
 <vertex x="34.3" y="2.4"/>
 <vertex x="34.3" y="1.6"/>
 <vertex x="35.8" y="1.6"/>
 <vertex x="35.8" y="2.4"/>
 </polygon>
-<via x="35.5" y="2" extent="1-16" drill="0.3048"/>
+<via x="35.5" y="2" extent="1-16" drill="0.32"/>
 <polygon width="0.1" layer="16" thermals="no">
 <vertex x="25" y="3"/>
 <vertex x="26.4" y="3"/>
 <vertex x="26.4" y="2.4"/>
 <vertex x="25" y="2.4"/>
 </polygon>
-<via x="26.1" y="2.7" extent="1-16" drill="0.3048"/>
-<via x="42.2" y="27" extent="1-16" drill="0.3048"/>
+<via x="26.1" y="2.7" extent="1-16" drill="0.32"/>
+<via x="42.2" y="27" extent="1-16" drill="0.32"/>
 <wire x1="7.2" y1="38.4" x2="8" y2="38.4" width="0.3" layer="16"/>
 <wire x1="8" y1="38.4" x2="9.295" y2="38.4" width="0.3" layer="16"/>
 <wire x1="9.295" y1="38.4" x2="9.3" y2="38.405" width="0.3" layer="16"/>
@@ -2922,14 +2922,14 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="11.705" y1="38.4" x2="11.7" y2="38.405" width="0.3" layer="16"/>
 <wire x1="7.2" y1="38.4" x2="7.2" y2="35.83" width="0.3" layer="16"/>
 <wire x1="7.2" y1="35.83" x2="7.3" y2="35.73" width="0.3" layer="16"/>
-<via x="8" y="38.4" extent="1-16" drill="0.3048"/>
-<via x="13" y="38.4" extent="1-16" drill="0.3048"/>
-<via x="12.4" y="35.5" extent="1-16" drill="0.3048"/>
+<via x="8" y="38.4" extent="1-16" drill="0.32"/>
+<via x="13" y="38.4" extent="1-16" drill="0.32"/>
+<via x="12.4" y="35.5" extent="1-16" drill="0.32"/>
 <wire x1="11.8" y1="35.73" x2="12.17" y2="35.73" width="0.3" layer="16"/>
 <wire x1="12.17" y1="35.73" x2="12.4" y2="35.5" width="0.3" layer="16"/>
 <wire x1="13.7" y1="35.73" x2="12.63" y2="35.73" width="0.3" layer="16"/>
 <wire x1="12.63" y1="35.73" x2="12.4" y2="35.5" width="0.3" layer="16"/>
-<via x="7.1" y="34.6" extent="1-16" drill="0.3048"/>
+<via x="7.1" y="34.6" extent="1-16" drill="0.32"/>
 <wire x1="7.3" y1="35.73" x2="7.3" y2="34.8" width="0.3" layer="16"/>
 <wire x1="7.3" y1="34.8" x2="7.1" y2="34.6" width="0.3" layer="16"/>
 <wire x1="7.1" y1="34.6" x2="7.1" y2="33.8" width="0.3" layer="16"/>
@@ -2981,9 +2981,9 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="27.602" y1="20.7" x2="27.602" y2="19.598" width="0.2" layer="1"/>
 <wire x1="27.602" y1="19.598" x2="27.9" y2="19.3" width="0.2" layer="1"/>
 <wire x1="27.9" y1="19.3" x2="28.5" y2="19.3" width="0.2" layer="1"/>
-<via x="31.3" y="3.4" extent="1-16" drill="0.3048"/>
-<via x="28.5" y="3.4" extent="1-16" drill="0.3048"/>
-<via x="29.9" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="31.3" y="3.4" extent="1-16" drill="0.32"/>
+<via x="28.5" y="3.4" extent="1-16" drill="0.32"/>
+<via x="29.9" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="28.502" y1="4.3" x2="28.502" y2="3.402" width="0.2" layer="1"/>
 <wire x1="28.502" y1="3.402" x2="28.5" y2="3.4" width="0.2" layer="1"/>
 <wire x1="30.102" y1="4.3" x2="30.102" y2="3.602" width="0.2" layer="1"/>
@@ -2992,69 +2992,69 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="29.702" y1="3.598" x2="29.9" y2="3.4" width="0.2" layer="1"/>
 <wire x1="31.302" y1="4.3" x2="31.302" y2="3.402" width="0.2" layer="1"/>
 <wire x1="31.302" y1="3.402" x2="31.3" y2="3.4" width="0.2" layer="1"/>
-<via x="30.5" y="2.6" extent="1-16" drill="0.3048"/>
-<via x="27.3" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="30.5" y="2.6" extent="1-16" drill="0.32"/>
+<via x="27.3" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="30.502" y1="1.7" x2="30.502" y2="2.598" width="0.2" layer="1"/>
 <wire x1="30.502" y1="2.598" x2="30.5" y2="2.6" width="0.2" layer="1"/>
 <wire x1="27.302" y1="1.7" x2="27.302" y2="2.598" width="0.2" layer="1"/>
 <wire x1="27.302" y1="2.598" x2="27.3" y2="2.6" width="0.2" layer="1"/>
-<via x="28.1" y="2.6" extent="1-16" drill="0.3048"/>
-<via x="29.3" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="28.1" y="2.6" extent="1-16" drill="0.32"/>
+<via x="29.3" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="29.302" y1="1.7" x2="29.302" y2="2.598" width="0.2" layer="1"/>
 <wire x1="29.302" y1="2.598" x2="29.3" y2="2.6" width="0.2" layer="1"/>
 <wire x1="28.102" y1="1.7" x2="28.102" y2="2.598" width="0.2" layer="1"/>
 <wire x1="28.102" y1="2.598" x2="28.1" y2="2.6" width="0.2" layer="1"/>
-<via x="11.7" y="2.8" extent="1-16" drill="0.3048"/>
+<via x="11.7" y="2.8" extent="1-16" drill="0.32"/>
 <wire x1="11.702" y1="1.7" x2="11.702" y2="2.798" width="0.2" layer="1"/>
 <wire x1="11.702" y1="2.798" x2="11.7" y2="2.8" width="0.2" layer="1"/>
-<via x="19.7" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="19.7" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="19.702" y1="1.7" x2="19.702" y2="2.598" width="0.2" layer="1"/>
 <wire x1="19.702" y1="2.598" x2="19.7" y2="2.6" width="0.2" layer="1"/>
-<via x="14.5" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="14.5" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="14.502" y1="1.7" x2="14.502" y2="2.598" width="0.2" layer="1"/>
 <wire x1="14.502" y1="2.598" x2="14.5" y2="2.6" width="0.2" layer="1"/>
-<via x="13.1" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="13.1" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="13.302" y1="1.7" x2="13.302" y2="2.398" width="0.2" layer="1"/>
 <wire x1="13.302" y1="2.398" x2="13.1" y2="2.6" width="0.2" layer="1"/>
 <wire x1="12.902" y1="1.7" x2="12.902" y2="2.402" width="0.2" layer="1"/>
 <wire x1="12.902" y1="2.402" x2="13.1" y2="2.6" width="0.2" layer="1"/>
-<via x="16.1" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="16.1" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="16.102" y1="1.7" x2="16.102" y2="2.598" width="0.2" layer="1"/>
 <wire x1="16.102" y1="2.598" x2="16.1" y2="2.6" width="0.2" layer="1"/>
-<via x="17.3" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="17.3" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="17.302" y1="1.7" x2="17.302" y2="2.598" width="0.2" layer="1"/>
 <wire x1="17.302" y1="2.598" x2="17.3" y2="2.6" width="0.2" layer="1"/>
-<via x="18.7" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="18.7" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="18.502" y1="1.7" x2="18.502" y2="2.402" width="0.2" layer="1"/>
 <wire x1="18.502" y1="2.402" x2="18.7" y2="2.6" width="0.2" layer="1"/>
-<via x="12.5" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="12.5" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="12.502" y1="4.3" x2="12.502" y2="3.402" width="0.2" layer="1"/>
 <wire x1="12.502" y1="3.402" x2="12.5" y2="3.4" width="0.2" layer="1"/>
-<via x="14.9" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="14.9" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="14.902" y1="4.3" x2="14.902" y2="3.402" width="0.2" layer="1"/>
 <wire x1="14.902" y1="3.402" x2="14.9" y2="3.4" width="0.2" layer="1"/>
-<via x="19.7" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="19.7" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="19.702" y1="4.3" x2="19.702" y2="3.402" width="0.2" layer="1"/>
 <wire x1="19.702" y1="3.402" x2="19.7" y2="3.4" width="0.2" layer="1"/>
-<via x="17.3" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="17.3" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="17.302" y1="4.3" x2="17.302" y2="3.402" width="0.2" layer="1"/>
 <wire x1="17.302" y1="3.402" x2="17.3" y2="3.4" width="0.2" layer="1"/>
-<via x="18.5" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="18.5" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="18.502" y1="4.3" x2="18.502" y2="3.402" width="0.2" layer="1"/>
 <wire x1="18.502" y1="3.402" x2="18.5" y2="3.4" width="0.2" layer="1"/>
-<via x="16.1" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="16.1" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="16.102" y1="4.3" x2="16.102" y2="3.402" width="0.2" layer="1"/>
 <wire x1="16.102" y1="3.402" x2="16.1" y2="3.4" width="0.2" layer="1"/>
-<via x="25" y="5.3" extent="1-16" drill="0.3048"/>
-<via x="23.3" y="5.3" extent="1-16" drill="0.3048"/>
+<via x="25" y="5.3" extent="1-16" drill="0.32"/>
+<via x="23.3" y="5.3" extent="1-16" drill="0.32"/>
 <wire x1="24.902" y1="4.3" x2="24.902" y2="5.202" width="0.2" layer="1"/>
 <wire x1="24.902" y1="5.202" x2="25" y2="5.3" width="0.2" layer="1"/>
 <wire x1="23.702" y1="4.3" x2="23.702" y2="4.898" width="0.2" layer="1"/>
 <wire x1="23.702" y1="4.898" x2="23.3" y2="5.3" width="0.2" layer="1"/>
-<via x="22.1" y="2.7" extent="1-16" drill="0.3048"/>
+<via x="22.1" y="2.7" extent="1-16" drill="0.32"/>
 <wire x1="22.102" y1="1.7" x2="22.102" y2="2.698" width="0.2" layer="1"/>
 <wire x1="22.102" y1="2.698" x2="22.1" y2="2.7" width="0.2" layer="1"/>
-<via x="22.8" y="2.8" extent="1-16" drill="0.3048"/>
+<via x="22.8" y="2.8" extent="1-16" drill="0.32"/>
 <wire x1="23.302" y1="1.7" x2="23.302" y2="2.298" width="0.2" layer="1"/>
 <wire x1="23.302" y1="2.298" x2="22.8" y2="2.8" width="0.2" layer="1"/>
 <wire x1="26.102" y1="1.7" x2="26.102" y2="2.698" width="0.2" layer="1"/>
@@ -3071,7 +3071,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="54.2" y1="16.2" x2="54.2" y2="17.2" width="0.3" layer="16"/>
 <via x="57.9" y="11.8" extent="1-16" drill="0.32"/>
 <via x="55.8" y="1.1" extent="1-16" drill="0.32"/>
-<via x="40.2" y="0.8" extent="1-16" drill="0.3048"/>
+<via x="40.2" y="0.8" extent="1-16" drill="0.32"/>
 <wire x1="59.4" y1="22" x2="58.64" y2="22.11" width="0" layer="19" extent="1-16"/>
 <wire x1="59.075" y1="20.575" x2="59.4" y2="22" width="0" layer="19" extent="1-1"/>
 <wire x1="56.96" y1="25.32" x2="58.64" y2="22.11" width="0" layer="19" extent="16-16"/>
@@ -3442,12 +3442,12 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <vertex x="37.1" y="10.3"/>
 <vertex x="34.5" y="10.3"/>
 </polygon>
-<via x="35.8" y="10.5" extent="1-16" drill="0.3048"/>
+<via x="35.8" y="10.5" extent="1-16" drill="0.32"/>
 <wire x1="35" y1="11.25" x2="34" y2="12.25" width="0.3" layer="16"/>
 <wire x1="34" y1="12.25" x2="32.95" y2="12.25" width="0.3" layer="16"/>
-<via x="30.2" y="24.4" extent="1-16" drill="0.3048"/>
-<via x="28.2" y="24.4" extent="1-16" drill="0.3048"/>
-<via x="29.2" y="19.8" extent="1-16" drill="0.3048"/>
+<via x="30.2" y="24.4" extent="1-16" drill="0.32"/>
+<via x="28.2" y="24.4" extent="1-16" drill="0.32"/>
+<via x="29.2" y="19.8" extent="1-16" drill="0.32"/>
 <wire x1="29.202" y1="20.7" x2="29.202" y2="19.802" width="0.2" layer="1"/>
 <wire x1="29.202" y1="19.802" x2="29.2" y2="19.8" width="0.2" layer="1"/>
 <wire x1="28.002" y1="23.3" x2="28.002" y2="24.202" width="0.2" layer="1"/>
@@ -3458,21 +3458,21 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="30.002" y1="24.202" x2="30.2" y2="24.4" width="0.2" layer="1"/>
 <wire x1="30.402" y1="23.3" x2="30.402" y2="24.198" width="0.2" layer="1"/>
 <wire x1="30.402" y1="24.198" x2="30.2" y2="24.4" width="0.2" layer="1"/>
-<via x="28.5" y="18.7" extent="1-16" drill="0.3048"/>
+<via x="28.5" y="18.7" extent="1-16" drill="0.32"/>
 <wire x1="27.202" y1="20.7" x2="27.202" y2="19.498" width="0.2" layer="1"/>
 <wire x1="27.202" y1="19.498" x2="27.6" y2="18.7" width="0.2" layer="1"/>
 <wire x1="27.6" y1="18.7" x2="28.5" y2="18.7" width="0.2" layer="1"/>
-<via x="15.3" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="15.3" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="15.302" y1="1.7" x2="15.302" y2="2.598" width="0.2" layer="1"/>
 <wire x1="15.302" y1="2.598" x2="15.3" y2="2.6" width="0.2" layer="1"/>
-<via x="18.1" y="2.6" extent="1-16" drill="0.3048"/>
+<via x="18.1" y="2.6" extent="1-16" drill="0.32"/>
 <wire x1="18.102" y1="1.7" x2="18.102" y2="2.598" width="0.2" layer="1"/>
 <wire x1="18.102" y1="2.598" x2="18.1" y2="2.6" width="0.2" layer="1"/>
 <wire x1="15.702" y1="1.7" x2="15.702" y2="2.198" width="0.2" layer="1"/>
 <wire x1="15.702" y1="2.198" x2="15.3" y2="2.6" width="0.2" layer="1"/>
 <wire x1="17.702" y1="1.7" x2="17.702" y2="2.202" width="0.2" layer="1"/>
 <wire x1="17.702" y1="2.202" x2="18.1" y2="2.6" width="0.2" layer="1"/>
-<via x="11.9" y="3.4" extent="1-16" drill="0.3048"/>
+<via x="11.9" y="3.4" extent="1-16" drill="0.32"/>
 <wire x1="11.702" y1="4.3" x2="11.702" y2="3.598" width="0.2" layer="1"/>
 <wire x1="11.702" y1="3.598" x2="11.9" y2="3.4" width="0.2" layer="1"/>
 <wire x1="12.102" y1="4.3" x2="12.102" y2="3.602" width="0.2" layer="1"/>
@@ -3540,16 +3540,16 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="11.65" y1="12.45" x2="10.3" y2="12.45" width="0.3" layer="16"/>
 <wire x1="10.3" y1="12.45" x2="8.95" y2="11.1" width="0.3" layer="16"/>
 <wire x1="8.95" y1="11.1" x2="8.9" y2="11.1" width="0.3" layer="16"/>
-<via x="8.9" y="11.1" extent="1-16" drill="0.3048"/>
+<via x="8.9" y="11.1" extent="1-16" drill="0.32"/>
 <wire x1="8.9" y1="11.1" x2="5.7" y2="11.1" width="0.3" layer="15"/>
-<via x="5.7" y="11.1" extent="1-16" drill="0.3048"/>
+<via x="5.7" y="11.1" extent="1-16" drill="0.32"/>
 <wire x1="5.7" y1="11.1" x2="5.75" y2="11.15" width="0.3" layer="16"/>
 <wire x1="5.75" y1="11.15" x2="5.75" y2="12.4" width="0.3" layer="16"/>
 <wire x1="12.5" y1="34.35" x2="11.8" y2="34.35" width="0.3" layer="1"/>
 <wire x1="11.8" y1="34.35" x2="10.9" y2="33.45" width="0.3" layer="1"/>
 <wire x1="10.9" y1="33.45" x2="9.2" y2="31.75" width="0.3" layer="1"/>
 <wire x1="9.2" y1="31.75" x2="9.2" y2="29.6" width="0.3" layer="1"/>
-<via x="9.2" y="29.6" extent="1-16" drill="0.3048"/>
+<via x="9.2" y="29.6" extent="1-16" drill="0.32"/>
 <wire x1="9.2" y1="29.6" x2="5.7" y2="26.1" width="0.3" layer="15"/>
 <wire x1="5.7" y1="26.1" x2="5.7" y2="11.1" width="0.3" layer="15"/>
 <contactref element="C43" pad="P$1"/>
@@ -3557,22 +3557,22 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="30.75" y1="7.25" x2="33.5" y2="7.25" width="0.3" layer="16"/>
 <wire x1="12" y1="7.85" x2="11.35" y2="8.5" width="0.3" layer="16"/>
 <wire x1="11.35" y1="8.5" x2="11" y2="8.5" width="0.3" layer="16"/>
-<via x="11" y="8.5" extent="1-16" drill="0.3048"/>
+<via x="11" y="8.5" extent="1-16" drill="0.32"/>
 <wire x1="11" y1="8.5" x2="10.2" y2="8.5" width="0.3" layer="2"/>
 <wire x1="10.2" y1="8.5" x2="8.9" y2="9.8" width="0.3" layer="2"/>
 <wire x1="8.9" y1="9.8" x2="8.9" y2="11.1" width="0.3" layer="2"/>
 <wire x1="12" y1="7.85" x2="12.95" y2="7.85" width="0.3" layer="16"/>
 <wire x1="12.95" y1="7.85" x2="13" y2="7.9" width="0.3" layer="16"/>
-<via x="13" y="7.9" extent="1-16" drill="0.3048"/>
+<via x="13" y="7.9" extent="1-16" drill="0.32"/>
 <wire x1="13" y1="7.9" x2="18.4" y2="7.9" width="0.3" layer="15"/>
 <wire x1="18.4" y1="7.9" x2="19" y2="7.3" width="0.3" layer="15"/>
 <wire x1="19" y1="7.3" x2="21.3" y2="7.3" width="0.3" layer="15"/>
-<via x="21.3" y="7.3" extent="1-16" drill="0.3048"/>
+<via x="21.3" y="7.3" extent="1-16" drill="0.32"/>
 <wire x1="21.3" y1="7.3" x2="25.4" y2="7.3" width="0.3" layer="2"/>
-<via x="25.4" y="7.3" extent="1-16" drill="0.3048"/>
+<via x="25.4" y="7.3" extent="1-16" drill="0.32"/>
 <wire x1="25.4" y1="7.3" x2="30.9" y2="7.3" width="0.3" layer="15"/>
 <wire x1="30.9" y1="7.3" x2="31.5" y2="7.9" width="0.3" layer="15"/>
-<via x="31.5" y="7.9" extent="1-16" drill="0.3048"/>
+<via x="31.5" y="7.9" extent="1-16" drill="0.32"/>
 <wire x1="31.5" y1="7.9" x2="31.4" y2="7.9" width="0.3" layer="16"/>
 <wire x1="31.4" y1="7.9" x2="30.5" y2="7" width="0.3" layer="16"/>
 <wire x1="56" y1="28.3" x2="56.95" y2="30.9" width="0" layer="19" extent="1-1"/>
@@ -3725,7 +3725,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="17.64735" y1="6.5857" x2="17.4143" y2="6.35265" width="0.1524" layer="1"/>
 <wire x1="17.4143" y1="6.35265" x2="17.4143" y2="6.3357" width="0.1524" layer="1"/>
 <wire x1="17.4143" y1="6.3357" x2="17.4" y2="6.3" width="0.1524" layer="1"/>
-<via x="17.4" y="6.3" extent="1-16" drill="0.3048"/>
+<via x="17.4" y="6.3" extent="1-16" drill="0.32"/>
 <wire x1="17.4" y1="6.3" x2="17.7" y2="6" width="0.1524" layer="16"/>
 <wire x1="17.7" y1="6" x2="18" y2="6" width="0.1524" layer="16"/>
 <wire x1="18" y1="6" x2="18" y2="5.25" width="0.1524" layer="16"/>
@@ -3738,7 +3738,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="22.74735" y1="6.8143" x2="17.2857" y2="6.8143" width="0.1524" layer="1"/>
 <wire x1="17.2857" y1="6.8143" x2="17.1357" y2="6.7857" width="0.1524" layer="1"/>
 <wire x1="17.1357" y1="6.7857" x2="16.9" y2="6.75" width="0.1524" layer="1"/>
-<via x="16.9" y="6.75" extent="1-16" drill="0.3048"/>
+<via x="16.9" y="6.75" extent="1-16" drill="0.32"/>
 <wire x1="16.9" y1="6.75" x2="16.8" y2="6.65" width="0.1524" layer="16"/>
 <wire x1="16.8" y1="6.65" x2="16.75" y2="6.65" width="0.1524" layer="16"/>
 <wire x1="16.75" y1="6.65" x2="16.75" y2="5.5" width="0.1524" layer="16"/>
