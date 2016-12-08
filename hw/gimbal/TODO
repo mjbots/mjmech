@@ -1,3 +1,10 @@
+r4 TODO
+ * add ground connections
+ * route power supplies
+ * route brushless driver
+ * route weapon driver
+ * autoroute
+
  * add version number or date to image somehow
 
  * reduce static power consumption by scaling duty cycle with force required
