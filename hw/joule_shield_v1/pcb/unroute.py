@@ -9,8 +9,12 @@ filename = sys.argv[1]
 
 IGNORE_RES = [
     re.compile('^<wire .* width="0.0762"'),
+    re.compile('^<wire .* width="0.127" layer="1"'),
+    re.compile('^<wire .* width="0.127" layer="2"'),
+    re.compile('^<wire .* width="0.127" layer="15"'),
+    re.compile('^<wire .* width="0.127" layer="16"'),
     re.compile('^<via .* drill="0.3048"'),
-    ]
+]
 
 
 def ignore(line):
