@@ -153,11 +153,9 @@ class Selector : boost::noncopyable {
       return;
     }
 
-    auto params = servo_.parameters();
-
-    auto opt = params->stream.options_description();
+    auto* opt = servo_.options();
     if (StartsWith(serial_port, "tcp:")) {
-      opt->find("type", false).semantic()->notify(std::string("tcp"));
+      opt->find("stream.type", false).semantic()->notify(std::string("tcp"));
       std::string host_target = serial_port.substr(4);
       size_t colon = host_target.find_first_of(':');
       if (colon == std::string::npos) {
@@ -165,14 +163,14 @@ class Selector : boost::noncopyable {
             std::runtime_error("missing colon in tcp host:target"));
         return;
       }
-      opt->find("tcp.host", false).semantic()
+      opt->find("stream.tcp.host", false).semantic()
           ->notify(host_target.substr(0, colon));
-      opt->find("tcp.port", false).semantic()
+      opt->find("stream.tcp.port", false).semantic()
           ->notify(boost::lexical_cast<int>(
                        host_target.substr(colon + 1)));
     } else {
-      opt->find("type", false).semantic()->notify(std::string("serial"));
-      opt->find("serial.serial_port", false).semantic()->notify(serial_port);
+      opt->find("stream.type", false).semantic()->notify(std::string("serial"));
+      opt->find("stream.serial.serial_port", false).semantic()->notify(serial_port);
     }
 
     servo_.AsyncStart([=](ErrorCode ec) {
