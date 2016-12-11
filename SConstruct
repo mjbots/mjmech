@@ -47,7 +47,7 @@ variant_suffix = '-' + os.uname()[4]
 
 subdirs = ['base', 'mech', 'python', 'legtool', 'tools']
 
-if not os.uname()[4].startswith('arm') and env['UBUNTU_RELEASE'] != 'xenial':
+if not os.uname()[4].startswith('arm'):
     subdirs += ['simulator']
 
 for subdir in subdirs:
