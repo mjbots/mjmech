@@ -3530,6 +3530,24 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="5" y1="3.6" x2="5" y2="-1.9" width="0.127" layer="21"/>
 <text x="-7.7" y="4" size="0.8" layer="21">&gt;NAME</text>
 </package>
+<package name="SO8N">
+<smd name="2" x="-2.65" y="0.635" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="3" x="-2.65" y="-0.635" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="1" x="-2.65" y="1.905" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="4" x="-2.65" y="-1.905" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="7" x="2.65" y="0.635" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="6" x="2.65" y="-0.635" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="8" x="2.65" y="1.905" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<smd name="5" x="2.65" y="-1.905" dx="0.6" dy="1.4" layer="1" rot="R90"/>
+<wire x1="-2.8" y1="2.4" x2="-2.8" y2="2.2" width="0.127" layer="21"/>
+<wire x1="-2.8" y1="2.2" x2="-2.8" y2="-2.4" width="0.127" layer="21"/>
+<wire x1="-2.8" y1="-2.4" x2="2.8" y2="-2.4" width="0.127" layer="21"/>
+<wire x1="2.8" y1="-2.4" x2="2.8" y2="2.4" width="0.127" layer="21"/>
+<wire x1="2.8" y1="2.4" x2="-2.8" y2="2.4" width="0.127" layer="21"/>
+<wire x1="-2.8" y1="2.2" x2="-2.6" y2="2.2" width="0.127" layer="21"/>
+<wire x1="-2.6" y1="2.2" x2="-2.6" y2="2.3" width="0.127" layer="21"/>
+<text x="-2.3" y="3" size="0.8" layer="21">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="BQ25890">
@@ -4092,6 +4110,20 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <pin name="D" x="2.54" y="7.62" visible="off" length="short" rot="R270"/>
 <pin name="S" x="2.54" y="-7.62" visible="off" length="short" rot="R90"/>
 <text x="-12.7" y="5.08" size="2.54" layer="95" font="vector">&gt;NAME</text>
+</symbol>
+<symbol name="M24M02">
+<wire x1="-10.16" y1="15.24" x2="-10.16" y2="-15.24" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="15.24" x2="10.16" y2="15.24" width="0.254" layer="94"/>
+<wire x1="10.16" y1="15.24" x2="10.16" y2="-15.24" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-15.24" x2="-10.16" y2="-15.24" width="0.254" layer="94"/>
+<text x="-10.16" y="17.78" size="2.54" layer="94">&gt;NAME</text>
+<text x="-7.62" y="10.16" size="2.54" layer="94">M24M02</text>
+<pin name="E2" x="-15.24" y="0" length="middle"/>
+<pin name="SCL" x="15.24" y="0" length="middle" rot="R180"/>
+<pin name="WC/" x="-15.24" y="-5.08" length="middle"/>
+<pin name="SDA" x="15.24" y="5.08" length="middle" rot="R180"/>
+<pin name="VSS" x="-5.08" y="-20.32" length="middle" rot="R90"/>
+<pin name="VCC" x="-15.24" y="5.08" length="middle"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -5777,6 +5809,26 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <connect gate="G$1" pin="D" pad="3"/>
 <connect gate="G$1" pin="G" pad="1"/>
 <connect gate="G$1" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="M24M02">
+<gates>
+<gate name="G$1" symbol="M24M02" x="0" y="0"/>
+</gates>
+<devices>
+<device name="SO8N" package="SO8N">
+<connects>
+<connect gate="G$1" pin="E2" pad="3"/>
+<connect gate="G$1" pin="SCL" pad="6"/>
+<connect gate="G$1" pin="SDA" pad="5"/>
+<connect gate="G$1" pin="VCC" pad="8"/>
+<connect gate="G$1" pin="VSS" pad="4"/>
+<connect gate="G$1" pin="WC/" pad="7"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -7959,6 +8011,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="C43" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
 <attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
 </part>
+<part name="U11" library="joule_shield" deviceset="M24M02" device="SO8N"/>
+<part name="GND54" library="supply1" deviceset="GND" device=""/>
+<part name="U$41" library="joule_shield" deviceset="VDD1" device=""/>
+<part name="C44" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="0.1uF">
+<attribute name="MPN" value="MF-CAP-0603-0.1uF"/>
+</part>
+<part name="R46" library="mf_passives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="MPN" value="MF-RES-0603-10K"/>
+</part>
+<part name="R47" library="mf_passives" deviceset="RESISTOR" device="_0603" value="10k">
+<attribute name="MPN" value="MF-RES-0603-10K"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -9836,6 +9900,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="POPULATE" x="177.8" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
 <instance part="GND50" gate="1" x="154.94" y="101.6"/>
+<instance part="U11" gate="G$1" x="73.66" y="-38.1"/>
+<instance part="GND54" gate="1" x="68.58" y="-68.58"/>
+<instance part="U$41" gate="G$1" x="25.4" y="-15.24"/>
+<instance part="C44" gate="G$1" x="25.4" y="-30.48"/>
+<instance part="R46" gate="G$1" x="35.56" y="-53.34"/>
+<instance part="R47" gate="G$1" x="48.26" y="-53.34"/>
 </instances>
 <busses>
 </busses>
@@ -9892,6 +9962,24 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="154.94" y1="106.68" x2="154.94" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="106.68" x2="177.8" y2="106.68" width="0.1524" layer="91"/>
 <junction x="154.94" y="106.68"/>
+</segment>
+<segment>
+<pinref part="GND54" gate="1" pin="GND"/>
+<pinref part="U11" gate="G$1" pin="VSS"/>
+<wire x1="68.58" y1="-66.04" x2="68.58" y2="-60.96" width="0.1524" layer="91"/>
+<pinref part="C44" gate="G$1" pin="P$2"/>
+<wire x1="68.58" y1="-60.96" x2="68.58" y2="-58.42" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-33.02" x2="25.4" y2="-60.96" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-60.96" x2="35.56" y2="-60.96" width="0.1524" layer="91"/>
+<junction x="68.58" y="-60.96"/>
+<pinref part="R46" gate="G$1" pin="P$2"/>
+<wire x1="35.56" y1="-60.96" x2="48.26" y2="-60.96" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="-60.96" x2="68.58" y2="-60.96" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="-60.96" x2="35.56" y2="-58.42" width="0.1524" layer="91"/>
+<junction x="35.56" y="-60.96"/>
+<pinref part="R47" gate="G$1" pin="P$2"/>
+<wire x1="48.26" y1="-60.96" x2="48.26" y2="-58.42" width="0.1524" layer="91"/>
+<junction x="48.26" y="-60.96"/>
 </segment>
 </net>
 <net name="VRTC" class="0">
@@ -9962,6 +10050,17 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="R32" gate="G$1" pin="P$1"/>
 <wire x1="144.78" y1="144.78" x2="144.78" y2="139.7" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="U$41" gate="G$1" pin="VDD1"/>
+<pinref part="C44" gate="G$1" pin="P$1"/>
+<wire x1="25.4" y1="-15.24" x2="25.4" y2="-22.86" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-22.86" x2="25.4" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-22.86" x2="50.8" y2="-22.86" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="-22.86" x2="50.8" y2="-33.02" width="0.1524" layer="91"/>
+<junction x="25.4" y="-22.86"/>
+<pinref part="U11" gate="G$1" pin="VCC"/>
+<wire x1="50.8" y1="-33.02" x2="58.42" y2="-33.02" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$52" class="0">
 <segment>
@@ -9999,6 +10098,36 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <junction x="177.8" y="127"/>
 <wire x1="177.8" y1="149.86" x2="187.96" y2="149.86" width="0.1524" layer="91"/>
 <label x="180.34" y="149.86" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$22" class="0">
+<segment>
+<pinref part="R46" gate="G$1" pin="P$1"/>
+<wire x1="35.56" y1="-48.26" x2="35.56" y2="-38.1" width="0.1524" layer="91"/>
+<pinref part="U11" gate="G$1" pin="E2"/>
+<wire x1="35.56" y1="-38.1" x2="58.42" y2="-38.1" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$32" class="0">
+<segment>
+<pinref part="R47" gate="G$1" pin="P$1"/>
+<wire x1="48.26" y1="-48.26" x2="48.26" y2="-43.18" width="0.1524" layer="91"/>
+<pinref part="U11" gate="G$1" pin="WC/"/>
+<wire x1="48.26" y1="-43.18" x2="58.42" y2="-43.18" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="I2C_0_SDA" class="0">
+<segment>
+<pinref part="U11" gate="G$1" pin="SDA"/>
+<wire x1="88.9" y1="-33.02" x2="127" y2="-33.02" width="0.1524" layer="91"/>
+<label x="114.3" y="-33.02" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="I2C_0_SCL" class="0">
+<segment>
+<pinref part="U11" gate="G$1" pin="SCL"/>
+<wire x1="88.9" y1="-38.1" x2="127" y2="-38.1" width="0.1524" layer="91"/>
+<label x="114.3" y="-38.1" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
