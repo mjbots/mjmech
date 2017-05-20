@@ -40,14 +40,22 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
+ * Move buttons and LEDs so they won't be obstructed by camera cable
  * Get JST-ZH5 SMT RA in house and verify footprint
-
- * Figure out some way to buy SMTSO-M1.6's
+ * Route USB signals
+ * Route power supply ground and powers
+ * Route Joule ground and powers
+ * Route ground and supply connections for everything else
 
  * DRC
  * Get test points for output of each of the voltage regulators
  * Clear all silks from vias
  * Verify pinouts on joule connector with Intel expansion board
+
+DONE 2017-05-20
+ * Removed 1.8V and 3.3V regulators
+ * Removed eeprom
+ * Changed mounting solution to pass-through M1.6 screws with retaining nuts
 
 DONE 2016-12-04
  * Get script to undo auto-route so I can save an auto-routed version
