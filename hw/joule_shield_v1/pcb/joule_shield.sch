@@ -3955,6 +3955,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <circle x="0" y="0" radius="3.5921" width="0.254" layer="94"/>
 <text x="-5.08" y="5.08" size="2.54" layer="94">SMTSO</text>
 <text x="-5.08" y="10.16" size="2.54" layer="94">&gt;NAME</text>
+<pin name="P$1" x="0" y="-5.08" length="middle" rot="R90"/>
 </symbol>
 <symbol name="M2.5MOUNT">
 <circle x="0" y="0" radius="3.5921" width="0.254" layer="94"/>
@@ -5581,6 +5582,9 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </gates>
 <devices>
 <device name="SMTSO-M1.6" package="SMTSO-M1.6">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>
@@ -7308,10 +7312,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="DPN" value="1276-1274-1-ND"/>
 <attribute name="MPN" value="CL10A226MP8NUNE"/>
 </part>
-<part name="C19" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="22uF">
-<attribute name="DPN" value="1276-1274-1-ND"/>
-<attribute name="MPN" value="CL10A226MP8NUNE"/>
-</part>
 <part name="C20" library="mf_passives" deviceset="CAPACITOR_NP" device="_0603" value="1uF">
 <attribute name="MPN" value="MF-CAP-0603-1uF"/>
 </part>
@@ -7593,9 +7593,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R29" library="mf_passives" deviceset="RESISTOR" device="_0603" value="27">
 <attribute name="MPN" value="MF-RES-0603-27"/>
 </part>
-<part name="SW1" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
-<part name="SW2" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
-<part name="SW3" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
+<part name="PWR" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
+<part name="DNX" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
+<part name="BTN" library="mf_switches" deviceset="TACT" device="_4.2MM" value="MF-SW-TACT-4.2MM"/>
 <part name="GND48" library="supply1" deviceset="GND" device=""/>
 <part name="D5" library="joule_shield" deviceset="ESD_DIODE" device="M1005">
 <attribute name="DPN" value="490-13209-1-ND"/>
@@ -7760,6 +7760,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" value="BLM15PD121SN1D"/>
 <attribute name="POPULATE" value="1"/>
 </part>
+<part name="GND12" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7826,6 +7827,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="POPULATE" x="114.3" y="-17.78" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="U$58" gate="G$1" x="-10.16" y="172.72"/>
+<instance part="GND12" gate="1" x="-25.4" y="-35.56"/>
 </instances>
 <busses>
 </busses>
@@ -7884,6 +7886,24 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <junction x="287.02" y="76.2"/>
 <pinref part="J5" gate="G$1" pin="5"/>
 <wire x1="287.02" y1="78.74" x2="294.64" y2="78.74" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="GND12" gate="1" pin="GND"/>
+<pinref part="U$48" gate="G$1" pin="P$1"/>
+<wire x1="-25.4" y1="-33.02" x2="-25.4" y2="-30.48" width="0.1524" layer="91"/>
+<pinref part="U$49" gate="G$1" pin="P$1"/>
+<wire x1="-25.4" y1="-30.48" x2="-25.4" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="-25.4" y1="-30.48" x2="-7.62" y2="-30.48" width="0.1524" layer="91"/>
+<wire x1="-7.62" y1="-30.48" x2="-7.62" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="-25.4" y="-30.48"/>
+<pinref part="U$50" gate="G$1" pin="P$1"/>
+<wire x1="-7.62" y1="-30.48" x2="10.16" y2="-30.48" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="-30.48" x2="10.16" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="-7.62" y="-30.48"/>
+<pinref part="U$51" gate="G$1" pin="P$1"/>
+<wire x1="10.16" y1="-30.48" x2="27.94" y2="-30.48" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="-30.48" x2="27.94" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="10.16" y="-30.48"/>
 </segment>
 </net>
 <net name="VDD3" class="0">
@@ -8669,9 +8689,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="C18" gate="G$1" x="68.58" y="119.38">
 <attribute name="DPN" x="68.58" y="119.38" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="C19" gate="G$1" x="76.2" y="119.38">
-<attribute name="DPN" x="76.2" y="119.38" size="1.778" layer="96" display="off"/>
-</instance>
 <instance part="C20" gate="G$1" x="86.36" y="119.38"/>
 <instance part="GND15" gate="1" x="71.12" y="111.76"/>
 <instance part="U$6" gate="G$1" x="20.32" y="132.08"/>
@@ -8696,14 +8713,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="68.58" y1="114.3" x2="71.12" y2="114.3" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="116.84" x2="68.58" y2="114.3" width="0.1524" layer="91"/>
 <junction x="68.58" y="114.3"/>
-<pinref part="C19" gate="G$1" pin="P$2"/>
-<wire x1="71.12" y1="114.3" x2="76.2" y2="114.3" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="114.3" x2="76.2" y2="116.84" width="0.1524" layer="91"/>
 <junction x="71.12" y="114.3"/>
 <pinref part="C20" gate="G$1" pin="P$2"/>
-<wire x1="76.2" y1="114.3" x2="86.36" y2="114.3" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="114.3" x2="86.36" y2="114.3" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="114.3" x2="86.36" y2="116.84" width="0.1524" layer="91"/>
-<junction x="76.2" y="114.3"/>
 </segment>
 </net>
 <net name="V3P3V" class="0">
@@ -8717,8 +8730,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="C18" gate="G$1" pin="P$1"/>
 <wire x1="68.58" y1="124.46" x2="68.58" y2="121.92" width="0.1524" layer="91"/>
 <junction x="68.58" y="124.46"/>
-<pinref part="C19" gate="G$1" pin="P$1"/>
-<wire x1="76.2" y1="124.46" x2="76.2" y2="121.92" width="0.1524" layer="91"/>
 <junction x="76.2" y="124.46"/>
 <pinref part="C20" gate="G$1" pin="P$1"/>
 <wire x1="76.2" y1="124.46" x2="86.36" y2="124.46" width="0.1524" layer="91"/>
@@ -9362,9 +9373,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U$43" gate="G$1" x="180.34" y="73.66"/>
 <instance part="R27" gate="G$1" x="180.34" y="55.88"/>
 <instance part="GND44" gate="1" x="149.86" y="20.32"/>
-<instance part="SW1" gate="G$1" x="17.78" y="124.46"/>
-<instance part="SW2" gate="G$1" x="88.9" y="124.46"/>
-<instance part="SW3" gate="G$1" x="162.56" y="124.46"/>
+<instance part="PWR" gate="G$1" x="17.78" y="124.46"/>
+<instance part="DNX" gate="G$1" x="88.9" y="124.46"/>
+<instance part="BTN" gate="G$1" x="162.56" y="124.46"/>
 <instance part="GND48" gate="1" x="10.16" y="99.06"/>
 <instance part="D5" gate="G$1" x="33.02" y="116.84" rot="R90">
 <attribute name="DPN" x="33.02" y="116.84" size="1.778" layer="96" rot="R90" display="off"/>
@@ -9421,7 +9432,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="GND48" gate="1" pin="GND"/>
 <wire x1="10.16" y1="101.6" x2="10.16" y2="104.14" width="0.1524" layer="91"/>
-<pinref part="SW1" gate="G$1" pin="P$3"/>
+<pinref part="PWR" gate="G$1" pin="P$3"/>
 <wire x1="10.16" y1="104.14" x2="10.16" y2="121.92" width="0.1524" layer="91"/>
 <wire x1="10.16" y1="121.92" x2="15.24" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="D5" gate="G$1" pin="P$1"/>
@@ -9435,7 +9446,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="106.68" y1="104.14" x2="106.68" y2="106.68" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="SW3" gate="G$1" pin="P$3"/>
+<pinref part="BTN" gate="G$1" pin="P$3"/>
 <wire x1="160.02" y1="121.92" x2="154.94" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="GND50" gate="1" pin="GND"/>
 <wire x1="154.94" y1="121.92" x2="154.94" y2="106.68" width="0.1524" layer="91"/>
@@ -9493,7 +9504,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </net>
 <net name="PMIC_PWRBTN_N" class="0">
 <segment>
-<pinref part="SW1" gate="G$1" pin="P$2"/>
+<pinref part="PWR" gate="G$1" pin="P$2"/>
 <pinref part="D5" gate="G$1" pin="P$2"/>
 <wire x1="20.32" y1="127" x2="33.02" y2="127" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="127" x2="33.02" y2="147.32" width="0.1524" layer="91"/>
@@ -9518,13 +9529,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="R31" gate="G$1" pin="P$2"/>
 <wire x1="73.66" y1="124.46" x2="73.66" y2="121.92" width="0.1524" layer="91"/>
-<pinref part="SW2" gate="G$1" pin="P$3"/>
+<pinref part="DNX" gate="G$1" pin="P$3"/>
 <wire x1="73.66" y1="121.92" x2="86.36" y2="121.92" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="UART2_TX" class="0">
 <segment>
-<pinref part="SW2" gate="G$1" pin="P$2"/>
+<pinref part="DNX" gate="G$1" pin="P$2"/>
 <pinref part="D6" gate="G$1" pin="P$2"/>
 <wire x1="91.44" y1="127" x2="106.68" y2="127" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="127" x2="106.68" y2="149.86" width="0.1524" layer="91"/>
@@ -9537,13 +9548,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="R32" gate="G$1" pin="P$2"/>
 <wire x1="144.78" y1="129.54" x2="144.78" y2="127" width="0.1524" layer="91"/>
-<pinref part="SW3" gate="G$1" pin="P$1"/>
+<pinref part="BTN" gate="G$1" pin="P$1"/>
 <wire x1="144.78" y1="127" x2="160.02" y2="127" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="BTN_N" class="0">
 <segment>
-<pinref part="SW3" gate="G$1" pin="P$2"/>
+<pinref part="BTN" gate="G$1" pin="P$2"/>
 <pinref part="D7" gate="G$1" pin="P$2"/>
 <wire x1="165.1" y1="127" x2="177.8" y2="127" width="0.1524" layer="91"/>
 <wire x1="177.8" y1="127" x2="177.8" y2="149.86" width="0.1524" layer="91"/>

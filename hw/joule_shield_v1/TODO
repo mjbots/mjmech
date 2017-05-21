@@ -40,8 +40,7 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Move buttons and LEDs so they won't be obstructed by camera cable
- * Get JST-ZH5 SMT RA in house and verify footprint
+ * Line up all physical mounting again
  * Route USB signals
  * Route power supply ground and powers
  * Route Joule ground and powers
@@ -56,6 +55,9 @@ DONE 2017-05-20
  * Removed 1.8V and 3.3V regulators
  * Removed eeprom
  * Changed mounting solution to pass-through M1.6 screws with retaining nuts
+ * Move buttons and LEDs so they won't be obstructed by camera cable
+ * Get JST-ZH5 SMT RA in house and verify footprint
+ * Give switches and LEDS meaningful names
 
 DONE 2016-12-04
  * Get script to undo auto-route so I can save an auto-routed version
