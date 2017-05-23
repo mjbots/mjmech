@@ -40,6 +40,7 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
+ * Verify pinouts on joule connector with Intel expansion board
  * Line up all physical mounting again
  * Route USB signals
  * Route power supply ground and powers
@@ -47,9 +48,12 @@ TODO
  * Route ground and supply connections for everything else
 
  * DRC
- * Get test points for output of each of the voltage regulators
  * Clear all silks from vias
- * Verify pinouts on joule connector with Intel expansion board
+
+DONE 2017-05-22
+ * Reviewed expansion board design guide
+ * Updated FT231X to have dual power from USB or from host
+ * Verified FT231X won't drive the board if VCCIO is grounded
 
 DONE 2017-05-20
  * Removed 1.8V and 3.3V regulators

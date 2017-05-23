@@ -7173,6 +7173,132 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="mf_discrete_semiconductor">
+<packages>
+<package name="SMA">
+<description>&lt;b&gt;Description:&lt;/b&gt; Footprint for Diodes in SMA Standard.&lt;br/&gt;</description>
+<smd name="CATHODE" x="-2" y="0" dx="2.5" dy="1.7" layer="1" rot="R180"/>
+<smd name="ANODE" x="2" y="0" dx="2.5" dy="1.7" layer="1" rot="R180"/>
+<text x="-4.2" y="1.89" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<polygon width="0.127" layer="21">
+<vertex x="-0.35" y="0"/>
+<vertex x="0.35" y="0.5"/>
+<vertex x="0.35" y="-0.5"/>
+</polygon>
+<wire x1="-3.6" y1="1.6" x2="3.6" y2="1.6" width="0.127" layer="21"/>
+<wire x1="3.6" y1="1.6" x2="3.6" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="3.6" y1="-1.6" x2="-3.6" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="-3.6" y1="-1.6" x2="-3.6" y2="1.6" width="0.127" layer="21"/>
+<polygon width="0.127" layer="21">
+<vertex x="-4.2" y="1.6"/>
+<vertex x="-3.6" y="1.6"/>
+<vertex x="-3.6" y="-1.6"/>
+<vertex x="-4.2" y="-1.6"/>
+</polygon>
+</package>
+<package name="SOD-123">
+<description>&lt;b&gt;Description:&lt;/b&gt; Footprint for Diodes in SOD-123 Standard.&lt;br/&gt;</description>
+<smd name="CATHODE" x="-1.675" y="0" dx="0.85" dy="1.2" layer="1" rot="R180"/>
+<smd name="ANODE" x="1.675" y="0" dx="0.85" dy="1.2" layer="1" rot="R180"/>
+<text x="-2.8" y="1.09" size="1.016" layer="25" font="vector" ratio="16">&gt;NAME</text>
+<polygon width="0.127" layer="21">
+<vertex x="-0.35" y="0"/>
+<vertex x="0.15" y="0.3"/>
+<vertex x="0.15" y="-0.3"/>
+</polygon>
+<wire x1="-2.4" y1="0.85" x2="2.4" y2="0.85" width="0.127" layer="21"/>
+<wire x1="2.4" y1="0.85" x2="2.4" y2="-0.85" width="0.127" layer="21"/>
+<wire x1="2.4" y1="-0.85" x2="-2.4" y2="-0.85" width="0.127" layer="21"/>
+<wire x1="-2.4" y1="-0.85" x2="-2.4" y2="0.85" width="0.127" layer="21"/>
+<polygon width="0.127" layer="21">
+<vertex x="-2.8" y="0.85"/>
+<vertex x="-2.4" y="0.85"/>
+<vertex x="-2.4" y="-0.85"/>
+<vertex x="-2.8" y="-0.85"/>
+</polygon>
+</package>
+</packages>
+<symbols>
+<symbol name="DIODE">
+<description>&lt;b&gt;Description:&lt;/b&gt; Symbol for Single Diodes.&lt;br/&gt;</description>
+<wire x1="1.016" y1="1.524" x2="1.016" y2="-1.524" width="0.254" layer="94"/>
+<wire x1="0.762" y1="0" x2="-0.762" y2="-1.524" width="0.254" layer="94"/>
+<wire x1="-0.762" y1="-1.524" x2="-0.762" y2="1.524" width="0.254" layer="94"/>
+<wire x1="-0.762" y1="1.524" x2="0.762" y2="0" width="0.254" layer="94"/>
+<polygon width="0.254" layer="94">
+<vertex x="-0.762" y="-1.524"/>
+<vertex x="-0.762" y="1.524"/>
+<vertex x="0.762" y="0"/>
+</polygon>
+<text x="-2.54" y="5.08" size="1.016" layer="95" font="vector" align="top-left">&gt;NAME</text>
+<text x="-2.54" y="2.54" size="1.016" layer="96" font="vector">&gt;VALUE</text>
+<pin name="ANODE" x="-2.54" y="0" visible="off" length="short"/>
+<pin name="CATHODE" x="2.54" y="0" visible="off" length="short" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="DIODES" prefix="D">
+<description>&lt;b&gt;Library:&lt;/b&gt;  MF_Discrete_Semiconductor&lt;br/&gt;
+&lt;b&gt;Description:&lt;/b&gt; Device for Single Packaged Diodes.&lt;br/&gt;</description>
+<gates>
+<gate name="G$1" symbol="DIODE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="_SMA" package="SMA">
+<connects>
+<connect gate="G$1" pin="ANODE" pad="ANODE"/>
+<connect gate="G$1" pin="CATHODE" pad="CATHODE"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="HOUSEPART" value="NO" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="POPULATE" value="1" constant="no"/>
+<attribute name="URL" value="" constant="no"/>
+<attribute name="VALUE" value="" constant="no"/>
+</technology>
+<technology name="_B140">
+<attribute name="HOUSEPART" value="YES" constant="no"/>
+<attribute name="MPN" value="MF-DIO-SMA-B140" constant="no"/>
+<attribute name="POPULATE" value="1" constant="no"/>
+<attribute name="URL" value="https://factory.macrofab.com/part/MF-DIO-SMA-B140" constant="no"/>
+<attribute name="VALUE" value="MF-DIO-SMA-B140" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="_SOD-123" package="SOD-123">
+<connects>
+<connect gate="G$1" pin="ANODE" pad="ANODE"/>
+<connect gate="G$1" pin="CATHODE" pad="CATHODE"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="HOUSEPART" value="NO" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="POPULATE" value="1" constant="no"/>
+<attribute name="URL" value="" constant="no"/>
+<attribute name="VALUE" value="" constant="no"/>
+</technology>
+<technology name="_1N4148">
+<attribute name="HOUSEPART" value="YES" constant="no"/>
+<attribute name="MPN" value="MF-DIO-SOD123-1N4148" constant="no"/>
+<attribute name="POPULATE" value="1" constant="no"/>
+<attribute name="URL" value="https://factory.macrofab.com/part/MF-DIO-SOD123-1N4148" constant="no"/>
+<attribute name="VALUE" value="MF-DIO-SOD123-1N4148" constant="no"/>
+</technology>
+<technology name="_BAT42">
+<attribute name="HOUSEPART" value="YES" constant="no"/>
+<attribute name="MPN" value="MF-DIO-SOD123-BAT42" constant="no"/>
+<attribute name="POPULATE" value="1" constant="no"/>
+<attribute name="URL" value="https://factory.macrofab.com/part/MF-DIO-SOD123-BAT42" constant="no"/>
+<attribute name="VALUE" value="MF-DIO-SOD123-BAT42" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -7220,7 +7346,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R3" library="mf_passives" deviceset="RESISTOR" device="_0603" value="100k">
 <attribute name="MPN" value="MF-RES-0603-100K"/>
 </part>
-<part name="D1" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
+<part name="SYS" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
 <part name="R4" library="mf_passives" deviceset="RESISTOR" device="_0603" value="560">
 <attribute name="MPN" value="MF-RES-0603-560"/>
 </part>
@@ -7625,9 +7751,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND50" library="supply1" deviceset="GND" device=""/>
-<part name="D8" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
-<part name="D9" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
-<part name="D10" library="mf_leds" deviceset="LED_SINGLE" device="-0603-GREEN" value="MF-LED-0603-GREEN"/>
+<part name="LED1" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
+<part name="LED2" library="mf_leds" deviceset="LED_SINGLE" device="-0603-RED" value="MF-LED-0603-RED"/>
+<part name="LED3" library="mf_leds" deviceset="LED_SINGLE" device="-0603-GREEN" value="MF-LED-0603-GREEN"/>
 <part name="GND51" library="supply1" deviceset="GND" device=""/>
 <part name="R33" library="mf_passives" deviceset="RESISTOR" device="_0603" value="1k">
 <attribute name="MPN" value="MF-RES-0603-1K"/>
@@ -7761,6 +7887,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
+<part name="GND13" library="supply1" deviceset="GND" device=""/>
+<part name="R13" library="mf_passives" deviceset="RESISTOR" device="_0603" value="0">
+<attribute name="MPN" value="MF-RES-0603-0"/>
+</part>
+<part name="D1" library="mf_discrete_semiconductor" deviceset="DIODES" device="_SOD-123" technology="_BAT42" value="MF-DIO-SOD123-BAT42"/>
+<part name="D8" library="mf_discrete_semiconductor" deviceset="DIODES" device="_SOD-123" technology="_BAT42" value="MF-DIO-SOD123-BAT42"/>
+<part name="U$2" library="joule_shield" deviceset="V5P0V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7828,6 +7961,8 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </instance>
 <instance part="U$58" gate="G$1" x="-10.16" y="172.72"/>
 <instance part="GND12" gate="1" x="-25.4" y="-35.56"/>
+<instance part="GND13" gate="1" x="10.16" y="15.24"/>
+<instance part="R13" gate="G$1" x="10.16" y="25.4"/>
 </instances>
 <busses>
 </busses>
@@ -7904,6 +8039,11 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="10.16" y1="-30.48" x2="27.94" y2="-30.48" width="0.1524" layer="91"/>
 <wire x1="27.94" y1="-30.48" x2="27.94" y2="-27.94" width="0.1524" layer="91"/>
 <junction x="10.16" y="-30.48"/>
+</segment>
+<segment>
+<pinref part="R13" gate="G$1" pin="P$2"/>
+<pinref part="GND13" gate="1" pin="GND"/>
+<wire x1="10.16" y1="20.32" x2="10.16" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VDD3" class="0">
@@ -8168,6 +8308,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="93.98" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
+<net name="N$10" class="0">
+<segment>
+<pinref part="J6" gate="G$1" pin="USB2_ID_PMIC"/>
+<wire x1="20.32" y1="40.64" x2="10.16" y2="40.64" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="40.64" x2="10.16" y2="30.48" width="0.1524" layer="91"/>
+<pinref part="R13" gate="G$1" pin="P$1"/>
+</segment>
+</net>
 </nets>
 </sheet>
 <sheet>
@@ -8197,7 +8345,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="R2" gate="G$1" x="43.18" y="43.18" rot="R270"/>
 <instance part="GND4" gate="1" x="33.02" y="40.64"/>
 <instance part="R3" gate="G$1" x="45.72" y="35.56" rot="R270"/>
-<instance part="D1" gate="G$1" x="10.16" y="33.02" rot="R270"/>
+<instance part="SYS" gate="G$1" x="10.16" y="33.02" rot="R270"/>
 <instance part="R4" gate="G$1" x="10.16" y="43.18"/>
 <instance part="R5" gate="G$1" x="-2.54" y="20.32"/>
 <instance part="GND5" gate="1" x="96.52" y="-7.62"/>
@@ -8326,14 +8474,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </net>
 <net name="N$1" class="0">
 <segment>
-<pinref part="D1" gate="G$1" pin="ANODE"/>
+<pinref part="SYS" gate="G$1" pin="ANODE"/>
 <pinref part="R4" gate="G$1" pin="P$2"/>
 <wire x1="10.16" y1="38.1" x2="10.16" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
 <segment>
-<pinref part="D1" gate="G$1" pin="CATHODE"/>
+<pinref part="SYS" gate="G$1" pin="CATHODE"/>
 <wire x1="10.16" y1="30.48" x2="10.16" y2="22.86" width="0.1524" layer="91"/>
 <pinref part="U1" gate="G$1" pin="/PG"/>
 <wire x1="10.16" y1="22.86" x2="73.66" y2="22.86" width="0.1524" layer="91"/>
@@ -9909,11 +10057,11 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="MPN" x="17.78" y="96.52" size="1.778" layer="96" rot="R90" display="off"/>
 <attribute name="POPULATE" x="17.78" y="96.52" size="1.778" layer="96" rot="R90" display="off"/>
 </instance>
-<instance part="FB3" gate="G$1" x="30.48" y="106.68">
-<attribute name="DPN" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
-<attribute name="MF" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
-<attribute name="MPN" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
-<attribute name="POPULATE" x="30.48" y="106.68" size="1.778" layer="96" display="off"/>
+<instance part="FB3" gate="G$1" x="27.94" y="121.92">
+<attribute name="DPN" x="27.94" y="121.92" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="27.94" y="121.92" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="27.94" y="121.92" size="1.778" layer="96" display="off"/>
+<attribute name="POPULATE" x="27.94" y="121.92" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C38" gate="G$1" x="43.18" y="99.06"/>
 <instance part="GND47" gate="1" x="22.86" y="83.82"/>
@@ -9921,6 +10069,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="C40" gate="G$1" x="60.96" y="38.1"/>
 <instance part="R28" gate="G$1" x="48.26" y="68.58" rot="R90"/>
 <instance part="R29" gate="G$1" x="55.88" y="66.04" rot="R90"/>
+<instance part="D1" gate="G$1" x="43.18" y="116.84" rot="R270"/>
+<instance part="D8" gate="G$1" x="50.8" y="116.84" rot="R270"/>
+<instance part="U$2" gate="G$1" x="50.8" y="127"/>
 </instances>
 <busses>
 </busses>
@@ -9981,7 +10132,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <segment>
 <pinref part="D4" gate="G$1" pin="P$2"/>
 <pinref part="FB3" gate="G$1" pin="P$1"/>
-<wire x1="17.78" y1="106.68" x2="20.32" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="106.68" x2="17.78" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="J1" gate="G$1" pin="5V"/>
 <wire x1="5.08" y1="71.12" x2="7.62" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="71.12" x2="7.62" y2="106.68" width="0.1524" layer="91"/>
@@ -9991,15 +10142,18 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </net>
 <net name="N$49" class="0">
 <segment>
-<pinref part="FB3" gate="G$1" pin="P$2"/>
-<wire x1="40.64" y1="106.68" x2="43.18" y2="106.68" width="0.1524" layer="91"/>
 <pinref part="C38" gate="G$1" pin="P$1"/>
 <wire x1="43.18" y1="106.68" x2="43.18" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="U10" gate="G$1" pin="VCC"/>
 <wire x1="50.8" y1="73.66" x2="66.04" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="106.68" x2="50.8" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="106.68" x2="50.8" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="D1" gate="G$1" pin="CATHODE"/>
+<wire x1="43.18" y1="114.3" x2="43.18" y2="106.68" width="0.1524" layer="91"/>
 <junction x="43.18" y="106.68"/>
+<pinref part="D8" gate="G$1" pin="CATHODE"/>
+<wire x1="50.8" y1="114.3" x2="50.8" y2="106.68" width="0.1524" layer="91"/>
+<junction x="50.8" y="106.68"/>
 </segment>
 </net>
 <net name="N$53" class="0">
@@ -10066,15 +10220,30 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="43.18" y1="68.58" x2="5.08" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
+<net name="N$16" class="0">
+<segment>
+<pinref part="FB3" gate="G$1" pin="P$2"/>
+<wire x1="38.1" y1="121.92" x2="43.18" y2="121.92" width="0.1524" layer="91"/>
+<pinref part="D1" gate="G$1" pin="ANODE"/>
+<wire x1="43.18" y1="121.92" x2="43.18" y2="119.38" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="V5P0V" class="0">
+<segment>
+<pinref part="U$2" gate="G$1" pin="V5P0V"/>
+<pinref part="D8" gate="G$1" pin="ANODE"/>
+<wire x1="50.8" y1="127" x2="50.8" y2="119.38" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 <sheet>
 <plain>
 </plain>
 <instances>
-<instance part="D8" gate="G$1" x="50.8" y="50.8" rot="R270"/>
-<instance part="D9" gate="G$1" x="68.58" y="50.8" rot="R270"/>
-<instance part="D10" gate="G$1" x="91.44" y="50.8" rot="R270"/>
+<instance part="LED1" gate="G$1" x="50.8" y="50.8" rot="R270"/>
+<instance part="LED2" gate="G$1" x="68.58" y="50.8" rot="R270"/>
+<instance part="LED3" gate="G$1" x="91.44" y="50.8" rot="R270"/>
 <instance part="GND51" gate="1" x="78.74" y="-20.32"/>
 <instance part="R33" gate="G$1" x="38.1" y="27.94" rot="R180"/>
 <instance part="R34" gate="G$1" x="27.94" y="15.24" rot="R180"/>
@@ -10136,41 +10305,41 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <net name="N$56" class="0">
 <segment>
 <pinref part="R39" gate="G$1" pin="P$2"/>
-<pinref part="D10" gate="G$1" pin="ANODE"/>
+<pinref part="LED3" gate="G$1" pin="ANODE"/>
 <wire x1="91.44" y1="58.42" x2="91.44" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$57" class="0">
 <segment>
 <pinref part="R38" gate="G$1" pin="P$2"/>
-<pinref part="D9" gate="G$1" pin="ANODE"/>
+<pinref part="LED2" gate="G$1" pin="ANODE"/>
 <wire x1="68.58" y1="58.42" x2="68.58" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$58" class="0">
 <segment>
 <pinref part="R37" gate="G$1" pin="P$2"/>
-<pinref part="D8" gate="G$1" pin="ANODE"/>
+<pinref part="LED1" gate="G$1" pin="ANODE"/>
 <wire x1="50.8" y1="58.42" x2="50.8" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$59" class="0">
 <segment>
-<pinref part="D8" gate="G$1" pin="CATHODE"/>
+<pinref part="LED1" gate="G$1" pin="CATHODE"/>
 <wire x1="50.8" y1="48.26" x2="50.8" y2="40.64" width="0.1524" layer="91"/>
 <pinref part="Q1" gate="G$1" pin="D"/>
 </segment>
 </net>
 <net name="N$60" class="0">
 <segment>
-<pinref part="D9" gate="G$1" pin="CATHODE"/>
+<pinref part="LED2" gate="G$1" pin="CATHODE"/>
 <wire x1="68.58" y1="48.26" x2="68.58" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="Q2" gate="G$1" pin="D"/>
 </segment>
 </net>
 <net name="N$61" class="0">
 <segment>
-<pinref part="D10" gate="G$1" pin="CATHODE"/>
+<pinref part="LED3" gate="G$1" pin="CATHODE"/>
 <wire x1="91.44" y1="48.26" x2="91.44" y2="12.7" width="0.1524" layer="91"/>
 <pinref part="Q3" gate="G$1" pin="D"/>
 </segment>

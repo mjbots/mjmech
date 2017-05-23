@@ -3706,6 +3706,43 @@ Wickmann</description>
 <wire x1="5" y1="3.6" x2="5" y2="-1.9" width="0.127" layer="21"/>
 <text x="-7.7" y="4" size="0.8" layer="21">&gt;NAME</text>
 </package>
+<package name="FLIP-CHIP-25">
+<smd name="B3" x="0" y="0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="B2" x="-0.4" y="0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="C2" x="-0.4" y="0" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="C3" x="0" y="0" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="B4" x="0.4" y="0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="C4" x="0.4" y="0" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="B1" x="-0.8" y="0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="C1" x="-0.8" y="0" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="D1" x="-0.8" y="-0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="D2" x="-0.4" y="-0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="D3" x="0" y="-0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="D4" x="0.4" y="-0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="A1" x="-0.8" y="0.8" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="A2" x="-0.4" y="0.8" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="A3" x="0" y="0.8" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="A4" x="0.4" y="0.8" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<wire x1="-1.1" y1="1.1" x2="-1.05" y2="1.1" width="0.02" layer="22"/>
+<wire x1="-1.05" y1="1.1" x2="-1" y2="1.1" width="0.02" layer="21"/>
+<wire x1="-1" y1="1.1" x2="1.1" y2="1.1" width="0.02" layer="21"/>
+<wire x1="1.1" y1="1.1" x2="1.1" y2="-1.1" width="0.02" layer="21"/>
+<wire x1="1.1" y1="-1.1" x2="-1.1" y2="-1.1" width="0.02" layer="21"/>
+<wire x1="-1.1" y1="-1.1" x2="-1.1" y2="1" width="0.02" layer="21"/>
+<wire x1="-1.1" y1="1" x2="-1.1" y2="1.05" width="0.02" layer="21"/>
+<wire x1="-1.1" y1="1.05" x2="-1.1" y2="1.1" width="0.02" layer="22"/>
+<text x="-1" y="1.2" size="0.4" layer="21">&gt;NAME</text>
+<wire x1="-1.1" y1="1" x2="-1" y2="1.1" width="0.02" layer="21"/>
+<smd name="B5" x="0.8" y="0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="C5" x="0.8" y="0" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="D5" x="0.8" y="-0.4" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="A5" x="0.8" y="0.8" dx="0.215" dy="0.215" layer="1" roundness="100" stop="no"/>
+<smd name="E2" x="-0.4" y="-0.8" dx="0.215" dy="0.215" layer="1" roundness="100" rot="R90" stop="no"/>
+<smd name="E3" x="0" y="-0.8" dx="0.215" dy="0.215" layer="1" roundness="100" rot="R90" stop="no"/>
+<smd name="E4" x="0.4" y="-0.8" dx="0.215" dy="0.215" layer="1" roundness="100" rot="R90" stop="no"/>
+<smd name="E1" x="-0.8" y="-0.8" dx="0.215" dy="0.215" layer="1" roundness="100" rot="R90" stop="no"/>
+<smd name="E5" x="0.8" y="-0.8" dx="0.215" dy="0.215" layer="1" roundness="100" rot="R90" stop="no"/>
+</package>
 </packages>
 <symbols>
 <symbol name="INTEL_JOULE_J6">
@@ -4310,6 +4347,38 @@ Wickmann</description>
 <pin name="D" x="2.54" y="7.62" visible="off" length="short" rot="R270"/>
 <pin name="S" x="2.54" y="-7.62" visible="off" length="short" rot="R90"/>
 <text x="-12.7" y="5.08" size="2.54" layer="95" font="vector">&gt;NAME</text>
+</symbol>
+<symbol name="STG3244ME">
+<wire x1="-15.24" y1="27.94" x2="-15.24" y2="-33.02" width="0.254" layer="94"/>
+<wire x1="-15.24" y1="-33.02" x2="15.24" y2="-33.02" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-33.02" x2="15.24" y2="27.94" width="0.254" layer="94"/>
+<wire x1="15.24" y1="27.94" x2="-15.24" y2="27.94" width="0.254" layer="94"/>
+<text x="-12.7" y="30.48" size="1.27" layer="94">&gt;NAME</text>
+<text x="-12.7" y="25.4" size="1.27" layer="94">ST6G3244ME</text>
+<pin name="VCCA" x="-20.32" y="22.86" length="middle"/>
+<pin name="VCCB" x="20.32" y="17.78" length="middle" rot="R180"/>
+<pin name="EN" x="-20.32" y="15.24" length="middle"/>
+<pin name="CMD_DIR" x="-20.32" y="10.16" length="middle"/>
+<pin name="CMD_A" x="-20.32" y="7.62" length="middle"/>
+<pin name="CLK_A" x="-20.32" y="2.54" length="middle"/>
+<pin name="CLK_F" x="-20.32" y="0" length="middle"/>
+<pin name="DAT0_DIR" x="-20.32" y="-5.08" length="middle"/>
+<pin name="DAT0_A" x="-20.32" y="-7.62" length="middle"/>
+<pin name="DAT123_DIR" x="-20.32" y="-12.7" length="middle"/>
+<pin name="DAT1_A" x="-20.32" y="-15.24" length="middle"/>
+<pin name="DAT2_A" x="-20.32" y="-17.78" length="middle"/>
+<pin name="DAT3_A" x="-20.32" y="-20.32" length="middle"/>
+<pin name="WP" x="-20.32" y="-25.4" length="middle"/>
+<pin name="CMD_B" x="20.32" y="10.16" length="middle" rot="R180"/>
+<pin name="CLK_B" x="20.32" y="2.54" length="middle" rot="R180"/>
+<pin name="DAT0_B" x="20.32" y="-7.62" length="middle" rot="R180"/>
+<pin name="DAT1_B" x="20.32" y="-15.24" length="middle" rot="R180"/>
+<pin name="DAT2_B" x="20.32" y="-17.78" length="middle" rot="R180"/>
+<pin name="DAT3_B" x="20.32" y="-20.32" length="middle" rot="R180"/>
+<pin name="CD" x="20.32" y="-25.4" length="middle" rot="R180"/>
+<pin name="GND" x="-20.32" y="-30.48" length="middle"/>
+<pin name="V_BAT" x="20.32" y="22.86" length="middle" rot="R180"/>
+<pin name="SEL" x="-20.32" y="17.78" length="middle"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -6067,6 +6136,44 @@ Wickmann</description>
 <connect gate="G$1" pin="D" pad="3"/>
 <connect gate="G$1" pin="G" pad="1"/>
 <connect gate="G$1" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="ST6G3244ME">
+<gates>
+<gate name="G$1" symbol="STG3244ME" x="0" y="0"/>
+</gates>
+<devices>
+<device name="FLIP-CHIP-25" package="FLIP-CHIP-25">
+<connects>
+<connect gate="G$1" pin="CD" pad="D3"/>
+<connect gate="G$1" pin="CLK_A" pad="C1"/>
+<connect gate="G$1" pin="CLK_B" pad="C5"/>
+<connect gate="G$1" pin="CLK_F" pad="E2"/>
+<connect gate="G$1" pin="CMD_A" pad="D2"/>
+<connect gate="G$1" pin="CMD_B" pad="D4"/>
+<connect gate="G$1" pin="CMD_DIR" pad="A2"/>
+<connect gate="G$1" pin="DAT0_A" pad="D1"/>
+<connect gate="G$1" pin="DAT0_B" pad="D5"/>
+<connect gate="G$1" pin="DAT0_DIR" pad="A3"/>
+<connect gate="G$1" pin="DAT123_DIR" pad="E3"/>
+<connect gate="G$1" pin="DAT1_A" pad="E1"/>
+<connect gate="G$1" pin="DAT1_B" pad="E5"/>
+<connect gate="G$1" pin="DAT2_A" pad="A1"/>
+<connect gate="G$1" pin="DAT2_B" pad="A5"/>
+<connect gate="G$1" pin="DAT3_A" pad="B1"/>
+<connect gate="G$1" pin="DAT3_B" pad="B5"/>
+<connect gate="G$1" pin="EN" pad="C2"/>
+<connect gate="G$1" pin="GND" pad="C3 C4"/>
+<connect gate="G$1" pin="SEL" pad="B2"/>
+<connect gate="G$1" pin="VCCA" pad="B3"/>
+<connect gate="G$1" pin="VCCB" pad="B4"/>
+<connect gate="G$1" pin="V_BAT" pad="A4"/>
+<connect gate="G$1" pin="WP" pad="E4"/>
 </connects>
 <technologies>
 <technology name=""/>
