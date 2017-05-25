@@ -40,7 +40,6 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Line up all physical mounting again
  * Route USB signals
  * Route power supply ground and powers
  * Route Joule ground and powers
@@ -48,6 +47,9 @@ TODO
 
  * DRC
  * Clear all silks from vias
+
+DONE 2017-05-24
+ * lined up all physical mounting
 
 DONE 2017-05-23
  * Verified pinouts on joule connector with Intel expansion board
