@@ -40,7 +40,6 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Route Joule ground and powers
  * Route ground and supply connections for everything else
 
  * DRC
@@ -51,6 +50,7 @@ DONE 2017-05-27
  * Routed USB power switches
  * Verified there is sufficient room for Joule nuts... they are approx
    3.6mm diameter, the existing via is 4mm diameter
+ * Routed Joule power and ground
 
 DONE 2017-05-26
  * Routed USB
