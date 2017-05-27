@@ -47,6 +47,9 @@ TODO
  * DRC
  * Clear all silks from vias
 
+DONE 2017-05-27
+ * Routed 5V regulator
+
 DONE 2017-05-26
  * Routed USB
  * Routed VSYS regulator
