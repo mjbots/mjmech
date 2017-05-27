@@ -9462,13 +9462,14 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="JD1" gate="G$1" pin="3"/>
 </segment>
 </net>
-<net name="N$28" class="0">
+<net name="VDC_JACK" class="0">
 <segment>
 <pinref part="JD1" gate="G$1" pin="4"/>
 <wire x1="25.4" y1="81.28" x2="48.26" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="D2" gate="G$1" pin="A"/>
 <wire x1="50.8" y1="106.68" x2="48.26" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="106.68" x2="48.26" y2="81.28" width="0.1524" layer="91"/>
+<label x="40.64" y="99.06" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VIN_CHRG" class="0">

@@ -40,13 +40,16 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Route USB signals
  * Route power supply ground and powers
  * Route Joule ground and powers
  * Route ground and supply connections for everything else
 
  * DRC
  * Clear all silks from vias
+
+DONE 2017-05-26
+ * Routed USB
+ * Routed VSYS regulator
 
 DONE 2017-05-24
  * lined up all physical mounting
