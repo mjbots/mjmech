@@ -8316,6 +8316,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="R13" gate="G$1" pin="P$1"/>
 </segment>
 </net>
+<net name="PMIC_PWRBTN_N" class="0">
+<segment>
+<pinref part="J6" gate="G$1" pin="PMIC_PWRBTN_N"/>
+<wire x1="81.28" y1="33.02" x2="116.84" y2="33.02" width="0.1524" layer="91"/>
+<label x="101.6" y="33.02" size="1.778" layer="95"/>
+</segment>
+</net>
 </nets>
 </sheet>
 <sheet>
@@ -9521,7 +9528,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="GND43" gate="1" x="157.48" y="48.26"/>
 <instance part="U$43" gate="G$1" x="180.34" y="73.66"/>
 <instance part="R27" gate="G$1" x="180.34" y="55.88"/>
-<instance part="GND44" gate="1" x="149.86" y="20.32"/>
+<instance part="GND44" gate="1" x="149.86" y="12.7"/>
 <instance part="PWR" gate="G$1" x="17.78" y="124.46"/>
 <instance part="DNX" gate="G$1" x="88.9" y="124.46"/>
 <instance part="BTN" gate="G$1" x="162.56" y="124.46"/>
@@ -9572,7 +9579,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="JFAN" gate="G$1" pin="SHLD"/>
 <wire x1="139.7" y1="27.94" x2="149.86" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="GND44" gate="1" pin="GND"/>
-<wire x1="149.86" y1="27.94" x2="149.86" y2="22.86" width="0.1524" layer="91"/>
+<wire x1="149.86" y1="27.94" x2="149.86" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="JFAN" gate="G$1" pin="3"/>
 <wire x1="139.7" y1="35.56" x2="149.86" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="35.56" x2="149.86" y2="27.94" width="0.1524" layer="91"/>

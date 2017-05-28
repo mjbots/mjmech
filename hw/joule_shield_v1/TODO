@@ -51,6 +51,7 @@ DONE 2017-05-27
  * Verified there is sufficient room for Joule nuts... they are approx
    3.6mm diameter, the existing via is 4mm diameter
  * Routed Joule power and ground
+ * Routed power and ground for level converts, SD card, and debug USB
 
 DONE 2017-05-26
  * Routed USB
