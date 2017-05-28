@@ -3541,7 +3541,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="20.4143" y1="7.45265" x2="20.84735" y2="7.8857" width="0.1524" layer="16"/>
 <wire x1="20.84735" y1="7.8857" x2="23.9857" y2="7.8857" width="0.1524" layer="16"/>
 <wire x1="23.9857" y1="7.8857" x2="24" y2="7.9" width="0.1524" layer="16"/>
-<via x="24" y="7.9" extent="1-16" drill="0.3048"/>
+<via x="24" y="7.9" extent="1-16" drill="0.31"/>
 <wire x1="24" y1="7.9" x2="24.102" y2="8.002" width="0.1524" layer="1"/>
 <wire x1="24.102" y1="8.002" x2="24.102" y2="9.3" width="0.1524" layer="1"/>
 </signal>
@@ -3554,7 +3554,7 @@ This DRC check is for 4-Layer Extended Capability boards to be manufactured thro
 <wire x1="20.75265" y1="8.1143" x2="23.6" y2="8.1143" width="0.1524" layer="16"/>
 <wire x1="23.6" y1="8.1143" x2="23.7857" y2="8.3" width="0.1524" layer="16"/>
 <wire x1="23.7857" y1="8.3" x2="24.5" y2="8.3" width="0.1524" layer="16"/>
-<via x="24.5" y="8.3" extent="1-16" drill="0.3048"/>
+<via x="24.5" y="8.3" extent="1-16" drill="0.31"/>
 <wire x1="24.5" y1="8.3" x2="24.502" y2="8.302" width="0.1524" layer="1"/>
 <wire x1="24.502" y1="8.302" x2="24.502" y2="9.3" width="0.1524" layer="1"/>
 </signal>
