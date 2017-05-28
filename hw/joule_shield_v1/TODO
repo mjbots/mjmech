@@ -40,7 +40,6 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
- * Route ground and supply connections for everything else
 
  * DRC
  * Clear all silks from vias
@@ -52,6 +51,7 @@ DONE 2017-05-27
    3.6mm diameter, the existing via is 4mm diameter
  * Routed Joule power and ground
  * Routed power and ground for level converts, SD card, and debug USB
+ * Routed all manual routes for everything
 
 DONE 2017-05-26
  * Routed USB
