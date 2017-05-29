@@ -40,9 +40,10 @@
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
 TODO
+ * Order
 
- * DRC
- * Clear all silks from vias
+DONE 2017-05-29
+ * Auto-route and arranged all silks
 
 DONE 2017-05-27
  * Routed 5V regulator
