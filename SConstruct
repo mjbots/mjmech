@@ -35,7 +35,11 @@ env.Append(LIBS=['snappy',
                  'boost_date_time'])
 
 env.ParseConfig('pkg-config --cflags --libs eigen3')
-env.ParseConfig('pkg-config --cflags --libs opencv')
+
+# This is commented out as making opencv work on the joule and xenial
+# simultaneously is currently an unsolved problem.
+#
+# env.ParseConfig('pkg-config --cflags --libs opencv')
 
 env['UBUNTU_RELEASE'] = subprocess.check_output(["lsb_release", "-cs"]).strip()
 
