@@ -1,9 +1,8 @@
- * Things to install in ref-os-iot image
-   * snappy
-   * log4cpp
-   * get ssh server starting
+ * Video streaming
+   * Figure out "unusual buffer flags" warning spam
 
- * Get software running on ref-os-iot
+ * Design fan mount for joule
+
  * Verify Joule 5GHz wifi works
 
  * Get prototype Joule shield working
@@ -69,8 +68,13 @@ Video/Control
 History
 ~~~~~~~
 
-DONE 2017-05-31
- *
+DONE 2017-06-26
+ * joule camera working
+ * all software running on ref-os-iot
+
+DONE 2017-06-12
+ * Got root ssh login on joule
+ * All deps running on joule
 
 DONE 2016-12-02
  * Verified that UART0 and UART1 work in joule ubuntu, up to 4M baud

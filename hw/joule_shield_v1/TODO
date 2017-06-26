@@ -39,6 +39,10 @@
      * main power
      * 4x GPIO w/ bipolar drivers MF-DSC-SOT233-MMBT3904
 
+r1 Errata
+
+ * FB1-5 are C0603 on the board, but the part is smaller
+
 TODO
  * Order
 
