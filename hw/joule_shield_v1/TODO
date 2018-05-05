@@ -1,14 +1,21 @@
+Bring up Debugging ideas
+ * In one trace, scope VSYS, VDD3, PMIC_PWRGOOD, and PMIC_RESET_N
+ * Scope VSYS on both boards right at Joule module to see if there are
+   obvious drops during bootup
+ * Scope the ISH_GPIO_0-3 on both boards to see when/if they trigger
+ * Scope eeprom I2C pins to see if it tries to talk to an EEPROM
+ * (last ditch) remove SD card level translator
+
+
  * Initial part selection
    * 12V->VSYS converter - BQ25892
    * VSYS->5V converter - FAN48623
-   * VSYS->3.3V converter - TPS63021
-   * VSYS->1.8V converter - TLV62084
    * USB power switch - TPS2553DRVT
      * should work with 1.8V logic, no level converter needed for enable
    * level converter for serial to servos
      * 2x SN74LVC1T45DBVR - 296-16843-1-ND
    * connector to servos / gimbal drive board
-     * 2x JST XH 4 (DPN 455-2262-1-ND)
+     * JST XH 4 (DPN 455-2262-1-ND)
      * probably have gimbal drive board daisy chain power to compute
        board
    * SD card
@@ -23,14 +30,9 @@
      * should be able to do direct 1.8V interface without level conversion
    * USB for camera - 5 pin JST ZH  455-1696-1-ND
    * USB for peripherals - A type female 609-4413-ND
-   * threaded fasteners for Joule module
-     * I think PEM: SMTSO-M1.6-2ET is the right one, but will need to
-       measure to be sure
    * mounting holes
    * fan power connector - a101008ct-nd
-   * configuration eeprom - 497-11600-1-ND
    * I2C0 - VSYS converter and config eeprom
-   * hdmi connector ? would need level converter and filters
    * buttons
      * power - MF-SW-TACT-6MM
      * boot from DNX - MF-SW-TACT-6MM
@@ -41,7 +43,16 @@
 
 r1 Errata
 
- * FB1-5 are C0603 on the board, but the part is smaller
+ * FB1-5 are C0603 on the board, but the part is 0402, need to
+   reselect part number for 0603 bead
+ * no ground test point
+ * PMIC_PWR_GOOD has no test point
+ * some SD card data lines are really long
+ * Joule J7 pin 48 is undocumented, but grounded in the expansion board
+ * lacking 0.1uF decoupling caps on vsys near joule connectors
+ * ISH_GPIO_3 is documented as being tweaked by the BIOS during boot,
+   it probably should be used to control power to one of the USB
+   switches
 
 TODO
  * Order
