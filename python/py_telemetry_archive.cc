@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/format.hpp>
 #include <boost/python.hpp>
+
+#include <fmt/format.h>
 
 #include "base/error_code.h"
 #include "base/fast_stream.h"
@@ -60,7 +61,7 @@ std::string FormatDict(bp::dict enum_items) {
   for (int i = 0; i < bp::len(items); i++) {
     int key = bp::extract<int>(items[i][0]);
     std::string value = bp::extract<std::string>(items[i][1]);
-    ostr << boost::format("%d:\"%s\",") % key % value;
+    ostr << fmt::format("{}:\"{}\",", key, value);
   }
   ostr << "}";
   return ostr.str();
@@ -71,8 +72,8 @@ bp::object MakeEnumType(const std::string& field_name,
   bp::dict globals = bp::extract<bp::dict>(g_main_namespace);
   bp::dict locals;
 
-  bp::exec(bp::str((boost::format(R"XX(
-class %1%(int):
+  bp::exec(bp::str(fmt::format(R"XX(
+class {0}(int):
   __slots__ = ()
   __fields__ = ('enum_items')
 
@@ -84,14 +85,14 @@ class %1%(int):
         value = int(value)
     return int.__new__(_cls, value)
 
-  enum_items = %2%
+  enum_items = {1}
 
   def __repr__(self):
     if self in self.enum_items:
-      return "'%%s(%%d)'" %% (self.enum_items[self], self)
-    return '%%s' %% self
-)XX") % field_name % FormatDict(enum_items)).str()),
-                  globals, locals);
+      return "'%s(%d)'" % (self.enum_items[self], self)
+    return '%s' % self
+)XX", field_name, FormatDict(enum_items))),
+           globals, locals());
 
   return locals[field_name];
 }
@@ -123,7 +124,7 @@ class ReadArchive {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
       throw SystemError::einval(
-          (boost::format("unsupported SchemaFlags %d") % flags).str());
+          (fmt::format("unsupported SchemaFlags {}", flags)));
     }
 
     return ReadSchemaObject(schema, name, false);
@@ -135,7 +136,7 @@ class ReadArchive {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
       throw SystemError::einval(
-          (boost::format("unsupported ObjectFlags %d") % flags).str());
+          fmt::format("unsupported ObjectFlags {}", flags));
     }
 
     bp::list fields_list;
@@ -283,7 +284,7 @@ class ReadArchive {
       }
       default: {
         throw SystemError::einval(
-            (boost::format("unimplemented field type %d") % ft).str());
+            fmt::format("unimplemented field type {}", ft));
       }
     }
 
@@ -296,7 +297,7 @@ class ReadArchive {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
       throw SystemError::einval(
-          (boost::format("unsupported SchemaFlags %d") % flags).str());
+          fmt::format("unsupported SchemaFlags {}", flags));
     }
 
     return ReadDataObject(schema_result, schema, data);
@@ -308,7 +309,7 @@ class ReadArchive {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
       throw SystemError::einval(
-          (boost::format("unsupported ObjectFlags %d") % flags).str());
+          fmt::format("unsupported ObjectFlags {}", flags));
     }
 
     int index = 0;
@@ -433,7 +434,7 @@ class ReadArchive {
       }
     }
     throw SystemError::einval(
-        (boost::format("invalid type %d") % ft).str());
+        fmt::format("invalid type {}", ft));
   }
 
   template <typename Stream>

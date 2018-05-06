@@ -1,0 +1,27 @@
+configuration:
+  - Debug
+  - Release
+
+image: Visual Studio 2017
+
+environment:
+  CTEST_OUTPUT_ON_FAILURE: 1
+  matrix:
+  - BUILD: msvc
+  - BUILD: msvc
+    PLATFORM: x64
+
+before_build:
+  # Workaround for CMake not wanting sh.exe on PATH for MinGW.
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+
+build_script:
+  - python support/appveyor-build.py
+
+on_failure:
+  - appveyor PushArtifact Testing/Temporary/LastTest.log
+  - appveyor AddTest test
+
+# Uncomment this to debug AppVeyor failures.
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

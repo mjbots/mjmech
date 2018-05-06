@@ -15,21 +15,17 @@
 #pragma once
 
 #include <string>
-#include <boost/format/format_fwd.hpp>
-
-#include "error_code.h"
 
 namespace mjmech {
 namespace base {
+
+class ErrorCode;
 
 /// Terminate the program.
 void AssertNotReached() __attribute__ ((noreturn));
 
 /// Terminate the program and display a backtrace.
 void Fail(const std::string& message) __attribute__ ((noreturn));
-
-/// Terminate the program and display a backtrace.
-void Fail(const boost::format&) __attribute__ ((noreturn));
 
 /// Terminate a program if the given error code is set.
 void FailIf(const ErrorCode&);

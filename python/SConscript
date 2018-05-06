@@ -15,6 +15,7 @@
 import os
 
 Import('canonenv')
+Import('libfmt_so')
 Import('libbase_so')
 Import('libmech_so')
 env = canonenv.Clone()
@@ -46,12 +47,14 @@ def add_lib(lib):
 
 add_lib(libmech_so)
 add_lib(libbase_so)
+add_lib(libfmt_so)
 bpenv.ParseConfig('pkg-config --cflags --libs python')
 pylegtool = bpenv.SharedLibrary(
     '_legtool', PY_SOURCES,
     LIBPREFIX='')
 bpenv.Depends(pylegtool, libmech_so)
 bpenv.Depends(pylegtool, libbase_so)
+bpenv.Depends(pylegtool, libfmt_so)
 
 # Verify that we can load this library.
 legtool_test = File('test/py_legtool_test.py')

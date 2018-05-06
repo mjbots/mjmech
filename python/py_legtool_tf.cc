@@ -14,8 +14,6 @@
 
 #include <boost/python.hpp>
 
-#include <boost/format.hpp>
-
 #include "base/point3d.h"
 #include "base/tf.h"
 

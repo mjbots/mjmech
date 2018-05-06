@@ -22,17 +22,24 @@ if ARGUMENTS.get('debug', 0):
 else:
     env.Append(CPPFLAGS=['-O3'])
 
-env.Append(CPPPATH=['#/'])
+env.Append(CPPDEFINES=[
+    'BOOST_COROUTINE_NO_DEPRECATION_WARNING',
+    'BOOST_COROUTINES_NO_DEPRECATION_WARNING',
+])
+
+env.Append(CPPPATH=['#/', '#/fmt/include'])
 env.Append(CPPFLAGS=['-Wall', '-Werror', '-g', '-std=c++1y'])
 env.Append(LINKFLAGS=['-rdynamic'])
-env.Append(LIBS=['snappy',
-                 'boost_system',
-                 'boost_program_options',
-                 'pthread',
-                 'rt',
-                 'log4cpp',
-                 'boost_filesystem',
-                 'boost_date_time'])
+env.Append(LIBS=[
+    'snappy',
+    'boost_system',
+    'boost_program_options',
+    'pthread',
+    'rt',
+    'log4cpp',
+    'boost_filesystem',
+    'boost_date_time',
+])
 
 env.ParseConfig('pkg-config --cflags --libs eigen3')
 
@@ -49,7 +56,7 @@ Export('canonenv')
 import os
 variant_suffix = '-' + os.uname()[4]
 
-subdirs = ['base', 'mech', 'python', 'legtool', 'tools']
+subdirs = ['fmt', 'base', 'mech', 'python', 'legtool', 'tools']
 
 if not os.uname()[4].startswith('arm'):
     subdirs += ['simulator']
