@@ -194,7 +194,6 @@ class Selector : boost::noncopyable {
   Servo servo_{service_, factory_};
   HerkuleXServoInterface<Servo> servo_interface_{&servo_};
   ServoInterfaceWrapper wrapper_{&servo_interface_};
-  bool started_{false};
 };
 }
 
