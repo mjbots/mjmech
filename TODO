@@ -1,13 +1,8 @@
- * Video streaming
-   * Figure out "unusual buffer flags" warning spam
+ * verify serial port functionality on pi
+ * get turret board compiling w/ clang freestanding in bazel
+ * build daughterboard for rpi3b
+ * build new turret for rpi3b
 
- * Design fan mount for joule
-
- * Verify Joule 5GHz wifi works
-
- * Get prototype Joule shield working
- * Modify old odroid shield to disable the servo drivers so as to not
-   conflict with joule servo driver
 
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
