@@ -8361,13 +8361,16 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </part>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="C2" library="rcl" deviceset="C-US" device="C1206" value="10uF 16V">
-<attribute name="DPN" value="399-7442-1-ND"/>
+<attribute name="MFG" value="MF"/>
+<attribute name="MPN" value="MF-CAP-1206-10u"/>
 </part>
 <part name="C3" library="rcl" deviceset="C-US" device="C0603" value="1uF 16V">
-<attribute name="DPN" value="399-7847-1-ND"/>
+<attribute name="MFG" value="TDK"/>
+<attribute name="MPN" value="C1608X7R1C105K080AC"/>
 </part>
 <part name="C4" library="rcl" deviceset="C-US" device="C1210" value="22uF 16V">
-<attribute name="DPN" value="445-3955-1-ND"/>
+<attribute name="MFG" value="TDK"/>
+<attribute name="MPN" value="CGA6P1X7R1C226M250AC"/>
 </part>
 <part name="L1" library="odroid_shield" deviceset="L-US" device="WURTH_74404042033" value="3.3uH">
 <attribute name="DPN" value="732-5505-1-ND"/>
@@ -8429,13 +8432,16 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </instance>
 <instance part="GND5" gate="1" x="63.5" y="-2.54"/>
 <instance part="C2" gate="G$1" x="15.24" y="33.02">
-<attribute name="DPN" x="15.24" y="33.02" size="1.778" layer="96" display="off"/>
+<attribute name="MFG" x="15.24" y="33.02" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="15.24" y="33.02" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C3" gate="G$1" x="22.86" y="22.86">
-<attribute name="DPN" x="22.86" y="22.86" size="1.778" layer="96" display="off"/>
+<attribute name="MFG" x="22.86" y="22.86" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="22.86" y="22.86" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C4" gate="G$1" x="114.3" y="27.94">
-<attribute name="DPN" x="114.3" y="27.94" size="1.778" layer="96" display="off"/>
+<attribute name="MFG" x="114.3" y="27.94" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="114.3" y="27.94" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="L1" gate="G$1" x="93.98" y="35.56" rot="R90">
 <attribute name="DPN" x="93.98" y="35.56" size="1.778" layer="96" rot="R90" display="off"/>
