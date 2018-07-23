@@ -63,7 +63,7 @@ struct StaticFunction<R(Args...), Size>
 
   using Base = typename StaticFunctionBase<R, Args...>::Base;
   template <typename F>
-  using Impl = typename StaticFunctionBase<R, Args...>::Impl<F>;
+  using Impl = typename StaticFunctionBase<R, Args...>::template Impl<F>;
 
   template <typename F>
   StaticFunction(const F& f) {
@@ -120,7 +120,7 @@ struct StaticFunction<R(Args...), Size>
   }
 
   bool valid() const {
-    for (int i = 0; i < storage_.size(); i++) {
+    for (size_t i = 0; i < storage_.size(); i++) {
       if (storage_[i] != 0) { return true; }
     }
     return false;

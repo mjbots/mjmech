@@ -111,7 +111,11 @@ TESTS = ['test/' + x for x in [
 
 testenv = hostenv.Clone()
 testenv.Append(LIBS=['boost_unit_test_framework'])
-testenv.Append(CXXFLAGS=['-Wno-unused-local-typedefs'])
+testenv.Append(CXXFLAGS=[
+    '-Wno-unused-local-typedefs',
+    '-Wno-deprecated-declarations',
+    '-Wno-sign-compare',
+])
 testenv['OBJPREFIX'] = 'tst_'
 
 test_gimbal = testenv.Program('test_gimbal', HOST_SOURCES + TESTS)

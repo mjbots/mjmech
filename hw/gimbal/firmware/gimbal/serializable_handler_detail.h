@@ -91,7 +91,7 @@ struct EnumerateArchive : public mjmech::base::VisitArchive<EnumerateArchive> {
     if (ea->parent_) { FormatPrefix(current, end, ea->parent_); }
 
     // Would we overflow?
-    if ((ea->prefix_.size() + 2) > std::distance(*current, *end)) { return 1; }
+    if (static_cast<ssize_t>(ea->prefix_.size() + 2) > std::distance(*current, *end)) { return 1; }
 
     for (auto it = ea->prefix_.begin(); it != ea->prefix_.end(); ++it) {
       **current = *it;
@@ -113,7 +113,7 @@ struct EnumerateArchive : public mjmech::base::VisitArchive<EnumerateArchive> {
     if (FormatPrefix(&it, &end, this)) {
       return gsl::cstring_span();
     }
-    if ((name.size() + 3) > std::distance(it, end)) {
+    if (static_cast<ssize_t>(name.size() + 3) > std::distance(it, end)) {
       return gsl::cstring_span();
     }
 

@@ -16,9 +16,15 @@
 
 #include <cmath>
 
+namespace std {
+using ::round;
+using ::log1p;
+}
+
 #include <Eigen/Core>
 
 #include "euler.h"
+#include "math_util.h"
 #include "point3d.h"
 
 class Quaternion;

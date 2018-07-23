@@ -16,6 +16,11 @@
 
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI (3.1415926535897932384626433832795028841971693993751058209)
+#define M_PI_2 (1.5707963267948966)
+#endif
+
 inline float WrapNegPiToPi(float value) {
   if (value >= -M_PI && value <= M_PI) { return value; }
   if (value > 0.0) {
