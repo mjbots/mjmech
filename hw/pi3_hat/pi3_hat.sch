@@ -8357,7 +8357,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="U3" library="odroid_shield" deviceset="ST1S10" device="">
 <attribute name="DPN" value="497-12084-1-ND"/>
 <attribute name="MF" value="STMicroelectronics"/>
-<attribute name="MPN" value="ST1S40IPUR"/>
+<attribute name="MPN" value="ST1S40IPHR"/>
 </part>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="C2" library="rcl" deviceset="C-US" device="C1206" value="10uF 16V">
