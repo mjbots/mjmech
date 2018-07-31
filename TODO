@@ -1,8 +1,26 @@
- * verify serial port functionality on pi
- * get turret board compiling w/ clang freestanding in bazel
- * build daughterboard for rpi3b
- * build new turret for rpi3b
+ * test rpi3 daughterboard
+ * mod mammal power board to disconnect/remove servo level translators
+ * boot up turret board again, recalibrate the gyro and both motors
 
+ * rpi3 mounting hardware TODO
+   * vertical brackets
+     * mark out in sketch where gimbal motor interferes with nut
+     * don't need to extend backward at all
+     * need mounting holes for weapon further forward so top screw
+       clears motor
+     * front needs bottom clearance for weapon side screws
+   * bottom plate
+     * needs to be shifted over to let rpi3 swing freely
+     * needs mounting holes for camera spaced across front
+     * holes for flex cable retention wire / twist tie
+     * make left side be narrower so pitch gimbal wire could be placed
+       on bottom side
+     * add longitudinal ridges for increased stiffness
+
+   * design front and rear shroud
+
+
+ * get turret board compiling w/ clang freestanding in bazel
 
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
@@ -62,6 +80,23 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2018-07-30
+ * Wrote setup script
+
+DONE 2018-07-23
+ * Got gimbal building on bionic
+ * Upgraded everything to bazel 0.15.1
+
+DONE 2018-07-17
+ * Modified brackets to move rpi3 and weapon further forward.  Seems
+   to balance relatively well in that position, although you can't put
+   a nut on the top weapon bolt
+
+DONE 2018-07-16
+ * Verified serial functionality
+ * Basic fit check of rpi3 mounting hardware
+ * Got rpi3 hat sent off to mfg
 
 DONE 2017-06-26
  * joule camera working
