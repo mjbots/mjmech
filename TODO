@@ -1,3 +1,4 @@
+ * Make video wifi link more reliable
  * test rpi3 daughterboard
  * mod mammal power board to disconnect/remove servo level translators
  * boot up turret board again, recalibrate the gyro and both motors
@@ -12,10 +13,11 @@
    * bottom plate
      * needs to be shifted over to let rpi3 swing freely
      * needs mounting holes for camera spaced across front
-     * holes for flex cable retention wire / twist tie
      * make left side be narrower so pitch gimbal wire could be placed
        on bottom side
      * add longitudinal ridges for increased stiffness
+     * mounting holes for rpi3 need to be shifted so it sits further
+       forward
 
    * design front and rear shroud
 
