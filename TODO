@@ -1,6 +1,3 @@
- * get tview and tplot operating again
-
- * boot up turret board again, recalibrate the gyro and both motors
  * build cable to rpi3 daughterboard
  * get whole robot walking again
 
@@ -85,6 +82,10 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2018-08-13
+ * get tview and tplot operating again
+ * boot up turret board again, recalibrate the gyro and both motors
 
 DONE 2018-08-12
  * Packaged python and boost::python
