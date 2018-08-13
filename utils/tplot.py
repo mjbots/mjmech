@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/python3 -B
 
-# Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2015-2018 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import PySide.QtGui as QtGui
 
 SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(SCRIPT_PATH, '../python'))
-sys.path.append(os.path.join(SCRIPT_PATH, 'build-x86_64'))
+sys.path.append(os.path.join(SCRIPT_PATH, '../bazel-bin/utils'))
 import ui_tplot_main_window
 
 import telemetry_log

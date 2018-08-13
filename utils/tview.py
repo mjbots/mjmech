@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/python3 -B
 
-# Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2015-2018 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,12 +35,12 @@ matplotlib.rcParams['backend.qt4'] = 'PySide'
 from matplotlib.backends import backend_qt4agg
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
-from IPython.external.qt import QtCore, QtGui
-from IPython.qt.console.history_console_widget import HistoryConsoleWidget
+from qtconsole.qt import QtCore, QtGui
+from qtconsole.history_console_widget import HistoryConsoleWidget
 
 SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(SCRIPT_PATH, '../python'))
-sys.path.append(os.path.join(SCRIPT_PATH, 'build-x86_64'))
+sys.path.append(os.path.join(SCRIPT_PATH, '../bazel-bin/utils'))
 
 import telemetry_archive
 import telemetry_log
@@ -105,7 +105,7 @@ class RecordSignal(object):
         return Connection(self, result)
 
     def update(self, value):
-        for handler in self._callbacks.itervalues():
+        for handler in self._callbacks.values():
             handler(value)
         return len(self._callbacks) != 0
 
@@ -280,6 +280,11 @@ class TviewConsoleWidget(HistoryConsoleWidget):
         self._prompt = '>>> '
         self.clear()
 
+        # The bionic version of ConsoleWidget seems to get the cursor
+        # position screwed up after a clear.  Let's just fix it up
+        # here.
+        self._append_before_prompt_cursor.setPosition(0)
+
     def sizeHint(self):
         return QtCore.QSize(600, 200)
 
@@ -294,7 +299,7 @@ class TviewConsoleWidget(HistoryConsoleWidget):
         self._control.moveCursor(QtGui.QTextCursor.End)
 
     def _is_complete(self, source, interactive):
-        return True
+        return True, False
 
     def _execute(self, source, hidden):
         self.line_input.emit(source)
@@ -316,7 +321,7 @@ class Record(object):
 
     def update(self, struct):
         count = 0
-        for key, signal in self.signals.iteritems():
+        for key, signal in self.signals.items():
             value = _get_data(struct, key)
             if signal.update(value):
                 count += 1
@@ -360,7 +365,7 @@ class TviewMainWindow(QtGui.QMainWindow):
         self.port = None
         self.default_rate = 100
 
-        self._buffer = ''
+        self._buffer = b''
         self._serial_timer = QtCore.QTimer()
         self._serial_timer.timeout.connect(self._poll_serial)
         self._serial_timer.start(10)
@@ -430,8 +435,8 @@ class TviewMainWindow(QtGui.QMainWindow):
             timeout=0.0)
 
         # Stop the spew.
-        self.port.write('\r\n')
-        self.port.write('tel stop\r\n')
+        self.port.write('\r\n'.encode('latin1'))
+        self.port.write('tel stop\r\n'.encode('latin1'))
 
         # Wait a short while, then eat everything we can.
         time.sleep(0.1)
@@ -474,7 +479,7 @@ class TviewMainWindow(QtGui.QMainWindow):
 
     def _handle_user_input(self, line):
         if self.port:
-            self.port.write(line + '\n')
+            self.port.write((line + '\n').encode('latin1'))
 
     def _handle_serial_data(self):
         if self._serial_state == self.STATE_LINE:
@@ -495,6 +500,8 @@ class TviewMainWindow(QtGui.QMainWindow):
         if line is None:
             return
 
+        line = line.decode('latin1')
+
         display = True
         if line == '':
             display = False
@@ -511,12 +518,22 @@ class TviewMainWindow(QtGui.QMainWindow):
             self.console.add_text(line + '\n')
 
     def _get_serial_line(self):
-        delim = '[\r\n]'
-        if not re.search(delim, self._buffer):
+        # Consume any newlines at the start of our buffer.
+        pos = 0
+        while pos < len(self._buffer) and self._buffer[pos] in b'\r\n':
+            pos += 1
+        self._buffer = self._buffer[pos:]
+
+        # Look for a trailing newline
+        end = 0
+        while end < len(self._buffer) and self._buffer[end] not in b'\r\n':
+            end += 1
+
+        if end >= len(self._buffer):
             return
 
-        line, rest = re.split('[\n\r]', self._buffer, maxsplit=1)
-        self._buffer = rest
+        line, self._buffer = self._buffer[:end], self._buffer[end+1:]
+
         return line
 
     def update_config(self, callback):
@@ -537,6 +554,7 @@ class TviewMainWindow(QtGui.QMainWindow):
         if not line:
             return
 
+        line = line.decode('latin1')
         self.console.add_text(line + '\n')
 
         if line.startswith('OK'):
@@ -596,13 +614,14 @@ class TviewMainWindow(QtGui.QMainWindow):
     def write_line(self, line):
         self.console.add_text(line)
         if self.port:
-            self.port.write(line)
+            self.port.write(line.encode('latin1'))
 
     def _handle_telemetry(self):
         line = self._get_serial_line()
         if not line:
             return
 
+        line = line.decode('latin1')
         self.console.add_text(line + '\n')
 
         if line.startswith('OK'):
@@ -680,7 +699,7 @@ class TviewMainWindow(QtGui.QMainWindow):
         size = struct.unpack('<I', self._buffer[1:5])[0]
         if size > 2 ** 24:
             # Whoops, probably bogus.
-            print 'Invalid schema size, skipping whatever we were doing.'
+            print('Invalid schema size, skipping whatever we were doing.')
             self._serial_state = self.STATE_LINE
             return
 
