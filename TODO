@@ -1,7 +1,10 @@
- * Make video wifi link more reliable
- * test rpi3 daughterboard
- * mod mammal power board to disconnect/remove servo level translators
+ * get tview and tplot operating again
+
  * boot up turret board again, recalibrate the gyro and both motors
+ * build cable to rpi3 daughterboard
+ * get whole robot walking again
+
+ * Make video wifi link more reliable
 
  * rpi3 mounting hardware TODO
    * vertical brackets
@@ -83,11 +86,22 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2018-08-12
+ * Packaged python and boost::python
+ * Got tview working
+
+DONE 2018-08-10
+ * Removed level translators from mammal odroid board
+ * Received pi3 shields r1
+ * Updated everything to bionic
+ * Modded pi3 hat to have correct voltage, tested and seems to power
+   the pi3 just fine
+
 DONE 2018-07-30
  * Wrote setup script
 
 DONE 2018-07-23
- * Got gimbal building on bionic
+ * Got gimbal building on xenial
  * Upgraded everything to bazel 0.15.1
 
 DONE 2018-07-17
