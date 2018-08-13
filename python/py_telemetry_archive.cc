@@ -25,10 +25,6 @@ namespace bp = boost::python;
 using namespace mjmech::base;
 typedef TelemetryFormat TF;
 
-bp::object g_collections = bp::import("collections");
-bp::object g_main_module = bp::import("__main__");
-bp::object g_main_namespace = g_main_module.attr("__dict__");
-
 template <typename Base>
 class RecordingStream {
  public:
@@ -69,7 +65,10 @@ std::string FormatDict(bp::dict enum_items) {
 
 bp::object MakeEnumType(const std::string& field_name,
                         bp::dict enum_items) {
-  bp::dict globals = bp::extract<bp::dict>(g_main_namespace);
+  bp::object main_module = bp::import("__main__");
+  bp::object main_namespace = main_module.attr("__dict__");
+
+  bp::dict globals = bp::extract<bp::dict>(main_namespace);
   bp::dict locals;
 
   bp::exec(bp::str(fmt::format(R"XX(
@@ -92,7 +91,7 @@ class {0}(int):
       return "'%s(%d)'" % (self.enum_items[self], self)
     return '%s' % self
 )XX", field_name, FormatDict(enum_items))),
-           globals, locals());
+           globals, locals);
 
   return locals[field_name];
 }
@@ -163,7 +162,7 @@ class ReadArchive {
     if (!ignore) {
       bp::dict result;
       result["fields"] = fields_list;
-      result["tuple"] = g_collections.attr("namedtuple")(
+      result["tuple"] = collections_.attr("namedtuple")(
           name, field_names);
 
       return result;
@@ -470,6 +469,7 @@ class ReadArchive {
     return result;
   }
 
+  const bp::object collections_ = bp::import("collections");
   const std::string schema_;
   const std::string name_;
   bp::object root_;
