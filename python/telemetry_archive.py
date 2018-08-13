@@ -1,4 +1,4 @@
-# Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2015-2018 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,16 +13,18 @@
 # limitations under the License.
 
 import collections
-import cStringIO as stringio
+import io
 import os
 import struct
 import sys
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(SCRIPT_PATH, 'build-x86_64'))
+sys.path.append(os.path.join(SCRIPT_PATH, '../bazel-bin/python'))
 
 from _telemetry_archive import *
 
+
+stringio = io.StringIO
 
 class ReadArchivePython(object):
     '''Parse schema and binary data objects serialized using the

@@ -16,11 +16,13 @@
 telemetry_format.h.'''
 
 import snappy
-import cStringIO as stringio
+import io
 import struct
 
 import telemetry_archive
 
+
+stringio = io.StringIO
 
 _BLOCK_STRUCT = struct.Struct('<HI')
 _HEADER = 'TLOG0002'
