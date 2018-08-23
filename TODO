@@ -1,5 +1,12 @@
- * remount turret in correct orientation
- * Make video wifi link more reliable
+ * Create tool to configure controller
+  * iwconfig wlxxx retry 1
+  * iwconfig wlxxx power off
+  * ip route add 239.89.108.0/24 dev wlxxx
+ * camera based target stabilization/tracking
+  * get opencv building
+
+
+ * optimize gstreamer/ffmpeg to get 1080p video working from rpi3
 
 
  * rpi3 mounting hardware TODO
@@ -18,7 +25,7 @@
      * mounting holes for rpi3 need to be shifted so it sits further
        forward
 
-   * design front and rear shroud
+   * design shroud
 
 
  * get turret board compiling w/ clang freestanding in bazel
@@ -28,12 +35,6 @@
 
  * control: make sure we are using multicasts for control commands
 
- * Logs collection from the robot
- * OSD -- general logging
-
- * control: deploy/launch script. Must also collect logs, including
-   video stats.
- * camera based target stabilization/tracking
 
 Post-Robotgames 2016 brainstorming
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,6 +82,16 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2018-08-22
+ * Switched to unicast, couldn't figure out a way to set mcast rate on
+   bcm43455c0
+ * Updated configs and startup script
+ * Discovered that 720p is all the rpi3 can encode with current
+   optimizations
+
+DONE 2018-08-20
+ * Mounted turret in correct orientation
 
 DONE 2018-08-19
  * first walking with rpi3!
