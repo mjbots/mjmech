@@ -1,13 +1,6 @@
  * Create tool to configure controller
-  * iwconfig wlxxx retry 1
+  * iwconfig wlxxx retry 2
   * iwconfig wlxxx power off
-  * ip route add 239.89.108.0/24 dev wlxxx
- * camera based target stabilization/tracking
-  * get opencv building
-
-
- * optimize gstreamer/ffmpeg to get 1080p video working from rpi3
-
 
  * rpi3 mounting hardware TODO
    * vertical brackets
@@ -23,17 +16,27 @@
        on bottom side
      * add longitudinal ridges for increased stiffness
      * mounting holes for rpi3 need to be shifted so it sits further
-       forward
+       forward, want to be able to connect shore supply without
+       tipping gimbal up
 
-   * design shroud
+ * design shroud
 
+ * Get video writing in controller working
 
- * get turret board compiling w/ clang freestanding in bazel
+ * gimbal
+   * get turret board compiling w/ clang freestanding in bazel
+   * rev board
+     * drop usb pass through
+     * add power/data pass through
+     * add on-board IMU for pitch compensation
+   * get gimbal running at 800hz
 
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
-
- * control: make sure we are using multicasts for control commands
+ * when strafing left, hard to make it actually go left and not curve
+   around
+ * numerical turret angle isn't as handy as seeing a diagram of the
+   robots current configuration relative to the turret
 
 
 Post-Robotgames 2016 brainstorming
@@ -57,8 +60,6 @@ Post-Robotgames 2016 brainstorming
 Movement
 ~~~~~~~~
 
- * Make AHRS actually work
-   * Possibly switch to Mahony IMU instead of UKF for easier tuning and stability
  * Switch gait engine to be one that selects foot placements
  * Make tplot be able to 3d render the mech
 
@@ -66,22 +67,19 @@ Video/Control
 ~~~~~~~~~~~~~
 
  * Fix raw_frames in VideoDisplay::Stats
- * control: ability to click on screen and start shooting there
  * control: ability to lock on / detect the target
- * video: dynamically control frame parameters, # of retransmissions
- * video: mjpeg mode for times when link is really bad
- * video: forward error correction / network coding
  * general: remove all address smarts from udp_data_link and udp_socket.
    It is perfectly ok (and more predicable) to specify all paramters
    by hand.
- * control: detect if bullet actually went out
- * video: see if we can decrease the camera latency
-  - currently ~200mS for H264 on-camera or ~120mS for H264 on-odroid
- * video: ensure --display.source=rtsp:// works
- * fix IMU -- find out the right i2c port
 
 History
 ~~~~~~~
+
+DONE 2018-08-28
+ * Made video of target tracking working
+
+DONE 2018-08-26
+ * Got aruco targets detected and rendered in frontend GUI
 
 DONE 2018-08-22
  * Switched to unicast, couldn't figure out a way to set mcast rate on
