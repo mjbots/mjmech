@@ -2,24 +2,12 @@
   * iwconfig wlxxx retry 2
   * iwconfig wlxxx power off
 
- * rpi3 mounting hardware TODO
-   * vertical brackets
-     * mark out in sketch where gimbal motor interferes with nut
-     * don't need to extend backward at all
-     * need mounting holes for weapon further forward so top screw
-       clears motor
-     * front needs bottom clearance for weapon side screws
-   * bottom plate
-     * needs to be shifted over to let rpi3 swing freely
-     * needs mounting holes for camera spaced across front
-     * make left side be narrower so pitch gimbal wire could be placed
-       on bottom side
-     * add longitudinal ridges for increased stiffness
-     * mounting holes for rpi3 need to be shifted so it sits further
-       forward, want to be able to connect shore supply without
-       tipping gimbal up
-
  * design shroud
+
+ * Get 3d printed
+   * new base plate
+   * new vertical plates
+   * shroud
 
  * Get video writing in controller working
 
@@ -74,6 +62,9 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2018-08-31
+ * Finished up design of new base plate and vertical plates
 
 DONE 2018-08-28
  * Made video of target tracking working
