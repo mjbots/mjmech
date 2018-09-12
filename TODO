@@ -2,12 +2,7 @@
   * iwconfig wlxxx retry 2
   * iwconfig wlxxx power off
 
- * design shroud
-
- * Get 3d printed
-   * new base plate
-   * new vertical plates
-   * shroud
+DONE
 
  * Get video writing in controller working
 
@@ -62,6 +57,28 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2018-09-11
+ * design shroud
+  * ensure weapon can rotate freely in both mounting positions
+  * add joining face at half boundary so it mates at more than a wall
+    thickness point
+  * split into two halves
+  * ensure rear and front will clear panel mounting supports
+  * cutout bottom area for gimbal
+  * cutout to turn on/off weapon activator switch
+  * ensure there is appropriate space for power wire to exit
+  * add structural connection to gimbal on sides
+  * consider upping thickness to 1.5 or 2mm
+  * cutout top for loading
+  * cutout front slot for barrel, laser, and camera
+  * add clips to hold two halves together
+
+
+ * Get 3d printed
+   * new base plate
+   * new vertical plates
+   * shroud
 
 DONE 2018-08-31
  * Finished up design of new base plate and vertical plates
