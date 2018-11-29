@@ -43,12 +43,13 @@ sys.path.append(os.path.join(SCRIPT_PATH, '../python'))
 sys.path.append(os.path.join(SCRIPT_PATH, '../bazel-bin/utils'))
 
 import telemetry_archive
-import telemetry_log
 import ui_tview_main_window
 
 
-LEFT_LEGEND_LOC=3
-RIGHT_LEGEND_LOC=2
+LEFT_LEGEND_LOC = 3
+RIGHT_LEGEND_LOC = 2
+
+DEFAULT_RATE = 100
 
 
 # TODO jpieper: Factor these out of tplot.py
@@ -307,10 +308,10 @@ class TviewConsoleWidget(HistoryConsoleWidget):
         return True
 
 
-class Record(object):
-    def __init__(self, archive, tree_item):
+class Record:
+    def __init__(self, archive):
         self.archive = archive
-        self.tree_item = tree_item
+        self.tree_item = None
         self.signals = {}
 
     def get_signal(self, name):
@@ -338,7 +339,7 @@ class NoEditDelegate(QtGui.QStyledItemDelegate):
 
 def _get_item_name(item):
     name = item.text(0)
-    while item.parent():
+    while item.parent().parent():
         name = item.parent().text(0) + '.' + name
         item = item.parent()
 
@@ -346,35 +347,376 @@ def _get_item_name(item):
 
 
 def _get_item_root(item):
-    while item.parent():
+    while item.parent().parent():
         item = item.parent()
     return item.text(0)
 
 
-class TviewMainWindow(QtGui.QMainWindow):
+class Device:
     STATE_LINE = 0
     STATE_CONFIG = 1
     STATE_TELEMETRY = 2
     STATE_SCHEMA = 3
     STATE_DATA = 4
 
+    def __init__(self, stream, console, prefix,
+                 config_tree_item, data_tree_item):
+        self._stream = stream
+        self._console = console
+        self._prefix = prefix
+        self._config_tree_item = config_tree_item
+        self._data_tree_item = data_tree_item
+
+        self._buffer = b''
+        self._serial_state = self.STATE_LINE
+        self._telemetry_records = {}
+        self._schema_name = None
+        self._config_tree_items = {}
+        self._config_callback = None
+
+        self._start_time = None
+
+    def start(self):
+        # Stop the spew.
+        self._stream.write('\r\n'.encode('latin1'))
+        self._stream.write('tel stop\r\n'.encode('latin1'))
+
+        # We want to wait a little bit, discard everything we have
+        # received, and then initialize the device.
+        self._start_time = time.time()
+
+    def _setup_device(self, callback):
+        # When we start, get a listing of all configuration options
+        # and all available telemetry channels.
+        def after_config():
+            self.update_telemetry(callback)
+        self.update_config(after_config)
+
+    def poll(self):
+        if self._start_time is not None:
+            now = time.time()
+            if now - self._start_time < 0.1:
+                return
+            # Discard any junk that may be there.
+            self._stream.read(8192)
+            self._start_time = None
+
+            self._setup_device(None)
+
+
+        try:
+            data = self._stream.read(8192)
+        except serial.serialutil.SerialException:
+            # We must have disconnected, close the port and try to
+            # re-open.
+            self.port.close()
+            self.port = None
+            return
+
+        self._buffer += data
+
+        while True:
+            old_len = len(self._buffer)
+            self._handle_serial_data()
+            if len(self._buffer) == old_len:
+                break
+
+    def write(self, data):
+        self._stream.write(data)
+
+    def config_item_changed(self, name, value):
+        if self._serial_state == self.STATE_CONFIG:
+            return
+
+        self.write_line('conf set %s %s\r\n' % (name, value))
+
+    def _handle_serial_data(self):
+        if self._serial_state == self.STATE_LINE:
+            self._handle_serial_line()
+        elif self._serial_state == self.STATE_CONFIG:
+            self._handle_config()
+        elif self._serial_state == self.STATE_TELEMETRY:
+            self._handle_telemetry()
+        elif self._serial_state == self.STATE_SCHEMA:
+            self._handle_schema()
+        elif self._serial_state == self.STATE_DATA:
+            self._handle_data()
+        else:
+            assert False
+
+    def _handle_serial_line(self):
+        line = self._get_serial_line()
+        if line is None:
+            return
+
+        line = line.decode('latin1')
+
+        display = True
+        if line == '':
+            display = False
+
+        if line.startswith('schema '):
+            self._serial_state = self.STATE_SCHEMA
+            self._schema_name = line.split(' ', 1)[1].strip()
+        elif line.startswith('emit '):
+            self._serial_state = self.STATE_DATA
+            self._schema_name = line.split(' ', 1)[1].strip()
+            display = False
+
+        if display:
+            self._console.add_text(self._prefix + line + '\n')
+
+    def _get_serial_line(self):
+        # Consume any newlines at the start of our buffer.
+        pos = 0
+        while pos < len(self._buffer) and self._buffer[pos] in b'\r\n':
+            pos += 1
+        self._buffer = self._buffer[pos:]
+
+        # Look for a trailing newline
+        end = 0
+        while end < len(self._buffer) and self._buffer[end] not in b'\r\n':
+            end += 1
+
+        if end >= len(self._buffer):
+            return
+
+        line, self._buffer = self._buffer[:end], self._buffer[end+1:]
+
+        return line
+
+    def update_config(self, callback):
+        # Clear out our config tree.
+        self._config_tree_item.takeChildren()
+        self._config_tree_items = {}
+
+        self._config_callback = callback
+        self.write_line('conf enumerate\r\n')
+
+        # TODO jpieper: In the current protocol this is racy, as there
+        # is no header on the config enumeration.  I should probably
+        # add one.
+        self._serial_state = self.STATE_CONFIG
+
+    def _handle_config(self):
+        line = self._get_serial_line()
+        if not line:
+            return
+
+        line = line.decode('latin1')
+        self._console.add_text(self._prefix + line + '\n')
+
+        if line.startswith('OK'):
+            # We're done with config now.
+            self._serial_state = self.STATE_LINE
+            cbk, self._config_callback = self._config_callback, None
+            if cbk:
+                cbk()
+        else:
+            # Add it into our tree view.
+            key, value = line.split(' ', 1)
+            name, rest = key.split('.', 1)
+            if name not in self._config_tree_items:
+                item = QtGui.QTreeWidgetItem(self._config_tree_item)
+                item.setText(0, name)
+                self._config_tree_items[name] = item
+
+            def add_config(item, key, value):
+                if key == '':
+                    item.setText(1, value)
+                    item.setFlags(QtCore.Qt.ItemIsEditable |
+                                  QtCore.Qt.ItemIsSelectable |
+                                  QtCore.Qt.ItemIsEnabled)
+                    return
+
+                fields = key.split('.', 1)
+                this_field = fields[0]
+                next_key = ''
+                if len(fields) > 1:
+                    next_key = fields[1]
+
+                child = None
+                # See if we already have an appropriate child.
+                for i in range(item.childCount()):
+                    if item.child(i).text(0) == this_field:
+                        child = item.child(i)
+                        break
+                if child is None:
+                    child = QtGui.QTreeWidgetItem(item)
+                    child.setText(0, this_field)
+                add_config(child, next_key, value)
+
+            add_config(self._config_tree_items[name], rest, value)
+
+            # TODO(jpieper)
+            # self.ui.configTreeWidget.resizeColumnToContents(0)
+
+    def update_telemetry(self, callback):
+        self._data_tree_item.takeChildren()
+        self._telemetry_records = {}
+
+        self._telemetry_callback = callback
+        self.write_line('tel list\r\n')
+
+        self._serial_state = self.STATE_TELEMETRY
+
+    def write_line(self, line):
+        self._console.add_text(self._prefix + line)
+        self._stream.write(line.encode('latin1'))
+
+    def _handle_telemetry(self):
+        line = self._get_serial_line()
+        if not line:
+            return
+
+        line = line.decode('latin1')
+        self._console.add_text(self._prefix + line + '\n')
+
+        if line.startswith('OK'):
+            # Now we need to start getting schemas.
+            self._serial_state = self.STATE_LINE
+            self._update_schema()
+        else:
+            name = line.strip()
+            self._telemetry_records[name] = None
+
+    def _update_schema(self):
+        # Find a channel we don't have a schema for and request it.
+        for name in self._telemetry_records.keys():
+            if self._telemetry_records[name] is None:
+                self.write_line('tel schema %s\r\n' % name)
+                self._serial_state = self.STATE_LINE
+                return
+
+        self._serial_state = self.STATE_LINE
+        # Guess we are done.  Update our tree view.
+
+        # TODO(jpieper)
+        # self.ui.telemetryTreeWidget.resizeColumnToContents(0)
+
+        cbk, self._telemetry_callback = self._telemetry_callback, None
+        if cbk:
+            cbk()
+
+    def _handle_schema(self):
+        schema = self._handle_sized_block()
+        if not schema:
+            return
+
+        name, self._schema_name = self._schema_name, None
+
+        if name in self._telemetry_records:
+            if self._telemetry_records[name]:
+                return
+
+        archive = telemetry_archive.ReadArchive(schema, name)
+
+        record = Record(archive)
+        self._telemetry_records[name] = record
+        record.tree_item = self._add_schema_to_tree(name, archive, record)
+
+        self._console.add_text(self._prefix + '<schema name=%s>\n' % name)
+
+        # Now look to see if there are any more we should request.
+        self._update_schema()
+
+    def _handle_data(self):
+        data = self._handle_sized_block()
+        if not data:
+            return
+
+        name, self._schema_name = self._schema_name, None
+
+        if name not in self._telemetry_records:
+            return
+
+        record = self._telemetry_records[name]
+        struct = record.archive.deserialize(data)
+        _set_tree_widget_data(record.tree_item, struct)
+        if record.update(struct):
+            now = time.time()
+            elapsed = now - self._last_draw_time
+            if elapsed > 0.2:
+                # TODO(jpieper)
+                # self.ui.plotWidget.canvas.draw()
+                self._last_draw_time = now
+
+        self._serial_state = self.STATE_LINE
+
+    def _handle_sized_block(self):
+        # Wait until we have the complete schema in the buffer.  It
+        # will start with the final newline from the first line.
+        if len(self._buffer) < 5:
+            return
+
+        size = struct.unpack('<I', self._buffer[1:5])[0]
+        if size > 2 ** 24:
+            # Whoops, probably bogus.
+            print('Invalid schema size, skipping whatever we were doing.')
+            self._serial_state = self.STATE_LINE
+            return
+
+        if len(self._buffer) < 5 + size:
+            return
+
+        block = self._buffer[5:5+size]
+        self._buffer = self._buffer[5+size:]
+        return block
+
+    class Schema:
+        def __init__(self, name, parent, record):
+            self._name = name
+            self._parent = parent
+            self.record = record
+
+        def expand(self):
+            self._parent.write_line('tel fmt %s 0\r\n' % self._name)
+            self._parent.write_line('tel rate %s %d\r\n' %
+                                    (self._name, DEFAULT_RATE))
+
+        def collapse(self):
+            self._parent.write_line('tel rate %s 0\r\n' % self._name)
+
+
+    def _add_schema_to_tree(self, name, archive, record):
+        item = QtGui.QTreeWidgetItem(self._data_tree_item)
+        item.setText(0, name)
+
+        schema = Device.Schema(name, self, record)
+        item.setData(0, QtCore.Qt.UserRole, schema)
+
+        # TODO jpieper: Factor this out of tplot.py.
+        def add_item(parent, element):
+            if 'fields' not in element:
+                return
+            for field in element['fields']:
+                name = field['name']
+
+                item = QtGui.QTreeWidgetItem(parent)
+                item.setText(0, name)
+
+                if 'children' in field:
+                    for child in field['children']:
+                        add_item(item, child)
+
+        add_item(item, archive.root)
+        return item
+
+
+
+class TviewMainWindow(QtGui.QMainWindow):
+
     def __init__(self, options, parent=None):
         QtGui.QMainWindow.__init__(self, parent)
 
         self.options = options
         self.port = None
+        self.device = None
         self.default_rate = 100
 
-        self._buffer = b''
         self._serial_timer = QtCore.QTimer()
         self._serial_timer.timeout.connect(self._poll_serial)
         self._serial_timer.start(10)
-
-        self._serial_state = self.STATE_LINE
-
-        self._telemetry_records = {}
-        self._schema_name = None
-        self._config_tree_items = {}
 
         self._last_draw_time = 0.0
 
@@ -424,9 +766,15 @@ class TviewMainWindow(QtGui.QMainWindow):
             self.ui.plotWidget.history_s = value
         self.ui.historySpin.valueChanged.connect(update_plotwidget)
 
-        self._config_callback = None
-
         QtCore.QTimer.singleShot(0, self._handle_startup)
+
+        self._device_1_config_item = QtGui.QTreeWidgetItem()
+        self._device_1_config_item.setText(0, "1")
+        self.ui.configTreeWidget.addTopLevelItem(self._device_1_config_item)
+
+        self._device_1_data_item = QtGui.QTreeWidgetItem()
+        self._device_1_data_item.setText(0, "1")
+        self.ui.telemetryTreeWidget.addTopLevelItem(self._device_1_data_item)
 
     def _open(self):
         self.port = serial.Serial(
@@ -434,318 +782,37 @@ class TviewMainWindow(QtGui.QMainWindow):
             baudrate=self.options.baudrate,
             timeout=0.0)
 
-        # Stop the spew.
-        self.port.write('\r\n'.encode('latin1'))
-        self.port.write('tel stop\r\n'.encode('latin1'))
-
-        # Wait a short while, then eat everything we can.
-        time.sleep(0.1)
-        self.port.read(8192)
+        self.device = Device(self.port, self.console, '1>',
+                             self._device_1_config_item,
+                             self._device_1_data_item)
+        self.device.start()
 
     def _handle_startup(self):
         self.console._control.setFocus()
-
-    def _setup_device(self, callback):
-        # When we start, get a listing of all configuration options
-        # and all available telemetry channels.
-        def after_config():
-            self.update_telemetry(callback)
-        self.update_config(after_config)
 
     def _poll_serial(self):
         if self.port is None:
             if os.path.exists(self.options.serial):
                 self._open()
-                self._setup_device(None)
             else:
                 return
-
-        try:
-            data = self.port.read(8192)
-        except serial.serialutil.SerialException:
-            # We must have disconnected, close the port and try to
-            # re-open.
-            self.port.close()
-            self.port = None
-            return
-
-        self._buffer += data
-
-        while True:
-            old_len = len(self._buffer)
-            self._handle_serial_data()
-            if len(self._buffer) == old_len:
-                break
+        else:
+            self.device.poll()
 
     def _handle_user_input(self, line):
-        if self.port:
-            self.port.write((line + '\n').encode('latin1'))
-
-    def _handle_serial_data(self):
-        if self._serial_state == self.STATE_LINE:
-            self._handle_serial_line()
-        elif self._serial_state == self.STATE_CONFIG:
-            self._handle_config()
-        elif self._serial_state == self.STATE_TELEMETRY:
-            self._handle_telemetry()
-        elif self._serial_state == self.STATE_SCHEMA:
-            self._handle_schema()
-        elif self._serial_state == self.STATE_DATA:
-            self._handle_data()
-        else:
-            assert False
-
-    def _handle_serial_line(self):
-        line = self._get_serial_line()
-        if line is None:
-            return
-
-        line = line.decode('latin1')
-
-        display = True
-        if line == '':
-            display = False
-
-        if line.startswith('schema '):
-            self._serial_state = self.STATE_SCHEMA
-            self._schema_name = line.split(' ', 1)[1].strip()
-        elif line.startswith('emit '):
-            self._serial_state = self.STATE_DATA
-            self._schema_name = line.split(' ', 1)[1].strip()
-            display = False
-
-        if display:
-            self.console.add_text(line + '\n')
-
-    def _get_serial_line(self):
-        # Consume any newlines at the start of our buffer.
-        pos = 0
-        while pos < len(self._buffer) and self._buffer[pos] in b'\r\n':
-            pos += 1
-        self._buffer = self._buffer[pos:]
-
-        # Look for a trailing newline
-        end = 0
-        while end < len(self._buffer) and self._buffer[end] not in b'\r\n':
-            end += 1
-
-        if end >= len(self._buffer):
-            return
-
-        line, self._buffer = self._buffer[:end], self._buffer[end+1:]
-
-        return line
-
-    def update_config(self, callback):
-        # Clear out our config tree.
-        self.ui.configTreeWidget.clear()
-        self._config_tree_items = {}
-
-        self._config_callback = callback
-        self.write_line('conf enumerate\r\n')
-
-        # TODO jpieper: In the current protocol this is racy, as there
-        # is no header on the config enumeration.  I should probably
-        # add one.
-        self._serial_state = self.STATE_CONFIG
-
-    def _handle_config(self):
-        line = self._get_serial_line()
-        if not line:
-            return
-
-        line = line.decode('latin1')
-        self.console.add_text(line + '\n')
-
-        if line.startswith('OK'):
-            # We're done with config now.
-            self._serial_state = self.STATE_LINE
-            cbk, self._config_callback = self._config_callback, None
-            if cbk:
-                cbk()
-        else:
-            # Add it into our tree view.
-            key, value = line.split(' ', 1)
-            name, rest = key.split('.', 1)
-            if name not in self._config_tree_items:
-                item = QtGui.QTreeWidgetItem()
-                item.setText(0, name)
-                self.ui.configTreeWidget.addTopLevelItem(item)
-                self._config_tree_items[name] = item
-
-            def add_config(item, key, value):
-                if key == '':
-                    item.setText(1, value)
-                    item.setFlags(QtCore.Qt.ItemIsEditable |
-                                  QtCore.Qt.ItemIsSelectable |
-                                  QtCore.Qt.ItemIsEnabled)
-                    return
-
-                fields = key.split('.', 1)
-                this_field = fields[0]
-                next_key = ''
-                if len(fields) > 1:
-                    next_key = fields[1]
-
-                child = None
-                # See if we already have an appropriate child.
-                for i in range(item.childCount()):
-                    if item.child(i).text(0) == this_field:
-                        child = item.child(i)
-                        break
-                if child is None:
-                    child = QtGui.QTreeWidgetItem(item)
-                    child.setText(0, this_field)
-                add_config(child, next_key, value)
-
-            add_config(self._config_tree_items[name], rest, value)
-
-            self.ui.configTreeWidget.resizeColumnToContents(0)
-
-    def update_telemetry(self, callback):
-        self.ui.telemetryTreeWidget.clear()
-        self._telemetry_records = {}
-
-        self._telemetry_callback = callback
-        self.write_line('tel list\r\n')
-
-        self._serial_state = self.STATE_TELEMETRY
-
-    def write_line(self, line):
-        self.console.add_text(line)
-        if self.port:
-            self.port.write(line.encode('latin1'))
-
-    def _handle_telemetry(self):
-        line = self._get_serial_line()
-        if not line:
-            return
-
-        line = line.decode('latin1')
-        self.console.add_text(line + '\n')
-
-        if line.startswith('OK'):
-            # Now we need to start getting schemas.
-            self._serial_state = self.STATE_LINE
-            self._update_schema()
-        else:
-            name = line.strip()
-            self._telemetry_records[name] = None
-
-    def _update_schema(self):
-        # Find a channel we don't have a schema for and request it.
-        for name in self._telemetry_records.keys():
-            if self._telemetry_records[name] is None:
-                self.write_line('tel schema %s\r\n' % name)
-                self._serial_state = self.STATE_LINE
-                return
-
-        self._serial_state = self.STATE_LINE
-        # Guess we are done.  Update our tree view.
-        self.ui.telemetryTreeWidget.resizeColumnToContents(0)
-        cbk, self._telemetry_callback = self._telemetry_callback, None
-        if cbk:
-            cbk()
-
-    def _handle_schema(self):
-        schema = self._handle_sized_block()
-        if not schema:
-            return
-
-        name, self._schema_name = self._schema_name, None
-
-        if name in self._telemetry_records:
-            if self._telemetry_records[name]:
-                return
-
-        archive = telemetry_archive.ReadArchive(schema, name)
-        item = self._add_schema_to_tree(name, archive)
-
-        self._telemetry_records[name] = Record(archive, item)
-
-        self.console.add_text('<schema name=%s>\n' % name)
-
-        # Now look to see if there are any more we should request.
-        self._update_schema()
-
-    def _handle_data(self):
-        data = self._handle_sized_block()
-        if not data:
-            return
-
-        name, self._schema_name = self._schema_name, None
-
-        if name not in self._telemetry_records:
-            return
-
-        record = self._telemetry_records[name]
-        struct = record.archive.deserialize(data)
-        _set_tree_widget_data(record.tree_item, struct)
-        if record.update(struct):
-            now = time.time()
-            elapsed = now - self._last_draw_time
-            if elapsed > 0.2:
-                self.ui.plotWidget.canvas.draw()
-                self._last_draw_time = now
-
-        self._serial_state = self.STATE_LINE
-
-    def _handle_sized_block(self):
-        # Wait until we have the complete schema in the buffer.  It
-        # will start with the final newline from the first line.
-        if len(self._buffer) < 5:
-            return
-
-        size = struct.unpack('<I', self._buffer[1:5])[0]
-        if size > 2 ** 24:
-            # Whoops, probably bogus.
-            print('Invalid schema size, skipping whatever we were doing.')
-            self._serial_state = self.STATE_LINE
-            return
-
-        if len(self._buffer) < 5 + size:
-            return
-
-        block = self._buffer[5:5+size]
-        self._buffer = self._buffer[5+size:]
-        return block
-
-    def _add_schema_to_tree(self, name, archive):
-        item = QtGui.QTreeWidgetItem()
-        item.setText(0, name)
-        self.ui.telemetryTreeWidget.addTopLevelItem(item)
-
-        # TODO jpieper: Factor this out of tplot.py.
-        def add_item(parent, element):
-            if 'fields' not in element:
-                return
-            for field in element['fields']:
-                name = field['name']
-
-                item = QtGui.QTreeWidgetItem(parent)
-                item.setText(0, name)
-
-                if 'children' in field:
-                    for child in field['children']:
-                        add_item(item, child)
-
-        add_item(item, archive.root)
-        return item
+        if self.device:
+            self.device.write((line + '\n').encode('latin1'))
 
     def _handle_tree_expanded(self, item):
         self.ui.telemetryTreeWidget.resizeColumnToContents(0)
-        if item.parent() is None:
-            # OK, since we're a top level node, request to start
-            # receiving updates.
-            name = item.text(0)
-            self.write_line('tel fmt %s 0\r\n' % name)
-            self.write_line('tel rate %s %d\r\n' % (name, self.default_rate))
+        user_data = item.data(0, QtCore.Qt.UserRole)
+        if user_data:
+            user_data.expand()
 
     def _handle_tree_collapsed(self, item):
-        if item.parent() is None:
-            # Stop this guy.
-            name = item.text(0)
-            self.write_line('tel rate %s 0\r\n' % name)
+        user_data = item.data(0, QtCore.Qt.UserRole)
+        if user_data:
+            user_data.collapse()
 
     def _handle_telemetry_context_menu(self, pos):
         item = self.ui.telemetryTreeWidget.itemAt(pos)
@@ -762,10 +829,15 @@ class TviewMainWindow(QtGui.QMainWindow):
         requested = menu.exec_(self.ui.telemetryTreeWidget.mapToGlobal(pos))
 
         if requested == left_action or requested == right_action:
+            top = item
+            while top.parent().parent():
+                top = top.parent()
+
+            schema = top.data(0, QtCore.Qt.UserRole)
+            record = schema.record()
+
             name = _get_item_name(item)
             root = _get_item_root(item)
-
-            record = self._telemetry_records[root]
 
             leaf = name.split('.', 1)[1]
             axis = 0
@@ -786,12 +858,8 @@ class TviewMainWindow(QtGui.QMainWindow):
         self.ui.configTreeWidget.resizeColumnToContents(0)
 
     def _handle_config_item_changed(self, item, column):
-        if self._serial_state == self.STATE_CONFIG:
-            return
-        value = item.text(1)
-        name = _get_item_name(item)
-
-        self.write_line('conf set %s %s\r\n' % (name, value))
+        # TODO(jpieper): Find the right device.
+        self.device.config_item_changed(_get_item_name(item), item.text(1))
 
     def _handle_plot_item_remove(self):
         index = self.ui.plotItemCombo.currentIndex()
