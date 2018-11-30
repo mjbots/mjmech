@@ -339,7 +339,7 @@ class NoEditDelegate(QtGui.QStyledItemDelegate):
 
 def _get_item_name(item):
     name = item.text(0)
-    while item.parent().parent():
+    while item.parent() and item.parent().parent():
         name = item.parent().text(0) + '.' + name
         item = item.parent()
 
@@ -395,7 +395,7 @@ class Device:
     def poll(self):
         if self._start_time is not None:
             now = time.time()
-            if now - self._start_time < 0.1:
+            if now - self._start_time < 0.2:
                 return
             # Discard any junk that may be there.
             self._stream.read(8192)
@@ -631,15 +631,9 @@ class Device:
             return
 
         record = self._telemetry_records[name]
-        struct = record.archive.deserialize(data)
-        _set_tree_widget_data(record.tree_item, struct)
-        if record.update(struct):
-            now = time.time()
-            elapsed = now - self._last_draw_time
-            if elapsed > 0.2:
-                # TODO(jpieper)
-                # self.ui.plotWidget.canvas.draw()
-                self._last_draw_time = now
+        if record:
+            struct = record.archive.deserialize(data)
+            _set_tree_widget_data(record.tree_item, struct)
 
         self._serial_state = self.STATE_LINE
 
@@ -718,8 +712,6 @@ class TviewMainWindow(QtGui.QMainWindow):
         self._serial_timer.timeout.connect(self._poll_serial)
         self._serial_timer.start(10)
 
-        self._last_draw_time = 0.0
-
         self.ui = ui_tview_main_window.Ui_TviewMainWindow()
         self.ui.setupUi(self)
 
@@ -785,6 +777,7 @@ class TviewMainWindow(QtGui.QMainWindow):
         self.device = Device(self.port, self.console, '1>',
                              self._device_1_config_item,
                              self._device_1_data_item)
+        self._device_1_config_item.setData(0, QtCore.Qt.UserRole, self.device)
         self.device.start()
 
     def _handle_startup(self):
@@ -858,8 +851,15 @@ class TviewMainWindow(QtGui.QMainWindow):
         self.ui.configTreeWidget.resizeColumnToContents(0)
 
     def _handle_config_item_changed(self, item, column):
-        # TODO(jpieper): Find the right device.
-        self.device.config_item_changed(_get_item_name(item), item.text(1))
+        if not item.parent():
+            return
+
+        top = item
+        while top.parent():
+            top = top.parent()
+
+        device = top.data(0, QtCore.Qt.UserRole)
+        device.config_item_changed(_get_item_name(item), item.text(1))
 
     def _handle_plot_item_remove(self):
         index = self.ui.plotItemCombo.currentIndex()
