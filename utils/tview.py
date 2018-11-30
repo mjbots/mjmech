@@ -19,6 +19,7 @@
 Interactively display and update values from an embedded device.
 '''
 
+import binascii
 import optparse
 import os
 import re
@@ -50,6 +51,120 @@ LEFT_LEGEND_LOC = 3
 RIGHT_LEGEND_LOC = 2
 
 DEFAULT_RATE = 100
+
+
+def read_varuint(data, offset):
+    '''Return (varuint, next_offset)'''
+
+    result = 0
+    shift = 0
+    for i in range(5):
+        if offset >= len(data):
+            return None, offset
+        this_byte, = struct.unpack('<B', data[offset:offset+1])
+        result |= (this_byte & 0x7f) << shift
+        shift += 7
+        offset += 1
+
+        if (this_byte & 0x80) == 0:
+            return result, offset
+
+    assert False
+
+
+class MultiplexStream:
+    def __init__(self, stream, destination_id):
+        self._stream = stream
+        self._destination_id = destination_id
+        self._read_buffer = b''
+        self._write_buffer = b''
+
+        self._done = False
+
+    def read(self, max_bytes):
+        to_return, self._read_buffer = self._read_buffer[0:max_bytes], self._read_buffer[max_bytes:]
+        return to_return
+
+    def write(self, data):
+        self._write_buffer += data
+
+    def poll(self):
+        if self._done:
+            return
+
+        header = struct.pack('<HBB', 0xab54, 0x80, self._destination_id)
+
+        to_write = min(len(self._write_buffer), 100)
+        payload = struct.pack('<BBB', 0x40, 1, to_write)
+
+        this_write, self._write_buffer = self._write_buffer[0:to_write], self._write_buffer[to_write:]
+        payload += this_write
+
+        # So we don't need varuint
+        assert len(payload) < 127
+
+        frame = header + struct.pack('<B', len(payload)) + payload
+
+        crc = binascii.crc_hqx(frame, 0xffff)
+        frame += struct.pack('<H', crc)
+
+        self._stream.write(frame)
+
+        try:
+            self._stream.timeout = 0.01
+
+            result_frame_start = self._stream.read(7)
+            if len(result_frame_start) < 7:
+                return
+
+            header, source, dest = struct.unpack(
+                '<HBB', result_frame_start[:4])
+            if header != 0xab54:
+                # TODO: resynchronize
+                self._stream.read(8192)
+                return
+
+            payload_len, payload_offset = read_varuint(result_frame_start, 4)
+            if payload_len is None:
+                # We don't yet have enough
+                return
+
+            result_frame_remainder = self._stream.read(
+                6 + (payload_offset - 4) + payload_len - len(result_frame_start))
+        finally:
+            self._stream.timeout = 0.0
+
+        result_frame = result_frame_start + result_frame_remainder
+
+        if dest != 0x00:
+            return
+
+        if source != self._destination_id:
+            return
+
+        payload = result_frame[payload_offset:-2]
+        if len(payload) < 3:
+            return
+
+        sbo = 0
+        subframe_id, sbo = read_varuint(payload, sbo)
+        channel, sbo = read_varuint(payload, sbo)
+        server_len, sbo = read_varuint(payload, sbo)
+
+        if subframe_id is None or channel is None or server_len is None:
+            return
+
+        if subframe_id != 0x41:
+            return
+
+        if channel != 1:
+            return
+
+        payload_rest = payload[sbo:]
+        if server_len != len(payload_rest):
+            return
+
+        self._read_buffer += payload_rest
 
 
 # TODO jpieper: Factor these out of tplot.py
@@ -173,6 +288,8 @@ class PlotItem(object):
         self.axis.relim()
         self.axis.autoscale()
 
+        self.plot_widget.data_update()
+
 
 class PlotWidget(QtGui.QWidget):
     COLORS = 'rbgcmyk'
@@ -183,6 +300,8 @@ class PlotWidget(QtGui.QWidget):
         self.history_s = 20.0
         self.next_color = 0
         self.paused = False
+
+        self.last_draw_time = 0.0
 
         self.figure = matplotlib.figure.Figure()
         self.canvas = FigureCanvas(self.figure)
@@ -237,6 +356,13 @@ class PlotWidget(QtGui.QWidget):
 
     def remove_plot(self, item):
         item.remove()
+
+    def data_update(self):
+        now = time.time()
+        elapsed = now - self.last_draw_time
+        if elapsed > 0.1:
+            self.last_draw_time = now
+            self.canvas.draw()
 
     def _get_axes_keys(self):
         result = []
@@ -404,14 +530,7 @@ class Device:
             self._setup_device(None)
 
 
-        try:
-            data = self._stream.read(8192)
-        except serial.serialutil.SerialException:
-            # We must have disconnected, close the port and try to
-            # re-open.
-            self.port.close()
-            self.port = None
-            return
+        data = self._stream.read(8192)
 
         self._buffer += data
 
@@ -633,6 +752,7 @@ class Device:
         record = self._telemetry_records[name]
         if record:
             struct = record.archive.deserialize(data)
+            record.update(struct)
             _set_tree_widget_data(record.tree_item, struct)
 
         self._serial_state = self.STATE_LINE
@@ -706,6 +826,7 @@ class TviewMainWindow(QtGui.QMainWindow):
         self.options = options
         self.port = None
         self.device = None
+        self.stream = None
         self.default_rate = 100
 
         self._serial_timer = QtCore.QTimer()
@@ -774,7 +895,9 @@ class TviewMainWindow(QtGui.QMainWindow):
             baudrate=self.options.baudrate,
             timeout=0.0)
 
-        self.device = Device(self.port, self.console, '1>',
+        self.stream = MultiplexStream(self.port, 1)
+
+        self.device = Device(self.stream, self.console, '1>',
                              self._device_1_config_item,
                              self._device_1_data_item)
         self._device_1_config_item.setData(0, QtCore.Qt.UserRole, self.device)
@@ -791,6 +914,7 @@ class TviewMainWindow(QtGui.QMainWindow):
                 return
         else:
             self.device.poll()
+            self.stream.poll()
 
     def _handle_user_input(self, line):
         if self.device:
@@ -827,7 +951,7 @@ class TviewMainWindow(QtGui.QMainWindow):
                 top = top.parent()
 
             schema = top.data(0, QtCore.Qt.UserRole)
-            record = schema.record()
+            record = schema.record
 
             name = _get_item_name(item)
             root = _get_item_root(item)
