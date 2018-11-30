@@ -79,8 +79,6 @@ class MultiplexStream:
         self._read_buffer = b''
         self._write_buffer = b''
 
-        self._done = False
-
     def read(self, max_bytes):
         to_return, self._read_buffer = self._read_buffer[0:max_bytes], self._read_buffer[max_bytes:]
         return to_return
@@ -88,10 +86,11 @@ class MultiplexStream:
     def write(self, data):
         self._write_buffer += data
 
-    def poll(self):
-        if self._done:
-            return
+    def flush(self):
+        if len(self._write_buffer):
+            self.poll()
 
+    def poll(self):
         header = struct.pack('<HBB', 0xab54, 0x80, self._destination_id)
 
         to_write = min(len(self._write_buffer), 100)
@@ -111,7 +110,7 @@ class MultiplexStream:
         self._stream.write(frame)
 
         try:
-            self._stream.timeout = 0.01
+            self._stream.timeout = 0.02
 
             result_frame_start = self._stream.read(7)
             if len(result_frame_start) < 7:
@@ -519,6 +518,8 @@ class Device:
         self.update_config(after_config)
 
     def poll(self):
+        self._stream.poll()
+
         if self._start_time is not None:
             now = time.time()
             if now - self._start_time < 0.2:
@@ -539,6 +540,8 @@ class Device:
             self._handle_serial_data()
             if len(self._buffer) == old_len:
                 break
+
+        self._stream.flush()
 
     def write(self, data):
         self._stream.write(data)
@@ -825,8 +828,7 @@ class TviewMainWindow(QtGui.QMainWindow):
 
         self.options = options
         self.port = None
-        self.device = None
-        self.stream = None
+        self.devices = []
         self.default_rate = 100
 
         self._serial_timer = QtCore.QTimer()
@@ -881,27 +883,35 @@ class TviewMainWindow(QtGui.QMainWindow):
 
         QtCore.QTimer.singleShot(0, self._handle_startup)
 
-        self._device_1_config_item = QtGui.QTreeWidgetItem()
-        self._device_1_config_item.setText(0, "1")
-        self.ui.configTreeWidget.addTopLevelItem(self._device_1_config_item)
-
-        self._device_1_data_item = QtGui.QTreeWidgetItem()
-        self._device_1_data_item.setText(0, "1")
-        self.ui.telemetryTreeWidget.addTopLevelItem(self._device_1_data_item)
-
     def _open(self):
         self.port = serial.Serial(
             port=self.options.serial,
             baudrate=self.options.baudrate,
             timeout=0.0)
 
-        self.stream = MultiplexStream(self.port, 1)
+        self.devices = []
+        self.ui.configTreeWidget.clear()
+        self.ui.telemetryTreeWidget.clear()
 
-        self.device = Device(self.stream, self.console, '1>',
-                             self._device_1_config_item,
-                             self._device_1_data_item)
-        self._device_1_config_item.setData(0, QtCore.Qt.UserRole, self.device)
-        self.device.start()
+        for device_id in [int(x) for x in self.options.devices.split(',')]:
+            stream = MultiplexStream(self.port, device_id)
+
+            config_item = QtGui.QTreeWidgetItem()
+            config_item.setText(0, str(device_id))
+            self.ui.configTreeWidget.addTopLevelItem(config_item)
+
+            data_item = QtGui.QTreeWidgetItem()
+            data_item.setText(0, str(device_id))
+            self.ui.telemetryTreeWidget.addTopLevelItem(data_item)
+
+            device = Device(stream, self.console, '{}>'.format(device_id),
+                            config_item,
+                            data_item)
+
+            config_item.setData(0, QtCore.Qt.UserRole, device)
+            device.start()
+
+            self.devices.append(device)
 
     def _handle_startup(self):
         self.console._control.setFocus()
@@ -913,12 +923,11 @@ class TviewMainWindow(QtGui.QMainWindow):
             else:
                 return
         else:
-            self.device.poll()
-            self.stream.poll()
+            [x.poll() for x in self.devices]
 
     def _handle_user_input(self, line):
-        if self.device:
-            self.device.write((line + '\n').encode('latin1'))
+        if self.devices:
+            self.devices[0].write((line + '\n').encode('latin1'))
 
     def _handle_tree_expanded(self, item):
         self.ui.telemetryTreeWidget.resizeColumnToContents(0)
@@ -1002,6 +1011,7 @@ def main():
 
     parser.add_option('--serial', '-s', default='/dev/ttyACM0')
     parser.add_option('--baudrate', '-b', type='int', default=115200)
+    parser.add_option('--devices', '-d', type='str', default='1')
 
     options, args = parser.parse_args()
     assert len(args) == 0
