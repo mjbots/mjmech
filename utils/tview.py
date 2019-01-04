@@ -72,6 +72,36 @@ def read_varuint(data, offset):
     assert False
 
 
+class BufferedSerial:
+    def __init__(self, port):
+        self.port = port
+        self._write_buffer = b''
+
+    def queue(self, data):
+        self._write_buffer += data
+
+    def poll(self):
+        if len(self._write_buffer):
+            self.write(b'')
+
+    def write(self, data):
+        to_write = self._write_buffer + data
+        self._write_buffer = b''
+
+        self.port.write(to_write)
+
+    def read(self, size):
+        return self.port.read(size)
+
+    def set_timeout(self, value):
+        self.port.timeout = value
+
+    def get_timeout(self):
+        return self.port.timeout
+
+    timeout = property(get_timeout, set_timeout)
+
+
 class MultiplexStream:
     def __init__(self, stream, destination_id):
         self._stream = stream
@@ -91,7 +121,14 @@ class MultiplexStream:
             self.poll()
 
     def poll(self):
-        header = struct.pack('<HBB', 0xab54, 0x80, self._destination_id)
+        # We only ask for a response if we're not writing immediately.
+        # That way we can get multiple writes out nearly
+        # simultaneously.
+        wait_for_response = len(self._write_buffer) == 0
+
+        header = struct.pack('<HBB', 0xab54,
+                             0x80 if wait_for_response else 0x00,
+                             self._destination_id)
 
         to_write = min(len(self._write_buffer), 100)
         payload = struct.pack('<BBB', 0x40, 1, to_write)
@@ -107,9 +144,13 @@ class MultiplexStream:
         crc = binascii.crc_hqx(frame, 0xffff)
         frame += struct.pack('<H', crc)
 
-        self._stream.write(frame)
+        self._stream.queue(frame)
+
+        if not wait_for_response:
+            return
 
         try:
+            self._stream.poll()
             self._stream.timeout = 0.02
 
             result_frame_start = self._stream.read(7)
@@ -120,11 +161,14 @@ class MultiplexStream:
                 '<HBB', result_frame_start[:4])
             if header != 0xab54:
                 # TODO: resynchronize
+                print("Resynchronizing! hdr={:x}".format(header), flush=True)
                 self._stream.read(8192)
                 return
 
             payload_len, payload_offset = read_varuint(result_frame_start, 4)
             if payload_len is None:
+                print("No payload!", flush=True)
+
                 # We don't yet have enough
                 return
 
@@ -885,10 +929,10 @@ class TviewMainWindow(QtGui.QMainWindow):
         QtCore.QTimer.singleShot(0, self._handle_startup)
 
     def _open(self):
-        self.port = serial.Serial(
+        self.port = BufferedSerial(serial.Serial(
             port=self.options.serial,
             baudrate=self.options.baudrate,
-            timeout=0.0)
+            timeout=0.0))
 
         self.devices = []
         self.ui.configTreeWidget.clear()
