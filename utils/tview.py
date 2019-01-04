@@ -484,8 +484,9 @@ class Device:
     STATE_SCHEMA = 3
     STATE_DATA = 4
 
-    def __init__(self, stream, console, prefix,
+    def __init__(self, number, stream, console, prefix,
                  config_tree_item, data_tree_item):
+        self.number = number
         self._stream = stream
         self._console = console
         self._prefix = prefix
@@ -904,7 +905,8 @@ class TviewMainWindow(QtGui.QMainWindow):
             data_item.setText(0, str(device_id))
             self.ui.telemetryTreeWidget.addTopLevelItem(data_item)
 
-            device = Device(stream, self.console, '{}>'.format(device_id),
+            device = Device(device_id, stream,
+                            self.console, '{}>'.format(device_id),
                             config_item,
                             data_item)
 
@@ -925,9 +927,34 @@ class TviewMainWindow(QtGui.QMainWindow):
         else:
             [x.poll() for x in self.devices]
 
+    def make_writer(self, device, line):
+        def write():
+            device.write((line + '\n').encode('latin1'))
+
+        return write
+
     def _handle_user_input(self, line):
-        if self.devices:
-            self.devices[0].write((line + '\n').encode('latin1'))
+        device_lines = [x.strip() for x in line.split('&&')]
+        now = time.time()
+        current_delay_ms = 0
+        for line in device_lines:
+            delay_re = re.search(r"^:(\d+)$", line)
+            device_re = re.search(r"^(\d+)>(.*)$", line)
+            if delay_re:
+                current_delay_ms += int(delay_re.group(1))
+                continue
+            elif device_re:
+                device_num = int(device_re.group(1))
+                line = device_re.group(2)
+            else:
+                device_num = self.devices[0].number
+            device = [x for x in self.devices if x.number == device_num][0]
+            writer = self.make_writer(device, line)
+
+            if current_delay_ms > 0:
+                QtCore.QTimer.singleShot(current_delay_ms, writer)
+            else:
+                writer()
 
     def _handle_tree_expanded(self, item):
         self.ui.telemetryTreeWidget.resizeColumnToContents(0)
