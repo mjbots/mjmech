@@ -583,9 +583,13 @@
 <smd name="3" x="0.95" y="-1.2" dx="0.8" dy="0.55" layer="1" rot="R270"/>
 <wire x1="-1.6" y1="1.2" x2="1.6" y2="1.2" width="0.127" layer="21"/>
 <wire x1="1.6" y1="1.2" x2="1.6" y2="-1.2" width="0.127" layer="21"/>
-<wire x1="1.6" y1="-1.2" x2="-1.6" y2="-1.2" width="0.127" layer="21"/>
-<wire x1="-1.6" y1="-1.2" x2="-1.6" y2="1.2" width="0.127" layer="21"/>
+<wire x1="1.6" y1="-1.2" x2="-1.3" y2="-1.2" width="0.127" layer="21"/>
+<wire x1="-1.3" y1="-1.2" x2="-1.6" y2="-1.2" width="0.127" layer="21"/>
+<wire x1="-1.6" y1="-1.2" x2="-1.6" y2="-0.9" width="0.127" layer="21"/>
 <text x="-2.2" y="-1.3" size="0.5" layer="25" font="vector" rot="R90">&gt;NAME</text>
+<wire x1="-1.6" y1="-0.9" x2="-1.6" y2="1.2" width="0.127" layer="21"/>
+<wire x1="-1.6" y1="-0.9" x2="-1.3" y2="-0.9" width="0.127" layer="21"/>
+<wire x1="-1.3" y1="-0.9" x2="-1.3" y2="-1.2" width="0.127" layer="21"/>
 </package>
 <package name="FUS_VISHAY_MFU0603">
 <smd name="1" x="-0.67945" y="0" dx="0.6985" dy="0.9398" layer="1"/>
