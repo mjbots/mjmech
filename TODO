@@ -2,8 +2,6 @@
   * iwconfig wlxxx retry 2
   * iwconfig wlxxx power off
 
-DONE
-
  * Get video writing in controller working
 
  * gimbal
@@ -57,6 +55,16 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-02-21
+ * More work on updated pi3 hat
+   * completed routing
+   * completed BOM
+   * fine silk placement
+   * BOM optimized down to 20 line items
+
+DONE 2019-02-20
+ * Worked on pi3 hat r2 w/ rs485 and higher voltage input
 
 DONE 2018-09-11
  * design shroud

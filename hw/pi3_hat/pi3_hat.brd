@@ -173,1073 +173,6 @@
 </package>
 </packages>
 </library>
-<library name="rcl">
-<description>&lt;b&gt;Resistors, Capacitors, Inductors&lt;/b&gt;&lt;p&gt;
-Based on the previous libraries:
-&lt;ul&gt;
-&lt;li&gt;r.lbr
-&lt;li&gt;cap.lbr 
-&lt;li&gt;cap-fe.lbr
-&lt;li&gt;captant.lbr
-&lt;li&gt;polcap.lbr
-&lt;li&gt;ipc-smd.lbr
-&lt;/ul&gt;
-All SMD packages are defined according to the IPC specifications and  CECC&lt;p&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;&lt;p&gt;
-&lt;p&gt;
-for Electrolyt Capacitors see also :&lt;p&gt;
-www.bccomponents.com &lt;p&gt;
-www.panasonic.com&lt;p&gt;
-www.kemet.com&lt;p&gt;
-http://www.secc.co.jp/pdf/os_e/2004/e_os_all.pdf &lt;b&gt;(SANYO)&lt;/b&gt;
-&lt;p&gt;
-for trimmer refence see : &lt;u&gt;www.electrospec-inc.com/cross_references/trimpotcrossref.asp&lt;/u&gt;&lt;p&gt;
-
-&lt;table border=0 cellspacing=0 cellpadding=0 width="100%" cellpaddding=0&gt;
-&lt;tr valign="top"&gt;
-
-&lt;! &lt;td width="10"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td width="90%"&gt;
-
-&lt;b&gt;&lt;font color="#0000FF" size="4"&gt;TRIM-POT CROSS REFERENCE&lt;/font&gt;&lt;/b&gt;
-&lt;P&gt;
-&lt;TABLE BORDER=0 CELLSPACING=1 CELLPADDING=2&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=8&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;RECTANGULAR MULTI-TURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;BOURNS&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;BI&amp;nbsp;TECH&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;DALE-VISHAY&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;PHILIPS/MEPCO&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;MURATA&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;PANASONIC&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;SPECTROL&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;B&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL color="#FF0000"&gt;MILSPEC&lt;/FONT&gt;
-      &lt;/B&gt;
-    &lt;/TD&gt;&lt;TD&gt;&amp;nbsp;&lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3 &gt;
-      3005P&lt;BR&gt;
-      3006P&lt;BR&gt;
-      3006W&lt;BR&gt;
-      3006Y&lt;BR&gt;
-      3009P&lt;BR&gt;
-      3009W&lt;BR&gt;
-      3009Y&lt;BR&gt;
-      3057J&lt;BR&gt;
-      3057L&lt;BR&gt;
-      3057P&lt;BR&gt;
-      3057Y&lt;BR&gt;
-      3059J&lt;BR&gt;
-      3059L&lt;BR&gt;
-      3059P&lt;BR&gt;
-      3059Y&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      89P&lt;BR&gt;
-      89W&lt;BR&gt;
-      89X&lt;BR&gt;
-      89PH&lt;BR&gt;
-      76P&lt;BR&gt;
-      89XH&lt;BR&gt;
-      78SLT&lt;BR&gt;
-      78L&amp;nbsp;ALT&lt;BR&gt;
-      56P&amp;nbsp;ALT&lt;BR&gt;
-      78P&amp;nbsp;ALT&lt;BR&gt;
-      T8S&lt;BR&gt;
-      78L&lt;BR&gt;
-      56P&lt;BR&gt;
-      78P&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      T18/784&lt;BR&gt;
-      783&lt;BR&gt;
-      781&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      2199&lt;BR&gt;
-      1697/1897&lt;BR&gt;
-      1680/1880&lt;BR&gt;
-      2187&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      8035EKP/CT20/RJ-20P&lt;BR&gt;
-      -&lt;BR&gt;
-      RJ-20X&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      1211L&lt;BR&gt;
-      8012EKQ&amp;nbsp;ALT&lt;BR&gt;
-      8012EKR&amp;nbsp;ALT&lt;BR&gt;
-      1211P&lt;BR&gt;
-      8012EKJ&lt;BR&gt;
-      8012EKL&lt;BR&gt;
-      8012EKQ&lt;BR&gt;
-      8012EKR&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      2101P&lt;BR&gt;
-      2101W&lt;BR&gt;
-      2101Y&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      2102L&lt;BR&gt;
-      2102S&lt;BR&gt;
-      2102Y&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      EVMCOG&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      43P&lt;BR&gt;
-      43W&lt;BR&gt;
-      43Y&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      40L&lt;BR&gt;
-      40P&lt;BR&gt;
-      40Y&lt;BR&gt;
-      70Y-T602&lt;BR&gt;
-      70L&lt;BR&gt;
-      70P&lt;BR&gt;
-      70Y&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      RT/RTR12&lt;BR&gt;
-      RT/RTR12&lt;BR&gt;
-      RT/RTR12&lt;BR&gt;
-      -&lt;BR&gt;
-      RJ/RJR12&lt;BR&gt;
-      RJ/RJR12&lt;BR&gt;
-      RJ/RJR12&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=8&gt;&amp;nbsp;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=8&gt;
-      &lt;FONT SIZE=4 FACE=ARIAL&gt;&lt;B&gt;SQUARE MULTI-TURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-   &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BOURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BI&amp;nbsp;TECH&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;DALE-VISHAY&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PHILIPS/MEPCO&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;MURATA&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PANASONIC&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;SPECTROL&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;MILSPEC&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      3250L&lt;BR&gt;
-      3250P&lt;BR&gt;
-      3250W&lt;BR&gt;
-      3250X&lt;BR&gt;
-      3252P&lt;BR&gt;
-      3252W&lt;BR&gt;
-      3252X&lt;BR&gt;
-      3260P&lt;BR&gt;
-      3260W&lt;BR&gt;
-      3260X&lt;BR&gt;
-      3262P&lt;BR&gt;
-      3262W&lt;BR&gt;
-      3262X&lt;BR&gt;
-      3266P&lt;BR&gt;
-      3266W&lt;BR&gt;
-      3266X&lt;BR&gt;
-      3290H&lt;BR&gt;
-      3290P&lt;BR&gt;
-      3290W&lt;BR&gt;
-      3292P&lt;BR&gt;
-      3292W&lt;BR&gt;
-      3292X&lt;BR&gt;
-      3296P&lt;BR&gt;
-      3296W&lt;BR&gt;
-      3296X&lt;BR&gt;
-      3296Y&lt;BR&gt;
-      3296Z&lt;BR&gt;
-      3299P&lt;BR&gt;
-      3299W&lt;BR&gt;
-      3299X&lt;BR&gt;
-      3299Y&lt;BR&gt;
-      3299Z&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      66P&amp;nbsp;ALT&lt;BR&gt;
-      66W&amp;nbsp;ALT&lt;BR&gt;
-      66X&amp;nbsp;ALT&lt;BR&gt;
-      66P&amp;nbsp;ALT&lt;BR&gt;
-      66W&amp;nbsp;ALT&lt;BR&gt;
-      66X&amp;nbsp;ALT&lt;BR&gt;
-      -&lt;BR&gt;
-      64W&amp;nbsp;ALT&lt;BR&gt;
-      -&lt;BR&gt;
-      64P&amp;nbsp;ALT&lt;BR&gt;
-      64W&amp;nbsp;ALT&lt;BR&gt;
-      64X&amp;nbsp;ALT&lt;BR&gt;
-      64P&lt;BR&gt;
-      64W&lt;BR&gt;
-      64X&lt;BR&gt;
-      66X&amp;nbsp;ALT&lt;BR&gt;
-      66P&amp;nbsp;ALT&lt;BR&gt;
-      66W&amp;nbsp;ALT&lt;BR&gt;
-      66P&lt;BR&gt;
-      66W&lt;BR&gt;
-      66X&lt;BR&gt;
-      67P&lt;BR&gt;
-      67W&lt;BR&gt;
-      67X&lt;BR&gt;
-      67Y&lt;BR&gt;
-      67Z&lt;BR&gt;
-      68P&lt;BR&gt;
-      68W&lt;BR&gt;
-      68X&lt;BR&gt;
-      67Y&amp;nbsp;ALT&lt;BR&gt;
-      67Z&amp;nbsp;ALT&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      5050&lt;BR&gt;
-      5091&lt;BR&gt;
-      5080&lt;BR&gt;
-      5087&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      T63YB&lt;BR&gt;
-      T63XB&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      5887&lt;BR&gt;
-      5891&lt;BR&gt;
-      5880&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      T93Z&lt;BR&gt;
-      T93YA&lt;BR&gt;
-      T93XA&lt;BR&gt;
-      T93YB&lt;BR&gt;
-      T93XB&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      8026EKP&lt;BR&gt;
-      8026EKW&lt;BR&gt;
-      8026EKM&lt;BR&gt;
-      8026EKP&lt;BR&gt;
-      8026EKB&lt;BR&gt;
-      8026EKM&lt;BR&gt;
-      1309X&lt;BR&gt;
-      1309P&lt;BR&gt;
-      1309W&lt;BR&gt;
-      8024EKP&lt;BR&gt;
-      8024EKW&lt;BR&gt;
-      8024EKN&lt;BR&gt;
-      RJ-9P/CT9P&lt;BR&gt;
-      RJ-9W&lt;BR&gt;
-      RJ-9X&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      3103P&lt;BR&gt;
-      3103Y&lt;BR&gt;
-      3103Z&lt;BR&gt;
-      3103P&lt;BR&gt;
-      3103Y&lt;BR&gt;
-      3103Z&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      3105P/3106P&lt;BR&gt;
-      3105W/3106W&lt;BR&gt;
-      3105X/3106X&lt;BR&gt;
-      3105Y/3106Y&lt;BR&gt;
-      3105Z/3105Z&lt;BR&gt;
-      3102P&lt;BR&gt;
-      3102W&lt;BR&gt;
-      3102X&lt;BR&gt;
-      3102Y&lt;BR&gt;
-      3102Z&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMCBG&lt;BR&gt;
-      EVMCCG&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      55-1-X&lt;BR&gt;
-      55-4-X&lt;BR&gt;
-      55-3-X&lt;BR&gt;
-      55-2-X&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      50-2-X&lt;BR&gt;
-      50-4-X&lt;BR&gt;
-      50-3-X&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      64P&lt;BR&gt;
-      64W&lt;BR&gt;
-      64X&lt;BR&gt;
-      64Y&lt;BR&gt;
-      64Z&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      RT/RTR22&lt;BR&gt;
-      RT/RTR22&lt;BR&gt;
-      RT/RTR22&lt;BR&gt;
-      RT/RTR22&lt;BR&gt;
-      RJ/RJR22&lt;BR&gt;
-      RJ/RJR22&lt;BR&gt;
-      RJ/RJR22&lt;BR&gt;
-      RT/RTR26&lt;BR&gt;
-      RT/RTR26&lt;BR&gt;
-      RT/RTR26&lt;BR&gt;
-      RJ/RJR26&lt;BR&gt;
-      RJ/RJR26&lt;BR&gt;
-      RJ/RJR26&lt;BR&gt;
-      RJ/RJR26&lt;BR&gt;
-      RJ/RJR26&lt;BR&gt;
-      RJ/RJR26&lt;BR&gt;
-      RT/RTR24&lt;BR&gt;
-      RT/RTR24&lt;BR&gt;
-      RT/RTR24&lt;BR&gt;
-      RJ/RJR24&lt;BR&gt;
-      RJ/RJR24&lt;BR&gt;
-      RJ/RJR24&lt;BR&gt;
-      RJ/RJR24&lt;BR&gt;
-      RJ/RJR24&lt;BR&gt;
-      RJ/RJR24&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=8&gt;&amp;nbsp;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=8&gt;
-      &lt;FONT SIZE=4 FACE=ARIAL&gt;&lt;B&gt;SINGLE TURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BOURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BI&amp;nbsp;TECH&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;DALE-VISHAY&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PHILIPS/MEPCO&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;MURATA&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PANASONIC&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;SPECTROL&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD ALIGN=CENTER&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;MILSPEC&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      3323P&lt;BR&gt;
-      3323S&lt;BR&gt;
-      3323W&lt;BR&gt;
-      3329H&lt;BR&gt;
-      3329P&lt;BR&gt;
-      3329W&lt;BR&gt;
-      3339H&lt;BR&gt;
-      3339P&lt;BR&gt;
-      3339W&lt;BR&gt;
-      3352E&lt;BR&gt;
-      3352H&lt;BR&gt;
-      3352K&lt;BR&gt;
-      3352P&lt;BR&gt;
-      3352T&lt;BR&gt;
-      3352V&lt;BR&gt;
-      3352W&lt;BR&gt;
-      3362H&lt;BR&gt;
-      3362M&lt;BR&gt;
-      3362P&lt;BR&gt;
-      3362R&lt;BR&gt;
-      3362S&lt;BR&gt;
-      3362U&lt;BR&gt;
-      3362W&lt;BR&gt;
-      3362X&lt;BR&gt;
-      3386B&lt;BR&gt;
-      3386C&lt;BR&gt;
-      3386F&lt;BR&gt;
-      3386H&lt;BR&gt;
-      3386K&lt;BR&gt;
-      3386M&lt;BR&gt;
-      3386P&lt;BR&gt;
-      3386S&lt;BR&gt;
-      3386W&lt;BR&gt;
-      3386X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      25P&lt;BR&gt;
-      25S&lt;BR&gt;
-      25RX&lt;BR&gt;
-      82P&lt;BR&gt;
-      82M&lt;BR&gt;
-      82PA&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      91E&lt;BR&gt;
-      91X&lt;BR&gt;
-      91T&lt;BR&gt;
-      91B&lt;BR&gt;
-      91A&lt;BR&gt;
-      91V&lt;BR&gt;
-      91W&lt;BR&gt;
-      25W&lt;BR&gt;
-      25V&lt;BR&gt;
-      25P&lt;BR&gt;
-      -&lt;BR&gt;
-      25S&lt;BR&gt;
-      25U&lt;BR&gt;
-      25RX&lt;BR&gt;
-      25X&lt;BR&gt;
-      72XW&lt;BR&gt;
-      72XL&lt;BR&gt;
-      72PM&lt;BR&gt;
-      72RX&lt;BR&gt;
-      -&lt;BR&gt;
-      72PX&lt;BR&gt;
-      72P&lt;BR&gt;
-      72RXW&lt;BR&gt;
-      72RXL&lt;BR&gt;
-      72X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      T7YB&lt;BR&gt;
-      T7YA&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      TXD&lt;BR&gt;
-      TYA&lt;BR&gt;
-      TYP&lt;BR&gt;
-      -&lt;BR&gt;
-      TYD&lt;BR&gt;
-      TX&lt;BR&gt;
-      -&lt;BR&gt;
-      150SX&lt;BR&gt;
-      100SX&lt;BR&gt;
-      102T&lt;BR&gt;
-      101S&lt;BR&gt;
-      190T&lt;BR&gt;
-      150TX&lt;BR&gt;
-      101&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      101SX&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      ET6P&lt;BR&gt;
-      ET6S&lt;BR&gt;
-      ET6X&lt;BR&gt;
-      RJ-6W/8014EMW&lt;BR&gt;
-      RJ-6P/8014EMP&lt;BR&gt;
-      RJ-6X/8014EMX&lt;BR&gt;
-      TM7W&lt;BR&gt;
-      TM7P&lt;BR&gt;
-      TM7X&lt;BR&gt;
-      -&lt;BR&gt;
-      8017SMS&lt;BR&gt;
-      -&lt;BR&gt;
-      8017SMB&lt;BR&gt;
-      8017SMA&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      CT-6W&lt;BR&gt;
-      CT-6H&lt;BR&gt;
-      CT-6P&lt;BR&gt;
-      CT-6R&lt;BR&gt;
-      -&lt;BR&gt;
-      CT-6V&lt;BR&gt;
-      CT-6X&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      8038EKV&lt;BR&gt;
-      -&lt;BR&gt;
-      8038EKX&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      8038EKP&lt;BR&gt;
-      8038EKZ&lt;BR&gt;
-      8038EKW&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      3321H&lt;BR&gt;
-      3321P&lt;BR&gt;
-      3321N&lt;BR&gt;
-      1102H&lt;BR&gt;
-      1102P&lt;BR&gt;
-      1102T&lt;BR&gt;
-      RVA0911V304A&lt;BR&gt;
-      -&lt;BR&gt;
-      RVA0911H413A&lt;BR&gt;
-      RVG0707V100A&lt;BR&gt;
-      RVA0607V(H)306A&lt;BR&gt;
-      RVA1214H213A&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      3104B&lt;BR&gt;
-      3104C&lt;BR&gt;
-      3104F&lt;BR&gt;
-      3104H&lt;BR&gt;
-      -&lt;BR&gt;
-      3104M&lt;BR&gt;
-      3104P&lt;BR&gt;
-      3104S&lt;BR&gt;
-      3104W&lt;BR&gt;
-      3104X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      EVMQ0G&lt;BR&gt;
-      EVMQIG&lt;BR&gt;
-      EVMQ3G&lt;BR&gt;
-      EVMS0G&lt;BR&gt;
-      EVMQ0G&lt;BR&gt;
-      EVMG0G&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMK4GA00B&lt;BR&gt;
-      EVM30GA00B&lt;BR&gt;
-      EVMK0GA00B&lt;BR&gt;
-      EVM38GA00B&lt;BR&gt;
-      EVMB6&lt;BR&gt;
-      EVLQ0&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMMSG&lt;BR&gt;
-      EVMMBG&lt;BR&gt;
-      EVMMAG&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMMCS&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMM1&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMM0&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      EVMM3&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      62-3-1&lt;BR&gt;
-      62-1-2&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      67R&lt;BR&gt;
-      -&lt;BR&gt;
-      67P&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      67X&lt;BR&gt;
-      63V&lt;BR&gt;
-      63S&lt;BR&gt;
-      63M&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      63H&lt;BR&gt;
-      63P&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      63X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      RJ/RJR50&lt;BR&gt;
-      RJ/RJR50&lt;BR&gt;
-      RJ/RJR50&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-&lt;/TABLE&gt;
-&lt;P&gt;&amp;nbsp;&lt;P&gt;
-&lt;TABLE BORDER=0 CELLSPACING=1 CELLPADDING=3&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=7&gt;
-      &lt;FONT color="#0000FF" SIZE=4 FACE=ARIAL&gt;&lt;B&gt;SMD TRIM-POT CROSS REFERENCE&lt;/B&gt;&lt;/FONT&gt;
-      &lt;P&gt;
-      &lt;FONT SIZE=4 FACE=ARIAL&gt;&lt;B&gt;MULTI-TURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BOURNS&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BI&amp;nbsp;TECH&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;DALE-VISHAY&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PHILIPS/MEPCO&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PANASONIC&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;TOCOS&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;AUX/KYOCERA&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      3224G&lt;BR&gt;
-      3224J&lt;BR&gt;
-      3224W&lt;BR&gt;
-      3269P&lt;BR&gt;
-      3269W&lt;BR&gt;
-      3269X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      44G&lt;BR&gt;
-      44J&lt;BR&gt;
-      44W&lt;BR&gt;
-      84P&lt;BR&gt;
-      84W&lt;BR&gt;
-      84X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      ST63Z&lt;BR&gt;
-      ST63Y&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      ST5P&lt;BR&gt;
-      ST5W&lt;BR&gt;
-      ST5X&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=7&gt;&amp;nbsp;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD COLSPAN=7&gt;
-      &lt;FONT SIZE=4 FACE=ARIAL&gt;&lt;B&gt;SINGLE TURN&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BOURNS&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;BI&amp;nbsp;TECH&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;DALE-VISHAY&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PHILIPS/MEPCO&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;PANASONIC&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;TOCOS&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD&gt;
-      &lt;FONT SIZE=3 FACE=ARIAL&gt;&lt;B&gt;AUX/KYOCERA&lt;/B&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-  &lt;TR&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      3314G&lt;BR&gt;
-      3314J&lt;BR&gt;
-      3364A/B&lt;BR&gt;
-      3364C/D&lt;BR&gt;
-      3364W/X&lt;BR&gt;
-      3313G&lt;BR&gt;
-      3313J&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      23B&lt;BR&gt;
-      23A&lt;BR&gt;
-      21X&lt;BR&gt;
-      21W&lt;BR&gt;
-      -&lt;BR&gt;
-      22B&lt;BR&gt;
-      22A&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      ST5YL/ST53YL&lt;BR&gt;
-      ST5YJ/5T53YJ&lt;BR&gt;
-      ST-23A&lt;BR&gt;
-      ST-22B&lt;BR&gt;
-      ST-22&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      ST-4B&lt;BR&gt;
-      ST-4A&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      ST-3B&lt;BR&gt;
-      ST-3A&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      EVM-6YS&lt;BR&gt;
-      EVM-1E&lt;BR&gt;
-      EVM-1G&lt;BR&gt;
-      EVM-1D&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      G4B&lt;BR&gt;
-      G4A&lt;BR&gt;
-      TR04-3S1&lt;BR&gt;
-      TRG04-2S1&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-    &lt;TD BGCOLOR="#cccccc" ALIGN=CENTER&gt;&lt;FONT FACE=ARIAL SIZE=3&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;
-      DVR-43A&lt;BR&gt;
-      CVR-42C&lt;BR&gt;
-      CVR-42A/C&lt;BR&gt;
-      -&lt;BR&gt;
-      -&lt;BR&gt;&lt;/FONT&gt;
-    &lt;/TD&gt;
-  &lt;/TR&gt;
-&lt;/TABLE&gt;
-&lt;P&gt;
-&lt;FONT SIZE=4 FACE=ARIAL&gt;&lt;B&gt;ALT =&amp;nbsp;ALTERNATE&lt;/B&gt;&lt;/FONT&gt;
-&lt;P&gt;
-
-&amp;nbsp;
-&lt;P&gt;
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;</description>
-<packages>
-<package name="R0603">
-<description>&lt;b&gt;RESISTOR&lt;/b&gt;</description>
-<wire x1="-0.432" y1="-0.356" x2="0.432" y2="-0.356" width="0.1524" layer="51"/>
-<wire x1="0.432" y1="0.356" x2="-0.432" y2="0.356" width="0.1524" layer="51"/>
-<wire x1="-1.473" y1="0.983" x2="1.473" y2="0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="0.983" x2="1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="-0.983" x2="-1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="-1.473" y1="-0.983" x2="-1.473" y2="0.983" width="0.0508" layer="39"/>
-<smd name="1" x="-0.85" y="0" dx="1" dy="1.1" layer="1"/>
-<smd name="2" x="0.85" y="0" dx="1" dy="1.1" layer="1"/>
-<text x="-0.635" y="0.635" size="1.27" layer="25">&gt;NAME</text>
-<text x="-0.635" y="-1.905" size="1.27" layer="27">&gt;VALUE</text>
-<rectangle x1="0.4318" y1="-0.4318" x2="0.8382" y2="0.4318" layer="51"/>
-<rectangle x1="-0.8382" y1="-0.4318" x2="-0.4318" y2="0.4318" layer="51"/>
-<rectangle x1="-0.1999" y1="-0.4001" x2="0.1999" y2="0.4001" layer="35"/>
-</package>
-</packages>
-</library>
 <library name="pinhead">
 <description>&lt;b&gt;Pin Header Connectors&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
@@ -1691,10 +624,10 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 </designrules>
 <autorouter>
 <pass name="Default">
-<param name="RoutingGrid" value="0.5mm"/>
+<param name="RoutingGrid" value="0.2mm"/>
 <param name="tpViaShape" value="round"/>
 <param name="PrefDir.1" value="|"/>
-<param name="PrefDir.2" value="0"/>
+<param name="PrefDir.2" value="/"/>
 <param name="PrefDir.3" value="0"/>
 <param name="PrefDir.4" value="0"/>
 <param name="PrefDir.5" value="0"/>
@@ -1707,7 +640,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <param name="PrefDir.12" value="0"/>
 <param name="PrefDir.13" value="0"/>
 <param name="PrefDir.14" value="0"/>
-<param name="PrefDir.15" value="0"/>
+<param name="PrefDir.15" value="\"/>
 <param name="PrefDir.16" value="-"/>
 <param name="cfVia" value="8"/>
 <param name="cfNonPref" value="5"/>
@@ -1786,38 +719,44 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="JP1" library="pinhead" package="2X08" value="" x="3.5" y="17.26" smashed="yes" rot="R90">
 <attribute name="NAME" x="6.6" y="26.675" size="1.5" layer="25" font="vector"/>
 <attribute name="VALUE" x="7.945" y="7.1" size="1.27" layer="27" rot="R90"/>
+<attribute name="POPULATE" value="0" x="3.5" y="17.26" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="JD1" library="odroid_shield" package="JST_XH_SMT_RA_4" value="JST-XH4SMT_RA" x="22.6" y="23.9" smashed="yes" rot="R180">
 <attribute name="DPN" value="455-2262-1-ND" x="1.01" y="28.98" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="30.4" y="26.6" size="1.5" layer="21" font="vector"/>
+<attribute name="POPULATE" value="1" x="22.6" y="23.9" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="S4B-XH-SM4-TB(LF)(SN)" x="22.6" y="23.9" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MF" value="JST" x="22.6" y="23.9" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="U5" library="pi3_hat" package="SOT23" value="DMG2305UX" x="10.1" y="9.1" smashed="yes" rot="R90">
-<attribute name="NAME" x="11.9" y="8.8" size="1" layer="25" font="vector"/>
+<attribute name="NAME" x="10.8" y="6.8" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 <attribute name="DPN" value="DMG2305UX-13DICT-ND" x="10.1" y="9.1" size="1.778" layer="27" rot="R90" display="off"/>
-</element>
-<element name="R3" library="rcl" package="R0603" value="10k 1%" x="11.3" y="16.41" smashed="yes" rot="R270">
-<attribute name="NAME" x="10.655" y="18.135" size="1" layer="25" font="vector"/>
-<attribute name="DPN" value="MCT0603-10.0K-CFCT-ND" x="11.3" y="16.41" size="1.778" layer="27" rot="R270" display="off"/>
-</element>
-<element name="R4" library="rcl" package="R0603" value="47k 1%" x="7.72" y="12.91" smashed="yes" rot="R270">
-<attribute name="NAME" x="6.955" y="14.655" size="1" layer="25" font="vector"/>
-<attribute name="DPN" value="P47.0KHCT-ND" x="7.72" y="12.91" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="DMG2305UX-13" x="10.1" y="9.1" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="Diodes Incorporated" x="10.1" y="9.1" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="10.1" y="9.1" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="U4" library="pi3_hat" package="SOT26" value="DMMT5401" x="10.36" y="13.14" smashed="yes">
-<attribute name="NAME" x="12.24" y="12.64" size="1" layer="25" font="vector"/>
+<attribute name="NAME" x="12.24" y="12.64" size="0.6" layer="25" font="vector" ratio="10"/>
 <attribute name="DPN" value="DMMT5401-FDICT-ND" x="10.36" y="13.14" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="DMMT5401-7-F" x="10.36" y="13.14" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="Didoes Incorporated" x="10.36" y="13.14" size="1.778" layer="27" display="off"/>
+<attribute name="POPULATE" value="1" x="10.36" y="13.14" size="1.778" layer="27" display="off"/>
 </element>
 <element name="F1" library="pi3_hat" package="FUS_VISHAY_MFU0603" value="MFU0603FF04000P100" x="43.6" y="23.2" smashed="yes">
 <attribute name="VENDOR" value="VISHAY" x="43.6" y="23.2" size="1.778" layer="27" display="off"/>
-<attribute name="MANUFACTURER_PART_NUMBER" value="MFU0603FF04000P100" x="43.6" y="23.2" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="43.935" y="24.1234" size="1" layer="25" font="vector" rot="SR90"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="" x="43.6" y="23.2" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="43.5234" y="23.865" size="0.6" layer="25" font="vector" ratio="10" rot="SR0"/>
 <attribute name="DPN" value="MFU06034.00CT-ND" x="43.6" y="23.2" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="MFU0603FF04000P100" x="43.6" y="23.2" size="1.778" layer="27" display="off"/>
+<attribute name="POPULATE" value="1" x="43.6" y="23.2" size="1.778" layer="27" display="off"/>
 </element>
-<element name="U2" library="pi3_hat" package="10L_DFN" value="RT829910L_DFN" x="50" y="21" rot="R180">
+<element name="U2" library="pi3_hat" package="10L_DFN" value="RT829910L_DFN" x="50" y="21" smashed="yes" rot="R180">
 <attribute name="MPN" value="RT8299ZQW" x="50" y="21" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MF" value="Richtek" x="50" y="21" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="50" y="19.3" size="0.6" layer="21" font="vector" ratio="10" rot="R180"/>
+<attribute name="POPULATE" value="1" x="50" y="21" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C2" library="mfpassives" package="C1206" value="10uF 35V" x="45.9" y="24.9" rot="R90">
+<element name="C2" library="mfpassives" package="C1206" value="10uF 35V" x="45.9" y="24.9" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="45.9" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="45.9" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="45.9" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1826,8 +765,9 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="45.9" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="TDK" x="45.9" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="45.9" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="44.7" y="27" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="C6" library="mfpassives" package="C1206" value="10uF 35V" x="48.3" y="24.9" rot="R90">
+<element name="C6" library="mfpassives" package="C1206" value="10uF 35V" x="48.3" y="24.9" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="48.3" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="48.3" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="48.3" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1836,8 +776,9 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="48.3" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="TDK" x="48.3" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="48.3" y="24.9" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="49.4" y="27.3" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="C7" library="mfpassives" package="C0603" value="1uF 16V" x="53.3" y="21.9">
+<element name="C7" library="mfpassives" package="C0603" value="1uF" x="53.3" y="21.9" smashed="yes">
 <attribute name="HOUSEPART" value="1" x="53.3" y="21.9" size="1.778" layer="27" display="off"/>
 <attribute name="TOLERANCE" value="" x="53.3" y="21.9" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="MF-CAP-0603-1uF" x="53.3" y="21.9" size="1.778" layer="27" display="off"/>
@@ -1845,8 +786,9 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="DIELECTRIC" value="" x="53.3" y="21.9" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="" x="53.3" y="21.9" size="1.778" layer="27" display="off"/>
 <attribute name="URL" value="" x="53.3" y="21.9" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="52.9" y="22.8" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="C3" library="mfpassives" package="C0805" value=".1uF 50V" x="50.5" y="24.5" rot="R90">
+<element name="C3" library="mfpassives" package="C0805" value=".1uF 50V" x="50.5" y="24.5" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="1" x="50.5" y="24.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="50.5" y="24.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="MF-CAP-0805-0.1uF" x="50.5" y="24.5" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1854,26 +796,31 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="DIELECTRIC" value="" x="50.5" y="24.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="" x="50.5" y="24.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="50.5" y="24.5" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="50.8" y="26.5" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="R1" library="mfpassives" package="R0603" value="27k 1%" x="53.3" y="20.3" rot="R180">
+<element name="R1" library="mfpassives" package="R0603" value="53.6k 1%" x="53.3" y="20.3" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TOLERANCE" value="" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="ERJ-3EKF5362V" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="POPULATE" value="1" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="URL" value="" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="WATTAGE" value="" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="54.9" y="20" size="0.6" layer="25" font="vector" ratio="10"/>
+<attribute name="MF" value="Panasonic" x="53.3" y="20.3" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="R2" library="mfpassives" package="R0603" value="5.1k 1%" x="52.6" y="18" rot="R270">
+<element name="R2" library="mfpassives" package="R0603" value="10k 1%" x="52.6" y="18" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TOLERANCE" value="" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="ERJ-3EKF1002V" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="POPULATE" value="1" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="URL" value="" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="53.5" y="16.7" size="0.6" layer="25" font="vector" ratio="10"/>
+<attribute name="MF" value="Panasonic" x="52.6" y="18" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C5" library="mfpassives" package="C1210" value="22uF 16V" x="37.7" y="16.1" rot="R180">
+<element name="C5" library="mfpassives" package="C1210" value="22uF 16V" x="37.7" y="16.1" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="" x="37.7" y="16.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TOLERANCE" value="" x="37.7" y="16.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="CL32A226KOJNNNE" x="37.7" y="16.1" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1882,8 +829,9 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="37.7" y="16.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="URL" value="" x="37.7" y="16.1" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MF" value="SAMSUNG" x="37.7" y="16.1" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="38.4" y="14.3" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="C8" library="mfpassives" package="C1210" value="22uF 16V" x="37.7" y="19.5" rot="R180">
+<element name="C8" library="mfpassives" package="C1210" value="22uF 16V" x="37.7" y="19.5" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="" x="37.7" y="19.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TOLERANCE" value="" x="37.7" y="19.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="CL32A226KOJNNNE" x="37.7" y="19.5" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1892,39 +840,49 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="37.7" y="19.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MF" value="SAMSUNG" x="37.7" y="19.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="URL" value="" x="37.7" y="19.5" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="37.1" y="21.3" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="L1" library="pi3_hat" package="TAIYO_8040" value="6.8uH 3.7A" x="44.1" y="18.5" rot="R180">
+<element name="L1" library="pi3_hat" package="TAIYO_8040" value="6.8uH 3.7A" x="44.1" y="18.5" smashed="yes" rot="R180">
 <attribute name="VALUE" value="" x="44.1" y="18.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="POPULATE" value="1" x="44.1" y="18.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="NR8040T6R8N" x="44.1" y="18.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MF" value="TAIYO YUDEN" x="44.1" y="18.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="HOUSEPART" value="0" x="44.1" y="18.5" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="45.4" y="14.3" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="U1" library="controller" package="TDFN10" value="MAX13431E" x="22.8" y="13.2" rot="R90">
+<element name="U1" library="controller" package="TDFN10" value="MAX13431E" x="22.8" y="13.2" smashed="yes" rot="R90">
 <attribute name="MPN" value="MAX13431EETB+T" x="18.3" y="9.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="POPULATE" value="1" x="18.3" y="9.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="Maxim" x="18.3" y="9.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="24.5" y="13.95" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="C1" library="mfpassives" package="C0603" value=".1uF" x="19.7" y="12.4" rot="R180">
-<attribute name="HOUSEPART" value="1" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="TOLERANCE" value="" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="MF-CAP-0603-0.1uF" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="POPULATE" value="1" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="DIELECTRIC" value="" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="URL" value="" x="19.7" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<element name="C1" library="mfpassives" package="C0805" value=".1uF 50V" x="19.3" y="12.4" smashed="yes" rot="R180">
+<attribute name="HOUSEPART" value="1" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="TOLERANCE" value="" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="MF-CAP-0805-0.1uF" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="1" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DIELECTRIC" value="" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VOLTAGE" value="" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="URL" value="" x="19.3" y="12.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="18.6" y="11.3" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="C4" library="mfpassives" package="C0603" value="1uF" x="19.7" y="14" rot="R180">
-<attribute name="HOUSEPART" value="1" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="TOLERANCE" value="" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="MF-CAP-0603-1uF" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="POPULATE" value="1" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="DIELECTRIC" value="" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="URL" value="" x="19.7" y="14" size="1.778" layer="27" rot="R180" display="off"/>
+<element name="C4" library="mfpassives" package="C0603" value="1uF" x="19.7" y="14.2" smashed="yes" rot="R180">
+<attribute name="HOUSEPART" value="1" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="TOLERANCE" value="" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="MF-CAP-0603-1uF" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="1" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DIELECTRIC" value="" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VOLTAGE" value="" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="URL" value="" x="19.7" y="14.2" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="18.6" y="15.1" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="U3" library="pi3_hat" package="UFQFPN32" value="STM32F051X6UFQFPN32" x="21.5" y="7" rot="R180"/>
-<element name="R5" library="mfpassives" package="R0603" value="220" x="21.8" y="2.7" rot="R270">
+<element name="U3" library="pi3_hat" package="UFQFPN32" value="STM32F051X6UFQFPN32" x="21.5" y="7" smashed="yes" rot="R180">
+<attribute name="NAME" x="21.3" y="9.7" size="0.6" layer="25" font="vector" ratio="10"/>
+<attribute name="POPULATE" value="1" x="21.5" y="7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="STM32F051K6U6" x="21.5" y="7" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MF" value="STMicroelectronics" x="21.5" y="7" size="1.778" layer="27" rot="R180" display="off"/>
+</element>
+<element name="R5" library="mfpassives" package="R0603" value="220" x="21.8" y="2.7" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="" x="21.8" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TOLERANCE" value="" x="21.8" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="MF-RES-0603-220" x="21.8" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1932,23 +890,26 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="21.8" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="URL" value="" x="21.8" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="WATTAGE" value="" x="21.8" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="22.375" y="0.675" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="X1" library="controller" package="ABM3B" value="8.0MHz" x="26.9" y="4.5" rot="R270">
+<element name="X1" library="controller" package="ABM3B" value="8.0MHz" x="26.9" y="4.5" smashed="yes" rot="R270">
 <attribute name="MPN" value="ABM3B-8.000MHZ-10-1-U-T" x="26.9" y="4.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="POPULATE" value="1" x="26.9" y="4.5" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MF" value="Abracon" x="26.9" y="4.5" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="29.3" y="5.735" size="0.6" layer="21" font="vector" ratio="10"/>
 </element>
-<element name="C9" library="mfpassives" package="C0603" value="10pF" x="27.9" y="8.7">
-<attribute name="HOUSEPART" value="1" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="TOLERANCE" value="" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="MF-CAP-0603-10pF" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="POPULATE" value="1" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="DIELECTRIC" value="" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="VOLTAGE" value="" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="MF" value="MACROFAB" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
-<attribute name="URL" value="" x="23.9" y="8.7" size="1.778" layer="27" display="off"/>
+<element name="C9" library="mfpassives" package="C0603" value="10pF" x="28.1" y="8.7" smashed="yes">
+<attribute name="HOUSEPART" value="1" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="TOLERANCE" value="" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="MF-CAP-0603-10pF" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="POPULATE" value="1" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="DIELECTRIC" value="" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="VOLTAGE" value="" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="MACROFAB" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="URL" value="" x="24.1" y="8.7" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="28.6" y="9.6" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="C10" library="mfpassives" package="C0603" value="10pF" x="30.125" y="2.675" rot="R90">
+<element name="C10" library="mfpassives" package="C0603" value="10pF" x="30.125" y="2.675" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="1" x="34.125" y="2.675" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="34.125" y="2.675" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="MF-CAP-0603-10pF" x="34.125" y="2.675" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1957,41 +918,35 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="34.125" y="2.675" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="MACROFAB" x="34.125" y="2.675" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="34.125" y="2.675" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="31.025" y="1.125" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="SWD" library="controller" package="JST_B6B-ZR-SM4-TF(LF)(SN)" value="JST-ZH6SMT_VERT" x="35" y="7.5" smashed="yes" rot="R90">
 <attribute name="MPN" value="B6B-ZR-SM4-TF(LF)(SN)" x="24.5" y="7.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="POPULATE" value="1" x="24.5" y="7.5" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="JST" x="24.5" y="7.5" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="38.0409875" y="0.632740625" size="1.2725" layer="25" rot="R180"/>
+<attribute name="NAME" x="30.1590125" y="13.167259375" size="1.2725" layer="25"/>
 </element>
-<element name="C11" library="mfpassives" package="C0603" value=".1uF" x="41.5" y="7" rot="R90">
+<element name="C11" library="mfpassives" package="C0805" value=".1uF 50V" x="41.5" y="7" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="1" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="MF-CAP-0603-0.1uF" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="MF-CAP-0805-0.1uF" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="POPULATE" value="1" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="DIELECTRIC" value="" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="41.5" y="7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="42.4" y="5" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="R6" library="mfpassives" package="R0603" value="120" x="22.5" y="16" rot="R180">
-<attribute name="HOUSEPART" value="" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="TOLERANCE" value="" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="POPULATE" value="1" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="URL" value="" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="WATTAGE" value="" x="22.5" y="16" size="1.778" layer="27" rot="R180" display="off"/>
+<element name="C12" library="mfpassives" package="C0805" value=".1uF 50V" x="25.5" y="9.7" smashed="yes" rot="R90">
+<attribute name="HOUSEPART" value="1" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="TOLERANCE" value="" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="MF-CAP-0805-0.1uF" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DIELECTRIC" value="" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VOLTAGE" value="" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="URL" value="" x="25.5" y="9.7" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="25.4" y="11.5" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="C12" library="mfpassives" package="C0603" value=".1uF" x="25.2" y="9.4" rot="R90">
-<attribute name="HOUSEPART" value="1" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="TOLERANCE" value="" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="MF-CAP-0603-0.1uF" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="POPULATE" value="1" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="DIELECTRIC" value="" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VOLTAGE" value="" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="URL" value="" x="25.2" y="9.4" size="1.778" layer="27" rot="R90" display="off"/>
-</element>
-<element name="C13" library="mfpassives" package="C0603" value="1uF" x="23.5" y="2.7" rot="R270">
+<element name="C13" library="mfpassives" package="C0603" value="1uF" x="23.5" y="2.7" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="1" x="23.5" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TOLERANCE" value="" x="23.5" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="MF-CAP-0603-1uF" x="23.5" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1999,20 +954,23 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="DIELECTRIC" value="" x="23.5" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="" x="23.5" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="URL" value="" x="23.5" y="2.7" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="24.5" y="0.7" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="D1" library="mfleds" package="LED0603" value="MF-LED-0603-RED" x="18.6" y="3.3" rot="R180">
+<element name="D1" library="mfleds" package="LED0603" value="MF-LED-0603-RED" x="18.6" y="3.3" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="YES" x="18.6" y="3.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="MF-LED-0603-RED" x="18.6" y="3.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="POPULATE" value="1" x="18.6" y="3.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-RED" x="18.6" y="3.3" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="17.2" y="4.2" size="0.6" layer="25" font="vector" ratio="10"/>
 </element>
-<element name="D2" library="mfleds" package="LED0603" value="MF-LED-0603-GREEN" x="18.6" y="1.5" rot="R180">
+<element name="D2" library="mfleds" package="LED0603" value="MF-LED-0603-GREEN" x="18.6" y="1.5" smashed="yes" rot="R180">
 <attribute name="HOUSEPART" value="YES" x="18.6" y="1.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MPN" value="MF-LED-0603-GREEN" x="18.6" y="1.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="POPULATE" value="1" x="18.6" y="1.5" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="URL" value="https://factory.macrofab.com/part/MF-LED-0603-GREEN" x="18.6" y="1.5" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="17" y="1.4" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="R7" library="mfpassives" package="R0603" value="220" x="16.2" y="4.2" rot="R90">
+<element name="R7" library="mfpassives" package="R0603" value="220" x="16.2" y="4.2" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="16.2" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="16.2" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="MF-RES-0603-220" x="16.2" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2020,8 +978,9 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="16.2" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="16.2" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="" x="16.2" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="16.9" y="2.7" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
-<element name="R8" library="mfpassives" package="R0603" value="220" x="14.6" y="4.2" rot="R90">
+<element name="R8" library="mfpassives" package="R0603" value="220" x="14.6" y="4.2" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="14.6" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="14.6" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="MF-RES-0603-220" x="14.6" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2029,6 +988,48 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="14.6" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="14.6" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="WATTAGE" value="" x="14.6" y="4.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="15.1" y="2.7" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
+</element>
+<element name="R3" library="mfpassives" package="R0603" value="10k 1%" x="11.3" y="16.4" smashed="yes" rot="R90">
+<attribute name="HOUSEPART" value="" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="TOLERANCE" value="" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="ERJ-3EKF1002V" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VOLTAGE" value="" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="URL" value="" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="WATTAGE" value="" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="11.9" y="18" size="0.6" layer="25" font="vector" ratio="10"/>
+<attribute name="MF" value="Panasonic" x="11.3" y="16.4" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
+<element name="R4" library="mfpassives" package="R0603" value="53.6k 1%" x="7.7" y="13.2" rot="R90">
+<attribute name="HOUSEPART" value="" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="TOLERANCE" value="" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="ERJ-3EKF5362V" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="POPULATE" value="1" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VOLTAGE" value="" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="URL" value="" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="WATTAGE" value="" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="Panasonic" x="7.7" y="13.2" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
+<element name="R6" library="mfpassives" package="R0603" value="220" x="22.6" y="23.1" smashed="yes" rot="MR0">
+<attribute name="HOUSEPART" value="" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="TOLERANCE" value="" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MPN" value="MF-RES-0603-220" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="POPULATE" value="1" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="VOLTAGE" value="" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="URL" value="" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="WATTAGE" value="" x="22.6" y="23.1" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="NAME" x="21" y="22.6" size="0.6" layer="26" font="vector" ratio="10" rot="MR0"/>
+</element>
+<element name="R9" library="mfpassives" package="R0603" value="220" x="22.6" y="24.85" smashed="yes" rot="MR0">
+<attribute name="HOUSEPART" value="" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="TOLERANCE" value="" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="MPN" value="MF-RES-0603-220" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="POPULATE" value="1" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="VOLTAGE" value="" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="URL" value="" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="WATTAGE" value="" x="22.6" y="24.85" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="NAME" x="21" y="24.45" size="0.6" layer="26" font="vector" ratio="10" rot="MR0"/>
 </element>
 </elements>
 <signals>
@@ -2052,8 +1053,6 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <wire x1="8.5" y1="9.7" x2="9.1" y2="9.1" width="0.3048" layer="1"/>
 </signal>
 <signal name="GND">
-<contactref element="R3" pad="1"/>
-<contactref element="R4" pad="1"/>
 <contactref element="JP1" pad="6"/>
 <contactref element="JP1" pad="14"/>
 <contactref element="JP1" pad="9"/>
@@ -2090,30 +1089,24 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <vertex x="3" y="0.5"/>
 <vertex x="0.5" y="3"/>
 </polygon>
-<via x="7.75" y="14.85" extent="1-16" drill="0.4"/>
-<via x="11.25" y="18.4" extent="1-16" drill="0.4"/>
-<wire x1="7.72" y1="13.76" x2="7.7" y2="14.76" width="0.254" layer="1"/>
-<wire x1="7.7" y1="14.76" x2="7.75" y2="14.85" width="0.254" layer="1"/>
-<wire x1="11.3" y1="17.26" x2="11.25" y2="17.26" width="0.254" layer="1"/>
-<wire x1="11.25" y1="17.26" x2="11.25" y2="18.4" width="0.254" layer="1"/>
 <via x="21.5" y="7" extent="1-16" drill="0.4"/>
-<via x="21.8" y="1" extent="1-16" drill="0.4"/>
-<via x="23.5" y="1" extent="1-16" drill="0.4"/>
-<wire x1="21.8" y1="1.95" x2="21.8" y2="1" width="0.4064" layer="1"/>
-<wire x1="23.5" y1="1.95" x2="23.5" y2="1" width="0.4064" layer="1"/>
+<via x="21.8" y="1.1" extent="1-16" drill="0.4"/>
+<via x="23.5" y="1.1" extent="1-16" drill="0.4"/>
+<wire x1="21.8" y1="1.95" x2="21.8" y2="1.1" width="0.4064" layer="1"/>
+<wire x1="23.5" y1="1.95" x2="23.5" y2="1.1" width="0.4064" layer="1"/>
 <via x="31.15" y="3.425" extent="1-16" drill="0.4"/>
 <via x="29.1" y="7.3" extent="1-16" drill="0.4"/>
 <wire x1="30.125" y1="3.425" x2="31.15" y2="3.425" width="0.3048" layer="1"/>
 <wire x1="28.1" y1="6.5" x2="29.1" y2="7.3" width="0.3048" layer="1"/>
 <wire x1="29.1" y1="7.3" x2="29.1" y2="8.25" width="0.3048" layer="1"/>
-<wire x1="29.1" y1="8.25" x2="28.65" y2="8.7" width="0.3048" layer="1"/>
-<via x="26.15" y="10.15" extent="1-16" drill="0.4"/>
-<wire x1="25.2" y1="10.15" x2="26.15" y2="10.15" width="0.4064" layer="1"/>
+<wire x1="29.1" y1="8.25" x2="28.85" y2="8.7" width="0.3048" layer="1"/>
+<via x="26.65" y="10.65" extent="1-16" drill="0.4"/>
+<wire x1="25.5" y1="10.65" x2="26.65" y2="10.65" width="0.4064" layer="1"/>
 <via x="39.75" y="8.2" extent="1-16" drill="0.4"/>
 <wire x1="37" y1="8.25" x2="39.7" y2="8.25" width="0.4064" layer="1"/>
 <wire x1="39.7" y1="8.25" x2="39.75" y2="8.2" width="0.4064" layer="1"/>
 <wire x1="39.75" y1="8.2" x2="41.05" y2="8.2" width="0.4064" layer="1"/>
-<wire x1="41.05" y1="8.2" x2="41.5" y2="7.75" width="0.4064" layer="1"/>
+<wire x1="41.05" y1="8.2" x2="41.5" y2="7.95" width="0.4064" layer="1"/>
 <via x="34.8" y="16.1" extent="1-16" drill="0.4"/>
 <via x="34.8" y="17.1" extent="1-16" drill="0.4"/>
 <via x="34.8" y="18.45" extent="1-16" drill="0.4"/>
@@ -2136,10 +1129,10 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <vertex x="25.8" y="17.1"/>
 </polygon>
 <via x="24.65" y="13.1" extent="1-16" drill="0.4"/>
-<via x="18.05" y="14" extent="1-16" drill="0.4"/>
-<via x="18.05" y="12.4" extent="1-16" drill="0.4"/>
-<wire x1="18.05" y1="14" x2="18.95" y2="14" width="0.4064" layer="1"/>
-<wire x1="18.05" y1="12.4" x2="18.95" y2="12.4" width="0.4064" layer="1"/>
+<via x="18.05" y="14.2" extent="1-16" drill="0.4"/>
+<via x="17.55" y="12.4" extent="1-16" drill="0.4"/>
+<wire x1="18.05" y1="14.2" x2="18.95" y2="14.2" width="0.4064" layer="1"/>
+<wire x1="17.55" y1="12.4" x2="18.35" y2="12.4" width="0.4064" layer="1"/>
 <wire x1="24.65" y1="13.1" x2="24.55" y2="13.2" width="0.4064" layer="1"/>
 <wire x1="24.55" y1="13.2" x2="22.8" y2="13.2" width="0.4064" layer="1"/>
 <wire x1="23.8" y1="14.675" x2="23.8" y2="13.2" width="0.254" layer="1"/>
@@ -2163,7 +1156,15 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <wire x1="52.6" y1="17.25" x2="52.6" y2="16.35" width="0.6096" layer="1"/>
 <wire x1="48.575" y1="20" x2="49.6" y2="20" width="0.254" layer="1"/>
 <wire x1="49.6" y1="20" x2="50" y2="20.4" width="0.254" layer="1"/>
-<wire x1="50" y1="20.4" x2="50" y2="21" width="0" layer="19" extent="1-1"/>
+<wire x1="50" y1="21.6" x2="50" y2="21" width="0.127" layer="1"/>
+<contactref element="R3" pad="P$2"/>
+<via x="11.25" y="18.25" extent="1-16" drill="0.4"/>
+<wire x1="11.3" y1="17.15" x2="11.25" y2="17.2" width="0.254" layer="1"/>
+<wire x1="11.25" y1="17.2" x2="11.25" y2="18.25" width="0.254" layer="1"/>
+<contactref element="R4" pad="P$2"/>
+<via x="7.75" y="15.05" extent="1-16" drill="0.4"/>
+<wire x1="7.7" y1="13.95" x2="7.75" y2="14" width="0.254" layer="1"/>
+<wire x1="7.75" y1="14" x2="7.75" y2="15.05" width="0.254" layer="1"/>
 </signal>
 <signal name="SW">
 <contactref element="U2" pad="9"/>
@@ -2178,51 +1179,68 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <vertex x="47.6" y="18.2"/>
 <vertex x="46.5" y="18.2"/>
 </polygon>
-<wire x1="50.5" y1="25.45" x2="50.5" y2="24.5" width="0.254" layer="1"/>
-<via x="50.5" y="24.5" extent="1-16" drill="0.4"/>
-<wire x1="50.5" y1="24.5" x2="50.5" y2="19.3" width="0.254" layer="16"/>
-<via x="50.5" y="19.3" extent="1-16" drill="0.4"/>
-<wire x1="50.5" y1="19.3" x2="47.7" y2="19.3" width="0.254" layer="1"/>
+<wire x1="50.5" y1="25.45" x2="50.7" y2="24.5" width="0.254" layer="1"/>
+<via x="50.7" y="24.5" extent="1-16" drill="0.4"/>
+<wire x1="50.7" y1="24.5" x2="50.7" y2="19.3" width="0.254" layer="16"/>
+<via x="50.7" y="19.3" extent="1-16" drill="0.4"/>
+<wire x1="50.7" y1="19.3" x2="47.7" y2="19.3" width="0.254" layer="1"/>
 <wire x1="47.7" y1="19.3" x2="46.9" y2="18.5" width="0.254" layer="1"/>
 </signal>
 <signal name="RS485_P">
-<contactref element="JD1" pad="2"/>
 <contactref element="U1" pad="8"/>
-<contactref element="R6" pad="P$1"/>
-<wire x1="23.85" y1="19.3" x2="23.85" y2="16.6" width="0.254" layer="1"/>
-<wire x1="23.85" y1="16.6" x2="23.25" y2="16" width="0.254" layer="1"/>
-<wire x1="23.25" y1="16" x2="22.8" y2="15.55" width="0.127" layer="1"/>
-<wire x1="22.8" y1="15.55" x2="22.8" y2="14.675" width="0.127" layer="1"/>
+<contactref element="R6" pad="P$2"/>
+<contactref element="R9" pad="P$2"/>
+<contactref element="JD1" pad="3"/>
+<wire x1="22.8" y1="14.675" x2="22.8" y2="16.1" width="0.127" layer="1"/>
+<wire x1="22.8" y1="16.1" x2="21.35" y2="16.85" width="0.127" layer="1"/>
+<wire x1="21.35" y1="16.85" x2="21.35" y2="19.3" width="0.127" layer="1"/>
+<wire x1="21.35" y1="19.3" x2="21.8" y2="19.75" width="0.127" layer="1"/>
+<wire x1="21.8" y1="19.75" x2="21.8" y2="21.9" width="0.127" layer="1"/>
+<via x="21.8" y="21.9" extent="1-16" drill="0.3048"/>
+<wire x1="21.8" y1="21.9" x2="21.85" y2="21.95" width="0.127" layer="16"/>
+<wire x1="21.85" y1="21.95" x2="21.85" y2="23.1" width="0.127" layer="16"/>
+<wire x1="21.85" y1="23.1" x2="21.85" y2="24.85" width="0.127" layer="16"/>
 </signal>
 <signal name="RS485_N">
-<contactref element="JD1" pad="3"/>
 <contactref element="U1" pad="9"/>
-<contactref element="R6" pad="P$2"/>
-<wire x1="21.35" y1="19.3" x2="21.35" y2="16.4" width="0.254" layer="1"/>
-<wire x1="21.35" y1="16.4" x2="21.75" y2="16" width="0.254" layer="1"/>
-<wire x1="21.75" y1="16" x2="22.3" y2="15.45" width="0.127" layer="1"/>
-<wire x1="22.3" y1="15.45" x2="22.3" y2="14.675" width="0.127" layer="1"/>
+<contactref element="R6" pad="P$1"/>
+<contactref element="R9" pad="P$1"/>
+<contactref element="JD1" pad="2"/>
+<wire x1="22.3" y1="14.675" x2="22.3" y2="15.6" width="0.127" layer="1"/>
+<via x="22.3" y="15.6" extent="1-16" drill="0.3048"/>
+<wire x1="22.3" y1="15.6" x2="23.1" y2="15.6" width="0.127" layer="16"/>
+<wire x1="23.1" y1="15.6" x2="23.85" y2="16.35" width="0.127" layer="16"/>
+<via x="23.85" y="16.35" extent="1-16" drill="0.3048"/>
+<wire x1="23.85" y1="16.35" x2="23.85" y2="19.3" width="0.127" layer="1"/>
+<wire x1="23.85" y1="19.3" x2="23.4" y2="19.75" width="0.127" layer="1"/>
+<wire x1="23.4" y1="19.75" x2="23.4" y2="21.9" width="0.127" layer="1"/>
+<via x="23.4" y="21.9" extent="1-16" drill="0.3048"/>
+<wire x1="23.4" y1="21.9" x2="23.35" y2="21.95" width="0.127" layer="16"/>
+<wire x1="23.35" y1="21.95" x2="23.35" y2="23.1" width="0.127" layer="16"/>
+<wire x1="23.35" y1="23.1" x2="23.35" y2="24.85" width="0.127" layer="16"/>
 </signal>
 <signal name="N$1">
 <contactref element="U4" pad="4"/>
-<contactref element="R3" pad="2"/>
 <contactref element="U4" pad="3"/>
 <contactref element="U4" pad="2"/>
-<wire x1="11.3" y1="15.56" x2="11.3" y2="14.35" width="0.3048" layer="1"/>
 <wire x1="11.3" y1="14.35" x2="11.31" y2="14.34" width="0.3048" layer="1"/>
 <wire x1="11.31" y1="14.34" x2="11.31" y2="11.94" width="0.3048" layer="1"/>
 <wire x1="11.31" y1="11.94" x2="10.36" y2="11.94" width="0.3048" layer="1"/>
+<contactref element="R3" pad="P$1"/>
+<wire x1="11.3" y1="15.65" x2="11.31" y2="15.64" width="0.254" layer="1"/>
+<wire x1="11.31" y1="15.64" x2="11.31" y2="14.34" width="0.254" layer="1"/>
 </signal>
 <signal name="N$5">
 <contactref element="U5" pad="1"/>
-<contactref element="R4" pad="2"/>
 <contactref element="U4" pad="1"/>
-<wire x1="7.72" y1="12.06" x2="9.41" y2="12.06" width="0.3048" layer="1"/>
 <wire x1="9.41" y1="12.06" x2="9.41" y2="11.94" width="0.3048" layer="1"/>
 <wire x1="9.41" y1="11.94" x2="9.41" y2="10.59" width="0.3048" layer="1"/>
 <wire x1="9.41" y1="10.59" x2="10" y2="10" width="0.3048" layer="1"/>
 <wire x1="10" y1="10" x2="10" y2="9.25" width="0.3048" layer="1"/>
 <wire x1="10" y1="9.25" x2="11.1" y2="8.15" width="0.3048" layer="1"/>
+<contactref element="R4" pad="P$1"/>
+<wire x1="7.7" y1="12.45" x2="8.21" y2="11.94" width="0.254" layer="1"/>
+<wire x1="8.21" y1="11.94" x2="9.41" y2="11.94" width="0.254" layer="1"/>
 </signal>
 <signal name="REGOUT">
 <contactref element="U4" pad="5"/>
@@ -2375,38 +1393,63 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <wire x1="23.85" y1="3.45" x2="23.85" y2="5.25" width="0.3048" layer="1"/>
 <via x="39.75" y="11.25" extent="1-16" drill="0.4"/>
 <wire x1="37" y1="11.25" x2="39.75" y2="11.25" width="0.4064" layer="1"/>
-<wire x1="20.45" y1="14" x2="20.45" y2="14.675" width="0.254" layer="1"/>
+<wire x1="20.45" y1="14.2" x2="20.45" y2="14.675" width="0.254" layer="1"/>
 <wire x1="20.45" y1="14.675" x2="21.8" y2="14.675" width="0.254" layer="1"/>
-<via x="20.5" y="11.45" extent="1-16" drill="0.4"/>
-<wire x1="20.5" y1="11.45" x2="20.5" y2="12.4" width="0.254" layer="1"/>
-<wire x1="20.5" y1="12.4" x2="20.45" y2="12.4" width="0.254" layer="1"/>
-<wire x1="20.5" y1="11.45" x2="20.5" y2="11.725" width="0.254" layer="1"/>
-<wire x1="20.5" y1="11.725" x2="21.8" y2="11.725" width="0.254" layer="1"/>
-<wire x1="20.45" y1="12.4" x2="20.45" y2="14" width="0.4064" layer="1"/>
+<via x="20.2" y="11.35" extent="1-16" drill="0.4"/>
+<wire x1="20.2" y1="11.35" x2="20.5" y2="12.4" width="0.254" layer="1"/>
+<wire x1="20.5" y1="12.4" x2="20.25" y2="12.4" width="0.254" layer="1"/>
+<wire x1="20.2" y1="11.35" x2="20.3" y2="11.7" width="0.254" layer="1"/>
+<wire x1="20.3" y1="11.7" x2="20.325" y2="11.725" width="0.254" layer="1"/>
+<wire x1="20.325" y1="11.725" x2="21.8" y2="11.725" width="0.254" layer="1"/>
+<wire x1="20.25" y1="12.4" x2="20.25" y2="13.525" width="0.4064" layer="1"/>
+<wire x1="20.25" y1="13.525" x2="20.45" y2="13.725" width="0.4064" layer="1"/>
+<wire x1="20.45" y1="13.725" x2="20.45" y2="14.2" width="0.4064" layer="1"/>
 <via x="19" y="9.45" extent="1-16" drill="0.4"/>
 <wire x1="19" y1="9.45" x2="19" y2="8.75" width="0.3048" layer="1"/>
 <wire x1="19" y1="8.75" x2="19.15" y2="8.75" width="0.3048" layer="1"/>
-<via x="25.2" y="9.4" extent="1-16" drill="0.3048"/>
-<wire x1="25.2" y1="8.65" x2="25.2" y2="9.4" width="0.3048" layer="1"/>
-<wire x1="25.2" y1="8.65" x2="24.4" y2="7.95" width="0.3048" layer="1"/>
-<wire x1="24.4" y1="7.95" x2="24.4" y2="7.4" width="0.3048" layer="1"/>
-<wire x1="24.4" y1="7.4" x2="24.15" y2="7.25" width="0.3048" layer="1"/>
-<wire x1="24.15" y1="7.25" x2="23.85" y2="7.25" width="0.3048" layer="1"/>
+<via x="25.5" y="9.6" extent="1-16" drill="0.3048"/>
+<wire x1="25.5" y1="8.75" x2="25.5" y2="9.6" width="0.3048" layer="1"/>
+<wire x1="23.85" y1="7.25" x2="24.55" y2="7.25" width="0.254" layer="1"/>
+<wire x1="24.55" y1="7.25" x2="24.55" y2="7.725" width="0.254" layer="1"/>
+<wire x1="24.55" y1="7.725" x2="25.1" y2="8.3" width="0.254" layer="1"/>
+<wire x1="25.1" y1="8.3" x2="25.175" y2="8.575" width="0.254" layer="1"/>
+<wire x1="25.175" y1="8.575" x2="25.5" y2="8.575" width="0.254" layer="1"/>
+<wire x1="25.5" y1="8.575" x2="25.5" y2="8.75" width="0.254" layer="1"/>
 </signal>
 <signal name="PI_TX_3V">
 <contactref element="JP1" pad="8"/>
 <contactref element="U3" pad="20"/>
-<wire x1="2.23" y1="15.99" x2="19.15" y2="7.25" width="0" layer="19" extent="1-1"/>
+<wire x1="2.23" y1="15.99" x2="3.42" y2="14.8" width="0.254" layer="1"/>
+<wire x1="3.42" y1="14.8" x2="6" y2="14.8" width="0.254" layer="1"/>
+<wire x1="6" y1="14.8" x2="9" y2="17.8" width="0.254" layer="1"/>
+<wire x1="9" y1="17.8" x2="9" y2="19.4" width="0.254" layer="1"/>
+<wire x1="9" y1="19.4" x2="9.3" y2="19.7" width="0.254" layer="1"/>
+<wire x1="9.3" y1="19.7" x2="12.9" y2="19.7" width="0.254" layer="1"/>
+<wire x1="12.9" y1="19.7" x2="16" y2="16.6" width="0.254" layer="1"/>
+<wire x1="16" y1="16.6" x2="16" y2="8.2" width="0.254" layer="1"/>
+<wire x1="16" y1="8.2" x2="16.95" y2="7.25" width="0.254" layer="1"/>
+<wire x1="16.95" y1="7.25" x2="19.15" y2="7.25" width="0.254" layer="1"/>
 </signal>
 <signal name="PI_RX_3V">
 <contactref element="JP1" pad="10"/>
 <contactref element="U3" pad="19"/>
-<wire x1="2.23" y1="18.53" x2="19.15" y2="7.75" width="0" layer="19" extent="1-1"/>
+<wire x1="2.23" y1="18.53" x2="3.5" y2="19.8" width="0.254" layer="1"/>
+<wire x1="3.5" y1="19.8" x2="6.6" y2="19.8" width="0.254" layer="1"/>
+<wire x1="6.6" y1="19.8" x2="7" y2="20.2" width="0.254" layer="1"/>
+<wire x1="7" y1="20.2" x2="13.4" y2="20.2" width="0.254" layer="1"/>
+<wire x1="13.4" y1="20.2" x2="16.5" y2="17.1" width="0.254" layer="1"/>
+<wire x1="16.5" y1="17.1" x2="16.5" y2="9.2" width="0.254" layer="1"/>
+<wire x1="16.5" y1="9.2" x2="17.95" y2="7.75" width="0.254" layer="1"/>
+<wire x1="17.95" y1="7.75" x2="19.15" y2="7.75" width="0.254" layer="1"/>
 </signal>
 <signal name="N$4">
 <contactref element="U3" pad="31"/>
 <contactref element="R5" pad="P$1"/>
-<wire x1="21.8" y1="3.45" x2="22.75" y2="4.65" width="0" layer="19" extent="1-1"/>
+<wire x1="22.6" y1="4.4" x2="22.8" y2="4.6" width="0.127" layer="1"/>
+<wire x1="22.6" y1="4.2" x2="22.6" y2="4.4" width="0.127" layer="1"/>
+<wire x1="21.8" y1="3.4" x2="22.6" y2="4.2" width="0.127" layer="1"/>
+<wire x1="22.8" y1="4.6" x2="22.75" y2="4.65" width="0.127" layer="1"/>
+<wire x1="21.8" y1="3.4" x2="21.8" y2="3.45" width="0.127" layer="1"/>
 </signal>
 <signal name="N$35">
 <contactref element="X1" pad="1"/>
@@ -2415,7 +1458,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <wire x1="23.85" y1="6.25" x2="25.45" y2="6.25" width="0.3048" layer="1"/>
 <wire x1="25.45" y1="6.25" x2="25.7" y2="6.5" width="0.3048" layer="1" curve="90"/>
 <wire x1="25.7" y1="6.5" x2="27.15" y2="7.95" width="0.3048" layer="1"/>
-<wire x1="27.15" y1="7.95" x2="27.15" y2="8.7" width="0.3048" layer="1"/>
+<wire x1="27.15" y1="7.95" x2="27.35" y2="8.7" width="0.3048" layer="1"/>
 </signal>
 <signal name="N$36">
 <contactref element="X1" pad="3"/>
@@ -2432,36 +1475,79 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <contactref element="SWD" pad="2"/>
 <contactref element="U3" pad="4"/>
 <contactref element="C11" pad="P$1"/>
-<wire x1="41.5" y1="6.25" x2="40.5" y2="5.25" width="0.4064" layer="1"/>
+<wire x1="41.5" y1="6.05" x2="40.5" y2="5.25" width="0.4064" layer="1"/>
 <wire x1="40.5" y1="5.25" x2="37" y2="5.25" width="0.4064" layer="1"/>
-<wire x1="23.85" y1="6.75" x2="37" y2="5.25" width="0" layer="19" extent="1-1"/>
+<wire x1="24.9" y1="6.8" x2="24" y2="6.8" width="0.127" layer="1"/>
+<wire x1="24.9" y1="7.5" x2="24.9" y2="6.8" width="0.127" layer="1"/>
+<wire x1="25.4" y1="8" x2="24.9" y2="7.5" width="0.127" layer="1"/>
+<wire x1="26.6" y1="8" x2="25.4" y2="8" width="0.127" layer="1"/>
+<wire x1="26.6" y1="9.2" x2="26.6" y2="8" width="0.127" layer="1"/>
+<wire x1="26.8" y1="9.4" x2="26.6" y2="9.2" width="0.127" layer="1"/>
+<wire x1="33.8" y1="9.4" x2="26.8" y2="9.4" width="0.127" layer="1"/>
+<wire x1="33.8" y1="7.2" x2="33.8" y2="9.4" width="0.127" layer="1"/>
+<wire x1="35.8" y1="5.2" x2="33.8" y2="7.2" width="0.127" layer="1"/>
+<wire x1="36.8" y1="5.2" x2="35.8" y2="5.2" width="0.127" layer="1"/>
+<wire x1="24" y1="6.8" x2="23.85" y2="6.75" width="0.127" layer="1"/>
+<wire x1="36.8" y1="5.2" x2="37" y2="5.25" width="0.127" layer="1"/>
 </signal>
 <signal name="N$12">
 <contactref element="SWD" pad="5"/>
 <contactref element="U3" pad="24"/>
-<wire x1="19.15" y1="5.25" x2="37" y2="9.75" width="0" layer="19" extent="1-1"/>
+<wire x1="18.4" y1="5.2" x2="19" y2="5.2" width="0.127" layer="1"/>
+<wire x1="21.6" y1="8.4" x2="18.4" y2="5.2" width="0.127" layer="16"/>
+<wire x1="34.4" y1="8.4" x2="21.6" y2="8.4" width="0.127" layer="16"/>
+<wire x1="35.6" y1="9.6" x2="34.4" y2="8.4" width="0.127" layer="1"/>
+<wire x1="37" y1="9.6" x2="35.6" y2="9.6" width="0.127" layer="1"/>
+<wire x1="19" y1="5.2" x2="19.15" y2="5.25" width="0.127" layer="1"/>
+<wire x1="37" y1="9.6" x2="37" y2="9.75" width="0.127" layer="1"/>
+<via x="18.4" y="5.2" extent="1-16" drill="0.3048"/>
+<via x="34.4" y="8.4" extent="1-16" drill="0.3048"/>
 </signal>
 <signal name="N$13">
 <contactref element="SWD" pad="3"/>
 <contactref element="U3" pad="23"/>
-<wire x1="19.15" y1="5.75" x2="37" y2="6.75" width="0" layer="19" extent="1-1"/>
+<wire x1="17.8" y1="5.8" x2="19" y2="5.8" width="0.127" layer="1"/>
+<wire x1="17.8" y1="4.6" x2="17.8" y2="5.8" width="0.127" layer="1"/>
+<wire x1="18.6" y1="3.8" x2="17.8" y2="4.6" width="0.127" layer="1"/>
+<wire x1="18.6" y1="1" x2="18.6" y2="3.8" width="0.127" layer="1"/>
+<wire x1="19.2" y1="0.4" x2="18.6" y2="1" width="0.127" layer="1"/>
+<wire x1="42.6" y1="0.4" x2="19.2" y2="0.4" width="0.127" layer="1"/>
+<wire x1="42.6" y1="6.6" x2="42.6" y2="0.4" width="0.127" layer="1"/>
+<wire x1="42.3" y1="6.8" x2="42.6" y2="6.6" width="0.127" layer="1"/>
+<wire x1="37" y1="6.8" x2="42.3" y2="6.8" width="0.127" layer="1"/>
+<wire x1="19" y1="5.8" x2="19.15" y2="5.75" width="0.127" layer="1"/>
+<wire x1="37" y1="6.8" x2="37" y2="6.75" width="0.127" layer="1"/>
 </signal>
 <signal name="485_TX">
 <contactref element="U1" pad="5"/>
 <contactref element="U3" pad="8"/>
-<wire x1="23.85" y1="8.75" x2="23.8" y2="11.725" width="0" layer="19" extent="1-1"/>
+<wire x1="23.8" y1="11.725" x2="23.8" y2="8.8" width="0.127" layer="1"/>
+<wire x1="23.8" y1="8.8" x2="23.85" y2="8.75" width="0.127" layer="1"/>
 </signal>
 <signal name="485_RX">
 <contactref element="U1" pad="2"/>
 <contactref element="U3" pad="9"/>
-<wire x1="23.25" y1="9.35" x2="22.3" y2="11.725" width="0" layer="19" extent="1-1"/>
+<wire x1="23.2" y1="10" x2="23.2" y2="9.4" width="0.127" layer="1"/>
+<wire x1="22.4" y1="10.8" x2="23.2" y2="10" width="0.127" layer="1"/>
+<wire x1="22.4" y1="11.6" x2="22.4" y2="10.8" width="0.127" layer="1"/>
+<wire x1="23.2" y1="9.4" x2="23.25" y2="9.35" width="0.127" layer="1"/>
+<wire x1="22.4" y1="11.6" x2="22.3" y2="11.725" width="0.127" layer="1"/>
 </signal>
 <signal name="485_DIR">
 <contactref element="U1" pad="3"/>
 <contactref element="U1" pad="4"/>
 <contactref element="U3" pad="7"/>
-<wire x1="22.8" y1="11.725" x2="23.3" y2="11.725" width="0" layer="19" extent="1-1"/>
-<wire x1="23.85" y1="8.25" x2="23.3" y2="11.725" width="0" layer="19" extent="1-1"/>
+<wire x1="23.2" y1="11.8" x2="22.8" y2="11.8" width="0.127" layer="1"/>
+<wire x1="22.8" y1="11.8" x2="22.8" y2="11.725" width="0.127" layer="1"/>
+<wire x1="23.2" y1="11.8" x2="23.3" y2="11.725" width="0.127" layer="1"/>
+<wire x1="24.4" y1="8.2" x2="24" y2="8.2" width="0.127" layer="1"/>
+<wire x1="24.4" y1="9.6" x2="24.4" y2="8.2" width="0.127" layer="1"/>
+<wire x1="23.2" y1="10.8" x2="24.4" y2="9.6" width="0.127" layer="2"/>
+<wire x1="23.2" y1="11.6" x2="23.2" y2="10.8" width="0.127" layer="1"/>
+<wire x1="24" y1="8.2" x2="23.85" y2="8.25" width="0.127" layer="1"/>
+<wire x1="23.2" y1="11.6" x2="23.3" y2="11.725" width="0.127" layer="1"/>
+<via x="24.4" y="9.6" extent="1-16" drill="0.3048"/>
+<via x="23.2" y="10.8" extent="1-16" drill="0.3048"/>
 </signal>
 <signal name="N$15">
 <contactref element="R7" pad="P$1"/>
