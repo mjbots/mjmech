@@ -1277,19 +1277,19 @@ In this library the device names are the same as the pin names of the symbols, t
 <packages>
 </packages>
 <symbols>
-<symbol name="+08V">
+<symbol name="+18V">
+<wire x1="0" y1="1.905" x2="0" y2="0.635" width="0.1524" layer="94"/>
 <wire x1="-0.635" y1="1.27" x2="0.635" y2="1.27" width="0.1524" layer="94"/>
-<wire x1="0" y1="0.635" x2="0" y2="1.905" width="0.1524" layer="94"/>
 <circle x="0" y="1.27" radius="1.27" width="0.254" layer="94"/>
-<text x="-1.905" y="3.175" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="+8V" x="0" y="-2.54" visible="off" length="short" direction="sup" rot="R90"/>
+<text x="-2.54" y="3.175" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="+18V" x="0" y="-2.54" visible="off" length="short" direction="sup" rot="R90"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="+8V" prefix="SUPPLY">
+<deviceset name="+18V" prefix="SUPPLY">
 <description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
 <gates>
-<gate name="+8V" symbol="+08V" x="0" y="0"/>
+<gate name="+18V" symbol="+18V" x="0" y="0"/>
 </gates>
 <devices>
 <device name="">
@@ -2314,7 +2314,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="+3V5" library="supply1" deviceset="+3V3" device=""/>
 <part name="+3V6" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND11" library="supply1" deviceset="GND" device=""/>
-<part name="SUPPLY3" library="supply2" deviceset="+8V" device=""/>
+<part name="SUPPLY3" library="supply2" deviceset="+18V" device=""/>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
 <part name="GND13" library="supply1" deviceset="GND" device=""/>
 <part name="+3V7" library="supply1" deviceset="+3V3" device=""/>
@@ -2337,7 +2337,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="POPULATE" value="1"/>
 </part>
 <part name="GND17" library="supply1" deviceset="GND" device=""/>
-<part name="SUPPLY4" library="supply2" deviceset="+8V" device=""/>
+<part name="SUPPLY4" library="supply2" deviceset="+18V" device=""/>
 <part name="GND18" library="supply1" deviceset="GND" device=""/>
 <part name="ARM" library="gimbal" deviceset="SLIDE_SWITCH" device="JS_SUB_SWITCH">
 <attribute name="MPN" value="JS102011SAQN"/>
@@ -2429,7 +2429,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="MF" value="TDK"/>
 <attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
 </part>
-<part name="SUPPLY5" library="supply2" deviceset="+8V" device=""/>
+<part name="SUPPLY5" library="supply2" deviceset="+18V" device=""/>
 <part name="R17" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
 <attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-RES-0603-1.69K"/>
@@ -2460,8 +2460,8 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="MPN" value="S4B-XH-SM4-TB(LF)(SN)"/>
 <attribute name="POPULATE" value="1"/>
 </part>
-<part name="SUPPLY2" library="supply2" deviceset="+8V" device=""/>
-<part name="SUPPLY6" library="supply2" deviceset="+8V" device=""/>
+<part name="SUPPLY2" library="supply2" deviceset="+18V" device=""/>
+<part name="SUPPLY6" library="supply2" deviceset="+18V" device=""/>
 <part name="U3" library="imu_junction" deviceset="TPS62177" device="WSON10">
 <attribute name="MF" value="TI"/>
 <attribute name="MPN" value="TPS62177DQCR"/>
@@ -2491,7 +2491,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="MF" value="Walsin"/>
 <attribute name="MPN" value="0402B104K500CT"/>
 </part>
-<part name="SUPPLY7" library="supply2" deviceset="+8V" device=""/>
+<part name="SUPPLY7" library="supply2" deviceset="+18V" device=""/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="U2" library="controller" deviceset="MAX13431E" device="">
 <attribute name="MF" value="Maxim"/>
@@ -2602,7 +2602,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="+3V5" gate="G$1" x="86.36" y="-297.18"/>
 <instance part="+3V6" gate="G$1" x="25.4" y="-292.1"/>
 <instance part="GND11" gate="1" x="101.6" y="-403.86"/>
-<instance part="SUPPLY3" gate="+8V" x="111.76" y="-375.92"/>
+<instance part="SUPPLY3" gate="+18V" x="111.76" y="-375.92"/>
 <instance part="GND12" gate="1" x="63.5" y="-210.82"/>
 <instance part="GND13" gate="1" x="226.06" y="-210.82"/>
 <instance part="+3V7" gate="G$1" x="172.72" y="-25.4"/>
@@ -2622,7 +2622,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="POPULATE" x="203.2" y="165.1" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND17" gate="1" x="203.2" y="142.24"/>
-<instance part="SUPPLY4" gate="+8V" x="226.06" y="236.22"/>
+<instance part="SUPPLY4" gate="+18V" x="226.06" y="236.22"/>
 <instance part="GND18" gate="1" x="226.06" y="180.34"/>
 <instance part="ARM" gate="G$1" x="104.14" y="-101.6">
 <attribute name="MPN" x="104.14" y="-101.6" size="1.778" layer="96" display="off"/>
@@ -2680,7 +2680,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="C19" gate="G$1" x="60.96" y="-48.26">
 <attribute name="MF" x="60.96" y="-48.26" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="SUPPLY5" gate="+8V" x="43.18" y="-17.78"/>
+<instance part="SUPPLY5" gate="+18V" x="43.18" y="-17.78"/>
 <instance part="R17" gate="G$1" x="91.44" y="-314.96" rot="R180"/>
 <instance part="R18" gate="G$1" x="96.52" y="-314.96" rot="R180"/>
 <instance part="R15" gate="G$1" x="30.48" y="-312.42" rot="R180"/>
@@ -2698,8 +2698,8 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="MF" x="48.26" y="-388.62" size="1.778" layer="96" display="off"/>
 <attribute name="POPULATE" x="48.26" y="-388.62" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="SUPPLY2" gate="+8V" x="7.62" y="-121.92"/>
-<instance part="SUPPLY6" gate="+8V" x="167.64" y="-127"/>
+<instance part="SUPPLY2" gate="+18V" x="7.62" y="-121.92"/>
+<instance part="SUPPLY6" gate="+18V" x="167.64" y="-127"/>
 <instance part="U3" gate="G$1" x="170.18" y="58.42">
 <attribute name="MPN" x="170.18" y="58.42" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="170.18" y="58.42" size="1.778" layer="96" display="off"/>
@@ -2721,7 +2721,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="C15" gate="G$1" x="226.06" y="53.34">
 <attribute name="MF" x="226.06" y="53.34" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="SUPPLY7" gate="+8V" x="132.08" y="76.2"/>
+<instance part="SUPPLY7" gate="+18V" x="132.08" y="76.2"/>
 <instance part="GND7" gate="1" x="111.76" y="-469.9"/>
 <instance part="U2" gate="G$1" x="78.74" y="-444.5">
 <attribute name="POPULATE" x="78.74" y="-444.5" size="1.778" layer="96" display="off"/>
@@ -3417,10 +3417,10 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="231.14" y1="-154.94" x2="243.84" y2="-154.94" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="+8V" class="0">
+<net name="+18V" class="0">
 <segment>
 <pinref part="J1" gate="G$1" pin="4"/>
-<pinref part="SUPPLY3" gate="+8V" pin="+8V"/>
+<pinref part="SUPPLY3" gate="+18V" pin="+18V"/>
 <wire x1="88.9" y1="-391.16" x2="111.76" y2="-391.16" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="-391.16" x2="111.76" y2="-378.46" width="0.1524" layer="91"/>
 <pinref part="J3" gate="G$1" pin="4"/>
@@ -3428,7 +3428,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <junction x="88.9" y="-391.16"/>
 </segment>
 <segment>
-<pinref part="SUPPLY4" gate="+8V" pin="+8V"/>
+<pinref part="SUPPLY4" gate="+18V" pin="+18V"/>
 <wire x1="226.06" y1="233.68" x2="226.06" y2="231.14" width="0.1524" layer="91"/>
 <pinref part="R5" gate="G$1" pin="P$2"/>
 </segment>
@@ -3457,7 +3457,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="C17" gate="G$1" pin="P$1"/>
 <pinref part="C18" gate="G$1" pin="P$1"/>
 <pinref part="C19" gate="G$1" pin="P$1"/>
-<pinref part="SUPPLY5" gate="+8V" pin="+8V"/>
+<pinref part="SUPPLY5" gate="+18V" pin="+18V"/>
 <junction x="43.18" y="-20.32"/>
 </segment>
 <segment>
@@ -3473,7 +3473,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="U5" gate="G$1" pin="VM2"/>
 <wire x1="12.7" y1="-137.16" x2="17.78" y2="-137.16" width="0.1524" layer="91"/>
 <pinref part="C22" gate="G$1" pin="P$1"/>
-<pinref part="SUPPLY2" gate="+8V" pin="+8V"/>
+<pinref part="SUPPLY2" gate="+18V" pin="+18V"/>
 <pinref part="C11" gate="G$1" pin="P$1"/>
 <wire x1="7.62" y1="-124.46" x2="-27.94" y2="-124.46" width="0.1524" layer="91"/>
 <wire x1="-27.94" y1="-124.46" x2="-27.94" y2="-137.16" width="0.1524" layer="91"/>
@@ -3492,7 +3492,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="U6" gate="G$1" pin="VM2"/>
 <wire x1="170.18" y1="-139.7" x2="177.8" y2="-139.7" width="0.1524" layer="91"/>
 <pinref part="C24" gate="G$1" pin="P$1"/>
-<pinref part="SUPPLY6" gate="+8V" pin="+8V"/>
+<pinref part="SUPPLY6" gate="+18V" pin="+18V"/>
 <pinref part="C16" gate="G$1" pin="P$1"/>
 <wire x1="132.08" y1="-137.16" x2="132.08" y2="-132.08" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="-132.08" x2="167.64" y2="-132.08" width="0.1524" layer="91"/>
@@ -3511,7 +3511,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="C12" gate="G$1" pin="P$1"/>
 <wire x1="132.08" y1="68.58" x2="132.08" y2="53.34" width="0.1524" layer="91"/>
 <junction x="132.08" y="68.58"/>
-<pinref part="SUPPLY7" gate="+8V" pin="+8V"/>
+<pinref part="SUPPLY7" gate="+18V" pin="+18V"/>
 </segment>
 </net>
 <net name="AS5048_SCK" class="0">
@@ -4055,19 +4055,19 @@ In this library the device names are the same as the pin names of the symbols, t
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,-40.64,165.1,D1,ANODE,N$39,,,"/>
-<approved hash="104,1,-40.64,154.94,D1,CATHODE,N$43,,,"/>
-<approved hash="104,1,-27.94,165.1,D2,ANODE,N$40,,,"/>
-<approved hash="104,1,-27.94,154.94,D2,CATHODE,N$37,,,"/>
-<approved hash="104,1,-15.24,165.1,D3,ANODE,N$41,,,"/>
-<approved hash="104,1,-15.24,154.94,D3,CATHODE,N$42,,,"/>
+<approved hash="104,1,-40.64,162.56,D1,ANODE,N$39,,,"/>
+<approved hash="104,1,-40.64,157.48,D1,CATHODE,N$43,,,"/>
+<approved hash="104,1,-27.94,162.56,D2,ANODE,N$40,,,"/>
+<approved hash="104,1,-27.94,157.48,D2,CATHODE,N$37,,,"/>
+<approved hash="104,1,-15.24,162.56,D3,ANODE,N$41,,,"/>
+<approved hash="104,1,-15.24,157.48,D3,CATHODE,N$42,,,"/>
 <approved hash="113,1,86.5971,-153.539,M1,,,,,"/>
 <approved hash="113,1,244.077,-150.999,M2,,,,,"/>
 <approved hash="113,1,184.108,-48.1288,J2,,,,,"/>
 <approved hash="113,1,203.2,159.978,Q1,,,,,"/>
-<approved hash="113,1,-39.1033,160.02,D1,,,,,"/>
-<approved hash="113,1,-26.4033,160.02,D2,,,,,"/>
-<approved hash="113,1,-13.7033,160.02,D3,,,,,"/>
+<approved hash="113,1,-40.1108,160.02,D1,,,,,"/>
+<approved hash="113,1,-27.4108,160.02,D2,,,,,"/>
+<approved hash="113,1,-14.7108,160.02,D3,,,,,"/>
 <approved hash="113,1,199.441,-63.5,U8,,,,,"/>
 </errors>
 </schematic>

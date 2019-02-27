@@ -1,41 +1,17 @@
 r4 TODO
- * Place all parts
- * change 8V to 18V
-
- * add ground connections
- * route power supplies
- * route brushless driver
- * route weapon driver
+ * switch all non-external silks to be 0.6 10%
+ * coarse silk placement
  * autoroute
+ * fine silk placement
+ * verify form factor fits
 
 
 r4 DONE
  * BOM count optimization
  * Switch all AFMPN to MPN/MF
+ * Switched 8V to 18V in power net name
+ * power and ground routed
 
-
-
- * add version number or date to image somehow
-
- * get operations working at 800Hz
-   * switch I2C to DMA
-   * profile further
-
- * gimbal control software
-   * when we are limiting the target due to max_slew, the target
-     body_dps should be non-zero?  More likely it should have an accel
-     and decel profile of some sort.
-   * wire up motor fault signals
-
- * make UI for debugging
-   * record tlog files
-   * easy to reach button for torque off
-
- * fire control
-   * wire up AEG fault signal
-
- * I was able to lock up the I2C bus by resetting the controller
-   with st-util
 
 
  * r2 defects
@@ -84,6 +60,31 @@ r4 DONE
    and the gimbal motor
  * 3D printed gimbal is a little more flexible than is desired in
    several axes
+
+GENERAL TODO
+
+ * add version number or date to image somehow
+
+ * get operations working at 800Hz
+   * switch I2C to DMA
+   * profile further
+
+ * gimbal control software
+   * when we are limiting the target due to max_slew, the target
+     body_dps should be non-zero?  More likely it should have an accel
+     and decel profile of some sort.
+   * wire up motor fault signals
+
+ * make UI for debugging
+   * record tlog files
+   * easy to reach button for torque off
+
+ * fire control
+   * wire up AEG fault signal
+
+ * I was able to lock up the I2C bus by resetting the controller
+   with st-util
+
 
 DONE 2016-02-08
  * fixed tview speed problems
