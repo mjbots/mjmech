@@ -1,13 +1,21 @@
 r4 TODO
+ * Place all parts
+ * change 8V to 18V
+
  * add ground connections
  * route power supplies
  * route brushless driver
  * route weapon driver
  * autoroute
 
- * add version number or date to image somehow
 
- * reduce static power consumption by scaling duty cycle with force required
+r4 DONE
+ * BOM count optimization
+ * Switch all AFMPN to MPN/MF
+
+
+
+ * add version number or date to image somehow
 
  * get operations working at 800Hz
    * switch I2C to DMA
