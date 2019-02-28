@@ -1,9 +1,4 @@
 r4 TODO
- * switch all non-external silks to be 0.6 10%
- * coarse silk placement
- * autoroute
- * fine silk placement
- * verify form factor fits
 
 
 r4 DONE
@@ -11,6 +6,12 @@ r4 DONE
  * Switch all AFMPN to MPN/MF
  * Switched 8V to 18V in power net name
  * power and ground routed
+ * switch all non-external silks to be 0.6 10%
+ * coarse silk placement
+ * verified form factor fits
+ * audit schematic
+ * autoroute
+ * fine silk placement
 
 
 
