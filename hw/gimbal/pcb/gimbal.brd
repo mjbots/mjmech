@@ -1230,7 +1230,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="17" y="14.6" size="0.6" layer="25" font="vector" ratio="10"/>
 <attribute name="HOUSEPART" value="" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="POPULATE" value="1" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="DIELECTRIC" value="" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="URL" value="" x="17.1" y="13.3" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1241,7 +1241,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="28.5" y="20.4" size="0.6" layer="25" font="vector" ratio="10"/>
 <attribute name="HOUSEPART" value="" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="POPULATE" value="1" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="DIELECTRIC" value="" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="URL" value="" x="27.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1252,7 +1252,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <attribute name="VOLTAGE" value="" x="31.2" y="13" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="32.1" y="11.7" size="0.6" layer="25" font="vector" ratio="10" rot="R180"/>
 <attribute name="HOUSEPART" value="" x="31.2" y="13" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="31.2" y="13" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="31.2" y="13" size="1.778" layer="27" display="off"/>
 <attribute name="POPULATE" value="1" x="31.2" y="13" size="1.778" layer="27" display="off"/>
 <attribute name="DIELECTRIC" value="" x="31.2" y="13" size="1.778" layer="27" display="off"/>
 <attribute name="URL" value="" x="31.2" y="13" size="1.778" layer="27" display="off"/>
@@ -1337,7 +1337,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="C13" library="mfpassives" package="C1206" value="10uF 35V" x="54.2" y="22" smashed="yes">
 <attribute name="HOUSEPART" value="" x="49.7" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="TOLERANCE" value="" x="49.7" y="22" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="49.7" y="22" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="49.7" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="POPULATE" value="1" x="49.7" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="DIELECTRIC" value="" x="49.7" y="22" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="" x="49.7" y="22" size="1.778" layer="27" display="off"/>
@@ -1348,7 +1348,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="C14" library="mfpassives" package="C1206" value="10uF 35V" x="54.2" y="19.5" smashed="yes">
 <attribute name="HOUSEPART" value="" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
 <attribute name="TOLERANCE" value="" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
 <attribute name="POPULATE" value="1" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
 <attribute name="DIELECTRIC" value="" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="" x="44.7" y="15.6" size="1.778" layer="27" display="off"/>
@@ -1359,7 +1359,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="C12" library="mfpassives" package="C1206" value="10uF 35V" x="58.2" y="25.1" smashed="yes" rot="R270">
 <attribute name="HOUSEPART" value="" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TOLERANCE" value="" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="POPULATE" value="1" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="DIELECTRIC" value="" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="" x="54.3" y="34.1" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1408,7 +1408,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="C11" library="mfpassives" package="C1206" value="10uF 35V" x="33.6" y="7.8" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="POPULATE" value="1" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="DIELECTRIC" value="" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="" x="33.6" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1419,7 +1419,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="C16" library="mfpassives" package="C1206" value="10uF 35V" x="46.2" y="7.8" smashed="yes" rot="R90">
 <attribute name="HOUSEPART" value="" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="POPULATE" value="1" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="DIELECTRIC" value="" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VOLTAGE" value="" x="46.2" y="7.8" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1456,7 +1456,7 @@ This DRC check is for 4-Layer Standard Capability boards to be manufactured thro
 <element name="C1" library="mfpassives" package="C1206" value="10uF 35V" x="17.1" y="40.4" smashed="yes">
 <attribute name="HOUSEPART" value="" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>
 <attribute name="TOLERANCE" value="" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>
 <attribute name="POPULATE" value="1" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>
 <attribute name="DIELECTRIC" value="" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>
 <attribute name="VOLTAGE" value="" x="17.1" y="40.4" size="1.778" layer="27" display="off"/>

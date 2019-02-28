@@ -2419,15 +2419,15 @@ In this library the device names are the same as the pin names of the symbols, t
 </part>
 <part name="C17" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="C18" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="C19" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="SUPPLY5" library="supply2" deviceset="+18V" device=""/>
 <part name="R17" library="mfpassives" deviceset="RESISTOR" device="_0603" value="1.69k">
@@ -2477,15 +2477,15 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="+3V12" library="supply1" deviceset="+3V3" device=""/>
 <part name="C13" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="C14" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="C12" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="C15" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="0.1uF 50V">
 <attribute name="MF" value="Walsin"/>
@@ -2509,11 +2509,11 @@ In this library the device names are the same as the pin names of the symbols, t
 </part>
 <part name="C11" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="C16" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND10" library="supply1" deviceset="GND" device=""/>
@@ -2532,7 +2532,7 @@ In this library the device names are the same as the pin names of the symbols, t
 </part>
 <part name="C1" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="CGA5L1X7R1V106M160AE"/>
 </part>
 </parts>
 <sheets>
