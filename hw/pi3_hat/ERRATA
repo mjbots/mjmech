@@ -1,3 +1,6 @@
+r2 ERRATA
+ * RT8299 EN needs a 100k pullup to VIN
+
 # r1 #
 
 * R1 is 10.5k instead of 105k
