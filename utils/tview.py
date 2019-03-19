@@ -971,9 +971,10 @@ class TviewMainWindow(QtGui.QMainWindow):
         else:
             [x.poll() for x in self.devices]
 
-    def make_writer(self, device, line):
+    def make_writer(self, devices, line):
         def write():
-            device.write((line + '\n').encode('latin1'))
+            for device in devices:
+                device.write((line + '\n').encode('latin1'))
 
         return write
 
@@ -983,17 +984,20 @@ class TviewMainWindow(QtGui.QMainWindow):
         current_delay_ms = 0
         for line in device_lines:
             delay_re = re.search(r"^:(\d+)$", line)
-            device_re = re.search(r"^(\d+)>(.*)$", line)
+            device_re = re.search(r"^(A|\d+)>(.*)$", line)
             if delay_re:
                 current_delay_ms += int(delay_re.group(1))
                 continue
             elif device_re:
-                device_num = int(device_re.group(1))
+                if device_re.group(1) == 'A':
+                    device_nums = [x.number for x in self.devices]
+                else:
+                    device_nums = [int(device_re.group(1))]
                 line = device_re.group(2)
             else:
-                device_num = self.devices[0].number
-            device = [x for x in self.devices if x.number == device_num][0]
-            writer = self.make_writer(device, line)
+                device_nums = [self.devices[0].number]
+            devices = [x for x in self.devices if x.number in device_nums]
+            writer = self.make_writer(devices, line)
 
             if current_delay_ms > 0:
                 QtCore.QTimer.singleShot(current_delay_ms, writer)
