@@ -35,13 +35,13 @@ bp::object ConvertPtree(const boost::property_tree::ptree& tree) {
     for (auto it = tree.begin(); it != tree.end(); ++it) {
       result.append(ConvertPtree(it->second));
     }
-    return result;
+    return std::move(result);
   } else {
     bp::dict result;
     for (auto it = tree.begin(); it != tree.end(); ++it) {
       result[it->first] = ConvertPtree(it->second);
     }
-    return result;
+    return std::move(result);
   }
 }
 }
