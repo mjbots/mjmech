@@ -1,4 +1,4 @@
-// Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
+// Copyright 2015-2019 Josh Pieper, jjp@pobox.com.  All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 
 #include <fmt/format.h>
 
-#include "base/error_code.h"
-#include "base/fast_stream.h"
-#include "base/telemetry_format.h"
+#include "mjlib/base/error_code.h"
+#include "mjlib/base/fast_stream.h"
+#include "mjlib/base/recording_stream.h"
+#include "mjlib/base/system_error.h"
+#include "mjlib/telemetry/telemetry_format.h"
 
 namespace {
 namespace bp = boost::python;
-using namespace mjmech::base;
-typedef TelemetryFormat TF;
+
+typedef mjlib::telemetry::TelemetryFormat TF;
 
 template <typename Base>
 class RecordingStream {
@@ -45,7 +47,7 @@ class RecordingStream {
 
   std::string str() const { return ostr_.str(); }
 
-  FastOStringStream ostr_;
+  mjlib::base::FastOStringStream ostr_;
   size_t last_read_ = 0;
   Base& base_;
 };
@@ -100,17 +102,17 @@ class ReadArchive {
  public:
   ReadArchive(const std::string& schema, const std::string& name)
       : schema_(schema), name_(name) {
-    FastIStringStream schema_stream(schema_);
-    TelemetryReadStream<FastIStringStream> schema_read_stream(schema_stream);
+    mjlib::base::FastIStringStream schema_stream(schema_);
+    mjlib::telemetry::TelemetryReadStream schema_read_stream(schema_stream);
 
     root_ = ReadSchema(schema_read_stream, name_);
   }
 
   bp::object deserialize(const std::string& data) {
-    FastIStringStream schema_stream(schema_);
-    FastIStringStream data_stream(data);
-    TelemetryReadStream<FastIStringStream> schema_read_stream(schema_stream);
-    TelemetryReadStream<FastIStringStream> data_read_stream(data_stream);
+    mjlib::base::FastIStringStream schema_stream(schema_);
+    mjlib::base::FastIStringStream data_stream(data);
+    mjlib::telemetry::TelemetryReadStream schema_read_stream(schema_stream);
+    mjlib::telemetry::TelemetryReadStream data_read_stream(data_stream);
 
     return ReadDataSchema(root_, schema_read_stream, data_read_stream);
   }
@@ -122,7 +124,7 @@ class ReadArchive {
   bp::object ReadSchema(Stream& schema, const std::string& name) {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
-      throw SystemError::einval(
+      throw mjlib::base::system_error::einval(
           (fmt::format("unsupported SchemaFlags {}", flags)));
     }
 
@@ -134,7 +136,7 @@ class ReadArchive {
                               bool ignore) {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
-      throw SystemError::einval(
+      throw mjlib::base::system_error::einval(
           fmt::format("unsupported ObjectFlags {}", flags));
     }
 
@@ -165,7 +167,7 @@ class ReadArchive {
       result["tuple"] = collections_.attr("namedtuple")(
           name, field_names);
 
-      return result;
+      return std::move(result);
     }
 
     return bp::object();
@@ -220,7 +222,7 @@ class ReadArchive {
         uint32_t nelements = stream.template Read<uint32_t>();
         if (nelements >
             static_cast<uint32_t>(TF::BlockOffsets::kMaxBlockSize)) {
-          throw SystemError::einval("corrupt array size");
+          throw mjlib::base::system_error::einval("corrupt array size");
         }
         bp::object child = ReadFieldRecord(
             stream, field_flags, field_name, ignore);
@@ -282,12 +284,12 @@ class ReadArchive {
         break;
       }
       default: {
-        throw SystemError::einval(
+        throw mjlib::base::system_error::einval(
             fmt::format("unimplemented field type {}", ft));
       }
     }
 
-    return result;
+    return std::move(result);
   }
 
   template <typename Stream>
@@ -295,7 +297,7 @@ class ReadArchive {
                             Stream& schema, Stream& data) {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
-      throw SystemError::einval(
+      throw mjlib::base::system_error::einval(
           fmt::format("unsupported SchemaFlags {}", flags));
     }
 
@@ -307,7 +309,7 @@ class ReadArchive {
                             Stream& schema, Stream& data) {
     uint32_t flags = schema.template Read<uint32_t>();
     if (flags != 0) {
-      throw SystemError::einval(
+      throw mjlib::base::system_error::einval(
           fmt::format("unsupported ObjectFlags {}", flags));
     }
 
@@ -322,7 +324,7 @@ class ReadArchive {
       if (index >= bp::len(fields)) {
         uint32_t final_type = schema.template Read<uint32_t>();
         if (final_type != static_cast<uint32_t>(TF::FieldType::kFinal)) {
-          throw SystemError::einval("corrupt log");
+          throw mjlib::base::system_error::einval("corrupt log");
         }
         break;
       }
@@ -410,7 +412,7 @@ class ReadArchive {
       case TF::FieldType::kOptional: {
         uint8_t present = data_stream.template Read<uint8_t>();
         if (present != 0 && present != 1) {
-          throw SystemError::einval("corrupt optional element");
+          throw mjlib::base::system_error::einval("corrupt optional element");
         }
         bp::list list_result =
             ReadVariableSize(
@@ -429,10 +431,10 @@ class ReadArchive {
             data_stream.template Read<uint32_t>());
       }
       case TF::FieldType::kFinal: {
-        throw SystemError::einval("invalid state");
+        throw mjlib::base::system_error::einval("invalid state");
       }
     }
-    throw SystemError::einval(
+    throw mjlib::base::system_error::einval(
         fmt::format("invalid type {}", ft));
   }
 
@@ -441,9 +443,8 @@ class ReadArchive {
                             uint32_t nelements,
                             Stream& schema_stream,
                             Stream& data_stream) {
-    typedef decltype(schema_stream.stream()) RawStream;
-    RecordingStream<RawStream> recording_raw_stream(schema_stream.stream());
-    TelemetryReadStream<RecordingStream<RawStream> > recording_stream(
+    mjlib::base::RecordingStream recording_raw_stream(schema_stream.stream());
+    mjlib::telemetry::TelemetryReadStream recording_stream(
         recording_raw_stream);
 
     // First, consume the schema while recording, we don't care
@@ -460,8 +461,8 @@ class ReadArchive {
     bp::object child = children[0];
     bp::list result;
     for (uint32_t i = 0; i < nelements; i++) {
-      FastIStringStream sub_schema_raw_stream(recording_raw_stream.str());
-      TelemetryReadStream<FastIStringStream> sub_schema_stream(
+      mjlib::base::FastIStringStream sub_schema_raw_stream(recording_raw_stream.str());
+      mjlib::telemetry::TelemetryReadStream sub_schema_stream(
           sub_schema_raw_stream);
       result.append(ReadDataField(child, sub_schema_stream, data_stream));
     }

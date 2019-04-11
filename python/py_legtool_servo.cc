@@ -1,4 +1,4 @@
-// Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
+// Copyright 2015-2019 Josh Pieper, jjp@pobox.com.  All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
 
 #include <boost/python.hpp>
 
-#include "base/concrete_comm_factory.h"
+#include "mjlib/io/stream_factory.h"
+
 #include "mech/herkulex.h"
 #include "mech/herkulex_servo_interface.h"
 
@@ -24,7 +25,7 @@ using namespace mjmech::base;
 using namespace mjmech::mech;
 namespace bp = boost::python;
 
-typedef ConcreteStreamFactory Factory;
+typedef mjlib::io::StreamFactory Factory;
 typedef HerkuleX Servo;
 
 namespace {
@@ -36,7 +37,7 @@ bool StartsWith(const std::string& data,
 }
 
 void HandleCallback(bp::object future,
-                    ErrorCode ec,
+                    mjlib::base::error_code ec,
                     bp::object result) {
   if (ec) {
     future.attr("set_exception")(
@@ -62,7 +63,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
           address,
               bp::extract<double>(py_joints[address])});
     }
-    servo_->SetPose(joints, [=](ErrorCode ec) {
+    servo_->SetPose(joints, [=](mjlib::base::error_code ec) {
         HandleCallback(future, ec, bp::object());
       });
   }
@@ -73,7 +74,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->EnablePower(
         power_state, addresses,
-        [=](ErrorCode ec) {
+        [=](mjlib::base::error_code ec) {
           HandleCallback(future, ec, bp::object());
         });
   }
@@ -82,7 +83,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetPose(
         addresses,
-        [=](ErrorCode ec,
+        [=](mjlib::base::error_code ec,
             const std::vector<ServoInterface::Joint> joints) {
 
           bp::dict result;
@@ -97,7 +98,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
   void get_temperature(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetTemperature(
-        addresses, [=](ErrorCode ec,
+        addresses, [=](mjlib::base::error_code ec,
                        const std::vector<ServoInterface::Temperature>& temps) {
           bp::dict result;
           for (const auto& temp: temps) {
@@ -111,7 +112,7 @@ class ServoInterfaceWrapper : boost::noncopyable {
   void get_voltage(bp::object py_addresses, bp::object future) {
     std::vector<int> addresses = GetAddresses(py_addresses);
     servo_->GetVoltage(
-        addresses, [=](ErrorCode ec,
+        addresses, [=](mjlib::base::error_code ec,
                        const std::vector<ServoInterface::Voltage>& temps) {
           bp::dict result;
           for (const auto& temp: temps) {
@@ -173,7 +174,7 @@ class Selector : boost::noncopyable {
       opt->find("stream.serial.serial_port", false).semantic()->notify(serial_port);
     }
 
-    servo_.AsyncStart([=](ErrorCode ec) {
+    servo_.AsyncStart([=](mjlib::base::error_code ec) {
         if (ec) {
           future.attr("set_exception")(
               std::runtime_error(ec.message()));
