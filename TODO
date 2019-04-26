@@ -1,3 +1,24 @@
+ * bring up gimbal board
+ * De-hack some of the moteus servo changes, commit
+ * standing up needs to be smarter, can't just "spring" all servos
+   into position
+
+ * make walking suck less
+   * figure out how to get legs to be spaced laterally more, first try
+     resulted in position getting all messed up
+   * verify legs are where legtool expects them to be
+   * send feedforward current
+     * maybe based on current position?
+
+
+ * Get monitoring of state working
+ * Get feedforward currents working
+ * Emit a single os syscall to write to all servos
+
+ * print / laminate fiducial targets
+
+ * Switch legtool to use the same code-paths as the C++ mech software
+
  * Create tool to configure controller
   * iwconfig wlxxx retry 2
   * iwconfig wlxxx power off
@@ -55,6 +76,11 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-04-20
+ * Started porting gimbal code to rules_mbed / mjlib
+   * Got a basic rs485 multiplex build functioning on the board, and
+     every sub-module compiling
 
 DONE 2019-02-21
  * More work on updated pi3 hat
