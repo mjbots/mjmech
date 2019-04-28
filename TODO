@@ -1,18 +1,15 @@
  * bring up gimbal board
- * De-hack some of the moteus servo changes, commit
- * standing up needs to be smarter, can't just "spring" all servos
-   into position
+ * stand up and sit down unassisted
+   * stand up: two phases, both using custom moteus commands
+     1) query positions
+     2) slew to above the ground at fixed velocity w/ low torque
+     3) slew to idle position with full torque
 
  * make walking suck less
-   * figure out how to get legs to be spaced laterally more, first try
-     resulted in position getting all messed up
-   * verify legs are where legtool expects them to be
    * send feedforward current
      * maybe based on current position?
 
-
  * Get monitoring of state working
- * Get feedforward currents working
  * Emit a single os syscall to write to all servos
 
  * print / laminate fiducial targets
@@ -27,10 +24,6 @@
 
  * gimbal
    * get turret board compiling w/ clang freestanding in bazel
-   * rev board
-     * drop usb pass through
-     * add power/data pass through
-     * add on-board IMU for pitch compensation
    * get gimbal running at 800hz
 
  * lizard robot (and probably mammal), takes too long to turn when
@@ -76,6 +69,14 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-04-27
+ * Recalibrated servo 5.  Everything else is holding just fine, I'm
+   not sure what is different about that one yet.
+
+DONE 2019-04-26
+ * Got all moteus changes committed and pushed
+ * Got all legs configured properly, first reasonable walking!
 
 DONE 2019-04-20
  * Started porting gimbal code to rules_mbed / mjlib
