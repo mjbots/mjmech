@@ -1,18 +1,35 @@
- * bring up gimbal board
+ * video of turret for post
+
  * stand up and sit down unassisted
    * stand up: two phases, both using custom moteus commands
      1) query positions
      2) slew to above the ground at fixed velocity w/ low torque
      3) slew to idle position with full torque
+   * sit down:
+     1) slew to above the ground at fixed velocity w/ full torque
+     2) torque off
+   * build bottom brackets that allow it to rest not completely on the
+     ground
 
  * make walking suck less
    * send feedforward current
      * maybe based on current position?
+   * stop trying to slide feet around when getting into the idle
+     position, need to step
 
  * Get monitoring of state working
  * Emit a single os syscall to write to all servos
 
- * print / laminate fiducial targets
+ * targets
+   * print / laminate fiducial targets
+   * need to track the target that is *closest* to center of view so
+     as to work when multiple are in view at once
+
+ * Figure out how to change 5ghz frequencies and document the procedure
+   * See if I can figure out what channels their transmitters will use
+     so that I could deconflict
+
+ * Get 5GHz transmitter for laptop
 
  * Switch legtool to use the same code-paths as the C++ mech software
 
@@ -69,6 +86,9 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-04-28
+ * Finished bringing up gimbal board
 
 DONE 2019-04-27
  * Recalibrated servo 5.  Everything else is holding just fine, I'm
