@@ -1,15 +1,13 @@
- * video of turret for post
-
  * stand up and sit down unassisted
-   * stand up: two phases, both using custom moteus commands
-     1) query positions
-     2) slew to above the ground at fixed velocity w/ low torque
-     3) slew to idle position with full torque
-   * sit down:
-     1) slew to above the ground at fixed velocity w/ full torque
-     2) torque off
    * build bottom brackets that allow it to rest not completely on the
      ground
+
+ * Implement moteus based turret client side
+ * Mount turret on robot and test integrated together
+
+ * Build protective shrouds for everything that needs it
+   * turret
+   * front and back legs (need mounting surface for target panels)
 
  * make walking suck less
    * send feedforward current
@@ -18,18 +16,23 @@
      position, need to step
 
  * Get monitoring of state working
+   * Including for operation and power of all servos
  * Emit a single os syscall to write to all servos
 
  * targets
    * print / laminate fiducial targets
    * need to track the target that is *closest* to center of view so
-     as to work when multiple are in view at once
+     as to work when multiple are in view at once, either that or lock
+     onto them by identifier
 
  * Figure out how to change 5ghz frequencies and document the procedure
    * See if I can figure out what channels their transmitters will use
      so that I could deconflict
 
- * Get 5GHz transmitter for laptop
+ * Test 5GHz transmitter from laptop
+
+ * Make the standup and sitdown sequences use actual IK interpolation,
+   instead of just joint interpolation
 
  * Switch legtool to use the same code-paths as the C++ mech software
 
@@ -38,10 +41,6 @@
   * iwconfig wlxxx power off
 
  * Get video writing in controller working
-
- * gimbal
-   * get turret board compiling w/ clang freestanding in bazel
-   * get gimbal running at 800hz
 
  * lizard robot (and probably mammal), takes too long to turn when
    changing direction or switching to strafing
@@ -86,6 +85,10 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-04-29
+ * Ordered FPV transmitter and receiver
+ * Implemented standup and sitdown phase
 
 DONE 2019-04-28
  * Finished bringing up gimbal board
