@@ -1887,6 +1887,10 @@
 <part name="R9" library="mfpassives" deviceset="RESISTOR" device="_0603" value="220">
 <attribute name="MPN" value="MF-RES-0603-220"/>
 </part>
+<part name="R10" library="mfpassives" deviceset="RESISTOR" device="_0603" value="53.6k 1%">
+<attribute name="MF" value="Panasonic"/>
+<attribute name="MPN" value="ERJ-3EKF5362V"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -2012,6 +2016,9 @@
 </instance>
 <instance part="R6" gate="G$1" x="246.38" y="157.48" rot="R180"/>
 <instance part="R9" gate="G$1" x="254" y="157.48" rot="R180"/>
+<instance part="R10" gate="G$1" x="33.02" y="35.56">
+<attribute name="MF" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -2293,15 +2300,18 @@
 <wire x1="7.62" y1="35.56" x2="10.16" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="10.16" y1="35.56" x2="10.16" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="C2" gate="G$1" pin="P$1"/>
-<wire x1="10.16" y1="35.56" x2="17.78" y2="35.56" width="0.1524" layer="91"/>
-<wire x1="17.78" y1="35.56" x2="17.78" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="35.56" x2="17.78" y2="40.64" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="40.64" x2="17.78" y2="33.02" width="0.1524" layer="91"/>
 <junction x="10.16" y="35.56"/>
 <pinref part="U2" gate="G$1" pin="VIN"/>
 <wire x1="45.72" y1="38.1" x2="48.26" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="45.72" y1="35.56" x2="45.72" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="17.78" y1="35.56" x2="45.72" y2="35.56" width="0.1524" layer="91"/>
-<junction x="17.78" y="35.56"/>
+<wire x1="45.72" y1="40.64" x2="45.72" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="40.64" x2="33.02" y2="40.64" width="0.1524" layer="91"/>
+<junction x="17.78" y="40.64"/>
 <label x="12.7" y="35.56" size="1.778" layer="95"/>
+<pinref part="R10" gate="G$1" pin="P$1"/>
+<wire x1="33.02" y1="40.64" x2="45.72" y2="40.64" width="0.1524" layer="91"/>
+<junction x="33.02" y="40.64"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -2546,6 +2556,13 @@
 <pinref part="D2" gate="G$1" pin="CATHODE"/>
 <pinref part="U3" gate="G$1" pin="PB4/SPI1_MISO/TIM3_CH1"/>
 <wire x1="276.86" y1="261.62" x2="228.6" y2="261.62" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$7" class="0">
+<segment>
+<pinref part="R10" gate="G$1" pin="P$2"/>
+<pinref part="U2" gate="G$1" pin="EN"/>
+<wire x1="33.02" y1="30.48" x2="48.26" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

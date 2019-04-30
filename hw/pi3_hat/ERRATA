@@ -1,3 +1,6 @@
+r3 DONE
+ * Added pullup to RT8299 EN
+
 r2 ERRATA
  * RT8299 EN needs a 100k pullup to VIN
 
