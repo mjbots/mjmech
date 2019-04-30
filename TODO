@@ -1,13 +1,26 @@
- * stand up and sit down unassisted
-   * build bottom brackets that allow it to rest not completely on the
-     ground
+ * Need a way to run tview.py against the live mech
+ * Update gimbal absolute yaw limit to give more travel
 
- * Implement moteus based turret client side
- * Mount turret on robot and test integrated together
+ * At one point, saw it skip the sit-down phase and go straight to
+   idle... can that be reproduced?
+
+ * Standing up doesn't work well with current resting feet and config.
+   The rubber feet drag along the ground during prepositioning.
+   * Either need to raise up the resting feet a bit, perhaps with the
+     squash balls, or try to tweak the config to get prepositioning up
+     a bit higher
+   * Ideally, prepositioning would be entirely in IK space, but that
+     is more work
+
 
  * Build protective shrouds for everything that needs it
    * turret
    * front and back legs (need mounting surface for target panels)
+
+ * remount weapon in turret to be balanced better
+ * gimbal pitch bldc maybe needs recalibrated, seems to push more one
+   way than the other
+ * turret reports reading error every couple of seconds...
 
  * make walking suck less
    * send feedforward current
@@ -31,6 +44,8 @@
 
  * Test 5GHz transmitter from laptop
 
+ * setup-system.py didn't leave the camera in a configured state, I
+   had to runraspi-config manually
  * Make the standup and sitdown sequences use actual IK interpolation,
    instead of just joint interpolation
 
@@ -85,6 +100,11 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-04-30
+ * Implemented support for moteus turret, connected it up and operated
+   it from the joystick!
+ * Tested integrated robot, including resting feet
 
 DONE 2019-04-29
  * Ordered FPV transmitter and receiver
