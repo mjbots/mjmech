@@ -1,8 +1,22 @@
- * Need a way to run tview.py against the live mech
- * Update gimbal absolute yaw limit to give more travel
+ * Build protective shrouds for everything that needs it
 
- * At one point, saw it skip the sit-down phase and go straight to
-   idle... can that be reproduced?
+   * get first leg quarter panel printed, verify that it fits
+     reasonably over leg and allows freedom of motion
+   * print other 3 quarter panels
+   * design leg shroud mounting adapters
+   * print leg shroud mounting adapters
+
+   * print turret left panel, verify that it roughly fits around turret
+   * print turret right panel
+   * design turret shroud mounting adapters
+   * print turret shroud mounting adapters
+
+   * make some kind of protection for agitator gearbox
+
+ * Need a way to run tview.py against the live mech
+   * verify tview.py can talk to everything over network
+
+ * Update gimbal absolute yaw limit to give more travel
 
  * Standing up doesn't work well with current resting feet and config.
    The rubber feet drag along the ground during prepositioning.
@@ -12,10 +26,11 @@
    * Ideally, prepositioning would be entirely in IK space, but that
      is more work
 
+ * At one point, saw it skip the sit-down phase and go straight to
+   idle... can that be reproduced?
 
- * Build protective shrouds for everything that needs it
-   * turret
-   * front and back legs (need mounting surface for target panels)
+ * endurance test walking
+ * try installing retaining clips on knee shafts
 
  * remount weapon in turret to be balanced better
  * gimbal pitch bldc maybe needs recalibrated, seems to push more one
@@ -101,9 +116,32 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2019-05-01
+ * Kept trying to print chassis leg shroud... first time failed, tried
+   again with thicker walls so that maybe it will deflect less while
+   printing.
+ * Modeled up the turret in f360, then made a shroud. Initially tried
+   to use freecad, since I had it there already, but freecad really
+   doesn't have a good way to created mirrored bodies which are
+   slightly different from one another.
+ * Installed polycarbonate lens for camera
+ * Updated tview to support network connections, then fought for an
+   absurdly long time trying to make it work.  It turns out the rpi's
+   uart fifo is only 16 bytes big!  Also, the kernel driver has a bug
+   that locks out the IRQ if data comes in too fast.  tview reliably
+   triggers this by asking for large binary schemas.  I compiled and
+   installed a preempt_rt build, which significantly decreased overall
+   performance, but didn't actually help with the serial lockup issue.
+   I tried setting the CPU affinity, but that didn't work at all.  I'm
+   kind of at a loss.  I guess I could update the multiplex protocol
+   to allow the master to control the maximum size of a tunnel reply,
+   which would at least allow me to work around the issue.
+
+
 DONE 2019-04-30
  * Implemented support for moteus turret, connected it up and operated
    it from the joystick!
+ * Installed resting feet
  * Tested integrated robot, including resting feet
 
 DONE 2019-04-29
