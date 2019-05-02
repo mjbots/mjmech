@@ -1,9 +1,18 @@
+ * Print queue
+   * turret shroud left <- NOW
+   * turret shroud right
+   * leg shroud mounting adapters
+   * turret shroud mounting adapters
+   * leg shroud left #2 (w/ front cutout)
+   * leg shroud right #2 (w/ front cutout)
+   * leg shroud left #3
+   * leg shroud right #3
+
  * Build protective shrouds for everything that needs it
 
    * get first leg quarter panel printed, verify that it fits
      reasonably over leg and allows freedom of motion
    * print other 3 quarter panels
-   * design leg shroud mounting adapters
    * print leg shroud mounting adapters
 
    * print turret left panel, verify that it roughly fits around turret
@@ -12,11 +21,6 @@
    * print turret shroud mounting adapters
 
    * make some kind of protection for agitator gearbox
-
- * Need a way to run tview.py against the live mech
-   * verify tview.py can talk to everything over network
-
- * Update gimbal absolute yaw limit to give more travel
 
  * Standing up doesn't work well with current resting feet and config.
    The rubber feet drag along the ground during prepositioning.
@@ -58,6 +62,9 @@
      so that I could deconflict
 
  * Test 5GHz transmitter from laptop
+
+ * tview.py can't view more than device at a time reliably when
+   tunneled over TCP
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
@@ -115,6 +122,18 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-02
+ * Updated bootloader to take new multiplex command
+ * Re-flashed bootloader on all servos
+ * Tried to make moteus_tool more robust when flashing... somehow
+   ended up bricking board SN 21.  It reported as read protected and
+   even the windows st-link util couldn't un-read protect it.  Swapped
+   out for SN 35.
+ * Designed leg shroud mounting adapters
+ * Verified tview can talk to everything, although only one device at
+   a time for some reason... probably latency and timeouts are
+   screwing things up
 
 DONE 2019-05-01
  * Kept trying to print chassis leg shroud... first time failed, tried
