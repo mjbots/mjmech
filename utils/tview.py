@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -B
 
-# Copyright 2015-2018 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2015-2019 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import optparse
 import os
 import re
 import serial
+import socket
 import struct
 import sys
 import time
@@ -72,6 +73,28 @@ def read_varuint(data, offset):
     assert False
 
 
+class NetworkPort:
+    def __init__(self, port):
+        self._port = port
+
+    def write(self, data):
+        self._port.send(data)
+
+    def read(self, size):
+        try:
+            return self._port.recv(size)
+        except socket.timeout:
+            return b''
+
+    @property
+    def timeout(self):
+        return self._port.gettimeout()
+
+    @timeout.setter
+    def timeout(self, value):
+        self._port.settimeout(value)
+
+
 class BufferedSerial:
     def __init__(self, port):
         self.port = port
@@ -103,11 +126,12 @@ class BufferedSerial:
 
 
 class MultiplexStream:
-    def __init__(self, stream, destination_id):
+    def __init__(self, stream, destination_id, max_receive_bytes=127):
         self._stream = stream
         self._destination_id = destination_id
         self._read_buffer = b''
         self._write_buffer = b''
+        self._max_receive_bytes = max_receive_bytes
 
     def read(self, max_bytes):
         to_return, self._read_buffer = self._read_buffer[0:max_bytes], self._read_buffer[max_bytes:]
@@ -131,7 +155,9 @@ class MultiplexStream:
                              self._destination_id)
 
         to_write = min(len(self._write_buffer), 100)
-        payload = struct.pack('<BBB', 0x40, 1, to_write)
+        payload = struct.pack(
+            '<BBB', 0x42 if wait_for_response else 0x40,
+            1, self._max_receive_bytes if wait_for_response else to_write)
 
         this_write, self._write_buffer = self._write_buffer[0:to_write], self._write_buffer[to_write:]
         payload += this_write
@@ -929,17 +955,28 @@ class TviewMainWindow(QtGui.QMainWindow):
         QtCore.QTimer.singleShot(0, self._handle_startup)
 
     def _open(self):
-        self.port = BufferedSerial(serial.Serial(
-            port=self.options.serial,
-            baudrate=self.options.baudrate,
-            timeout=0.0))
+        if self.options.target:
+            target_fields = self.options.target.split(':')
+            try:
+                port = NetworkPort(socket.create_connection(
+                    (target_fields[0], int(target_fields[1])), timeout=2.0))
+            except OSError:
+                print("could not connect to: ", self.options.target)
+                exit(1)
+            self.port = BufferedSerial(port)
+        else:
+            self.port = BufferedSerial(serial.Serial(
+                port=self.options.serial,
+                baudrate=self.options.baudrate,
+                timeout=0.0))
 
         self.devices = []
         self.ui.configTreeWidget.clear()
         self.ui.telemetryTreeWidget.clear()
 
         for device_id in [int(x) for x in self.options.devices.split(',')]:
-            stream = MultiplexStream(self.port, device_id)
+            stream = MultiplexStream(
+                self.port, device_id, self.options.max_receive_bytes)
 
             config_item = QtGui.QTreeWidgetItem()
             config_item.setText(0, str(device_id))
@@ -964,7 +1001,7 @@ class TviewMainWindow(QtGui.QMainWindow):
 
     def _poll_serial(self):
         if self.port is None:
-            if os.path.exists(self.options.serial):
+            if os.path.exists(self.options.serial) or self.options.target:
                 self._open()
             else:
                 return
@@ -1087,6 +1124,8 @@ def main():
     parser.add_option('--serial', '-s', default='/dev/ttyACM0')
     parser.add_option('--baudrate', '-b', type='int', default=115200)
     parser.add_option('--devices', '-d', type='str', default='1')
+    parser.add_option('--target', '-t', default=None)
+    parser.add_option('--max-receive-bytes', default=127, type=int)
 
     options, args = parser.parse_args()
     assert len(args) == 0
