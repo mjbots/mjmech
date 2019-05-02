@@ -22,37 +22,39 @@
 
    * make some kind of protection for agitator gearbox
 
- * Standing up doesn't work well with current resting feet and config.
-   The rubber feet drag along the ground during prepositioning.
-   * Either need to raise up the resting feet a bit, perhaps with the
-     squash balls, or try to tweak the config to get prepositioning up
-     a bit higher
-   * Ideally, prepositioning would be entirely in IK space, but that
-     is more work
+ * Get monitoring of state working
+   * Including for operation and power of all servos
+   * If a servo faults, stop everything right away to minimize damage
 
- * At one point, saw it skip the sit-down phase and go straight to
-   idle... can that be reproduced?
+ * make walking suck less
+   * stop trying to slide feet around when getting into the idle
+     position, need to step
+   * send feedforward current
+     * maybe based on current position?
+
+ * preposition_z_offset seems to have metric relationship problems
+   with where the end effectors actually end up.  legtool would be
+   nice, in the interim I need to do something else to verify 10m ==
+   10mm
 
  * endurance test walking
  * try installing retaining clips on knee shafts
+
 
  * remount weapon in turret to be balanced better
  * gimbal pitch bldc maybe needs recalibrated, seems to push more one
    way than the other
  * turret reports reading error every couple of seconds...
 
- * make walking suck less
-   * send feedforward current
-     * maybe based on current position?
-   * stop trying to slide feet around when getting into the idle
-     position, need to step
-
- * Get monitoring of state working
-   * Including for operation and power of all servos
  * Emit a single os syscall to write to all servos
 
+ * A moderate number of commands seem to get dropped when being sent
+   to the servos... unclear if that is in the junction board, on the
+   servos, or maybe I suppose even the rpi3.  Could also be data
+   integrity issues...
+
  * targets
-   * print / laminate fiducial targets
+   * print and cut out fiducial targets
    * need to track the target that is *closest* to center of view so
      as to work when multiple are in view at once, either that or lock
      onto them by identifier
@@ -134,6 +136,11 @@ DONE 2019-05-02
  * Verified tview can talk to everything, although only one device at
    a time for some reason... probably latency and timeouts are
    screwing things up
+ * Installed squash balls on resting feet
+ * Reproduced skipping the sitting phase
+ * Iterated on sitting and standing.  Got it pretty reliable.
+ * Test printed a fiducial on card-stock with new printer.  Seems like
+   it will work out to at least 10ft w/ official 3in max size.
 
 DONE 2019-05-01
  * Kept trying to print chassis leg shroud... first time failed, tried
