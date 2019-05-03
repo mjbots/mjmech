@@ -22,13 +22,7 @@
 
    * make some kind of protection for agitator gearbox
 
- * Get monitoring of state working
-   * Including for operation and power of all servos
-   * If a servo faults, stop everything right away to minimize damage
-
  * make walking suck less
-   * stop trying to slide feet around when getting into the idle
-     position, need to step
    * send feedforward current
      * maybe based on current position?
 
@@ -38,6 +32,8 @@
    10mm
 
  * endurance test walking
+   * check servo 5 cal... it had drifted some again :(
+   * maybe just replace that leg?
  * try installing retaining clips on knee shafts
 
 
@@ -70,8 +66,18 @@
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
- * Make the standup and sitdown sequences use actual IK interpolation,
-   instead of just joint interpolation
+
+ * make prepositioning use IK (need to sample joint poses and do
+   forward IK first), then perhaps a search strategy
+
+ * gait rework
+   * select foot placements
+   * only run forward
+   * structure like control layers, so outer modules can invoke
+     control of raw leg endpoints or raw joint positions/forces as
+     necessary
+   * how to handle forces?
+
 
  * Switch legtool to use the same code-paths as the C++ mech software
 
@@ -110,7 +116,6 @@ Post-Robotgames 2016 brainstorming
 Movement
 ~~~~~~~~
 
- * Switch gait engine to be one that selects foot placements
  * Make tplot be able to 3d render the mech
 
 Video/Control
@@ -141,6 +146,12 @@ DONE 2019-05-02
  * Iterated on sitting and standing.  Got it pretty reliable.
  * Test printed a fiducial on card-stock with new printer.  Seems like
    it will work out to at least 10ft w/ official 3in max size.
+ * Got monitoring of servos working, and shutdown in the case of
+   fault... although it polls infrequently enough that it isn't likely
+   to help
+ * When stopping, got the gait to keep stepping until the legs are in
+   a good position.  Also applied acceleration in both directions,
+   since slowing down was causing problems too.
 
 DONE 2019-05-01
  * Kept trying to print chassis leg shroud... first time failed, tried
