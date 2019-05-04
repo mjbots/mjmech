@@ -1,30 +1,17 @@
+ * make gimbal able to aim lower
+
  * Print queue
-   * turret shroud left <- NOW
-   * turret shroud right
-   * leg shroud mounting adapters
-   * turret shroud mounting adapters
-   * leg shroud left #2 (w/ front cutout)
+   * leg shroud left #2 (w/ front cutout) <- NOW
    * leg shroud right #2 (w/ front cutout)
+   * leg shroud mounting adapters
    * leg shroud left #3
    * leg shroud right #3
-
- * Build protective shrouds for everything that needs it
-
-   * get first leg quarter panel printed, verify that it fits
-     reasonably over leg and allows freedom of motion
-   * print other 3 quarter panels
-   * print leg shroud mounting adapters
-
-   * print turret left panel, verify that it roughly fits around turret
-   * print turret right panel
-   * design turret shroud mounting adapters
-   * print turret shroud mounting adapters
-
-   * make some kind of protection for agitator gearbox
 
  * make walking suck less
    * send feedforward current
      * maybe based on current position?
+
+ * test BB velocity
 
  * preposition_z_offset seems to have metric relationship problems
    with where the end effectors actually end up.  legtool would be
@@ -34,7 +21,9 @@
  * endurance test walking
    * check servo 5 cal... it had drifted some again :(
    * maybe just replace that leg?
- * try installing retaining clips on knee shafts
+
+ * install remaining retaining clips on knee shafts
+ * figure out why fiducial recognition range is worse than before
 
 
  * remount weapon in turret to be balanced better
@@ -61,6 +50,7 @@
 
  * Test 5GHz transmitter from laptop
 
+ * rework lab supply umbilical to remove all the stuff I don't use anymore
  * tview.py can't view more than device at a time reliably when
    tunneled over TCP
 
@@ -77,6 +67,8 @@
      control of raw leg endpoints or raw joint positions/forces as
      necessary
    * how to handle forces?
+   * rewrite tf and frames to require less manual copy constructor and
+     less/no aliased pointers?
 
 
  * Switch legtool to use the same code-paths as the C++ mech software
@@ -129,6 +121,18 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-03
+ * Got pre-charge board installed, first untethered operation!
+ * Finished printing turret shroud
+ * Printed turret shroud adapters, glued to turret
+ * Tried test fitting retaining rings onto leg shafts... was using the
+   wrong tool and broke it after getting two on.  Hopefully ordered
+   the right and higher quality tool.
+ * Assembled first leg shroud, cut out front leg holes
+ * Printed leg shroud adapters, glued first set to chassis, mounted
+   leg shroud on chassis
+
 
 DONE 2019-05-02
  * Updated bootloader to take new multiplex command
