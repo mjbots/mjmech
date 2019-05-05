@@ -63,7 +63,7 @@ class BoolGuard(object):
 
 class Log(object):
     def __init__(self, filename):
-        self.reader = telemetry_log.BulkReader(open(filename))
+        self.reader = telemetry_log.BulkReader(open(filename, 'rb'))
         self.records = self.reader.records()
         self.all = None
 
@@ -104,7 +104,7 @@ def _bisect(array, item, key):
     upper = len(array)
 
     while abs(lower - upper) > 1:
-        mid = (lower + upper) / 2
+        mid = (lower + upper) // 2
         value = key(array[mid])
         if item < value:
             upper = mid
@@ -136,8 +136,13 @@ def _set_tree_widget_data(item, struct,
         if isinstance(field, tuple) and child.childCount() > 0:
             _set_tree_widget_data(child, field)
         elif isinstance(field, list):
+            def get(x, y):
+                try:
+                    return x[int(y)]
+                except IndexError:
+                    return 0
             _set_tree_widget_data(child, field,
-                                  getter=lambda x, y: x[int(y)],
+                                  getter=get,
                                   required_size=len(field))
         else:
             child.setText(1, str(field))
@@ -244,10 +249,10 @@ class Tplot(QtGui.QMainWindow):
 
         self.log = maybe_log
         for name in self.log.records.keys():
-            self.ui.recordCombo.addItem(name)
+            self.ui.recordCombo.addItem(name.decode('utf8'))
 
             item = QtGui.QTreeWidgetItem()
-            item.setText(0, name)
+            item.setText(0, name.decode('utf8'))
             self.ui.treeWidget.addTopLevelItem(item)
             self.tree_items.append(item)
 
@@ -281,7 +286,7 @@ class Tplot(QtGui.QMainWindow):
         self.ui.xCombo.clear()
         self.ui.yCombo.clear()
 
-        exemplar = self.log.records[record]
+        exemplar = self.log.records[record.encode('utf8')]
         default_x = None
         index = [0, None]
 
@@ -396,7 +401,7 @@ class Tplot(QtGui.QMainWindow):
 
         # Look through all the records for those which have a
         # "timestamp" field.  Find the minimum and maximum of each.
-        for record, exemplar in self.log.records.iteritems():
+        for record, exemplar in self.log.records.items():
             if record not in self.log.all:
                 continue
             timestamp_getter = _make_timestamp_getter(self.log.all[record])
@@ -408,6 +413,9 @@ class Tplot(QtGui.QMainWindow):
                 continue
             this_min = min(these_times)
             this_max = max(these_times)
+
+            if this_min < 0 or this_max < 0:
+                continue
 
             if self.time_start is None or this_min < self.time_start:
                 self.time_start = this_min
@@ -426,7 +434,7 @@ class Tplot(QtGui.QMainWindow):
         if event.key not in ['1', '2', '3', '4']:
             return
         index = ord(event.key) - ord('1')
-        for key, value in self.axes.iteritems():
+        for key, value in self.axes.items():
             if key == AXES[index]:
                 value.set_navigate(True)
             else:
@@ -435,7 +443,7 @@ class Tplot(QtGui.QMainWindow):
     def handle_key_release(self, event):
         if event.key not in ['1', '2', '3', '4']:
             return
-        for key, value in self.axes.iteritems():
+        for key, value in self.axes.items():
             value.set_navigate(True)
 
     def update_time(self, new_time, update_slider=True):
@@ -476,7 +484,7 @@ class Tplot(QtGui.QMainWindow):
 
     def update_tree_view(self, time):
         for item in self.tree_items:
-            name = item.text(0)
+            name = item.text(0).encode('utf8')
             if name not in self.log.all:
                 continue
             all_data = self.log.all[name]

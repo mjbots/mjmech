@@ -21,11 +21,8 @@ import struct
 
 import telemetry_archive
 
-
-stringio = io.StringIO
-
 _BLOCK_STRUCT = struct.Struct('<HI')
-_HEADER = 'TLOG0002'
+_HEADER = b'TLOG0002'
 _BLOCK_SCHEMA = 1
 _BLOCK_DATA = 2
 
@@ -65,7 +62,7 @@ class BulkReader(object):
             yield block_type, block_data
 
     def _parse_schema(self, block_data, filter=None):
-        stream = telemetry_archive.ReadStream(stringio.StringIO(block_data))
+        stream = telemetry_archive.ReadStream(io.BytesIO(block_data))
         identifier = stream.read_uint32()
         flags = stream.read_uint32()
         name = stream.read_pstring()
@@ -134,7 +131,7 @@ class BulkReader(object):
                 records[identifier] = bulk_record
             elif block_type == _BLOCK_DATA:
                 stream = telemetry_archive.ReadStream(
-                    stringio.StringIO(block_data))
+                    io.BytesIO(block_data))
                 identifier = stream.read_uint32()
                 flags = stream.read_uint16()
 
@@ -151,7 +148,7 @@ class BulkReader(object):
                     flags &= ~(BlockDataFlags.kSnappy)
                     rest = stream.stream.read()
                     stream = telemetry_archive.ReadStream(
-                        stringio.StringIO(snappy.uncompress(rest)))
+                        io.BytesIO(snappy.uncompress(rest)))
                 assert flags == 0  # no unknown flags
 
                 rest = stream.stream.read()
