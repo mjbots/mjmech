@@ -1,8 +1,11 @@
+ * Figure out why servo 5 is getting so hot!
  * Diagnose what is up with servo #5 now
+
  * Try decreasing leg lift height
  * Try bringing leg in more gently when landing
  * Increase command frequency... verify how much margin we have at the
    current 100Hz.
+     * Send all servo data in a single syscall
  * Decrease kp on all direct drive servos in an attempt to improve
    damping, since the derivative term can be increased no more
  * Assemble and mount leg shroud #2
@@ -13,11 +16,6 @@
    * leg shroud right #3
 
  * test BB velocity
-
- * preposition_z_offset seems to have metric relationship problems
-   with where the end effectors actually end up.  legtool would be
-   nice, in the interim I need to do something else to verify 10m ==
-   10mm
 
  * endurance test walking
    * check servo 5 cal... it had drifted some again :(
@@ -30,8 +28,6 @@
  * gimbal pitch bldc maybe needs recalibrated, seems to push more one
    way than the other
  * turret reports reading error every couple of seconds...
-
- * Emit a single os syscall to write to all servos
 
  * A moderate number of commands seem to get dropped when being sent
    to the servos... unclear if that is in the junction board, on the
@@ -126,6 +122,13 @@ DONE 2019-05-05
  * Tested feedforward current... seems to have the desired effect of
    reducing sag when stepping in place.  Doesn't seem to help walking
    a whole lot yet.
+ * Figured out at least one IK problem.  The tibia joint no longer had
+   the relationship I thought it did now that I have a geared belt in
+   place.  Applied correction in code, and re-zeroed all the servos.
+   * The preposition_z_offset seems to work as expected now, yay!
+ * Still doesn't walk very well, although now it looks like something
+   is up with servo #5.  It keeps getting way hotter than everything
+   else for the same gait cycles, and also keeps having its cal drift.
 
 DONE 2019-05-04
  * Updated to torque max command
