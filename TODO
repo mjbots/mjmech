@@ -1,15 +1,21 @@
- * Figure out why servo 5 is getting so hot!
- * Diagnose what is up with servo #5 now
-
- * Try decreasing leg lift height
- * Try bringing leg in more gently when landing
- * Increase command frequency... verify how much margin we have at the
-   current 100Hz.
+ * Gentle landing w/ higher rate
+   * Increase command frequency... verify how much margin we have at the
+     current 100Hz.
      * Send all servo data in a single syscall
- * Decrease kp on all direct drive servos in an attempt to improve
-   damping, since the derivative term can be increased no more
+     * Switch imu_junction board to rp3 hat style forwarding for reduced latency
+   * When lowering feet, use a two rate approach, fast for the bulk of
+     the lower, then a gentle ease in for the remainder.
+
+ * Save power by standing up taller when stationary, and dropping down
+   lower to move... need to semi-gradually ramp in and out of it
+
+ * Maybe replace feet with all squash feet for increased friction?
+ * Try whole-robot force control?  rpi3 samples all positions at high
+   rate, and just sends low kp commands with the feedforward torque as
+   the primary input?
  * Assemble and mount leg shroud #2
- * Verify we aren't hitting the max servo speed
+
+ * non-zero leg idle positions in the z axis do not work
 
  * Print queue
    * leg shroud left #3
@@ -117,6 +123,39 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-06
+ * Investigated high power draw from servo #5.  AFAIK the problem is
+   just some slight assymmetry in either the leg or the chassis that
+   makes it need a little more torque to hold the same position.  When
+   the robot tips a bit to the left, then it needs even more torque,
+   which results in a bad feedback loop that results in maybe 2x the
+   current consumption in that servo.  I attribute this to poor
+   position control bandwidth also.
+ * Tried decreasing kp by 4.5x... it was much more damped, but also
+   unable to stand unassisted. :(
+ * Finished up 3 more controller boards.  Servo 5 was SN 24, going to
+   swap it out with newly readied 33 to see if it works any better.
+ * Pulled SN 29 off of servo 10, since it has a busted temp sensor.
+   Replaced with SN 39
+ * Seems to walk significantly better with new #5 servo, but that
+   servo is still getting hotter than the other lower leg ones by a
+   fair amount. :( Guess I'll check the heatsink compound on the other
+   side too.
+ * Tried fiddling with leg lift height.  20cm is the minimum that
+   doesn't catch on the ground when moving.  30cm clears reliably, but
+   is really stompy.  Legs are also slipping a fair amount even on
+   foam, maybe when the others stomp down?  Need to look at high speed
+   video.
+ * Re-applied thermal paste on back of #5's heat sink
+ * Got high fps video, several problems
+   * It still sags somewhat when legs are in flight
+   * When legs land, they hit hard enough to bounce the other legs out
+     of contact with the ground, causing slippage.
+ * More work to improve smoothness of walking
+   * Gently ramp in feed-forward term after landing
+   * Drop p-term when in flight and gradually ramp it back up when on
+     the ground
 
 DONE 2019-05-05
  * Tested feedforward current... seems to have the desired effect of
