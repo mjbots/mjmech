@@ -1,15 +1,16 @@
- * make gimbal able to aim lower
+ * Diagnose what is up with servo #5 now
+ * Try decreasing leg lift height
+ * Try bringing leg in more gently when landing
+ * Increase command frequency... verify how much margin we have at the
+   current 100Hz.
+ * Decrease kp on all direct drive servos in an attempt to improve
+   damping, since the derivative term can be increased no more
+ * Assemble and mount leg shroud #2
+ * Verify we aren't hitting the max servo speed
 
  * Print queue
-   * leg shroud left #2 (w/ front cutout) <- NOW
-   * leg shroud right #2 (w/ front cutout)
-   * leg shroud mounting adapters
    * leg shroud left #3
    * leg shroud right #3
-
- * make walking suck less
-   * send feedforward current
-     * maybe based on current position?
 
  * test BB velocity
 
@@ -22,7 +23,6 @@
    * check servo 5 cal... it had drifted some again :(
    * maybe just replace that leg?
 
- * install remaining retaining clips on knee shafts
  * figure out why fiducial recognition range is worse than before
 
 
@@ -121,6 +121,17 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-05
+ * Tested feedforward current... seems to have the desired effect of
+   reducing sag when stepping in place.  Doesn't seem to help walking
+   a whole lot yet.
+
+DONE 2019-05-04
+ * Updated to torque max command
+ * Set gimbal power to 0.95, lowered pitch limit to -20 deg
+ * Got left leg shroud #2 off printer
+ * Installed remaining retaining clips
 
 DONE 2019-05-03
  * Got pre-charge board installed, first untethered operation!
