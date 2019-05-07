@@ -1,38 +1,76 @@
- * Gentle landing w/ higher rate
+Schedule
+
+   * Tuesday
+     - The feedforward current seems to be busted in some
+       way... especially obvious in shoulder joints, but elsewhere as
+       well.  When standing still, the feedforward torques don't seem
+       that correlated (and in some cases seem to be the opposite) of
+       what is necessary.
+       - When standing, the feedforward torque should match what is
+         actually used for all servos!
+     - Get rotating working in a usable, if slow way
+     - save power when stopped
+     - fix gimbal yaw cal
+     - maybe make tool to re-cal a servo with only going through 1 or
+       two electrical phases for fixing #5?
+   * Wednesday
+     - Test walking with all armor installed and BBs loaded,
+       - install leg shroud #2
+     - set maximum walking speeds to what won't fall over
+     - film "qualification" video
+     - endurance test walking on batteries
+   * Thursday
+     - Build spare gearbox servo
+   * Friday
+     - Pack parts/tools/prep pelican for robot
+     - Test control from laptop, build all software
+     - Test powering from the 24V supply
+   * Monday
+     - Improve fiducials, test BB velocity
+     - Test with multiple fiducials in view, track closest
+     - Print and cutout fiducial targets
+     - Test 5.8ghz transmitter/receiver
+   * Tuesday/Wednesday
+     - slack
+     - maybe scrimmage practice with laptop hw?
+   * Thursday
+     - travel
+
+
+ * Gentle landing
    * Increase command frequency... verify how much margin we have at the
      current 100Hz.
      * Send all servo data in a single syscall
      * Switch imu_junction board to rp3 hat style forwarding for reduced latency
+   * Leg pair 1/2/3, 10/11/12 seems to sag more when in stance
+     * verify calibration of all lower legs
    * When lowering feet, use a two rate approach, fast for the bulk of
      the lower, then a gentle ease in for the remainder.
 
  * Save power by standing up taller when stationary, and dropping down
    lower to move... need to semi-gradually ramp in and out of it
+ * Rotating uses *lots* of power, maybe need to reduce the max rate of
+   rotation?  Or do something else to optimize it?
+   * Maybe reduce the maximum allowable shoulder angle?
 
- * Maybe replace feet with all squash feet for increased friction?
+ * Figure out how to connect something to the 24V supply
+
  * Try whole-robot force control?  rpi3 samples all positions at high
    rate, and just sends low kp commands with the feedforward torque as
    the primary input?
- * Assemble and mount leg shroud #2
-
- * non-zero leg idle positions in the z axis do not work
 
  * Print queue
    * leg shroud left #3
    * leg shroud right #3
 
- * test BB velocity
-
- * endurance test walking
-   * check servo 5 cal... it had drifted some again :(
-   * maybe just replace that leg?
-
- * figure out why fiducial recognition range is worse than before
-
 
  * remount weapon in turret to be balanced better
+ * non-zero leg idle positions in the z axis do not work
+
  * gimbal pitch bldc maybe needs recalibrated, seems to push more one
    way than the other
+ * gimbal yaw is slightly off center
+
  * turret reports reading error every couple of seconds...
 
  * A moderate number of commands seem to get dropped when being sent
@@ -75,10 +113,6 @@
 
  * Switch legtool to use the same code-paths as the C++ mech software
 
- * Create tool to configure controller
-  * iwconfig wlxxx retry 2
-  * iwconfig wlxxx power off
-
  * Get video writing in controller working
 
  * lizard robot (and probably mammal), takes too long to turn when
@@ -92,25 +126,18 @@
 Post-Robotgames 2016 brainstorming
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * Want VGA->5.8GHz TX, so we can broadcast our video to other monitors
- * 5.8GHz recording system, so we can record compeitors video for posterity
  * Make sure our gun is strong enough
- * Targeting panel calibration rig: gun with variable FPS, FPS meter
  * Spare velcro
- * ser2net on odroid, or some other way to run legtool
  * big monitor: next match time, or the current score
- * scoring transponder which does not suck
- * suggest to forum: no-2.4Ghz system
- * suggest to forum: new transponder protocol or system
- * check-in servo manual
- * make sur the procedure to set up new servo is recorded/clear
- * make sure it complains loudly when networkmanager is up
- * simple target panel tester: power + superbright LED with right connector
  * put sharpie (black + white) in the toolkit
 
 Movement
 ~~~~~~~~
 
- * Make tplot be able to 3d render the mech
+ * tplot
+  * render mech in 3d
+  * render joint torques, feedforward torques, and difference
+  * structures inside of lists
 
 Video/Control
 ~~~~~~~~~~~~~
@@ -156,6 +183,11 @@ DONE 2019-05-06
    * Gently ramp in feed-forward term after landing
    * Drop p-term when in flight and gradually ramp it back up when on
      the ground
+ * Replacement #5 board still has calibration drift! :( It must be
+   either related to how hot it is getting, how much current is going
+   through it, or the bracket.
+ * Made legs switch into world frame *before* landing, so they have
+   zero translational velocity when they hit.
 
 DONE 2019-05-05
  * Tested feedforward current... seems to have the desired effect of
