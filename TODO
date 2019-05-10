@@ -1,41 +1,73 @@
-Schedule
+ * print queue
+   * prusa_jjp
+     * be8108 gearbox <- NOW
+     * gearbox shoulder (apx 1pm Friday)
+   * prusa_beat
+     * 100 tooth mandrel <- NOW
+     * gearbox leg (apx 10am Friday)
 
-   * Tuesday
-     - The feedforward current seems to be busted in some
-       way... especially obvious in shoulder joints, but elsewhere as
-       well.  When standing still, the feedforward torques don't seem
-       that correlated (and in some cases seem to be the opposite) of
-       what is necessary.
-       - When standing, the feedforward torque should match what is
-         actually used for all servos!
-     - Get rotating working in a usable, if slow way
-     - save power when stopped
-     - fix gimbal yaw cal
-     - maybe make tool to re-cal a servo with only going through 1 or
-       two electrical phases for fixing #5?
-   * Wednesday
-     - Test walking with all armor installed and BBs loaded,
-       - install leg shroud #2
-     - set maximum walking speeds to what won't fall over
-     - film "qualification" video
-     - endurance test walking on batteries
-   * Thursday
-     - Build spare gearbox servo
-   * Friday
-     - Pack parts/tools/prep pelican for robot
-     - Test control from laptop, build all software
-     - Test powering from the 24V supply
-   * Monday
-     - Improve fiducials, test BB velocity
-     - Test with multiple fiducials in view, track closest
-     - Print and cutout fiducial targets
-     - Test 5.8ghz transmitter/receiver
-   * Tuesday/Wednesday
-     - slack
-     - maybe scrimmage practice with laptop hw?
-   * Thursday
-     - travel
+ * gearbox build status
+  * internal gears turned 8/10
+  * plastic parts printed 6/10
+  * rotors fine drilled 0/10
+  * gearboxes assembled 0/10
+  * legs printed 0/5
+  * legs assembled 0 /5
 
+  * motors separated 10/10
+  * rotors rough drilled 11/10
+  * stators rough drilled 11/10
+  * stators removed 11/10
+
+
+ * design gearbox leg
+   * upper leg still needs
+     * bearing lip for knee joint
+     * truss?  (at a minimum, something to be able to see inside)
+
+     DONE
+     * tensioner
+       * insert for bolt
+       * slideway for bracket
+     * spacer to upper leg motor
+     * mounting holes for upper leg motor shafts and bolts
+     * access holes on the other side for mounting bolts
+     * upper pulley hole
+     * bolt holes for lower knee stud
+     * access ports above and below pulley to see belt
+
+   * lower leg
+
+     DONE
+     * hole for lower bearing
+     * bolt holes for pulley
+     * maybe bearing lips for bearings?  those might be in the pulley
+
+   * lower pulley
+     * heat set inserts, lower leg bolts to these
+   * knee stud
+     * heat set inserts on both sides
+     * fits into knee bearings
+     * upper leg bolts to this
+   * tensioner bracket
+     * bracket which slides an axle through, and an HK0408 bearing
+     * has hole on back side
+     * alignment tabs so that it can only slide in one direction
+
+
+
+
+ - walk with gearbox legs
+ - film "qualification" video
+ - endurance test walking
+ - fix gimbal yaw cal
+
+ -  Improve fiducials, test BB velocity
+ - Test with multiple fiducials in view, track closest
+ - Print and cutout fiducial targets
+ - Test control from laptop, build all software
+ - Test powering from the 24V supply
+ - Test 5.8ghz transmitter/receiver
 
  * Gentle landing
    * Increase command frequency... verify how much margin we have at the
@@ -138,6 +170,8 @@ Movement
   * render mech in 3d
   * render joint torques, feedforward torques, and difference
   * structures inside of lists
+  * integrate tplot and tview, so it can display live data as well as
+    logged data
 
 Video/Control
 ~~~~~~~~~~~~~
@@ -150,6 +184,33 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-09
+ * Ordered more HW for gearbox builds
+ * Turned down 6 more gears, fixture broke doing last two :(
+ * Designed gearbox leg and shoulder bracket.
+
+DONE 2019-05-08
+ * Separated the rest of the motors, including disassembly all but one
+   of the direct drive legs
+ * Tried to turn down inner gears... mandrel is now too loose to hold
+   gears without some kind of clamp.  Designed a clamp and will print
+   it tonight.
+ * Rough machined 10 rotors
+ * Rough machined 10 stators
+ * Built 100tooth mandrel cap, installed inserts into mandrel and test
+   fit... seems like it will work
+ * Final removal of all stators
+
+DONE 2019-05-07
+ * Got multiplex_tool in the deployed image
+ * Updated servos to allow re-zeroing after boot, wrote a script to
+   re-zero all servos
+ * Pretty much gave up on the direct drive motors. :( #5 just is never
+   good enough, and it is close enough to the edge power wise, that
+   even slight problems result in it overheating or over-currenting.
+ * Filed down 10 more sun gear holders
+ * Separated a bunch of motors
 
 DONE 2019-05-06
  * Investigated high power draw from servo #5.  AFAIK the problem is
