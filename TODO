@@ -1,60 +1,33 @@
  * print queue
    * prusa_jjp
-     * be8108 gearbox <- NOW
-     * gearbox shoulder (apx 1pm Friday)
+     * mirror shoulder ETA 2pm Sunday <- NOW
+     * leg
+     * spacer plate
+     * leg
+     * gearbox
    * prusa_beat
-     * 100 tooth mandrel <- NOW
-     * gearbox leg (apx 10am Friday)
+     * spacer plate ETA 11:30am
+     * leg
+     * mirror shoulder
+     * gearbox
+
+ * Need to design shoulder spacer plate to give an extra 2mm of room
+   between motors
 
  * gearbox build status
-  * internal gears turned 8/10
-  * plastic parts printed 6/10
-  * rotors fine drilled 0/10
+  * plastic gearbox parts printed 8/10
+  * back plate heat set inserts 8/10
   * gearboxes assembled 0/10
-  * legs printed 0/5
-  * legs assembled 0 /5
+  * legs printed 1/5
+  * shoulders printed 2/5
+  * legs assembled 1/5
 
+  * internal gears turned 10/10
+  * rotors fine drilled 12/10
   * motors separated 10/10
   * rotors rough drilled 11/10
-  * stators rough drilled 11/10
+  * stators rough drilled 12/10
   * stators removed 11/10
-
-
- * design gearbox leg
-   * upper leg still needs
-     * bearing lip for knee joint
-     * truss?  (at a minimum, something to be able to see inside)
-
-     DONE
-     * tensioner
-       * insert for bolt
-       * slideway for bracket
-     * spacer to upper leg motor
-     * mounting holes for upper leg motor shafts and bolts
-     * access holes on the other side for mounting bolts
-     * upper pulley hole
-     * bolt holes for lower knee stud
-     * access ports above and below pulley to see belt
-
-   * lower leg
-
-     DONE
-     * hole for lower bearing
-     * bolt holes for pulley
-     * maybe bearing lips for bearings?  those might be in the pulley
-
-   * lower pulley
-     * heat set inserts, lower leg bolts to these
-   * knee stud
-     * heat set inserts on both sides
-     * fits into knee bearings
-     * upper leg bolts to this
-   * tensioner bracket
-     * bracket which slides an axle through, and an HK0408 bearing
-     * has hole on back side
-     * alignment tabs so that it can only slide in one direction
-
-
 
 
  - walk with gearbox legs
@@ -62,7 +35,7 @@
  - endurance test walking
  - fix gimbal yaw cal
 
- -  Improve fiducials, test BB velocity
+ - Improve fiducials, test BB velocity
  - Test with multiple fiducials in view, track closest
  - Print and cutout fiducial targets
  - Test control from laptop, build all software
@@ -185,10 +158,23 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2019-05-11
+ * much progress on gearboxes
+ * working print of leg
+ * working print of shoulder
+
+DONE 2019-05-10
+ * fine machining on all rotors
+ * Finished reprint of 100tooth gear mandrel
+ * Kinda turned down remaining two gears... they seem a little out of
+   true, but maybe they will work?  Diameter varies by +- 0.1mm around
+   the circumferences, so I aimed for 54.80-55.00.
+
+
 DONE 2019-05-09
  * Ordered more HW for gearbox builds
  * Turned down 6 more gears, fixture broke doing last two :(
- * Designed gearbox leg and shoulder bracket.
+ * Designed gearbox leg and shoulder bracket
 
 DONE 2019-05-08
  * Separated the rest of the motors, including disassembly all but one
