@@ -1,27 +1,31 @@
+ * Walking
+   * Verify config and scale of all motors
+   * Build a leg with two good motors
+
+
  * print queue
    * prusa_jjp
-     * mirror shoulder ETA 2pm Sunday <- NOW
-     * leg ETA 3am
-     * mirror shoulder
-     * spacer plate
+     * mirror shoulder <- NOW
+     * gearbox
      * gearbox
    * prusa_beat
-     * leg ETA 12:30am <- NOW
+     * leg <- NOW
+     * spacer plate
      * leg
-     * gearbox
+     * shoulder
+     * shoulder spacer
 
- * Need to design shoulder spacer plate to give an extra 2mm of room
-   between motors
 
  * gearbox build status
   * plastic gearbox parts printed 8/10
   * back plate heat set inserts 8/10
   * back plates post machined 8/10
-  * gearboxes assembled 0/10
-  * legs printed 1/5
+  * gearboxes assembled 8/10
+  * legs printed 3/5
   * shoulders printed 3/6
   * shoulder spacers printed 2/5
-  * legs assembled 1/5
+  * legs mechanical assembly 1/5
+  * legs on robot
 
   * internal gears turned 10/10
   * rotors fine drilled 12/10
@@ -35,8 +39,6 @@
  - film "qualification" video
  - endurance test walking
  - fix gimbal yaw cal
-
- R3 SN11 needs phase wires lengthened :(
 
  - Improve fiducials, test BB velocity
  - Test with multiple fiducials in view, track closest
@@ -156,6 +158,19 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-13
+ * Got first 8 gearboxes assembled
+   * I feel like a gunsmith before interchangeable parts!
+ * Smoothness binning
+   * SN7 & 8 are the worst, but not terrible even
+   * 5, 6, 9, 10, 11, 12 are all pretty good
+
+DONE 2019-05-12
+ * Started assembling gearboxes
+   * Post-machined the back plates to give more room
+   * R3 SN9 was formerly an id #5 and needed its encoder integral limit
+     relaxed to cal
 
 DONE 2019-05-11
  * much progress on gearboxes
