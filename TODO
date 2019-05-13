@@ -1,14 +1,13 @@
  * print queue
    * prusa_jjp
      * mirror shoulder ETA 2pm Sunday <- NOW
-     * leg
+     * leg ETA 3am
+     * mirror shoulder
      * spacer plate
-     * leg
      * gearbox
    * prusa_beat
-     * spacer plate ETA 11:30am
+     * leg ETA 12:30am <- NOW
      * leg
-     * mirror shoulder
      * gearbox
 
  * Need to design shoulder spacer plate to give an extra 2mm of room
@@ -17,9 +16,11 @@
  * gearbox build status
   * plastic gearbox parts printed 8/10
   * back plate heat set inserts 8/10
+  * back plates post machined 8/10
   * gearboxes assembled 0/10
   * legs printed 1/5
-  * shoulders printed 2/5
+  * shoulders printed 3/6
+  * shoulder spacers printed 2/5
   * legs assembled 1/5
 
   * internal gears turned 10/10
