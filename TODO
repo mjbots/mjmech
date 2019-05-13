@@ -36,6 +36,8 @@
  - endurance test walking
  - fix gimbal yaw cal
 
+ R3 SN11 needs phase wires lengthened :(
+
  - Improve fiducials, test BB velocity
  - Test with multiple fiducials in view, track closest
  - Print and cutout fiducial targets
@@ -64,10 +66,6 @@
  * Try whole-robot force control?  rpi3 samples all positions at high
    rate, and just sends low kp commands with the feedforward torque as
    the primary input?
-
- * Print queue
-   * leg shroud left #3
-   * leg shroud right #3
 
 
  * remount weapon in turret to be balanced better
