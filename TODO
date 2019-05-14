@@ -1,88 +1,39 @@
- * Walking
-   * Verify config and scale of all motors
-   * Build a leg with two good motors
+ * set limits for all motors in moteus_ik.cfg
+ * print quarter circle armor plates for motors to keep BBs out
+ * print target panel adapter for front and back of robot
+
+ * get control constants in terms of torque
+ * update pid gains on all motors to be better now that we have gearboxes
+ * update mech software max torque to be higher now that we have gearboxes
+
+ * mount gearbox protectors
+ * mount target panels
+ * make new rs485 cables to go around the back of the leg assembly
+   instead of the front
+ * 6 hours of walking tuning
+ * install turret shroud
+ - Test control from laptop, build all software
+ - test firing actual bbs
+ - film "qualification" video
+ - endurance test walking
+ - fix gimbal yaw cal
+ - need box to rest on to zero all servos
 
 
  * print queue
    * prusa_jjp
-     * mirror shoulder <- NOW
-     * gearbox
-     * gearbox
-   * prusa_beat
      * leg <- NOW
-     * spacer plate
-     * leg
-     * shoulder
-     * shoulder spacer
-
-
- * gearbox build status
-  * plastic gearbox parts printed 8/10
-  * back plate heat set inserts 8/10
-  * back plates post machined 8/10
-  * gearboxes assembled 8/10
-  * legs printed 3/5
-  * shoulders printed 3/6
-  * shoulder spacers printed 2/5
-  * legs mechanical assembly 1/5
-  * legs on robot
-
-  * internal gears turned 10/10
-  * rotors fine drilled 12/10
-  * motors separated 10/10
-  * rotors rough drilled 11/10
-  * stators rough drilled 12/10
-  * stators removed 11/10
-
-
- - walk with gearbox legs
- - film "qualification" video
- - endurance test walking
- - fix gimbal yaw cal
+     * front/rear target plate adapter draft
+     * gearbox?
+   * prusa_roxy
+     * gearbox <- NOW
+     * motor protector draft
 
  - Improve fiducials, test BB velocity
  - Test with multiple fiducials in view, track closest
  - Print and cutout fiducial targets
- - Test control from laptop, build all software
  - Test powering from the 24V supply
  - Test 5.8ghz transmitter/receiver
-
- * Gentle landing
-   * Increase command frequency... verify how much margin we have at the
-     current 100Hz.
-     * Send all servo data in a single syscall
-     * Switch imu_junction board to rp3 hat style forwarding for reduced latency
-   * Leg pair 1/2/3, 10/11/12 seems to sag more when in stance
-     * verify calibration of all lower legs
-   * When lowering feet, use a two rate approach, fast for the bulk of
-     the lower, then a gentle ease in for the remainder.
-
- * Save power by standing up taller when stationary, and dropping down
-   lower to move... need to semi-gradually ramp in and out of it
- * Rotating uses *lots* of power, maybe need to reduce the max rate of
-   rotation?  Or do something else to optimize it?
-   * Maybe reduce the maximum allowable shoulder angle?
-
- * Figure out how to connect something to the 24V supply
-
- * Try whole-robot force control?  rpi3 samples all positions at high
-   rate, and just sends low kp commands with the feedforward torque as
-   the primary input?
-
-
- * remount weapon in turret to be balanced better
- * non-zero leg idle positions in the z axis do not work
-
- * gimbal pitch bldc maybe needs recalibrated, seems to push more one
-   way than the other
- * gimbal yaw is slightly off center
-
- * turret reports reading error every couple of seconds...
-
- * A moderate number of commands seem to get dropped when being sent
-   to the servos... unclear if that is in the junction board, on the
-   servos, or maybe I suppose even the rpi3.  Could also be data
-   integrity issues...
 
  * targets
    * print and cut out fiducial targets
@@ -94,7 +45,34 @@
    * See if I can figure out what channels their transmitters will use
      so that I could deconflict
 
- * Test 5GHz transmitter from laptop
+ * pack!
+   * wire for target harness
+   * tools
+   * spare screws and parts
+   * display parts
+
+ * Gentle landing
+   * Increase command frequency... verify how much margin we have at the
+     current 100Hz.
+     * Send all servo data in a single syscall
+     * Switch imu_junction board to rp3 hat style forwarding for reduced latency
+   * Leg pair 1/2/3, 10/11/12 seems to sag more when in stance
+     * verify calibration of all lower legs
+   * When lowering feet, use a two rate approach, fast for the bulk of
+     the lower, then a gentle ease in for the remainder.
+
+ * non-zero leg idle positions in the z axis do not work
+
+ * gimbal pitch bldc maybe needs recalibrated, seems to push more one
+   way than the other
+
+ * turret reports reading error every couple of seconds...
+
+ * A moderate number of commands seem to get dropped when being sent
+   to the servos... unclear if that is in the junction board, on the
+   servos, or maybe I suppose even the rpi3.  Could also be data
+   integrity issues...
+
 
  * rework lab supply umbilical to remove all the stuff I don't use anymore
  * tview.py can't view more than device at a time reliably when
@@ -165,6 +143,8 @@ DONE 2019-05-13
  * Smoothness binning
    * SN7 & 8 are the worst, but not terrible even
    * 5, 6, 9, 10, 11, 12 are all pretty good
+ * iFlight stators are in SN7 and SN10
+ * Assembled and installed all 4 motors.  Walked on them!
 
 DONE 2019-05-12
  * Started assembling gearboxes
