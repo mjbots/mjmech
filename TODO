@@ -1,38 +1,21 @@
- * set limits for all motors in moteus_ik.cfg
- * print quarter circle armor plates for motors to keep BBs out
- * print target panel adapter for front and back of robot
+ * print target panel adapter for back of robot
 
- * get control constants in terms of torque
- * update pid gains on all motors to be better now that we have gearboxes
- * update mech software max torque to be higher now that we have gearboxes
-
- * mount gearbox protectors
- * mount target panels
- * make new rs485 cables to go around the back of the leg assembly
-   instead of the front
  * 6 hours of walking tuning
- * install turret shroud
- - Test control from laptop, build all software
- - test firing actual bbs
- - film "qualification" video
- - endurance test walking
- - fix gimbal yaw cal
- - need box to rest on to zero all servos
 
+ - Test control from laptop, build all software
+ - test programming stm32 from laptop
+ - endurance test walking
 
  * print queue
    * prusa_jjp
-     * leg <- NOW
-     * front/rear target plate adapter draft
+     * target plate adapter
      * gearbox?
    * prusa_roxy
-     * gearbox <- NOW
-     * motor protector draft
+     * gearbox protectors <- NOW
 
  - Improve fiducials, test BB velocity
  - Test with multiple fiducials in view, track closest
  - Print and cutout fiducial targets
- - Test powering from the 24V supply
  - Test 5.8ghz transmitter/receiver
 
  * targets
@@ -46,10 +29,27 @@
      so that I could deconflict
 
  * pack!
+   * velcro for target plates
+   * double sided tape
+   * BB speed meter
+   * Sterilite box for doing leg cal
+   * M2.5 M3 driver
+   * hex key set
+   * Big purple screwdriver
+   * a few precision drivers
+   * hot glue gun
+   * velcro for target panels
+   * rs485 adapters
+   * stm32 programmer
    * wire for target harness
    * tools
    * spare screws and parts
    * display parts
+
+AFTER EVENT
+
+ * Re-do pulleys to get more torque without skipping... probably in
+   aluminum, or post-machining a real pulley
 
  * Gentle landing
    * Increase command frequency... verify how much margin we have at the
@@ -89,7 +89,8 @@
    * only run forward
    * structure like control layers, so outer modules can invoke
      control of raw leg endpoints or raw joint positions/forces as
-     necessary
+     necessary, including letting the user inject commands at any
+     layer
    * how to handle forces?
    * rewrite tf and frames to require less manual copy constructor and
      less/no aliased pointers?
@@ -136,6 +137,19 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-14
+ * Printed lower pulleys at 0.15mm, installed
+ * Printed extra belt tensioners, have two in each leg
+ * Re-zeroed the gimbal yaw
+ * Re-glued the 3 loosest resting feet
+ * Fixed jumping shoulder joints... they were being started outside of
+   their absolute position limits.  Noted it in the moteus TODO
+ * Installed turret shroud
+ * Took "qualification" video, including firing some BBs
+ * Installed first 8 gearbox protectors
+ * Printed and double sided taped target panel adapter
+ * Build new harnesses between femurs and tibias and tied them up
 
 DONE 2019-05-13
  * Got first 8 gearboxes assembled
