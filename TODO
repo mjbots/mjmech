@@ -1,50 +1,9 @@
- * print target panel adapter for back of robot
-
- * 6 hours of walking tuning
-
- - Test control from laptop, build all software
- - test programming stm32 from laptop
- - endurance test walking
-
- * print queue
-   * prusa_jjp
-     * target plate adapter
-     * gearbox?
-   * prusa_roxy
-     * gearbox protectors <- NOW
-
- - Improve fiducials, test BB velocity
- - Test with multiple fiducials in view, track closest
- - Print and cutout fiducial targets
- - Test 5.8ghz transmitter/receiver
-
  * targets
-   * print and cut out fiducial targets
    * need to track the target that is *closest* to center of view so
      as to work when multiple are in view at once, either that or lock
      onto them by identifier
 
- * Figure out how to change 5ghz frequencies and document the procedure
-   * See if I can figure out what channels their transmitters will use
-     so that I could deconflict
 
- * pack!
-   * velcro for target plates
-   * double sided tape
-   * BB speed meter
-   * Sterilite box for doing leg cal
-   * M2.5 M3 driver
-   * hex key set
-   * Big purple screwdriver
-   * a few precision drivers
-   * hot glue gun
-   * velcro for target panels
-   * rs485 adapters
-   * stm32 programmer
-   * wire for target harness
-   * tools
-   * spare screws and parts
-   * display parts
 
 AFTER EVENT
 
@@ -138,6 +97,21 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2019-05-15
+ * Installed second target panel adapter
+ * Tested ethernet from laptop to rpi
+ * Tested 5.8ghz tx, while sending controller video over it!
+ * Looks like my wifi frequency doesn't overlap with any of the FPV
+   frequencies, and changing it is just tweaking
+   /etc/hostapd/hostapd.conf.
+ * Designed and printed a "desk bracket" to clamp a freestanding motor
+   to a desk/table
+ * Connectorized and flashed spare rpi3 hat fresh from macrofab
+ * Built 3.5A 20V 3.5mm bullet supply from an old thinkpad wall wart
+ * Build spare gearbox SN13
+ * Cutout a bunch of fiducials
+
+
 DONE 2019-05-14
  * Printed lower pulleys at 0.15mm, installed
  * Printed extra belt tensioners, have two in each leg
@@ -150,6 +124,12 @@ DONE 2019-05-14
  * Installed first 8 gearbox protectors
  * Printed and double sided taped target panel adapter
  * Build new harnesses between femurs and tibias and tied them up
+ * Built mech software and tested control from laptop
+ * Verified I could build moteus firmware and run openocd on laptop
+ * Did some minimal experiments with fiducials... they seem probably
+   about as good as they were before in the lighting conditions I was
+   able to get tonight.
+ * Printed out a bunch of fiducials
 
 DONE 2019-05-13
  * Got first 8 gearboxes assembled
