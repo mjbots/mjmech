@@ -198,7 +198,10 @@ def _get_data(value, name):
     fields = name.split('.')
     for field in fields:
         if isinstance(value, list):
-            value = value[int(field)]
+            try:
+                value = value[int(field)]
+            except IndexError:
+                return None
         else:
             value = getattr(value, field)
     return value
