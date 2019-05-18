@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -B
 
-# Copyright 2015-2018 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2015-2019 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,6 +73,30 @@ class Log(object):
         self.all = self.reader.get()
 
 
+def _add_schema_struct_to_tree_view(parent_item, schema_element):
+    assert 'fields' in schema_element
+
+    for schema_field in schema_element['fields']:
+        name = schema_field['name']
+
+        item = QtGui.QTreeWidgetItem(parent_item)
+        item.setText(0, name)
+
+        _add_schema_item_to_tree_view(item, schema_field)
+
+
+def _add_schema_item_to_tree_view(item, schema):
+    if schema['type'] == 17:
+        _add_schema_struct_to_tree_view(item, schema['children'][0])
+    if schema['type'] == 18:
+        # Optionals we act as pass-throughs
+        _add_schema_item_to_tree_view(item, schema['children'][0])
+    else:
+        # All other types we ignore for now, and let them get filled
+        # in on the first data.
+        pass
+
+
 def _make_timestamp_getter(all_data):
     if len(all_data) == 0:
         return lambda x: 0.0
@@ -121,31 +145,45 @@ def _clear_tree_widget(item):
         _clear_tree_widget(child)
 
 
-def _set_tree_widget_data(item, struct,
-                          getter=lambda x, y: getattr(x, y),
-                          required_size=0):
-    if item.childCount() < required_size:
-        for i in range(item.childCount(), required_size):
-            subitem = QtGui.QTreeWidgetItem(item)
-            subitem.setText(0, str(i))
-    for i in range(item.childCount()):
-        child = item.child(i)
-        name = child.text(0)
+def _set_tree_widget_data_struct(qt_item, data_struct, schema):
+    for schema_index, schema_field in enumerate(schema['fields']):
+        name = schema_field['name']
+        data_field = getattr(data_struct, name)
 
-        field = getter(struct, name)
-        if isinstance(field, tuple) and child.childCount() > 0:
-            _set_tree_widget_data(child, field)
-        elif isinstance(field, list):
-            def get(x, y):
-                try:
-                    return x[int(y)]
-                except IndexError:
-                    return 0
-            _set_tree_widget_data(child, field,
-                                  getter=get,
-                                  required_size=len(field))
+        _set_tree_widget_data_item(
+            qt_item.child(schema_index), data_field, schema_field)
+
+
+def _set_tree_widget_data_item(qt_item, data_struct, schema):
+
+    has_children = 'children' in schema
+    # If we have children, that makes us a container of some sort.
+
+    if schema['type'] == 17:
+        # This field is a structure.
+        _set_tree_widget_data_struct(
+            qt_item, data_struct, schema['children'][0])
+    elif schema['type'] == 18:
+        # We are an optional.
+        if data_struct is None:
+            _clear_tree_widget(qt_item)
         else:
-            child.setText(1, str(field))
+            _set_tree_widget_data_item(qt_item, data_struct,
+                                       schema['children'][0])
+    elif has_children:
+        # We are some other container.  (ignore pairs for now)
+        assert isinstance(data_struct, list)
+        for i in range(qt_item.childCount(), len(data_struct)):
+            subitem = QtGui.QTreeWidgetItem(qt_item)
+            subitem.setText(0, str(i))
+            _add_schema_item_to_tree_view(subitem, schema['children'][0])
+        for i in range(len(data_struct)):
+            subitem = qt_item.child(i)
+            _set_tree_widget_data_item(
+                subitem, data_struct[i], schema['children'][0])
+    else:
+        # We must just be text!
+        qt_item.setText(1, str(data_struct))
 
 
 def _get_data(value, name):
@@ -256,30 +294,8 @@ class Tplot(QtGui.QMainWindow):
             self.ui.treeWidget.addTopLevelItem(item)
             self.tree_items.append(item)
 
-            exemplar = self.log.records[name]
-            def add_item(parent, element):
-                if 'fields' not in element:
-                    return
-                for field in element['fields']:
-                    name = field['name']
-
-                    item = QtGui.QTreeWidgetItem(parent)
-                    item.setText(0, name)
-
-                    if 'nelements' in field:
-                        child = field['children'][0]
-                        # If this is a type with only one child, just
-                        # fall down to it.
-                        if 'children' in child and len(child['children']) == 1:
-                            child = ['children'][0]
-                        for i in range(field['nelements']):
-                            subitem = QtGui.QTreeWidgetItem(item)
-                            subitem.setText(0, str(i))
-                            add_item(subitem, child)
-                    elif 'children' in field:
-                        for child in field['children']:
-                            add_item(item, child)
-            add_item(item, exemplar)
+            schema = self.log.records[name]
+            _add_schema_struct_to_tree_view(item, schema)
 
     def handle_record_combo(self):
         record = self.ui.recordCombo.currentText()
@@ -498,7 +514,8 @@ class Tplot(QtGui.QMainWindow):
                 _clear_tree_widget(item)
             else:
                 this_data = all_data[this_data_index]
-                _set_tree_widget_data(item, this_data)
+                _set_tree_widget_data_struct(item, this_data,
+                                             self.log.records[name])
 
     def update_plot_dots(self, new_time):
         updated = False
