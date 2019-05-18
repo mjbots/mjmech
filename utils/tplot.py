@@ -68,9 +68,17 @@ class Log(object):
         self.all = None
 
     def get_all(self):
-        if self.all:
+        if self.all is not None:
             return
         self.all = self.reader.get()
+
+
+def _walk_item(item):
+    fields = None
+    while item.parent():
+        fields = item.text(0) + ("." + fields if fields else "")
+        item = item.parent()
+    return item.text(0), fields
 
 
 def _add_schema_struct_to_tree_view(parent_item, schema_element):
@@ -250,6 +258,8 @@ class Tplot(QtGui.QMainWindow):
         self.ui.addPlotButton.clicked.connect(self.handle_add_plot_button)
         self.ui.removeButton.clicked.connect(self.handle_remove_button)
         self.ui.treeWidget.itemExpanded.connect(self.handle_item_expanded)
+        self.ui.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.handle_tree_widget_context_menu)
         self.tree_items = []
         self.ui.treeWidget.header().setResizeMode(
             QtGui.QHeaderView.ResizeToContents)
@@ -341,11 +351,14 @@ class Tplot(QtGui.QMainWindow):
             self.ui.xCombo.setCurrentIndex(default_x)
 
     def handle_add_plot_button(self):
-        self.log.get_all()
-
         record = self.ui.recordCombo.currentText()
         xname = self.ui.xCombo.currentText()
         yname = self.ui.yCombo.currentText()
+
+        self._add_plot(record.encode('utf8'), xname, yname)
+
+    def _add_plot(self, record, xname, yname):
+        self.log.get_all()
 
         data = self.log.all[record]
         xdata = [_get_data(x, xname) for x in data]
@@ -408,6 +421,22 @@ class Tplot(QtGui.QMainWindow):
 
     def handle_item_expanded(self):
         self.update_timeline()
+
+    def handle_tree_widget_context_menu(self, point):
+        item = self.ui.treeWidget.itemAt(point)
+        record, fields = _walk_item(item)
+
+        if record is None or fields is None:
+            return
+
+        menu = QtGui.QMenu()
+        plot_vs_time = menu.addAction("Plot vs time")
+        result = menu.exec_(self.ui.treeWidget.mapToGlobal(point))
+        if result is None:
+            return
+        if result == plot_vs_time:
+            self._add_plot(record.encode('utf8'), 'timestamp', fields)
+
 
     def update_timeline(self):
         if self.time_start is not None:
