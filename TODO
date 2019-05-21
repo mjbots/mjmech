@@ -1,14 +1,10 @@
- * targets
-   * need to track the target that is *closest* to center of view so
-     as to work when multiple are in view at once, either that or lock
-     onto them by identifier
-
-
 
 AFTER EVENT
 
- * Re-do pulleys to get more torque without skipping... probably in
-   aluminum, or post-machining a real pulley
+ * Get outer housing and back housing in metal in some way
+ * Design mini-cheetah style legs with successive links instead of inward facing
+ * design production controllers and gearboxes
+
 
  * Gentle landing
    * Increase command frequency... verify how much margin we have at the
@@ -67,12 +63,6 @@ AFTER EVENT
    robots current configuration relative to the turret
 
 
-Post-Robotgames 2016 brainstorming
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Want VGA->5.8GHz TX, so we can broadcast our video to other monitors
- * Make sure our gun is strong enough
- * Spare velcro
- * big monitor: next match time, or the current score
  * put sharpie (black + white) in the toolkit
 
 Movement
@@ -81,7 +71,6 @@ Movement
  * tplot
   * render mech in 3d
   * render joint torques, feedforward torques, and difference
-  * structures inside of lists
   * integrate tplot and tview, so it can display live data as well as
     logged data
 
