@@ -1,37 +1,65 @@
+ * Minimal high jump and decent walking
+   * print new upper leg and test
+   * print revised shoulder
+   * install longer power leads on one motor
+   * figure out how to do inline rs485 connector, maybe just use
+     board-mount connector w/ heat shrink?
+   * test assemble entire leg
 
-AFTER EVENT
+   * drill phase clamp holes in second reinforcing ring
+   * fasten second reinforcing ring
 
- * Get outer housing and back housing in metal in some way
- * Design mini-cheetah style legs with successive links instead of inward facing
- * design production controllers and gearboxes
+   * print 10x more reinforcing rings
+   * install 10x more reinforcing rings with 30min epoxy
 
+   * mfg leg stud out of either really high infill or aluminum
 
- * Gentle landing
+ * Mech warfare fixes
+   * Fix gimbal board EMI problems
+     * Possibly just design a "gimbal only" board, and a separate
+       "AEG/agitator/laser" board.  That would make it easier to move
+       to a two gun system, and likely more flexible to mechanically
+       integrate
+   * Integrate new rf comms and telemetry
+
+ * Design new gimbal and turret mechanics to reduce height, possibly
+   support a different board, since we don't care about the rpi3's
+   wifi anymore
+
+ * Get walking and jumping
+
+ * Communication robustness
    * Increase command frequency... verify how much margin we have at the
      current 100Hz.
      * Send all servo data in a single syscall
      * Switch imu_junction board to rp3 hat style forwarding for reduced latency
-   * Leg pair 1/2/3, 10/11/12 seems to sag more when in stance
-     * verify calibration of all lower legs
+   * turret reports reading error every couple of seconds...
+   * A moderate number of commands seem to get dropped when being sent
+     to the servos... unclear if that is in the junction board, on the
+     servos, or maybe I suppose even the rpi3.  Could also be data
+     integrity issues...
+   * tview.py can't view more than device at a time reliably when
+     tunneled over TCP
+
+ * Pocket NC bringup
+   * Machine their test part
+   * Try a sun gear holder, see if I can get tolerances
+
+ * Gearbox improvements
+   * Machine a front housing that has the widened outer flange to
+     connect to a pure cylindrical outer housing
+   * Design a new metal cylindrical outer housing machined from round
+     tube
+   * Optimize size and weight
+
+ * Easy gait improvements
+   * First, get high rate commands working
    * When lowering feet, use a two rate approach, fast for the bulk of
      the lower, then a gentle ease in for the remainder.
-
- * non-zero leg idle positions in the z axis do not work
-
- * gimbal pitch bldc maybe needs recalibrated, seems to push more one
-   way than the other
-
- * turret reports reading error every couple of seconds...
-
- * A moderate number of commands seem to get dropped when being sent
-   to the servos... unclear if that is in the junction board, on the
-   servos, or maybe I suppose even the rpi3.  Could also be data
-   integrity issues...
+   * non-zero leg idle positions in the z axis do not work
 
 
  * rework lab supply umbilical to remove all the stuff I don't use anymore
- * tview.py can't view more than device at a time reliably when
-   tunneled over TCP
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
@@ -85,6 +113,11 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-05-21
+ * Unpacked
+ * Printed test reinforcing ring
+ * Printed test full rotation shoulder
 
 DONE 2019-05-15
  * Installed second target panel adapter
