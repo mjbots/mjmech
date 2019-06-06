@@ -1,32 +1,33 @@
+ * Print queue
+   * 1x reinforcing rings
+
+ * Full rotation quad
+   * 3x old leg disassembly
+   * 2x lengthen power leads
+   * 2x rs485 extenders
+   * 6x reinforcing rings
+   * 3x leg re-assembly
+
+
  * Minimal high jump and decent walking
-   * print new upper leg and test
-   * print revised shoulder
-   * install longer power leads on one motor
-   * figure out how to do inline rs485 connector, maybe just use
-     board-mount connector w/ heat shrink?
-   * test assemble entire leg
-
-   * drill phase clamp holes in second reinforcing ring
-   * fasten second reinforcing ring
-
-   * print 10x more reinforcing rings
-   * install 10x more reinforcing rings with 30min epoxy
-
-   * mfg leg stud out of either really high infill or aluminum
-
- * Mech warfare fixes
-   * Fix gimbal board EMI problems
-     * Possibly just design a "gimbal only" board, and a separate
-       "AEG/agitator/laser" board.  That would make it easier to move
-       to a two gun system, and likely more flexible to mechanically
-       integrate
-   * Integrate new rf comms and telemetry
-
- * Design new gimbal and turret mechanics to reduce height, possibly
-   support a different board, since we don't care about the rpi3's
-   wifi anymore
+   * install 6x more reinforcing rings
+   * remove and disassemble 3x legs
+   * 3x build legs
 
  * Get walking and jumping
+
+ * Mech warfare fixes
+   * Integrate new rf comms and telemetry
+
+ * Make turret more rigid and smaller
+   * Build AEG/laser/agitator only board w/ pass-through power-data
+   * Design new AEG feeder mechanism with BB holder hard mounted to
+     the AEG and lower down out of 3D printed parts
+   * Design new gimbal with more generic mounting options... room for
+     1 or 2 AEGs and computers... maybe slip ring for 360 rotation?
+   * this would remove the need for the massive shroud by getting rid
+     of the dedicated AEG joining wire, and reduce the jiggles that
+     happen when walking
 
  * Communication robustness
    * Increase command frequency... verify how much margin we have at the
@@ -38,12 +39,18 @@
      to the servos... unclear if that is in the junction board, on the
      servos, or maybe I suppose even the rpi3.  Could also be data
      integrity issues...
-   * tview.py can't view more than device at a time reliably when
-     tunneled over TCP
+   * tview.py isn't reliable over TCP
 
  * Pocket NC bringup
-   * Machine their test part
-   * Try a sun gear holder, see if I can get tolerances
+   * Try sun gear holder in 1-op mode
+     * Don't break any mills!
+   * Get stock for pocketnc
+     * Knee stud
+     * Back housing
+     * Back housing fixture
+
+   * Do aluminum front housing
+   * Do aluminum outer housing
 
  * Gearbox improvements
    * Machine a front housing that has the widened outer flange to
@@ -58,8 +65,6 @@
      the lower, then a gentle ease in for the remainder.
    * non-zero leg idle positions in the z axis do not work
 
-
- * rework lab supply umbilical to remove all the stuff I don't use anymore
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
@@ -113,6 +118,52 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-06-06
+ * Finished printing everything but 1 reinforcing ring set!
+
+DONE 2019-06-01
+ * Processed 3x reinforcing rings from the printer
+ * Started a shoulder and upper motor joint print
+ * Tried to mill the sun gear holder in 2-op mode.  First time, failed
+   because I plain screwed up the program and plunged directly into
+   uncut material.
+   * Second time got all the way through the 3mm Datron portion, then
+     drove the long reach mill way to hard and stalled it, then it
+     exploded when I tried to spin it up a second time with way
+     reduced parameters.
+
+DONE 2019-05-31
+ * Test assembled full rotation leg... largely looks to work
+   * Upper leg a tad too small, the belt rubs against the upper insert support
+   * Lower leg bolt holes didn't go all the way through
+ * Ordered more belts and pulleys
+ * Printed 2x more reinforcing rings
+
+DONE 2019-05-30
+ * Got 5mm gt3 upper and lower pulley off printer... upper was busted
+   and had to be re-printed
+ * Updated upper and lower leg for 28/28 gearing, made both a little
+   bit longer to handle the longer belt I had assuming a bigger lower
+   gear size
+ * Installed reinforcing ring on SN13
+ * Assembled all the motors for the full rotation leg, just missing
+   actual leg!
+ * Stripped down umbilical
+ * New upper pulley seems to work fine
+ * Debugged turret EMI problem... wasn't able to exactly reproduce on
+   the lab bench, but scoping the power supply showed massive voltage
+   ripple.  Added a lot of capacitors and things looked a whole lot
+   better.
+
+
+DONE 2019-05-23
+ * Got upper leg print, mounted on motor with reinforcing ring along
+   with pulley, old lower leg, and new knee stud.
+ * Printed shoulder with increased spacing
+ * Installed longer power leads and a jump RS485 cable onto SN6 for
+   full rotation upper leg test
+ * Drilled out second reinforcing ring
 
 DONE 2019-05-21
  * Unpacked
