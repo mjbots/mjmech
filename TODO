@@ -1,18 +1,10 @@
- * Print queue
-   * 1x reinforcing rings
-
  * Full rotation quad
-   * 3x old leg disassembly
-   * 2x lengthen power leads
-   * 2x rs485 extenders
-   * 6x reinforcing rings
+   * 6x reinforced motor re-assembly
+   * 3x rs485 extenders
    * 3x leg re-assembly
-
-
- * Minimal high jump and decent walking
-   * install 6x more reinforcing rings
-   * remove and disassemble 3x legs
-   * 3x build legs
+   * 3x leg installation
+   * SN3, SN4, SN12 all need their rotors re-aligned (or maybe a new
+     sun gear from pocketnc)
 
  * Get walking and jumping
 
@@ -119,8 +111,29 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2019-06-14
+ * Finished refurbing SN4 and SN3.  SN12 is proving more problematic,
+   trying to print a new back housing to see if bearing misalignment
+   is causing its problems.
+
+DONE 2019-06-11
+ * Lengthened 3x motor leads to use as lower leg joints
+
+DONE 2019-06-10
+ * Installed remaining 6x reinforcing rings
+
+DONE 2019-06-09
+ * Processed final reinforcing rings
+
 DONE 2019-06-06
  * Finished printing everything but 1 reinforcing ring set!
+ * Removed all legs from old chassis
+ * Installed first full rotation leg on chassis
+ * Installed 3x legs worth of heat set inserts
+ * Re-printed tensioners, as the first batch all failed during bearing
+   installation
+ * Pressed bearings into 3x upper legs
+ * Disassembled all 3 remaining old legs
 
 DONE 2019-06-01
  * Processed 3x reinforcing rings from the printer
