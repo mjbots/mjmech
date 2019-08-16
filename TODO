@@ -1,15 +1,27 @@
- * Full rotation quad
-   * 6x reinforced motor re-assembly
-   * 3x rs485 extenders
-   * 3x leg re-assembly
-   * 3x leg installation
-   * SN3, SN4, SN12 all need their rotors re-aligned (or maybe a new
-     sun gear from pocketnc)
-
  * Get walking and jumping
+   * set up so that I can turn reasonable even without a turret
+     * make manual mode work with new lift_height_percent again
+     * update mech_warfare_command so that a cmdline option will
+       toggle using drive vs. manual mode
+   * video walking around on floor
+   * test walking on squishy mat
+   * create a start-up procedure that works with new joints
+     * probably zero in the splayed out position?
+   * turning doesn't seem to be working that well?
+   * optimize walking and turning speed using this gait engine
+   * test jumping?
+
+ * Make shroud for turretless rpi
+   * new baseplate
+   * shroud which bolts on
+   * make JST PH4 "null modem" cable so that I don't have to keep
+     re-pinning to use the turret
 
  * Mech warfare fixes
    * Integrate new rf comms and telemetry
+
+ * Set up rpi wifi to use a hostname with the MAC address encoded in
+   it for uniqueness
 
  * Make turret more rigid and smaller
    * Build AEG/laser/agitator only board w/ pass-through power-data
@@ -110,6 +122,23 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-08-16
+ * First walking with new chassis!
+ * Got manual mode working through cmdline option "--opt.manual_mode 1"
+
+DONE 2019-08-15
+ * Flashed another rpi3
+ * Flashed another rpi3 hat
+ * Installed mech sw on rpi3
+ * Mounted rpi3
+ * Zeroed and set range for all 12 servos
+ * First draft of mech config
+ * Made the legs cycle for the first time.  It doesn't look like the
+   legs are lifting the correct amount though, not sure what is up
+   with that.
+ * Leg lifting problems were due to a scale factor on the velocity
+   sent to the joints.
 
 DONE 2019-06-14
  * Finished refurbing SN4 and SN3.  SN12 is proving more problematic,
