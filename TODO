@@ -1,21 +1,24 @@
  * Get walking and jumping
-   * set up so that I can turn reasonable even without a turret
-     * make manual mode work with new lift_height_percent again
-     * update mech_warfare_command so that a cmdline option will
-       toggle using drive vs. manual mode
-   * video walking around on floor
+   * write a multiplex_tool level jump test tool
    * test walking on squishy mat
+     * try to make it as challenging as mech warfare
+     * non-level
+     * stuff under it (especially bbs)
+
    * create a start-up procedure that works with new joints
      * probably zero in the splayed out position?
-   * turning doesn't seem to be working that well?
    * optimize walking and turning speed using this gait engine
    * test jumping?
+
+ * IK doesn't seem to do a useful thing for pitch?
 
  * Make shroud for turretless rpi
    * new baseplate
    * shroud which bolts on
    * make JST PH4 "null modem" cable so that I don't have to keep
      re-pinning to use the turret
+
+ * add sheathing around leg wiring for looks
 
  * Mech warfare fixes
    * Integrate new rf comms and telemetry
@@ -122,6 +125,16 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-08-20
+ * Set shoulder gains to 800/15 and swing_percent to 30, seems to walk
+   decently well, although there are still some underdamped yaw
+   oscillations.
+ * Turning still doesn't work at all.  I think that I may have the
+   legs not all configured correctly
+ * Reconfigured legs, got turning working, although pitch still
+   doesn't seem to work properly.  Really need to get legtool level
+   diagnostics working again.
 
 DONE 2019-08-16
  * First walking with new chassis!
