@@ -21,5 +21,5 @@ set -x
     --remote_debug.port 9999 \
     --video_link.source 192.168.16.42:2180 \
     --opt.max_translate_x_mm_s 100 --opt.max_translate_y_mm_s 100 \
-    --opt.max_rotate_deg_s=10 \
+    --opt.max_rotate_deg_s=20 \
     "$@"
