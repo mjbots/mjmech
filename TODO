@@ -1,16 +1,10 @@
  * Get walking and jumping
-   * write a multiplex_tool level jump test tool
-   * test walking on squishy mat
-     * try to make it as challenging as mech warfare
-     * non-level
-     * stuff under it (especially bbs)
-
    * create a start-up procedure that works with new joints
      * probably zero in the splayed out position?
    * optimize walking and turning speed using this gait engine
-   * test jumping?
 
  * IK doesn't seem to do a useful thing for pitch?
+ * Get -Werror on
 
  * Make shroud for turretless rpi
    * new baseplate
@@ -125,6 +119,9 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-08-22
+ * JUMP!
 
 DONE 2019-08-20
  * Set shoulder gains to 800/15 and swing_percent to 30, seems to walk
