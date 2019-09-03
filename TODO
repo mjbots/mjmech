@@ -1,3 +1,14 @@
+ * Fix comms
+   * Increase command frequency... verify how much margin we have at the
+     current 100Hz.
+     * Send all servo data in a single syscall
+     * Switch imu_junction board to rp3 hat style forwarding for reduced latency
+   * A moderate number of commands seem to get dropped when being sent
+     to the servos... unclear if that is in the junction board, on the
+     servos, or maybe I suppose even the rpi3.  Could also be data
+     integrity issues...
+   * Get 100Hz feedback on all servos
+
  * Get walking and jumping
    * create a start-up procedure that works with new joints
      * probably zero in the splayed out position?
@@ -31,15 +42,7 @@
      happen when walking
 
  * Communication robustness
-   * Increase command frequency... verify how much margin we have at the
-     current 100Hz.
-     * Send all servo data in a single syscall
-     * Switch imu_junction board to rp3 hat style forwarding for reduced latency
    * turret reports reading error every couple of seconds...
-   * A moderate number of commands seem to get dropped when being sent
-     to the servos... unclear if that is in the junction board, on the
-     servos, or maybe I suppose even the rpi3.  Could also be data
-     integrity issues...
    * tview.py isn't reliable over TCP
 
  * Pocket NC bringup
