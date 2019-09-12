@@ -1,13 +1,26 @@
+* Update to new moteus register map
+* query all servo serial numbers and firmware versions and report them
+  in the log
+* interlock on moteus register map version
+
  * Fix comms
    * Increase command frequency... verify how much margin we have at the
      current 100Hz.
-     * Send all servo data in a single syscall
-     * Switch imu_junction board to rp3 hat style forwarding for reduced latency
+     * Fix register definitions in servo to group them properly
+     * Update to send command and query in a single cycle
+     * Optimize command so that unnecessary things aren't sent
+     * Make setup-system.py set performance governor for the CPUs
+     * Maybe move servo commanding and querying to a separate thread?
+
+   * figure out why I have such a high error rate when flashing from
+     the rpi
+
    * A moderate number of commands seem to get dropped when being sent
      to the servos... unclear if that is in the junction board, on the
      servos, or maybe I suppose even the rpi3.  Could also be data
      integrity issues...
    * Get 100Hz feedback on all servos
+   * Get all allocation out of servo command and reply loop
 
  * Get walking and jumping
    * create a start-up procedure that works with new joints
@@ -122,6 +135,13 @@ Video/Control
 
 History
 ~~~~~~~
+
+2019-09-05
+ * Worked up latency analysis for current implementation.  Looking to
+   see what can be done to reduce rpi turnaround time, so trying newer
+   kernel and rt-preempt.  Also need to test that to see if the newer
+   kernel fixes the bug that locks up the serial port when it
+   overruns.
 
 DONE 2019-08-22
  * JUMP!
