@@ -14,6 +14,7 @@
 
 #include <boost/python.hpp>
 
+#include "mjlib/base/fail.h"
 #include "mjlib/io/stream_factory.h"
 
 #include "mech/herkulex.h"
@@ -79,48 +80,16 @@ class ServoInterfaceWrapper : boost::noncopyable {
         });
   }
 
-  void get_pose(bp::object py_addresses, bp::object future) {
-    std::vector<int> addresses = GetAddresses(py_addresses);
-    servo_->GetPose(
-        addresses,
-        [=](mjlib::base::error_code ec,
-            const std::vector<ServoInterface::Joint> joints) {
-
-          bp::dict result;
-          for (const auto& joint: joints) {
-            result[joint.address] = joint.angle_deg;
-          }
-
-          HandleCallback(future, ec, result);
-      });
+  void get_pose(bp::object, bp::object) {
+    mjlib::base::AssertNotReached();
   }
 
-  void get_temperature(bp::object py_addresses, bp::object future) {
-    std::vector<int> addresses = GetAddresses(py_addresses);
-    servo_->GetTemperature(
-        addresses, [=](mjlib::base::error_code ec,
-                       const std::vector<ServoInterface::Temperature>& temps) {
-          bp::dict result;
-          for (const auto& temp: temps) {
-            result[temp.address] = temp.temperature_C;
-          }
-
-          HandleCallback(future, ec, result);
-        });
+  void get_temperature(bp::object, bp::object) {
+    mjlib::base::AssertNotReached();
   }
 
-  void get_voltage(bp::object py_addresses, bp::object future) {
-    std::vector<int> addresses = GetAddresses(py_addresses);
-    servo_->GetVoltage(
-        addresses, [=](mjlib::base::error_code ec,
-                       const std::vector<ServoInterface::Voltage>& temps) {
-          bp::dict result;
-          for (const auto& temp: temps) {
-            result[temp.address] = temp.voltage;
-          }
-
-          HandleCallback(future, ec, result);
-        });
+  void get_voltage(bp::object, bp::object) {
+    mjlib::base::AssertNotReached();
   }
 
  private:
