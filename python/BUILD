@@ -27,20 +27,3 @@ cc_binary(
     ],
     linkshared = True,
 )
-
-cc_binary(
-    name = "_legtool.so",
-    srcs = [
-        'py_legtool.cc',
-        'py_legtool_servo.cc',
-        'py_legtool_tf.cc',
-        'py_legtool_legik.cc',
-        'py_legtool.h',
-    ],
-    deps = [
-        '//base',
-        '//mech',
-        '@boost//:python',
-    ],
-    linkshared = True,
-)
