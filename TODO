@@ -1,34 +1,27 @@
-* Update to new moteus register map
-* query all servo serial numbers and firmware versions and report them
-  in the log
-* interlock on moteus register map version
+ * 2019Q3 state of the project post/video
+   * servo guts footage?
+   * rail leg jumping
+   * full rotation leg design
+   * no resting legs
+   * walking without breaking, tuned up acceleration and gains
+   * jumping (maybe closed loop)?
 
- * Fix comms
-   * Increase command frequency... verify how much margin we have at the
-     current 100Hz.
-     * Fix register definitions in servo to group them properly
-     * Update to send command and query in a single cycle
-     * Optimize command so that unnecessary things aren't sent
-     * Make setup-system.py set performance governor for the CPUs
-     * Maybe move servo commanding and querying to a separate thread?
-
-   * figure out why I have such a high error rate when flashing from
-     the rpi
-
-   * A moderate number of commands seem to get dropped when being sent
-     to the servos... unclear if that is in the junction board, on the
-     servos, or maybe I suppose even the rpi3.  Could also be data
-     integrity issues...
-   * Get 100Hz feedback on all servos
-   * Get all allocation out of servo command and reply loop
+ * Figure out why leg points seem to have a sign error about the
+   shoulder y (forward) axis.
 
  * Get walking and jumping
-   * create a start-up procedure that works with new joints
-     * probably zero in the splayed out position?
    * optimize walking and turning speed using this gait engine
+
+ * blocked on next revision of moteus servo w/ CAN interface
+   * query all servo serial numbers and firmware versions and report them
+     in the log
+   * interlock on moteus register map version
 
  * IK doesn't seem to do a useful thing for pitch?
  * Get -Werror on
+
+ * Fix comms
+   * Make setup-system.py setup isolcpus
 
  * Make shroud for turretless rpi
    * new baseplate
@@ -44,16 +37,6 @@
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
 
- * Make turret more rigid and smaller
-   * Build AEG/laser/agitator only board w/ pass-through power-data
-   * Design new AEG feeder mechanism with BB holder hard mounted to
-     the AEG and lower down out of 3D printed parts
-   * Design new gimbal with more generic mounting options... room for
-     1 or 2 AEGs and computers... maybe slip ring for 360 rotation?
-   * this would remove the need for the massive shroud by getting rid
-     of the dedicated AEG joining wire, and reduce the jiggles that
-     happen when walking
-
  * Communication robustness
    * turret reports reading error every couple of seconds...
    * tview.py isn't reliable over TCP
@@ -62,26 +45,11 @@
    * Try sun gear holder in 1-op mode
      * Don't break any mills!
    * Get stock for pocketnc
-     * Knee stud
-     * Back housing
-     * Back housing fixture
-
-   * Do aluminum front housing
-   * Do aluminum outer housing
-
- * Gearbox improvements
-   * Machine a front housing that has the widened outer flange to
-     connect to a pure cylindrical outer housing
-   * Design a new metal cylindrical outer housing machined from round
-     tube
-   * Optimize size and weight
 
  * Easy gait improvements
-   * First, get high rate commands working
    * When lowering feet, use a two rate approach, fast for the bulk of
      the lower, then a gentle ease in for the remainder.
    * non-zero leg idle positions in the z axis do not work
-
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
@@ -90,6 +58,7 @@
    forward IK first), then perhaps a search strategy
 
  * gait rework
+   * implement layered control for legs
    * select foot placements
    * only run forward
    * structure like control layers, so outer modules can invoke
@@ -99,6 +68,16 @@
    * how to handle forces?
    * rewrite tf and frames to require less manual copy constructor and
      less/no aliased pointers?
+
+ * Make turret more rigid and smaller
+   * Build AEG/laser/agitator only board w/ pass-through power-data
+   * Design new AEG feeder mechanism with BB holder hard mounted to
+     the AEG and lower down out of 3D printed parts
+   * Design new gimbal with more generic mounting options... room for
+     1 or 2 AEGs and computers... maybe slip ring for 360 rotation?
+   * this would remove the need for the massive shroud by getting rid
+     of the dedicated AEG joining wire, and reduce the jiggles that
+     happen when walking
 
 
  * Switch legtool to use the same code-paths as the C++ mech software
@@ -136,7 +115,13 @@ Video/Control
 History
 ~~~~~~~
 
-2019-09-05
+DONE 2019-09-20
+ * Working on no-resting leg sit-stand sequence.  Have standing and
+   starting to walk working.  Sitting down is having frame
+   transformation issues when stepping to a place where sitting down
+   is possible.
+
+DONE 2019-09-05
  * Worked up latency analysis for current implementation.  Looking to
    see what can be done to reduce rpi turnaround time, so trying newer
    kernel and rt-preempt.  Also need to test that to see if the newer
