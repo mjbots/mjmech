@@ -147,8 +147,11 @@ class BulkReader(object):
                 if flags & BlockDataFlags.kSnappy:
                     flags &= ~(BlockDataFlags.kSnappy)
                     rest = stream.stream.read()
-                    stream = telemetry_archive.ReadStream(
-                        io.BytesIO(snappy.uncompress(rest)))
+                    try:
+                        stream = telemetry_archive.ReadStream(
+                            io.BytesIO(snappy.uncompress(rest)))
+                    except snappy.UncompressError:
+                        return
                 assert flags == 0  # no unknown flags
 
                 rest = stream.stream.read()
