@@ -189,6 +189,9 @@ def _set_tree_widget_data_item(qt_item, data_struct, schema):
             subitem = qt_item.child(i)
             _set_tree_widget_data_item(
                 subitem, data_struct[i], schema['children'][0])
+        while qt_item.childCount() > len(data_struct):
+            qt_item.removeChild(qt_item.child(qt_item.childCount() - 1))
+
     else:
         # We must just be text!
         qt_item.setText(1, str(data_struct))
@@ -570,7 +573,7 @@ class Tplot(QtGui.QMainWindow):
                     line.tplot_marker = matplotlib.lines.Line2D([], [])
                     line.tplot_marker.set_marker('o')
                     line.tplot_marker.set_color(line._color)
-                    self.left_axis.add_line(line.tplot_marker)
+                    axis.add_line(line.tplot_marker)
 
                 updated = True
                 xdata = [_get_data(this_data, line.tplot_xname)]
