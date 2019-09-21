@@ -6,10 +6,8 @@
    * walking without breaking, tuned up acceleration and gains
    * jumping (maybe closed loop)?
 
- * Figure out why leg points seem to have a sign error about the
-   shoulder y (forward) axis.
-
  * Get walking and jumping
+   * filter body commands on the mech to make them smooth
    * optimize walking and turning speed using this gait engine
 
  * blocked on next revision of moteus servo w/ CAN interface
@@ -17,7 +15,6 @@
      in the log
    * interlock on moteus register map version
 
- * IK doesn't seem to do a useful thing for pitch?
  * Get -Werror on
 
  * Fix comms
@@ -120,6 +117,11 @@ DONE 2019-09-20
    starting to walk working.  Sitting down is having frame
    transformation issues when stepping to a place where sitting down
    is possible.
+ * Figured out that I had the signs of all femurs and tibias
+   backwards.  This was causing the IK to have an inversion across the
+   x axis, as well as making the pitch motion of the body be
+   inaccurate, as well as other problems (like making it walk
+   backwards).
 
 DONE 2019-09-05
  * Worked up latency analysis for current implementation.  Looking to
