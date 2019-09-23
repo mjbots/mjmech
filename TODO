@@ -1,30 +1,42 @@
- * 2019Q3 state of the project post/video
-   * servo guts footage?
-   * rail leg jumping
-   * full rotation leg design
-   * no resting legs
-   * walking without breaking, tuned up acceleration and gains
-   * jumping (maybe closed loop)?
-
  * Get walking and jumping
-   * filter body commands on the mech to make them smooth
    * optimize walking and turning speed using this gait engine
+
+ * 2019Q3 state of the project post/video
+
+ * rev moteus board
+   * at least 36V input, w/ protection up to 50V
+   * FD-CAN
+   * XT30 power connectors
+   * External rated 3 pin connector for CAN
+   * More, cheaper capacitance
+   * Lower cost
+ * rev chassis
+   * internal mounting for rpi / hat
+   * internal mounting for pre-charge / power distribution
+   * mounting for battery stud and access to reach removal tabs
+   * external access for power switch
+   * mechanism for handle mounting
+   * maybe battery with not so much wasted form factor?
+ * rev rpi hat
+   * have 4 primary FD-CAN busses, 2x driven by an MCU each
+   * IMU driven by third MCU, w/ auxiliary CAN bus
+   * voltage regulator down from at least 36V / w protection up to 50V
+   * XT30 power input
+ * rev power distribution / pre-charge
+   * put 5 XT30 power plugs and pre-charge on one board
+   * include power switch
+   * CAN bus too for soft power control?
+ * finish rev gearbox
 
  * blocked on next revision of moteus servo w/ CAN interface
    * query all servo serial numbers and firmware versions and report them
      in the log
    * interlock on moteus register map version
 
- * Get -Werror on
+ * when faulting, switch to a brake mode so we more gently fall down
 
  * Fix comms
    * Make setup-system.py setup isolcpus
-
- * Make shroud for turretless rpi
-   * new baseplate
-   * shroud which bolts on
-   * make JST PH4 "null modem" cable so that I don't have to keep
-     re-pinning to use the turret
 
  * add sheathing around leg wiring for looks
 
@@ -33,10 +45,6 @@
 
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
-
- * Communication robustness
-   * turret reports reading error every couple of seconds...
-   * tview.py isn't reliable over TCP
 
  * Pocket NC bringup
    * Try sun gear holder in 1-op mode
@@ -50,9 +58,6 @@
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
-
- * make prepositioning use IK (need to sample joint poses and do
-   forward IK first), then perhaps a search strategy
 
  * gait rework
    * implement layered control for legs
@@ -122,6 +127,7 @@ DONE 2019-09-20
    x axis, as well as making the pitch motion of the body be
    inaccurate, as well as other problems (like making it walk
    backwards).
+ * Smoothed out body offsets
 
 DONE 2019-09-05
  * Worked up latency analysis for current implementation.  Looking to
