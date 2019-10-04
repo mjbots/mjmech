@@ -1,15 +1,3 @@
- * Get walking and jumping
-   * optimize walking and turning speed using this gait engine
-
- * 2019Q3 state of the project post/video
-
- * rev moteus board
-   * at least 36V input, w/ protection up to 50V
-   * FD-CAN
-   * XT30 power connectors
-   * External rated 3 pin connector for CAN
-   * More, cheaper capacitance
-   * Lower cost
  * rev chassis
    * internal mounting for rpi / hat
    * internal mounting for pre-charge / power distribution
@@ -17,23 +5,23 @@
    * external access for power switch
    * mechanism for handle mounting
    * maybe battery with not so much wasted form factor?
+
+ * rev leg to not fail near the foot
+
  * rev rpi hat
    * have 4 primary FD-CAN busses, 2x driven by an MCU each
    * IMU driven by third MCU, w/ auxiliary CAN bus
    * voltage regulator down from at least 36V / w protection up to 50V
    * XT30 power input
- * rev power distribution / pre-charge
-   * put 5 XT30 power plugs and pre-charge on one board
-   * include power switch
-   * CAN bus too for soft power control?
+   * RF interface
+ * rev leg to have a better foot material
+
  * finish rev gearbox
 
  * blocked on next revision of moteus servo w/ CAN interface
    * query all servo serial numbers and firmware versions and report them
      in the log
    * interlock on moteus register map version
-
- * when faulting, switch to a brake mode so we more gently fall down
 
  * Fix comms
    * Make setup-system.py setup isolcpus
@@ -116,6 +104,19 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-04
+ * Got improved fault handling working, we now command zero velocity
+   for all remaining servos on a fault
+
+DONE 2019-10-03
+ * Replaced busted leg #1
+
+DONE 2019-09-30
+ * rev power distribution / pre-charge
+   * put 5 XT30 power plugs and pre-charge on one board
+   * include power switch
+   * CAN bus too for soft power control?
 
 DONE 2019-09-20
  * Working on no-resting leg sit-stand sequence.  Have standing and
