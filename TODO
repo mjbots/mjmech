@@ -1,22 +1,39 @@
- * rev chassis
-   * internal mounting for rpi / hat
-   * internal mounting for pre-charge / power distribution
-   * mounting for battery stud and access to reach removal tabs
-   * external access for power switch
-   * mechanism for handle mounting
-   * maybe battery with not so much wasted form factor?
+ * try foaming in a foot adapter
+   * foam in more foot adapters to try and get better
 
- * rev leg to not fail near the foot
+ * gait rework
+   * Make a writeup showing where velocity/torque was inaccurate before
 
- * rev rpi hat
+   * implement layered control for legs
+   * implement new "main program" that isn't mech warfare based
+   * structure like control layers, so outer modules can invoke
+     control of raw leg endpoints or raw joint positions/forces as
+     necessary, including letting the user inject commands at any
+     layer
+   * add easier text diagnostics control
+   * do "controlled" jump
+
+   * switch to new telemetry encoding and UI tool
+   * get 3d diagnostics rendering working
+   * verify all IK and force IK using 3D diagnostics
+
+   * select foot placements
+   * only run forward
+   * how to handle forces?
+   * rewrite tf and frames to require less manual copy constructor and
+     less/no aliased pointers?
+
+ * finish rev gearbox
+
+ * rev rpi hat - BLOCKED on bringing up power dist board
    * have 4 primary FD-CAN busses, 2x driven by an MCU each
    * IMU driven by third MCU, w/ auxiliary CAN bus
    * voltage regulator down from at least 36V / w protection up to 50V
    * XT30 power input
    * RF interface
- * rev leg to have a better foot material
 
- * finish rev gearbox
+ * Get nrfusb mfg - BLOCKED on fdcanusb bringup to verify controller
+   w/usb works
 
  * blocked on next revision of moteus servo w/ CAN interface
    * query all servo serial numbers and firmware versions and report them
@@ -37,27 +54,9 @@
  * Pocket NC bringup
    * Try sun gear holder in 1-op mode
      * Don't break any mills!
-   * Get stock for pocketnc
-
- * Easy gait improvements
-   * When lowering feet, use a two rate approach, fast for the bulk of
-     the lower, then a gentle ease in for the remainder.
-   * non-zero leg idle positions in the z axis do not work
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
-
- * gait rework
-   * implement layered control for legs
-   * select foot placements
-   * only run forward
-   * structure like control layers, so outer modules can invoke
-     control of raw leg endpoints or raw joint positions/forces as
-     necessary, including letting the user inject commands at any
-     layer
-   * how to handle forces?
-   * rewrite tf and frames to require less manual copy constructor and
-     less/no aliased pointers?
 
  * Make turret more rigid and smaller
    * Build AEG/laser/agitator only board w/ pass-through power-data
@@ -104,6 +103,33 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-15
+ * Wrote tools to compare IK solutions and generate plots
+
+DONE 2019-10-13
+ * Got inverse force in revised IK
+
+DONE 2019-10-12
+ * Got inverse velocity in revised IK
+
+DONE 2019-10-11
+ * Installed new bottom plates
+ * Sorted out Amass inventory
+ * Keep working on revised IK
+
+DONE 2019-10-10
+ * Test fit of chassis v2, tried sanding a corner... wow, one corner
+   took almost 2 hours and isn't even perfect
+
+DONE 2019-10-08
+ * Made up a draft of the nrfusb... will wait on something else with
+   the stm32g4 on it working before I send off yet another untested
+   layout.
+ * First chassis v2 front plate printed
+
+DONE 2019-10-07
+ * Ordered fdusbcan from macrofab
 
 DONE 2019-10-04
  * Got improved fault handling working, we now command zero velocity
