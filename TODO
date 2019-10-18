@@ -2,15 +2,13 @@
    * foam in more foot adapters to try and get better
 
  * gait rework
-   * Make a writeup showing where velocity/torque was inaccurate before
-
-   * implement layered control for legs
-   * implement new "main program" that isn't mech warfare based
-   * structure like control layers, so outer modules can invoke
-     control of raw leg endpoints or raw joint positions/forces as
-     necessary, including letting the user inject commands at any
-     layer
-   * add easier text diagnostics control
+   * implement "stand up" and "sit down" transition states
+     * some more general way of knowing if one mode can lead into
+       another?  Or what the current mode needs to do to get into a
+       transitionable state
+   * implement "body control" state
+   * implement "controlled jump / pronk" mode
+   * create a non-debug protocol and joystick commander for it
    * do "controlled" jump
 
    * switch to new telemetry encoding and UI tool
@@ -103,6 +101,14 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-18
+ * Printed new chassis top plate with turret mounts
+ * Work on standup control mode
+
+DONE 2019-10-17
+ * Implemented most of a new standalone control app, got joint and leg
+   modes done
 
 DONE 2019-10-15
  * Wrote tools to compare IK solutions and generate plots
