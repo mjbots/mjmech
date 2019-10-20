@@ -2,14 +2,12 @@
    * foam in more foot adapters to try and get better
 
  * gait rework
-   * implement "stand up" and "sit down" transition states
-     * some more general way of knowing if one mode can lead into
-       another?  Or what the current mode needs to do to get into a
-       transitionable state
-   * implement "body control" state
+   * record current R frame leg commands in state so that multiple
+     modes can share them, probably put stance or not there
    * implement "controlled jump / pronk" mode
+   * implement "legacy gait" mode
+   * implement "sit down" mode
    * create a non-debug protocol and joystick commander for it
-   * do "controlled" jump
 
    * switch to new telemetry encoding and UI tool
    * get 3d diagnostics rendering working
@@ -18,8 +16,6 @@
    * select foot placements
    * only run forward
    * how to handle forces?
-   * rewrite tf and frames to require less manual copy constructor and
-     less/no aliased pointers?
 
  * finish rev gearbox
 
@@ -101,6 +97,9 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-19
+ * Implemented "rest" control mode
 
 DONE 2019-10-18
  * Printed new chassis top plate with turret mounts
