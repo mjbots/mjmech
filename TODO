@@ -1,13 +1,15 @@
+ * switch everything from mm to m
+
  * try foaming in a foot adapter
    * foam in more foot adapters to try and get better
 
  * gait rework
-   * record current R frame leg commands in state so that multiple
-     modes can share them, probably put stance or not there
-   * implement "controlled jump / pronk" mode
+   * get web UI to be able to command jump gaits from the joystick
+
+   * add movement to jump mode
+
    * implement "legacy gait" mode
    * implement "sit down" mode
-   * create a non-debug protocol and joystick commander for it
 
    * switch to new telemetry encoding and UI tool
    * get 3d diagnostics rendering working
@@ -97,6 +99,19 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-23
+ * Integrated websocket/joystick UI into quadruped application, got it
+   working for resting and zero
+
+DONE 2019-10-22
+ * Created websocket joystick PoC that sends joystick data to the
+   server and retrieves data from the server to the UI
+
+DONE 2019-10-21
+ * "rest" mode needs to smoothly slew to idle height
+ * make single jump revert to rest mode, so you can just send the
+   jump command again
 
 DONE 2019-10-19
  * Implemented "rest" control mode
