@@ -1,15 +1,10 @@
  * switch everything from mm to m
-
- * try foaming in a foot adapter
-   * foam in more foot adapters to try and get better
+ * Just use "id" for all joint and leg ids
 
  * gait rework
-   * get web UI to be able to command jump gaits from the joystick
-
-   * add movement to jump mode
+   * debug moving jump mode
 
    * implement "legacy gait" mode
-   * implement "sit down" mode
 
    * switch to new telemetry encoding and UI tool
    * get 3d diagnostics rendering working
@@ -18,6 +13,9 @@
    * select foot placements
    * only run forward
    * how to handle forces?
+
+ * try foaming in a foot adapter
+   * foam in more foot adapters to try and get better
 
  * finish rev gearbox
 
@@ -99,6 +97,14 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-24
+ * Worked to integrate L frame motion into the jump mode
+ * Added a non-latching zero velocity mode to servo
+ * First kinda-moving jump mode, each resulting in a fault of some
+   sort, most of which resulting in losing all relevant logs so it is
+   hard to debug.  The battery didn't fall out, so I think they all
+   had an overall power system fault that rebooted the pi.
 
 DONE 2019-10-23
  * Integrated websocket/joystick UI into quadruped application, got it
