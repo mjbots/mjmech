@@ -1,18 +1,31 @@
- * switch everything from mm to m
- * Just use "id" for all joint and leg ids
+ * pronking
+   * sometimes the landing phase is cut short
+   * something makes a grinding noise
+   * I don't think lateral motion is working correctly
+   * maybe save until regular gait
+     * legs need to move *past* idle when in retract phase to have maximum travel
+     * need to somehow control gait cycle time to manage speed and not
+       run out of travel
 
- * gait rework
-   * debug moving jump mode
-
+ * legacy gait
    * implement "legacy gait" mode
 
-   * switch to new telemetry encoding and UI tool
-   * get 3d diagnostics rendering working
    * verify all IK and force IK using 3D diagnostics
 
    * select foot placements
    * only run forward
-   * how to handle forces?
+
+ * UI improvements
+   * update command UI to use shoulder+dpad to select gait, start to
+     control active, and one of the buttons to force motion even with
+     no analog stick
+
+ * telemetry
+   * switch to new telemetry encoding and UI tool
+   * get 3d diagnostics rendering working
+
+ * switch everything from mm to m
+ * Just use "id" for all joint and leg ids
 
  * try foaming in a foot adapter
    * foam in more foot adapters to try and get better
@@ -97,6 +110,12 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2019-10-29
+ * Numbered legs
+
+DONE 2019-10-28
+ * Moved everything to chassis v2
 
 DONE 2019-10-24
  * Worked to integrate L frame motion into the jump mode
