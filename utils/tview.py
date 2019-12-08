@@ -53,6 +53,21 @@ RIGHT_LEGEND_LOC = 2
 
 DEFAULT_RATE = 100
 
+def readline(stream):
+    result = b''
+    while True:
+        c = stream.read(1)
+        if len(c) == 0:
+            return result
+        result += c
+        if c == b'\n':
+            return result
+
+def dehexify(data):
+    result = b''
+    for i in range(0, len(data), 2):
+        result += bytes([int(data[i:i+2], 16)])
+    return result
 
 def read_varuint(data, offset):
     '''Return (varuint, next_offset)'''
@@ -125,13 +140,13 @@ class BufferedSerial:
     timeout = property(get_timeout, set_timeout)
 
 
-class MultiplexStream:
-    def __init__(self, stream, destination_id, max_receive_bytes=127):
+class StreamBase:
+    def __init__(self, stream, destination_id, max_receive_bytes):
         self._stream = stream
         self._destination_id = destination_id
+        self._max_receive_bytes = max_receive_bytes
         self._read_buffer = b''
         self._write_buffer = b''
-        self._max_receive_bytes = max_receive_bytes
 
     def read(self, max_bytes):
         to_return, self._read_buffer = self._read_buffer[0:max_bytes], self._read_buffer[max_bytes:]
@@ -143,6 +158,84 @@ class MultiplexStream:
     def flush(self):
         if len(self._write_buffer):
             self.poll()
+
+
+class FdcanUsbStream(StreamBase):
+    def __init__(self, *args, **kwargs):
+        super(FdcanUsbStream, self).__init__(*args, **kwargs)
+
+    def poll(self):
+        wait_for_response = len(self._write_buffer) == 0
+
+        to_write = min(len(self._write_buffer), 100)
+        payload = struct.pack(
+            '<BBB', 0x42 if wait_for_response else 0x40,
+            1, self._max_receive_bytes if wait_for_response else to_write)
+
+        this_write, self._write_buffer = self._write_buffer[0:to_write], self._write_buffer[to_write:]
+        payload += this_write
+
+        assert len(payload) < 127
+        self._stream.queue(
+            'can send {:x} {}\n'.format(
+                (0x8000 if wait_for_response else 0x0) | self._destination_id,
+                ''.join(['{:02x}'.format(x) for x in payload]))
+            .encode('latin1'))
+
+        try:
+            self._stream.poll()
+            self._stream.timeout = 0.10
+
+            while True:
+                maybe_response = readline(self._stream)
+                if maybe_response == b'':
+                    return
+                if maybe_response.startswith(b"OK"):
+                    if not wait_for_response:
+                        # This is all we need here.
+                        return
+                    continue
+                if maybe_response.startswith(b"rcv "):
+                    break
+
+        finally:
+            self._stream.timeout = 0.0
+
+        fields = maybe_response.decode('latin1').strip().split(' ')
+        address = int(fields[1], 16)
+        dest = address & 0xff
+        source = (address >> 8) & 0xff
+
+        if dest != 0x00:
+            return
+
+        if source != self._destination_id:
+            return
+
+        payload = dehexify(fields[2])
+
+        sbo = 0
+        subframe_id, sbo = read_varuint(payload, sbo)
+        channel, sbo = read_varuint(payload, sbo)
+        server_len, sbo = read_varuint(payload, sbo)
+
+        if subframe_id is None or channel is None or server_len is None:
+            return
+
+        if subframe_id != 0x41:
+            return
+
+        if channel != 1:
+            return
+
+        payload_rest = payload[sbo:]
+        to_add = payload_rest[0:server_len]
+        self._read_buffer += to_add
+
+
+class MultiplexStream(StreamBase):
+    def __init__(self, *args, **kwargs):
+        super(FdcanUsbStream, self).__init__(*args, **kwargs)
 
     def poll(self):
         # We only ask for a response if we're not writing immediately.
@@ -975,8 +1068,12 @@ class TviewMainWindow(QtGui.QMainWindow):
         self.ui.telemetryTreeWidget.clear()
 
         for device_id in [int(x) for x in self.options.devices.split(',')]:
-            stream = MultiplexStream(
-                self.port, device_id, self.options.max_receive_bytes)
+            if self.options.fdcanusb:
+                stream = FdcanUsbStream(
+                    self.port, device_id, self.options.max_receive_bytes)
+            else:
+                stream = MultiplexStream(
+                    self.port, device_id, self.options.max_receive_bytes)
 
             config_item = QtGui.QTreeWidgetItem()
             config_item.setText(0, str(device_id))
@@ -1125,6 +1222,7 @@ def main():
     parser.add_option('--baudrate', '-b', type='int', default=115200)
     parser.add_option('--devices', '-d', type='str', default='1')
     parser.add_option('--target', '-t', default=None)
+    parser.add_option('--fdcanusb', '-c', action='store_true')
     parser.add_option('--max-receive-bytes', default=127, type=int)
 
     options, args = parser.parse_args()
