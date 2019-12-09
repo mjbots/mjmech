@@ -235,7 +235,7 @@ class FdcanUsbStream(StreamBase):
 
 class MultiplexStream(StreamBase):
     def __init__(self, *args, **kwargs):
-        super(FdcanUsbStream, self).__init__(*args, **kwargs)
+        super(MultiplexStream, self).__init__(*args, **kwargs)
 
     def poll(self):
         # We only ask for a response if we're not writing immediately.
