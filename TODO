@@ -1,3 +1,6 @@
+ * get moteus_tool to work with serial ports in addition to robot
+   specific interfaces
+
  * pronking
    * sometimes the landing phase is cut short
    * something makes a grinding noise
@@ -57,10 +60,6 @@
 
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
-
- * Pocket NC bringup
-   * Try sun gear holder in 1-op mode
-     * Don't break any mills!
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
