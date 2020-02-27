@@ -1,5 +1,7 @@
- * get moteus_tool to work with serial ports in addition to robot
-   specific interfaces
+ * make "quad" sticker to go under the mjbots one
+ * mount rpi3 on chassis
+ * zero all servos
+ * first movement!
 
  * pronking
    * sometimes the landing phase is cut short
@@ -11,7 +13,7 @@
        run out of travel
 
  * legacy gait
-   * implement "legacy gait" mode
+   * implement 1 and 2 leg walking mode
 
    * verify all IK and force IK using 3D diagnostics
 
@@ -30,28 +32,18 @@
  * switch everything from mm to m
  * Just use "id" for all joint and leg ids
 
- * try foaming in a foot adapter
-   * foam in more foot adapters to try and get better
-
- * finish rev gearbox
-
- * rev rpi hat - BLOCKED on bringing up power dist board
-   * have 4 primary FD-CAN busses, 2x driven by an MCU each
-   * IMU driven by third MCU, w/ auxiliary CAN bus
-   * voltage regulator down from at least 36V / w protection up to 50V
-   * XT30 power input
-   * RF interface
-
- * Get nrfusb mfg - BLOCKED on fdcanusb bringup to verify controller
-   w/usb works
-
- * blocked on next revision of moteus servo w/ CAN interface
+ * servo improvements
    * query all servo serial numbers and firmware versions and report them
      in the log
    * interlock on moteus register map version
 
  * Fix comms
    * Make setup-system.py setup isolcpus
+   * Improve cycle time of fdcan query
+     * remove can id high header bytes
+     * optimize hold times
+     * maybe update quadruped_control to command and query in one operation?
+   * Make the CAN client runtime switchable so that quad A0 will work too
 
  * add sheathing around leg wiring for looks
 
@@ -109,6 +101,23 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2020-02-26
+ * More work on pi3 hat... now have multi-device queries working for 2
+   devices per bus, going across 8 devices in all.  When doing 3 at
+   once per bus something seems to drop one of the commands.
+ * Got everything working.  Cycle time could still be optimized more,
+   but decent enough for now.
+
+DONE 2020-02-25
+ * Got pi3 hat communicating with servos
+ * Started writing "my first" AsioClient for the pi3 hat based on
+   spidev.  Will probably have to do a bit-bang one eventually, but
+   this will get me started
+
+DONE 2020-02-23
+ * Updated to mjlib w/ move-only callbacks
+ * Updated moteus_tool to work with new extensibility framework
 
 DONE 2019-10-29
  * Numbered legs
