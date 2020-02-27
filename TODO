@@ -1,7 +1,18 @@
+ * legacy gait
+   * implement 1 and 2 leg walking mode
+
+   * verify all IK and force IK using 3D diagnostics
+
+   * select foot placements
+   * only run forward
+
  * make "quad" sticker to go under the mjbots one
- * mount rpi3 on chassis
- * zero all servos
- * first movement!
+ * resolve all TODOs on pi3 hat
+
+ * have servos remember if they have ever been zeroed, and make qc
+   refuse to start if all have not been zeroed
+ * make fixture to hold legs in absolute zero position for zeroing
+   operation
 
  * pronking
    * sometimes the landing phase is cut short
@@ -12,13 +23,6 @@
      * need to somehow control gait cycle time to manage speed and not
        run out of travel
 
- * legacy gait
-   * implement 1 and 2 leg walking mode
-
-   * verify all IK and force IK using 3D diagnostics
-
-   * select foot placements
-   * only run forward
 
  * UI improvements
    * update command UI to use shoulder+dpad to select gait, start to
@@ -66,20 +70,8 @@
      of the dedicated AEG joining wire, and reduce the jiggles that
      happen when walking
 
-
- * Switch legtool to use the same code-paths as the C++ mech software
-
- * Get video writing in controller working
-
- * lizard robot (and probably mammal), takes too long to turn when
-   changing direction or switching to strafing
- * when strafing left, hard to make it actually go left and not curve
-   around
  * numerical turret angle isn't as handy as seeing a diagram of the
    robots current configuration relative to the turret
-
-
- * put sharpie (black + white) in the toolkit
 
 Movement
 ~~~~~~~~
@@ -101,6 +93,16 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2020-02-27
+ * rpi3 mounted on chassis
+ * Updated all legs to new geometry
+ * zerod all servos
+ * debugged a too high SPI speed
+ * created A1 config
+ * updated start-robot
+ * first movement!
+ * jumped!
 
 DONE 2020-02-26
  * More work on pi3 hat... now have multi-device queries working for 2
