@@ -1,10 +1,12 @@
+ * get ahrs working
+ * switch knees to be in non-opposing configuration
+
  * legacy gait
-   * implement 1 and 2 leg walking mode
+   * constant deceleration trajectories for move
+   * need a "sit down" mode again
 
-   * verify all IK and force IK using 3D diagnostics
-
-   * select foot placements
-   * only run forward
+ * switch legs around and remake cables to no longer have "wrap
+   around" routing between upper and lower leg servos
 
  * make "quad" sticker to go under the mjbots one
  * resolve all TODOs on pi3 hat
@@ -16,7 +18,6 @@
 
  * pronking
    * sometimes the landing phase is cut short
-   * something makes a grinding noise
    * I don't think lateral motion is working correctly
    * maybe save until regular gait
      * legs need to move *past* idle when in retract phase to have maximum travel
@@ -93,6 +94,18 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2020-03-03
+ * Got jumping working again
+
+DONE 2020-03-02
+ * Got stub of walking control working
+ * Got walking largely working
+ * Got idle position decoupled from standup position
+ * Got mostly constant acceleration trajectories for lift and lower
+
+DONE 2020-03-01
+ * Implemented stub of walking control
 
 DONE 2020-02-27
  * rpi3 mounted on chassis
