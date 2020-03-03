@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright 2015 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
@@ -26,6 +26,7 @@ import sys
 
 SCRIPT_PATH=os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(SCRIPT_PATH, '../python'))
+sys.path.append(os.path.join(SCRIPT_PATH, '../bazel-bin/utils'))
 
 import telemetry_log
 
@@ -109,22 +110,40 @@ class Channel(object):
             w.add(timestamp_s, value)
 
 
-def enumerate_fields(sample, predicate):
+def enumerate_fields(sample, predicate, prefix=''):
+    if predicate('', sample):
+        return ['']
+
+    if not hasattr(sample, '_asdict'):
+        return []
+
     result = []
-    for name, value in sample.__dict__.iteritems():
+    for name, value in sample._asdict().items():
         if predicate(name, value):
             result.append(name)
-        elif hasattr(value, '__dict__'):
+        elif hasattr(value, '_asdict'):
             result += [name + '.' + x for x in
                        enumerate_fields(value, predicate)]
+        elif type(value) == list:
+            for i in range(len(value)):
+                result += [name + '.{}'.format(i) for x in
+                           enumerate_fields(value[i], predicate)]
     return result
 
 
 def get(sample, name):
     if '.' in name:
         mine, child = name.split('.', 1)
-        return get(getattr(sample, mine), child)
-    return getattr(sample, name)
+        try:
+            int_mine = int(mine)
+            return get(sample[int_mine], child)
+        except:
+            return get(getattr(sample, mine), child)
+    try:
+        int_name = int(name)
+        return sample[int_name]
+    except:
+        return getattr(sample, name)
 
 
 class Record(object):
@@ -144,7 +163,7 @@ class Record(object):
 
         for name in enumerate_fields(sample,
                                      lambda name, value: 'timestamp' in name):
-            self.timestamp_scale = 1e-4
+            self.timestamp_scale = 1.0
             self.timestamp_field = name
             break
 
@@ -159,7 +178,7 @@ class Record(object):
 
     def valid_periods_indices(self):
         result = []
-        name = self.channels.keys()[0]
+        name = list(self.channels.keys())[0]
         for i in range(len(self.periods)):
             if not self.channels[name].windows[i].valid():
                 break
@@ -168,7 +187,7 @@ class Record(object):
 
     def add(self, sample):
         timestamp_s = get(sample, self.timestamp_field) * self.timestamp_scale
-        for key, channel in self.channels.iteritems():
+        for key, channel in self.channels.items():
             value = get(sample, key)
             channel.add(timestamp_s, value)
 
@@ -187,11 +206,11 @@ def main():
     assert len(args) == 0, 'unexpected arguments'
 
     assert options.input is not None
-    br = telemetry_log.BulkReader(open(options.input))
+    br = telemetry_log.BulkReader(open(options.input, 'rb'))
     record = None
 
     i = 0
-    for name, data in br.items([options.record]):
+    for name, data in br.items([options.record.encode('latin1')]):
         i += 1
         if options.limit and i > options.limit:
             break
@@ -204,21 +223,20 @@ def main():
 
 
     # Do the header.
-    print 'Time',
+    print('Time', end='')
     for name in sorted(record.channels.keys()):
-        print ',', name,
-    print
+        print(',', name, end='')
+    print()
 
     for period_index in record.valid_periods_indices():
-        print record.periods[period_index],
+        print(record.periods[period_index], end='')
 
         for name in sorted(record.channels.keys()):
             channel = record.channels[name]
-            print ',', channel.windows[period_index].variance.stddev(),
+            print(',', channel.windows[period_index].variance.stddev(), end='')
 
-        print
+        print()
 
 
 if __name__ == '__main__':
     main()
-
