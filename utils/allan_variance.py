@@ -168,7 +168,7 @@ class Record(object):
             break
 
     def window_periods(self, scale):
-        period_s = 0.05
+        period_s = 0.001
         result = []
         while period_s < 1e7:
             result.append(period_s)
