@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -B
 
-# Copyright 2015-2019 Josh Pieper, jjp@pobox.com.  All rights reserved.
+# Copyright 2015-2020 Josh Pieper, jjp@pobox.com.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,9 @@ sys.path.append(os.path.join(SCRIPT_PATH, '../python'))
 sys.path.append(os.path.join(SCRIPT_PATH, '../bazel-bin/utils'))
 import ui_tplot_main_window
 
-import telemetry_log
+import mjlib.telemetry.reader as reader
+import mjlib.telemetry.file_reader as file_reader
+
 
 AXES = ['Left', 'Right', '3', '4']
 
@@ -63,7 +65,7 @@ class BoolGuard(object):
 
 class Log(object):
     def __init__(self, filename):
-        self.reader = telemetry_log.BulkReader(open(filename, 'rb'))
+        self.reader = file_reader.FileReader(filename)
         self.records = self.reader.records()
         self.all = None
 
@@ -81,24 +83,19 @@ def _walk_item(item):
     return item.text(0), fields
 
 
-def _add_schema_struct_to_tree_view(parent_item, schema_element):
-    assert 'fields' in schema_element
-
-    for schema_field in schema_element['fields']:
-        name = schema_field['name']
+def _add_schema_struct_to_tree_view(parent_item, schema):
+    for field in schema.fields:
+        name = field.name
 
         item = QtGui.QTreeWidgetItem(parent_item)
         item.setText(0, name)
 
-        _add_schema_item_to_tree_view(item, schema_field)
+        _add_schema_item_to_tree_view(item, field.type_class)
 
 
 def _add_schema_item_to_tree_view(item, schema):
-    if schema['type'] == 17:
-        _add_schema_struct_to_tree_view(item, schema['children'][0])
-    if schema['type'] == 18:
-        # Optionals we act as pass-throughs
-        _add_schema_item_to_tree_view(item, schema['children'][0])
+    if isinstance(schema, reader.ObjectType):
+        _add_schema_struct_to_tree_view(item, schema)
     else:
         # All other types we ignore for now, and let them get filled
         # in on the first data.
@@ -154,41 +151,36 @@ def _clear_tree_widget(item):
 
 
 def _set_tree_widget_data_struct(qt_item, data_struct, schema):
-    for schema_index, schema_field in enumerate(schema['fields']):
-        name = schema_field['name']
+    for schema_index, field in enumerate(schema.fields):
+        name = field.name
         data_field = getattr(data_struct, name)
 
         _set_tree_widget_data_item(
-            qt_item.child(schema_index), data_field, schema_field)
+            qt_item.child(schema_index), data_field, field.type_class)
 
 
 def _set_tree_widget_data_item(qt_item, data_struct, schema):
-
-    has_children = 'children' in schema
-    # If we have children, that makes us a container of some sort.
-
-    if schema['type'] == 17:
+    if isinstance(schema, reader.ObjectType):
         # This field is a structure.
-        _set_tree_widget_data_struct(
-            qt_item, data_struct, schema['children'][0])
-    elif schema['type'] == 18:
-        # We are an optional.
+        _set_tree_widget_data_struct(qt_item, data_struct, schema)
+    elif isinstance(schema, reader.UnionType):
+        # We are likely an optional.
         if data_struct is None:
             _clear_tree_widget(qt_item)
         else:
-            _set_tree_widget_data_item(qt_item, data_struct,
-                                       schema['children'][0])
-    elif has_children:
-        # We are some other container.  (ignore pairs for now)
+            assert len(schema.items) == 2
+            assert isinstance(schema.items[0], reader.NullType)
+            _set_tree_widget_data_item(qt_item, data_struct, schema.items[1])
+    elif isinstance(schema, reader.ArrayType):
         assert isinstance(data_struct, list)
         for i in range(qt_item.childCount(), len(data_struct)):
             subitem = QtGui.QTreeWidgetItem(qt_item)
             subitem.setText(0, str(i))
-            _add_schema_item_to_tree_view(subitem, schema['children'][0])
+            _add_schema_item_to_tree_view(subitem, schema.type_class)
         for i in range(len(data_struct)):
             subitem = qt_item.child(i)
             _set_tree_widget_data_item(
-                subitem, data_struct[i], schema['children'][0])
+                subitem, data_struct[i], schema.type_class)
         while qt_item.childCount() > len(data_struct):
             qt_item.removeChild(qt_item.child(qt_item.childCount() - 1))
 
@@ -303,10 +295,10 @@ class Tplot(QtGui.QMainWindow):
 
         self.log = maybe_log
         for name in self.log.records.keys():
-            self.ui.recordCombo.addItem(name.decode('utf8'))
+            self.ui.recordCombo.addItem(name)
 
             item = QtGui.QTreeWidgetItem()
-            item.setText(0, name.decode('utf8'))
+            item.setText(0, name)
             self.ui.treeWidget.addTopLevelItem(item)
             self.tree_items.append(item)
 
@@ -318,29 +310,28 @@ class Tplot(QtGui.QMainWindow):
         self.ui.xCombo.clear()
         self.ui.yCombo.clear()
 
-        exemplar = self.log.records[record.encode('utf8')]
+        schema = self.log.records[record]
         default_x = None
         index = [0, None]
 
-        def add_item(index, parent, element):
-            if 'fields' not in element:
+        def add_item(index, parent, schema):
+            if not isinstance(schema, reader.ObjectType):
                 return
-            for field in element['fields']:
-                name = field['name']
+            for field in schema.fields:
+                name = field.name
                 this_name = parent
                 if len(this_name):
                     this_name += '.'
                 this_name += name
 
-                if 'nelements' in field:
-                    child = field['children'][0]
-                    if 'children' in child and len(child['children']) == 1:
-                        child = ['children'][0]
-                    for i in range(field['nelements']):
-                        add_item(index, this_name + "." + str(i), child)
-                elif 'children' in field:
-                    for child in field['children']:
-                        add_item(index, this_name, child)
+                if isinstance(field.type_class, reader.ArrayType):
+                    child = field.type_class.type_class
+                    # TODO: Figure out how many to add to the record
+                    # drop down.
+                    pass
+                elif isinstance(field.type_class, reader.ObjectType):
+                    for field in field.type_class.fields:
+                        add_item(index, this_name, field.type_class)
                 else:
                     self.ui.xCombo.addItem(this_name)
                     self.ui.yCombo.addItem(this_name)
@@ -350,7 +341,7 @@ class Tplot(QtGui.QMainWindow):
 
                     index[0] += 1
 
-        add_item(index, '', exemplar)
+        add_item(index, '', schema)
         default_x = index[1]
 
         if default_x:
@@ -361,18 +352,18 @@ class Tplot(QtGui.QMainWindow):
         xname = self.ui.xCombo.currentText()
         yname = self.ui.yCombo.currentText()
 
-        self._add_plot(record.encode('utf8'), xname, yname)
+        self._add_plot(record, xname, yname)
 
     def _add_plot(self, record, xname, yname):
         self.log.get_all()
 
         data = self.log.all[record]
-        xdata = [_get_data(x, xname) for x in data]
-        ydata = [_get_data(x, yname) for x in data]
+        xdata = [_get_data(x.data, xname) for x in data]
+        ydata = [_get_data(x.data, yname) for x in data]
 
         line = matplotlib.lines.Line2D(xdata, ydata)
         line.tplot_record_name = record
-        if 'timestamp' in [x['name'] for x in self.log.records[record]['fields']]:
+        if 'timestamp' in [x.name for x in self.log.records[record].fields]:
             line.tplot_has_timestamp = True
         line.tplot_xname = xname
         line.tplot_yname = yname
@@ -441,7 +432,7 @@ class Tplot(QtGui.QMainWindow):
         if result is None:
             return
         if result == plot_vs_time:
-            self._add_plot(record.encode('utf8'), 'timestamp', fields)
+            self._add_plot(record, 'timestamp', fields)
 
 
     def update_timeline(self):
@@ -452,14 +443,14 @@ class Tplot(QtGui.QMainWindow):
 
         # Look through all the records for those which have a
         # "timestamp" field.  Find the minimum and maximum of each.
-        for record, exemplar in self.log.records.items():
-            if record not in self.log.all:
+        for record_name, schema in self.log.records.items():
+            if record_name not in self.log.all:
                 continue
-            timestamp_getter = _make_timestamp_getter(self.log.all[record])
+            timestamp_getter = _make_timestamp_getter(self.log.all[record_name])
             if timestamp_getter is None:
                 continue
 
-            these_times = [timestamp_getter(x) for x in self.log.all[record]]
+            these_times = [timestamp_getter(x) for x in self.log.all[record_name]]
             if len(these_times) == 0:
                 continue
             this_min = min(these_times)
@@ -498,6 +489,8 @@ class Tplot(QtGui.QMainWindow):
             value.set_navigate(True)
 
     def update_time(self, new_time, update_slider=True):
+        if new_time is None:
+            return
         new_time = max(self.time_start, min(self.time_end, new_time))
         self.time_current = new_time
 
@@ -535,7 +528,7 @@ class Tplot(QtGui.QMainWindow):
 
     def update_tree_view(self, time):
         for item in self.tree_items:
-            name = item.text(0).encode('utf8')
+            name = item.text(0)
             if name not in self.log.all:
                 continue
             all_data = self.log.all[name]
@@ -549,7 +542,7 @@ class Tplot(QtGui.QMainWindow):
                 _clear_tree_widget(item)
             else:
                 this_data = all_data[this_data_index]
-                _set_tree_widget_data_struct(item, this_data,
+                _set_tree_widget_data_struct(item, this_data.data,
                                              self.log.records[name])
 
     def update_plot_dots(self, new_time):
@@ -576,8 +569,8 @@ class Tplot(QtGui.QMainWindow):
                     axis.add_line(line.tplot_marker)
 
                 updated = True
-                xdata = [_get_data(this_data, line.tplot_xname)]
-                ydata = [_get_data(this_data, line.tplot_yname)]
+                xdata = [_get_data(this_data.data, line.tplot_xname)]
+                ydata = [_get_data(this_data.data, line.tplot_yname)]
                 line.tplot_marker.set_data(xdata, ydata)
 
         if updated:
