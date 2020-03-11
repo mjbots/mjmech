@@ -1,9 +1,22 @@
- * get ahrs working
- * switch knees to be in non-opposing configuration
+ * mjlib telemetry
+  * writing seek records
+  * writing/reading compression
+  * reader: index
+  * reader: seek
+
+ * try walking with narrower gait to see if that reduces the shoulder
+   sag
+
+ * need a way to keep track of which videos go with which logs, and to
+   synchronize time within a video to that within a log
+
+ * when turning in walking gait, the yaw motors didn't seem to be
+   moving smoothly
 
  * legacy gait
-   * constant deceleration trajectories for move
    * need a "sit down" mode again
+   * stop lowering when contact occurs, possibly go further than the
+     lift height
 
  * switch legs around and remake cables to no longer have "wrap
    around" routing between upper and lower leg servos
@@ -11,14 +24,11 @@
  * make "quad" sticker to go under the mjbots one
  * resolve all TODOs on pi3 hat
 
- * have servos remember if they have ever been zeroed, and make qc
-   refuse to start if all have not been zeroed
  * make fixture to hold legs in absolute zero position for zeroing
    operation
 
  * pronking
-   * sometimes the landing phase is cut short
-   * I don't think lateral motion is working correctly
+   * seems like linear motion stalls near the point of lift off or before?
    * maybe save until regular gait
      * legs need to move *past* idle when in retract phase to have maximum travel
      * need to somehow control gait cycle time to manage speed and not
@@ -36,11 +46,6 @@
 
  * switch everything from mm to m
  * Just use "id" for all joint and leg ids
-
- * servo improvements
-   * query all servo serial numbers and firmware versions and report them
-     in the log
-   * interlock on moteus register map version
 
  * Fix comms
    * Make setup-system.py setup isolcpus
@@ -94,6 +99,20 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2020-03-11
+ * Integrated new telemetry into robot and tplot
+
+DONE 2020-03-09
+ * Fixed longstanding issue with jump landing being cut short
+
+DONE 2020-03-05
+ * Got rezeroing interlock into place
+ * Flipped sign of front knees, now it walks in a more anthropomorphic
+   way.  Fixed enough stuff to make that work.
+
+DONE 2020-03-04
+ * Got full rate IMU data into log!
 
 DONE 2020-03-03
  * Got jumping working again
