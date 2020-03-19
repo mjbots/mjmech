@@ -160,6 +160,10 @@ def _set_tree_widget_data_struct(qt_item, data_struct, schema):
 
 
 def _set_tree_widget_data_item(qt_item, data_struct, schema):
+    if qt_item is None:
+        # TODO(jpieper): I have no idea why this is necessary right
+        # now.
+        return
     if isinstance(schema, reader.ObjectType):
         # This field is a structure.
         _set_tree_widget_data_struct(qt_item, data_struct, schema)
