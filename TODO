@@ -129,6 +129,10 @@ Video/Control
 History
 ~~~~~~~
 
+DONE 2020-03-25
+ * Got basic simulator geometry working
+ * Switched everything over to clipp to make dynamic selection easier
+
 DONE 2020-03-24
  * Got dart GUI compiling and running
 
