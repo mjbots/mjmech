@@ -1,22 +1,36 @@
- * Further jump work
-   * Position doesn't track commanded very well during
-     landing... maybe feedforward force is not correct?
+ * Add sheathing to remaining cables
 
-   * The transition from falling to landing is rough, power should be
-     applied semi-gradually
+ * make fixture to hold legs in absolute zero position for zeroing
+   operation
+
+ * Further jump work
 
    * Landing does a bad job of hitting the lower height... maybe the
      initial velocity estimate is off?  Probably need to recalculate
-     throughout landing.
+     throughout landing.  However, the calculation could become
+     unstable when we are close to the final goal height.
 
+   * transition to landing should occur based on z distance, not based
+     on time, otherwise fast falling results in most of the Z distance
+     being used up in falling.
+
+   * Need a retracting condition to switch to landing (skipping
+     falling) if the legs start moving up or we start applying
+     significant force... that implies our legs have caught on the
+     ground.
+
+   * need to limit overall power so as to not exceed the batteries'
+     limit
+
+
+   * need to latch new acceleration on every jump of a repeat, not
+     just when starting the jump
 
    * seems like linear motion stalls near the point of lift off or before?
 
    * legs need to move *past* idle when in retract phase to have maximum travel
      * need to somehow control gait cycle time to manage speed and not
        run out of travel
-
- * Bring up and install power dist r3
 
  * Get NRF to work for command
    * Create client application
@@ -34,6 +48,8 @@
 
  * need a way to keep track of which videos go with which logs, and to
    synchronize time within a video to that within a log
+    * Perhaps record audio on rpi and clap / say random words?
+    * Perhaps wack the side of the case and use the sound / accelerometer?
 
  * when turning in walking gait, the yaw motors didn't seem to be
    moving smoothly
@@ -43,14 +59,9 @@
    * stop lowering when contact occurs, possibly go further than the
      lift height
 
- * switch legs around and remake cables to no longer have "wrap
-   around" routing between upper and lower leg servos
-
  * make "quad" sticker to go under the mjbots one
  * resolve all TODOs on pi3 hat
 
- * make fixture to hold legs in absolute zero position for zeroing
-   operation
 
 
  * UI improvements
@@ -117,6 +128,15 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2020-03-24
+ * Got dart GUI compiling and running
+
+DONE 2020-03-21
+ * Rewired legs to not have "wrap-around", got sheath on two before
+   running out of heat shrink
+ * Brought up power dist r3
+ * Reflashed and calibrated all servos
 
 DONE 2020-03-18
  * Work on jump gait
