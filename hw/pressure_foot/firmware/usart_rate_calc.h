@@ -1,4 +1,4 @@
-/** Copyright 2008-2014 Josh Pieper, jjp@pobox.com.  All rights reserved. */
+/** Copyright 2008-2014 Josh Pieper, jjp@pobox.com. */
 
 #ifndef USART_RATE_CALC_H
 #define USART_RATE_CALC_H
