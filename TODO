@@ -1,7 +1,8 @@
  * simulator
-   * zero velocity mode
    * verify signs of all angles, velocities, and torques for servos
    * verify signs and rotations of all IMU quantities
+   * switching into rest mode sometimes seems to jerk the front legs?
+     Maybe the control position isn't getting reset?
    * get mass to be correct for each leg and the main body
    * get walking and pronking to roughly match reality
    * Z rotation appears to be backwards, probably coordinate system
