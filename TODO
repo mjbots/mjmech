@@ -1,5 +1,4 @@
  * simulator
-   * verify signs of all angles, velocities, and torques for servos
    * verify signs and rotations of all IMU quantities
    * get mass to be correct for each leg and the main body
    * get walking and pronking to roughly match reality
