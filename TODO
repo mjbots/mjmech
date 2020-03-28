@@ -1,12 +1,15 @@
+ * Get NRF to work for command
+   * Integrate into pi3 hat
+   * Create client application
+   * Integrate into mech software, somehow share with diagnostic web interface?
+
  * simulator
-   * verify signs and rotations of all IMU quantities
-   * get mass to be correct for each leg and the main body
+   * get mass to be correct for each leg and the main body along with
+     moment
    * get walking and pronking to roughly match reality
-   * Z rotation appears to be backwards, probably coordinate system
-     has wrong sign for x or y... maybe not a problem?
+   * flip coordinate system for viewing to fix mirroring
    * debug time
    * start in an appropriate position rather than falling
-
 
  * Add sheathing to remaining cables
 
@@ -38,11 +41,6 @@
      * need to somehow control gait cycle time to manage speed and not
        run out of travel
 
- * Get NRF to work for command
-   * Create client application
-   * Integrate into pi3 hat
-   * Integrate into mech software, somehow share with diagnostic web interface?
-
  * mjlib telemetry
   * writing seek records
   * writing/reading compression
@@ -68,8 +66,6 @@
  * make "quad" sticker to go under the mjbots one
  * resolve all TODOs on pi3 hat
 
-
-
  * UI improvements
    * update command UI to use shoulder+dpad to select gait, start to
      control active, and one of the buttons to force motion even with
@@ -90,13 +86,15 @@
      * maybe update quadruped_control to command and query in one operation?
    * Make the CAN client runtime switchable so that quad A0 will work too
 
- * add sheathing around leg wiring for looks
-
  * Mech warfare fixes
    * Integrate new rf comms and telemetry
 
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
+
+ * build "plugs" to cover and protect the cable entry points on
+   exterior motors... clamp around cables and somehow snap onto upper
+   motor joint and onto bare motor
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
@@ -110,6 +108,10 @@
    * this would remove the need for the massive shroud by getting rid
      of the dedicated AEG joining wire, and reduce the jiggles that
      happen when walking
+
+ * Switch to using a gear reduction for lower leg...
+   * It needs to supply nearly all the torque, so it is worth aiming
+     for a 2x reduction
 
  * numerical turret angle isn't as handy as seeing a diagram of the
    robots current configuration relative to the turret
