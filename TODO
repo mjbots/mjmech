@@ -1,6 +1,4 @@
  * Get NRF to work for command
-   * Integrate into pi3 hat
-   * Create client application
    * Integrate into mech software, somehow share with diagnostic web interface?
 
  * simulator
@@ -136,6 +134,12 @@ Video/Control
 
 History
 ~~~~~~~
+
+DONE 2020-03-28
+ * Got basic nrf hooked up to pi3 hat and working with cmdline client
+
+DONE 2020-03-27
+ * Fixed many signs
 
 DONE 2020-03-26
  * Got basic control hooked up in sim, it walks and jumps!  (kinda)
