@@ -1,5 +1,7 @@
  * Get NRF to work for command
    * Integrate into mech software, somehow share with diagnostic web interface?
+ * Mech warfare fixes
+   * Integrate new rf comms and telemetry
 
  * simulator
    * get mass to be correct for each leg and the main body along with
@@ -45,9 +47,6 @@
   * reader: index
   * reader: seek
 
- * try walking with narrower gait to see if that reduces the shoulder
-   sag
-
  * need a way to keep track of which videos go with which logs, and to
    synchronize time within a video to that within a log
     * Perhaps record audio on rpi and clap / say random words?
@@ -70,13 +69,13 @@
      no analog stick
 
  * telemetry
-   * switch to new telemetry encoding and UI tool
+   * make new telemetry log plotting tool
    * get 3d diagnostics rendering working
 
  * switch everything from mm to m
  * Just use "id" for all joint and leg ids
 
- * Fix comms
+ * Fix setup
    * Make setup-system.py setup isolcpus
    * Improve cycle time of fdcan query
      * remove can id high header bytes
@@ -84,8 +83,6 @@
      * maybe update quadruped_control to command and query in one operation?
    * Make the CAN client runtime switchable so that quad A0 will work too
 
- * Mech warfare fixes
-   * Integrate new rf comms and telemetry
 
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
@@ -111,6 +108,12 @@
    * It needs to supply nearly all the torque, so it is worth aiming
      for a 2x reduction
 
+ * Lifecycle
+   * Provide means to change control board LED flash pattern over CAN
+   * Start out in one flash pattern until host application starts
+   * Set one flash pattern when rezeroing is needed, and solid green
+     when good to go
+
  * numerical turret angle isn't as handy as seeing a diagram of the
    robots current configuration relative to the turret
 
@@ -123,17 +126,12 @@ Movement
   * integrate tplot and tview, so it can display live data as well as
     logged data
 
-Video/Control
-~~~~~~~~~~~~~
-
- * Fix raw_frames in VideoDisplay::Stats
- * control: ability to lock on / detect the target
- * general: remove all address smarts from udp_data_link and udp_socket.
-   It is perfectly ok (and more predicable) to specify all paramters
-   by hand.
 
 History
 ~~~~~~~
+
+DONE 2020-03-31
+ * POC work on client, got GL rendered on top of webcam data
 
 DONE 2020-03-28
  * Got basic nrf hooked up to pi3 hat and working with cmdline client
