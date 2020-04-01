@@ -1,7 +1,10 @@
- * Get NRF to work for command
-   * Integrate into mech software, somehow share with diagnostic web interface?
- * Mech warfare fixes
-   * Integrate new rf comms and telemetry
+ * Write actual command app
+   * read joystick
+     * get mapping to be correct
+   * write commands
+   * read telemetry
+   * change gaits
+   * ffmpeg wrappers
 
  * simulator
    * get mass to be correct for each leg and the main body along with
@@ -132,6 +135,9 @@ History
 
 DONE 2020-03-31
  * POC work on client, got GL rendered on top of webcam data
+   * webcam frame rate decoupled from rendering framerate
+   * Read mjpeg
+   * aspect ratio
 
 DONE 2020-03-28
  * Got basic nrf hooked up to pi3 hat and working with cmdline client
