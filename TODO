@@ -1,8 +1,28 @@
+ * Mech warfare necessary
+   * ffmpeg integration for rf_command
+   * functioning BB loading system
+   * rough design of turret
+     * aeg
+     * BB loader
+     * battery
+     * rpi + hat + rpi camera
+     * power control board
+     * 2x gimbal motors
+     * 2x moteus controllers
+     * fpv camera
+     * lens guard
+     * outer shell /w power switch
+     * thrust bearing
+   * build "plugs" to cover and protect the cable entry points on
+     exterior motors... clamp around cables and somehow snap onto upper
+     motor joint and onto bare motor
+
+
+ * With chip antenna nrf, I unexpectedly see more than 50 per second
+   received on the robot side?
+
  * RfControl reports useless velocity field, needs to report correct
    one
-
- * entering rest mode from walk/jump needs to wait for a zero velocity
-   command and all four legs on ground/appropriate point in cycle
 
  * The raspberry pi aux hat got into a state where either it, or the
    master was only sending slot 0 and 1 with the app going, and when
@@ -12,14 +32,14 @@
  * have never seen a single packet reported dropped on the robot,
    maybe the aux pi is always reporting slots even when they don't
    make it?  Maybe it is just really good at receiving?
- * pi aux should have a deadman on transmitting slots?
 
- * Write actual command app
-   * ffmpeg wrappers
+ * pi aux should have a deadman on transmitting slots?  or some other
+   way for rf_command to know when the control app is dead?
+
 
  * simulator
-   * get mass to be correct for each leg and the main body along with
-     moment
+   * get mass to be correct for each leg and the main body
+   * measure moment of all the moveable parts
    * get walking and pronking to roughly match reality
    * flip coordinate system for viewing to fix mirroring
    * debug time
@@ -101,9 +121,6 @@
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
 
- * build "plugs" to cover and protect the cable entry points on
-   exterior motors... clamp around cables and somehow snap onto upper
-   motor joint and onto bare motor
 
  * setup-system.py didn't leave the camera in a configured state, I
    had to runraspi-config manually
@@ -143,6 +160,10 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-04-02
+ * Got gait transition working smoothly.  Re-enabled "rest while
+   stopped" in rf_command
 
 DONE 2020-04-01
  * First command over RF
