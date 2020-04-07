@@ -1,5 +1,6 @@
  * Mech warfare
    * functioning BB loading system
+     * test first print first part of hop up
      * machine flat on barrel
      * design barrel clamp / laser rest / cameras rest
      * print hop up
@@ -20,6 +21,21 @@
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
      motor joint and onto bare motor
+
+ * Further jump work
+
+   * legs need to move *past* idle when in retract phase to have maximum travel
+     * need to somehow control gait cycle time to manage speed and not
+       run out of travel
+
+   * Need a retracting condition to switch to landing (skipping
+     falling) if the legs start moving up or we start applying
+     significant force... that implies our legs have caught on the
+     ground.
+
+   * need to limit overall power so as to not exceed the batteries'
+     limit
+
 
  * RF Control
    * With chip antenna nrf, I unexpectedly see more than 50 per second
@@ -42,7 +58,6 @@
    * measure moment of all the moveable parts
    * get walking and pronking to roughly match reality
    * flip coordinate system for viewing to fix mirroring
-   * debug time
    * start in an appropriate position rather than falling
 
  * Add sheathing to remaining cables
@@ -50,30 +65,6 @@
  * make fixture to hold legs in absolute zero position for zeroing
    operation
 
- * Further jump work
-
-   * Landing does a bad job of hitting the lower height... maybe the
-     initial velocity estimate is off?  Probably need to recalculate
-     throughout landing.  However, the calculation could become
-     unstable when we are close to the final goal height.
-
-   * transition to landing should occur based on z distance, not based
-     on time, otherwise fast falling results in most of the Z distance
-     being used up in falling.
-
-   * Need a retracting condition to switch to landing (skipping
-     falling) if the legs start moving up or we start applying
-     significant force... that implies our legs have caught on the
-     ground.
-
-   * need to limit overall power so as to not exceed the batteries'
-     limit
-
-   * seems like linear motion stalls near the point of lift off or before?
-
-   * legs need to move *past* idle when in retract phase to have maximum travel
-     * need to somehow control gait cycle time to manage speed and not
-       run out of travel
 
  * mjlib telemetry
   * writing seek records
@@ -160,6 +151,12 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-04-07
+ * Improved jump heuristics some... now does a better job of hitting
+   the lower height, although for some reason I can't manage to
+   recursively calculate an accurate constant acceleration profile to
+   reach it.
 
 DONE 2020-04-03
  * Got video rendering working in rf command
