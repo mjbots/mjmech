@@ -1,23 +1,27 @@
+ * aeg_driver
+  * fine align parts
+  * route power
+  * route drives
+  * rough align silks
+  * autoroute
+  * fine align silks
+
  * Mech warfare
-   * functioning BB loading system
-     * test first print first part of hop up
-     * machine flat on barrel
-     * design barrel clamp / laser rest / cameras rest
-     * print hop up
-     * print rest
-     * iterate
    * rough design of turret
-     * aeg
-     * BB loader
-     * battery
-     * rpi + hat + rpi camera
-     * power control board
-     * 2x gimbal motors
-     * 2x moteus controllers
+     * lay out frame for right side
+     * rpi camera
      * fpv camera
      * lens guard
      * outer shell /w power switch
-     * thrust bearing
+
+     * maybe make base larger, so that bolts mounting to top of robot
+       can be installed while the entire thing is assembled.
+       * necessitates a new top for quad a1 with additional further
+         out bolt pattern (likely nice anyway when moving switch to
+         front/back)
+     * maybe make a separate cover for yaw controller so it isn't
+       exposed.
+
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
      motor joint and onto bare motor
@@ -151,6 +155,11 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-04-15
+ * Progress on turret... rough layout of aeg_driver done.  CAD for
+   left side and yaw roughed in.  Loader and hop up printed and tested
+   to work.
 
 DONE 2020-04-07
  * Improved jump heuristics some... now does a better job of hitting
