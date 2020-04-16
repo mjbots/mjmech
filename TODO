@@ -1,8 +1,10 @@
  * aeg_driver
+  * round part placement
   * fine align parts
   * route power
+  * route CAN
   * route drives
-  * rough align silks
+  * rough align silks and fix sizes
   * autoroute
   * fine align silks
 
@@ -16,9 +18,6 @@
 
      * maybe make base larger, so that bolts mounting to top of robot
        can be installed while the entire thing is assembled.
-       * necessitates a new top for quad a1 with additional further
-         out bolt pattern (likely nice anyway when moving switch to
-         front/back)
      * maybe make a separate cover for yaw controller so it isn't
        exposed.
 
