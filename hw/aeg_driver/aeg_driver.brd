@@ -770,7 +770,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <elements>
 <element name="C11" library="mfpassives" package="C0402" value="0.1uF" x="21" y="17.3" smashed="yes">
 <attribute name="DIELECTRIC" value="" x="62.91" y="-30.96" size="1.778" layer="27" display="off"/>
-<attribute name="HOUSEPART" value="1" x="62.91" y="-30.96" size="1.778" layer="27" display="off"/>
+<attribute name="HOUSEPART" value="YES" x="62.91" y="-30.96" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF" x="62.91" y="-30.96" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="21" y="18" size="0.8" layer="25" font="vector"/>
 <attribute name="POPULATE" value="1" x="62.91" y="-30.96" size="1.778" layer="27" display="off"/>
@@ -780,7 +780,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 </element>
 <element name="C6" library="mfpassives" package="C0402" value="0.1uF" x="12.2" y="20.5" smashed="yes" rot="R90">
 <attribute name="DIELECTRIC" value="" x="60.46" y="39.55" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="HOUSEPART" value="1" x="60.46" y="39.55" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="HOUSEPART" value="YES" x="60.46" y="39.55" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF" x="60.46" y="39.55" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="11.5" y="20.6" size="0.8" layer="25" font="vector" rot="R180"/>
 <attribute name="POPULATE" value="1" x="60.46" y="39.55" size="1.778" layer="27" rot="R90" display="off"/>
@@ -801,7 +801,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 </element>
 <element name="C9" library="mfpassives" package="C0402" value="0.1uF" x="18.4" y="9.6" smashed="yes" rot="R270">
 <attribute name="DIELECTRIC" value="" x="-29.86" y="-17.07" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="HOUSEPART" value="1" x="-29.86" y="-17.07" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="HOUSEPART" value="YES" x="-29.86" y="-17.07" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF" x="-29.86" y="-17.07" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="19.2" y="8.6" size="0.8" layer="25" font="vector"/>
 <attribute name="POPULATE" value="1" x="-29.86" y="-17.07" size="1.778" layer="27" rot="R270" display="off"/>
@@ -811,7 +811,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 </element>
 <element name="C8" library="mfpassives" package="C0402" value="0.1uF" x="17.2" y="9.6" smashed="yes" rot="R270">
 <attribute name="DIELECTRIC" value="" x="-31.06" y="-20.88" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="HOUSEPART" value="1" x="-31.06" y="-20.88" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="HOUSEPART" value="YES" x="-31.06" y="-20.88" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF" x="-31.06" y="-20.88" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="16.7" y="7.3" size="0.8" layer="25" font="vector"/>
 <attribute name="POPULATE" value="1" x="-31.06" y="-20.88" size="1.778" layer="27" rot="R270" display="off"/>
@@ -821,7 +821,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 </element>
 <element name="C7" library="mfpassives" package="C0402" value="1uF" x="16" y="9.6" smashed="yes" rot="R270">
 <attribute name="DIELECTRIC" value="" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="HOUSEPART" value="1" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="HOUSEPART" value="YES" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="MF-CAP-0402-1uF" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="15.2" y="9.4" size="0.8" layer="25" font="vector" rot="R180"/>
 <attribute name="POPULATE" value="1" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
@@ -829,11 +829,11 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <attribute name="URL" value="" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="" x="-32.26" y="-24.69" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C10" library="mfpassives" package="C1206" value="10uF 35V" x="16.6" y="5.9" smashed="yes">
+<element name="C10" library="mfpassives" package="C1206" value="10uF 50V" x="16.6" y="5.9" smashed="yes">
 <attribute name="DIELECTRIC" value="" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
 <attribute name="HOUSEPART" value="" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="TDK" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="C3216X7R1H106K160AE" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="17.6" y="4.6" size="0.8" layer="25" font="vector" rot="R180"/>
 <attribute name="POPULATE" value="1" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
 <attribute name="TOLERANCE" value="" x="36.92" y="-38.55" size="1.778" layer="27" display="off"/>
@@ -897,7 +897,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 </element>
 <element name="C5" library="mfpassives" package="C0402" value="0.1uF" x="9.2" y="11.5" smashed="yes" rot="R270">
 <attribute name="DIELECTRIC" value="" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="HOUSEPART" value="1" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="HOUSEPART" value="YES" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="9.9" y="11.8" size="0.8" layer="25" font="vector"/>
 <attribute name="POPULATE" value="1" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
@@ -938,11 +938,11 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <attribute name="URL" value="" x="-4.8" y="-18.07" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="" x="-4.8" y="-18.07" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C4" library="mfpassives" package="C1206" value="10uF 35V" x="3.7" y="22.8" smashed="yes" rot="R90">
+<element name="C4" library="mfpassives" package="C1206" value="10uF 50V" x="3.7" y="22.8" smashed="yes" rot="R90">
 <attribute name="DIELECTRIC" value="" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="HOUSEPART" value="" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="TDK" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="C3216X7R1H106K160AE" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="2.6" y="25.6" size="0.8" layer="25" font="vector"/>
 <attribute name="POPULATE" value="1" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="TOLERANCE" value="" x="48.15" y="38.04" size="1.778" layer="27" rot="R90" display="off"/>
@@ -984,27 +984,32 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <attribute name="POPULATE" value="1" x="7.78" y="34.49" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="J5" library="controller" package="XT30PW_MALE" value="XT30XT30PW_MALE" x="23.9" y="23.1" smashed="yes" rot="R270">
+<attribute name="MPN" value="XT30PW-M" x="23.9" y="23.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="36.5" y="30.1" size="1" layer="25" rot="R90"/>
-<attribute name="POPULATE" value="0" x="18.82" y="-15" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="POPULATE" value="1" x="18.82" y="-15" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="J2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="" x="15.4" y="45" smashed="yes" rot="R180">
 <attribute name="NAME" x="14.7838" y="46.6288" size="1" layer="25"/>
 <attribute name="POPULARITY" value="98" x="-1.11" y="78.02" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="0" x="15.4" y="45" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="17.94" y="48.175" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="J4" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="" x="27.8" y="45" smashed="yes" rot="R180">
 <attribute name="NAME" x="27.1838" y="46.5288" size="1" layer="25"/>
 <attribute name="POPULARITY" value="98" x="4.94" y="78.02" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="0" x="27.8" y="45" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.34" y="48.175" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="J3" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="" x="21.6" y="45" smashed="yes">
 <attribute name="NAME" x="21.0838" y="46.5288" size="1" layer="25"/>
 <attribute name="POPULARITY" value="98" x="50.81" y="11.98" size="1.778" layer="27" display="off"/>
+<attribute name="POPULATE" value="0" x="21.6" y="45" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="19.06" y="41.825" size="1.27" layer="27"/>
 </element>
 <element name="J1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="" x="9.2" y="45" smashed="yes" rot="R180">
 <attribute name="NAME" x="8.6838" y="46.6288" size="1" layer="25"/>
 <attribute name="POPULARITY" value="98" x="-26.36" y="78.02" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="POPULATE" value="0" x="9.2" y="45" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="11.74" y="48.175" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="L1" library="mfpassives" package="L1210" value="33uH" x="6.6" y="22.8" smashed="yes" rot="R270">

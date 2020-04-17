@@ -1961,7 +1961,8 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/STM32G474CEU6
 <attribute name="POPULATE" value="0"/>
 </part>
 <part name="J5" library="controller" deviceset="XT30" device="XT30PW_MALE">
-<attribute name="POPULATE" value="0"/>
+<attribute name="MPN" value="XT30PW-M"/>
+<attribute name="POPULATE" value="1"/>
 </part>
 <part name="P+5" library="supply1" deviceset="V+" device=""/>
 <part name="U4" library="controller" deviceset="TCAN334G" device="SOT23" value="TCAN334GSOT23">
@@ -1988,32 +1989,32 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/STM32G474CEU6
 <attribute name="POPULATE" value="1"/>
 </part>
 <part name="C5" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="0.1uF">
-<attribute name="HOUSEPART" value="1"/>
+<attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF"/>
 </part>
 <part name="C6" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="0.1uF">
-<attribute name="HOUSEPART" value="1"/>
+<attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF"/>
 </part>
 <part name="C11" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="0.1uF">
-<attribute name="HOUSEPART" value="1"/>
+<attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF"/>
 </part>
 <part name="C9" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="0.1uF">
-<attribute name="HOUSEPART" value="1"/>
+<attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF"/>
 </part>
 <part name="C8" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="0.1uF">
-<attribute name="HOUSEPART" value="1"/>
+<attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-CAP-0402-0.1uF"/>
 </part>
 <part name="C7" library="mfpassives" deviceset="CAPACITOR_NP" device="_0402" value="1uF">
-<attribute name="HOUSEPART" value="1"/>
+<attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-CAP-0402-1uF"/>
 </part>
-<part name="C10" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
+<part name="C10" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 50V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="C3216X7R1H106K160AE"/>
 </part>
 <part name="J6" library="precharge" deviceset="JST-ZH6" device="SMT_VERT">
 <attribute name="MF" value="JST"/>
@@ -2042,9 +2043,9 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/STM32G474CEU6
 <attribute name="MPN" value="NLFV32T-330K-EF"/>
 <attribute name="POPULATE" value="1"/>
 </part>
-<part name="C4" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 35V">
+<part name="C4" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 50V">
 <attribute name="MF" value="TDK"/>
-<attribute name="MPN" value="CGA5L1X7R1V106K160AC"/>
+<attribute name="MPN" value="C3216X7R1H106K160AE"/>
 </part>
 <part name="C2" library="mfpassives" deviceset="CAPACITOR_NP" device="_0603" value="1uF 50V">
 <attribute name="MF" value="SAMSUNG"/>
@@ -2096,16 +2097,24 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/STM32G474CEU6
 <attribute name="MPN" value="MF-RES-0603-560"/>
 </part>
 <part name="P+4" library="supply1" deviceset="V+" device=""/>
-<part name="J2" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
-<part name="J4" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
-<part name="J3" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
+<part name="J2" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="J4" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2">
+<attribute name="POPULATE" value="0"/>
+</part>
+<part name="J3" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2">
+<attribute name="POPULATE" value="0"/>
+</part>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="U1" library="mfdiscrete" deviceset="N-CHANNEL_FET" device="_SOT-23-3">
 <attribute name="HOUSEPART" value="YES"/>
 <attribute name="MPN" value="MF-DSC-SOT233-BSS138"/>
 <attribute name="POPULATE" value="1"/>
 </part>
-<part name="J1" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
+<part name="J1" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2">
+<attribute name="POPULATE" value="0"/>
+</part>
 <part name="GND8" library="supply1" deviceset="GND" device=""/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
 <part name="C13" library="mfpassives" deviceset="CAPACITOR_NP" device="_1206" value="10uF 50V">
@@ -2229,6 +2238,7 @@ Licensed under the Apache 2.0 License</text>
 <attribute name="POPULATE" x="127" y="-48.26" size="7.62" layer="96" display="off"/>
 <attribute name="NAME" x="121.92" y="-42.418" size="1.778" layer="95"/>
 <attribute name="VALUE" x="121.92" y="-55.626" size="1.778" layer="96"/>
+<attribute name="MPN" x="127" y="-48.26" size="1.778" layer="96" font="vector" display="off"/>
 </instance>
 <instance part="P+5" gate="1" x="152.4" y="-38.1" smashed="yes">
 <attribute name="VALUE" x="149.86" y="-40.64" size="1.778" layer="96" rot="R90"/>
@@ -2432,14 +2442,17 @@ Licensed under the Apache 2.0 License</text>
 <instance part="J2" gate="G$1" x="365.76" y="-218.44" smashed="yes">
 <attribute name="NAME" x="359.41" y="-212.725" size="1.778" layer="95"/>
 <attribute name="VALUE" x="359.41" y="-223.52" size="1.778" layer="96"/>
+<attribute name="POPULATE" x="365.76" y="-218.44" size="1.778" layer="96" font="vector" display="off"/>
 </instance>
 <instance part="J4" gate="G$1" x="558.8" y="-203.2" smashed="yes">
 <attribute name="NAME" x="552.45" y="-197.485" size="1.778" layer="95"/>
 <attribute name="VALUE" x="552.45" y="-208.28" size="1.778" layer="96"/>
+<attribute name="POPULATE" x="558.8" y="-203.2" size="1.778" layer="96" font="vector" display="off"/>
 </instance>
 <instance part="J3" gate="G$1" x="558.8" y="-228.6" smashed="yes">
 <attribute name="NAME" x="552.45" y="-222.885" size="1.778" layer="95"/>
 <attribute name="VALUE" x="552.45" y="-233.68" size="1.778" layer="96"/>
+<attribute name="POPULATE" x="558.8" y="-228.6" size="1.778" layer="96" font="vector" display="off"/>
 </instance>
 <instance part="GND7" gate="1" x="68.58" y="-121.92" smashed="yes">
 <attribute name="VALUE" x="66.04" y="-124.46" size="1.778" layer="96"/>
@@ -2454,6 +2467,7 @@ Licensed under the Apache 2.0 License</text>
 <instance part="J1" gate="G$1" x="76.2" y="-91.44" smashed="yes">
 <attribute name="NAME" x="69.85" y="-85.725" size="1.778" layer="95"/>
 <attribute name="VALUE" x="69.85" y="-96.52" size="1.778" layer="96"/>
+<attribute name="POPULATE" x="76.2" y="-91.44" size="1.778" layer="96" font="vector" display="off"/>
 </instance>
 <instance part="GND8" gate="1" x="548.64" y="-233.68" smashed="yes">
 <attribute name="VALUE" x="546.1" y="-236.22" size="1.778" layer="96"/>
