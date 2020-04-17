@@ -23,7 +23,7 @@
 <layer number="13" name="Route13" color="21" fill="1" visible="no" active="no"/>
 <layer number="14" name="Route14" color="22" fill="1" visible="no" active="no"/>
 <layer number="15" name="Route15" color="23" fill="1" visible="no" active="yes"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
@@ -675,11 +675,11 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <pass name="Default">
 <param name="RoutingGrid" value="50mil"/>
 <param name="AutoGrid" value="1"/>
-<param name="Efforts" value="0"/>
+<param name="Efforts" value="2"/>
 <param name="TopRouterVariant" value="1"/>
 <param name="tpViaShape" value="round"/>
 <param name="PrefDir.1" value="a"/>
-<param name="PrefDir.2" value="0"/>
+<param name="PrefDir.2" value="a"/>
 <param name="PrefDir.3" value="0"/>
 <param name="PrefDir.4" value="0"/>
 <param name="PrefDir.5" value="0"/>
@@ -692,7 +692,7 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <param name="PrefDir.12" value="0"/>
 <param name="PrefDir.13" value="0"/>
 <param name="PrefDir.14" value="0"/>
-<param name="PrefDir.15" value="0"/>
+<param name="PrefDir.15" value="a"/>
 <param name="PrefDir.16" value="a"/>
 <param name="cfVia" value="8"/>
 <param name="cfNonPref" value="5"/>
@@ -873,16 +873,16 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <attribute name="URL" value="" x="-19.3" y="79.95" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VOLTAGE" value="" x="-19.3" y="79.95" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C14" library="mfpassives" package="C1206" value="10uF 50V" x="19" y="34" smashed="yes" rot="R270">
-<attribute name="DIELECTRIC" value="" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="HOUSEPART" value="" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MF" value="TDK" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="C3216X7R1H106K160AE" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="21.1" y="31.7" size="0.8" layer="25" font="vector" rot="R180"/>
-<attribute name="POPULATE" value="1" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="TOLERANCE" value="" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="URL" value="" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="VOLTAGE" value="" x="-25.45" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<element name="C14" library="mfpassives" package="C1206" value="10uF 50V" x="18.8" y="34" smashed="yes" rot="R270">
+<attribute name="DIELECTRIC" value="" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="HOUSEPART" value="" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MF" value="TDK" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="C3216X7R1H106K160AE" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="20.9" y="31.7" size="0.8" layer="25" font="vector" rot="R180"/>
+<attribute name="POPULATE" value="1" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="TOLERANCE" value="" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="URL" value="" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VOLTAGE" value="" x="-25.65" y="3.52" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C15" library="mfpassives" package="C1206" value="10uF 50V" x="12.9" y="30.1" smashed="yes" rot="R270">
 <attribute name="DIELECTRIC" value="" x="-31.55" y="-5.46" size="1.778" layer="27" rot="R270" display="off"/>
@@ -905,16 +905,16 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <attribute name="URL" value="" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VOLTAGE" value="" x="-39.06" y="-38.03" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C17" library="mfpassives" package="C1206" value="10uF 50V" x="21.4" y="36.9" smashed="yes" rot="R90">
-<attribute name="DIELECTRIC" value="" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="HOUSEPART" value="" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MF" value="TDK" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="C3216X7R1H106K160AE" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="20.1" y="38.9" size="0.8" layer="25" font="vector" rot="R180"/>
-<attribute name="POPULATE" value="1" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="TOLERANCE" value="" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="URL" value="" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VOLTAGE" value="" x="59.5" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<element name="C17" library="mfpassives" package="C1206" value="10uF 50V" x="21.2" y="36.9" smashed="yes" rot="R90">
+<attribute name="DIELECTRIC" value="" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="HOUSEPART" value="" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="TDK" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="C3216X7R1H106K160AE" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="19.9" y="38.9" size="0.8" layer="25" font="vector" rot="R180"/>
+<attribute name="POPULATE" value="1" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="TOLERANCE" value="" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="URL" value="" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VOLTAGE" value="" x="59.3" y="78.81" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C19" library="mfpassives" package="C1206" value="10uF 50V" x="25.5" y="30.9" smashed="yes" rot="R180">
 <attribute name="DIELECTRIC" value="" x="-21.49" y="69" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1045,15 +1045,15 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <attribute name="VOLTAGE" value="" x="-21.47" y="76.15" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="WATTAGE" value="" x="-21.47" y="76.15" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="R4" library="mfpassives" package="R0603" value="560" x="16.3" y="31.6" smashed="yes" rot="R180">
-<attribute name="HOUSEPART" value="YES" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MPN" value="MF-RES-0603-560" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="17" y="30.7" size="0.8" layer="25" font="vector" rot="R180"/>
-<attribute name="POPULATE" value="1" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="TOLERANCE" value="" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="URL" value="" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VOLTAGE" value="" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="WATTAGE" value="" x="-39.58" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<element name="R4" library="mfpassives" package="R0603" value="560" x="16.1" y="31.6" smashed="yes" rot="R180">
+<attribute name="HOUSEPART" value="YES" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MPN" value="MF-RES-0603-560" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="16.8" y="30.7" size="0.8" layer="25" font="vector" rot="R180"/>
+<attribute name="POPULATE" value="1" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="TOLERANCE" value="" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="URL" value="" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VOLTAGE" value="" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="WATTAGE" value="" x="-39.78" y="76.05" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="U$1" library="precharge" package="M2.5MOUNT" value="MOUNT" x="34" y="45" smashed="yes">
 <attribute name="POPULATE" value="0" x="79.72" y="10.71" size="1.778" layer="27" display="off"/>
@@ -1243,8 +1243,8 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <vertex x="34.4" y="35"/>
 <vertex x="32.3" y="35"/>
 </polygon>
-<wire x1="24" y1="35.4" x2="21.4" y2="35.4" width="0.508" layer="1"/>
-<wire x1="21.4" y1="35.4" x2="21.4" y2="35.45" width="0.508" layer="1"/>
+<wire x1="24" y1="35.4" x2="21.2" y2="35.4" width="0.508" layer="1"/>
+<wire x1="21.2" y1="35.4" x2="21.2" y2="35.45" width="0.508" layer="1"/>
 <via x="21.4" y="36.3" extent="1-16" drill="0.35"/>
 <via x="22.1" y="36.3" extent="1-16" drill="0.35"/>
 <via x="19" y="36.3" extent="1-16" drill="0.35"/>
@@ -1284,7 +1284,8 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <wire x1="7.55" y1="35.4" x2="7.55" y2="35.5" width="0.508" layer="1"/>
 <via x="7.7" y="31.8" extent="1-16" drill="0.35"/>
 <wire x1="7.7" y1="32.45" x2="7.7" y2="31.8" width="0.254" layer="1"/>
-<wire x1="18.3" y1="36.3" x2="16.5" y2="35.4" width="0" layer="19" extent="1-1"/>
+<wire x1="18" y1="35.375" x2="16.5" y2="35.375" width="0.127" layer="1"/>
+<wire x1="16.5" y1="35.375" x2="16.5" y2="35.4" width="0.127" layer="1"/>
 </signal>
 <signal name="GND">
 <contactref element="U4" pad="2"/>
@@ -1536,12 +1537,21 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <signal name="CAN_RX">
 <contactref element="U4" pad="4"/>
 <contactref element="U3" pad="33"/>
-<wire x1="18.95" y1="16.35" x2="24.1" y2="14.325" width="0" layer="19" extent="1-1"/>
+<wire x1="20.25" y1="16.25" x2="19" y2="16.25" width="0.127" layer="1"/>
+<wire x1="22.125" y1="14.375" x2="20.25" y2="16.25" width="0.127" layer="1"/>
+<wire x1="24" y1="14.375" x2="22.125" y2="14.375" width="0.127" layer="1"/>
+<wire x1="19" y1="16.25" x2="18.95" y2="16.35" width="0.127" layer="1"/>
+<wire x1="24" y1="14.375" x2="24.1" y2="14.325" width="0.127" layer="1"/>
 </signal>
 <signal name="CAN_TX">
 <contactref element="U4" pad="1"/>
 <contactref element="U3" pad="34"/>
-<wire x1="18.95" y1="16.85" x2="24.1" y2="16.275" width="0" layer="19" extent="1-1"/>
+<wire x1="20.75" y1="16.75" x2="19" y2="16.75" width="0.127" layer="1"/>
+<wire x1="21" y1="17" x2="20.75" y2="16.75" width="0.127" layer="1"/>
+<wire x1="21" y1="17.875" x2="21" y2="17" width="0.127" layer="1"/>
+<wire x1="22.5" y1="17.875" x2="21" y2="17.875" width="0.127" layer="1"/>
+<wire x1="24.1" y1="16.275" x2="22.5" y2="17.875" width="0.127" layer="1"/>
+<wire x1="19" y1="16.75" x2="18.95" y2="16.85" width="0.127" layer="1"/>
 </signal>
 <signal name="CAN_P" class="1">
 <contactref element="U4" pad="7"/>
@@ -1680,45 +1690,109 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <via x="32.1" y="39.4" extent="1-16" drill="0.35"/>
 <wire x1="31" y1="39.4" x2="32.1" y2="39.4" width="0.254" layer="1"/>
 <wire x1="16.5" y1="39.4" x2="17.6" y2="39.4" width="0.254" layer="1"/>
-<wire x1="31" y1="39.4" x2="25.9" y2="33.5" width="0" layer="19" extent="1-1"/>
-<wire x1="11.4" y1="33.5" x2="8.8" y2="27.8" width="0" layer="19" extent="1-1"/>
+<wire x1="11.375" y1="32.5" x2="11.375" y2="33.5" width="0.254" layer="1"/>
+<wire x1="11.375" y1="32.125" x2="11.375" y2="32.5" width="0.254" layer="16"/>
+<wire x1="8.875" y1="29.625" x2="11.375" y2="32.125" width="0.254" layer="16"/>
+<wire x1="8.875" y1="27.875" x2="8.875" y2="29.625" width="0.254" layer="16"/>
+<wire x1="11.375" y1="33.5" x2="11.4" y2="33.5" width="0.254" layer="1"/>
+<wire x1="8.875" y1="27.875" x2="8.8" y2="27.8" width="0.254" layer="16"/>
+<wire x1="26" y1="32.5" x2="26" y2="33.5" width="0.254" layer="1"/>
+<wire x1="27.375" y1="32.5" x2="26" y2="32.5" width="0.254" layer="16"/>
+<wire x1="32" y1="37.125" x2="27.375" y2="32.5" width="0.254" layer="16"/>
+<wire x1="32" y1="39.375" x2="32" y2="37.125" width="0.254" layer="16"/>
+<wire x1="26" y1="33.5" x2="25.9" y2="33.5" width="0.254" layer="1"/>
+<wire x1="32" y1="39.375" x2="32.1" y2="39.4" width="0.254" layer="16"/>
+<via x="11.375" y="32.5" extent="1-16" drill="0.1016"/>
+<via x="26" y="32.5" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="NRST">
 <contactref element="J6" pad="2"/>
 <contactref element="U3" pad="7"/>
 <contactref element="C5" pad="P$1"/>
-<wire x1="9.2" y1="12.05" x2="12.05" y2="14.85" width="0" layer="19" extent="1-1"/>
-<wire x1="4.7" y1="10.65" x2="9.2" y2="12.05" width="0" layer="19" extent="1-1"/>
+<wire x1="8.5" y1="11.375" x2="9.125" y2="12" width="0.127" layer="1"/>
+<wire x1="5.375" y1="11.375" x2="7.625" y2="11.375" width="0.127" layer="1"/>
+<wire x1="7.625" y1="11.375" x2="8.5" y2="11.375" width="0.127" layer="1"/>
+<wire x1="4.75" y1="10.75" x2="5.375" y2="11.375" width="0.127" layer="1"/>
+<wire x1="9.125" y1="12" x2="9.2" y2="12.05" width="0.127" layer="1"/>
+<wire x1="4.75" y1="10.75" x2="4.7" y2="10.65" width="0.127" layer="1"/>
+<wire x1="7.875" y1="14.875" x2="12" y2="14.875" width="0.127" layer="1"/>
+<wire x1="7.625" y1="14.625" x2="7.875" y2="14.875" width="0.127" layer="1"/>
+<wire x1="7.625" y1="11.375" x2="7.625" y2="14.625" width="0.127" layer="1"/>
+<wire x1="12" y1="14.875" x2="12.05" y2="14.85" width="0.127" layer="1"/>
 </signal>
 <signal name="SWDIO">
 <contactref element="J6" pad="3"/>
 <contactref element="U3" pad="36"/>
-<wire x1="4.7" y1="12.15" x2="18.95" y2="17.85" width="0" layer="19" extent="1-1"/>
+<wire x1="19.625" y1="18.5" x2="19" y2="17.875" width="0.127" layer="1"/>
+<wire x1="23" y1="18.5" x2="19.625" y2="18.5" width="0.127" layer="1"/>
+<wire x1="24.875" y1="16.625" x2="23" y2="18.5" width="0.127" layer="1"/>
+<wire x1="24.875" y1="6.75" x2="24.875" y2="16.625" width="0.127" layer="1"/>
+<wire x1="25.875" y1="5.75" x2="24.875" y2="6.75" width="0.127" layer="1"/>
+<wire x1="25.875" y1="1.75" x2="25.875" y2="5.75" width="0.127" layer="1"/>
+<wire x1="22.375" y1="1.75" x2="25.875" y2="1.75" width="0.127" layer="1"/>
+<wire x1="19.625" y1="4.5" x2="22.375" y2="1.75" width="0.127" layer="1"/>
+<wire x1="7.875" y1="4.5" x2="19.625" y2="4.5" width="0.127" layer="1"/>
+<wire x1="3.875" y1="8.5" x2="7.875" y2="4.5" width="0.127" layer="1"/>
+<wire x1="2.625" y1="8.5" x2="3.875" y2="8.5" width="0.127" layer="1"/>
+<wire x1="2.375" y1="8.75" x2="2.625" y2="8.5" width="0.127" layer="1"/>
+<wire x1="2.375" y1="12.125" x2="2.375" y2="8.75" width="0.127" layer="1"/>
+<wire x1="4.625" y1="12.125" x2="2.375" y2="12.125" width="0.127" layer="1"/>
+<wire x1="19" y1="17.875" x2="18.95" y2="17.85" width="0.127" layer="1"/>
+<wire x1="4.625" y1="12.125" x2="4.7" y2="12.15" width="0.127" layer="1"/>
 </signal>
 <signal name="SWCLK">
 <contactref element="J6" pad="5"/>
 <contactref element="U3" pad="37"/>
-<wire x1="4.7" y1="15.15" x2="18.25" y2="18.55" width="0" layer="19" extent="1-1"/>
+<wire x1="18.75" y1="18.5" x2="18.25" y2="18.5" width="0.127" layer="1"/>
+<wire x1="12.375" y1="18.5" x2="18.75" y2="18.5" width="0.127" layer="16"/>
+<wire x1="11.75" y1="17.875" x2="12.375" y2="18.5" width="0.127" layer="16"/>
+<wire x1="11.125" y1="17.875" x2="11.75" y2="17.875" width="0.127" layer="16"/>
+<wire x1="10.875" y1="17.625" x2="11.125" y2="17.875" width="0.127" layer="1"/>
+<wire x1="8.5" y1="17.625" x2="10.875" y2="17.625" width="0.127" layer="1"/>
+<wire x1="6.125" y1="15.25" x2="8.5" y2="17.625" width="0.127" layer="1"/>
+<wire x1="4.75" y1="15.25" x2="6.125" y2="15.25" width="0.127" layer="1"/>
+<wire x1="18.25" y1="18.5" x2="18.25" y2="18.55" width="0.127" layer="1"/>
+<wire x1="4.75" y1="15.25" x2="4.7" y2="15.15" width="0.127" layer="1"/>
+<via x="18.75" y="18.5" extent="1-16" drill="0.1016"/>
+<via x="11.125" y="17.875" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="LED1">
 <contactref element="D1" pad="CATHODE"/>
 <contactref element="U3" pad="5"/>
-<wire x1="8.5" y1="8.25" x2="12.05" y2="15.85" width="0" layer="19" extent="1-1"/>
+<wire x1="11" y1="10.75" x2="8.5" y2="8.25" width="0.127" layer="1"/>
+<wire x1="11" y1="15.625" x2="11" y2="10.75" width="0.127" layer="16"/>
+<wire x1="11.125" y1="15.75" x2="11" y2="15.625" width="0.127" layer="1"/>
+<wire x1="12" y1="15.75" x2="11.125" y2="15.75" width="0.127" layer="1"/>
+<wire x1="12" y1="15.75" x2="12.05" y2="15.85" width="0.127" layer="1"/>
+<via x="11" y="10.75" extent="1-16" drill="0.1016"/>
+<via x="11" y="15.625" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="LED2">
 <contactref element="D2" pad="CATHODE"/>
 <contactref element="U3" pad="6"/>
-<wire x1="10.5" y1="8.25" x2="12.05" y2="15.35" width="0" layer="19" extent="1-1"/>
+<wire x1="10.5" y1="9.25" x2="10.5" y2="8.25" width="0.127" layer="1"/>
+<wire x1="10.625" y1="9.25" x2="10.5" y2="9.25" width="0.127" layer="1"/>
+<wire x1="10.625" y1="15.25" x2="10.625" y2="9.25" width="0.127" layer="16"/>
+<wire x1="12" y1="15.25" x2="10.625" y2="15.25" width="0.127" layer="1"/>
+<wire x1="12" y1="15.25" x2="12.05" y2="15.35" width="0.127" layer="1"/>
+<via x="10.625" y="9.25" extent="1-16" drill="0.1016"/>
+<via x="10.625" y="15.25" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="LX">
 <contactref element="U2" pad="8"/>
 <contactref element="L1" pad="P$1"/>
-<wire x1="6.6" y1="24.25" x2="7.45" y2="25.75" width="0" layer="19" extent="1-1"/>
+<wire x1="7.375" y1="24.25" x2="7.375" y2="25.75" width="0.127" layer="1"/>
+<wire x1="6.6" y1="24.25" x2="7.375" y2="24.25" width="0.127" layer="1"/>
+<wire x1="7.375" y1="25.75" x2="7.45" y2="25.75" width="0.127" layer="1"/>
 </signal>
 <signal name="N$13">
 <contactref element="C3" pad="P$1"/>
 <contactref element="U2" pad="3"/>
-<wire x1="9.35" y1="26.75" x2="10.9" y2="26.25" width="0" layer="19" extent="1-1"/>
+<wire x1="9.5" y1="26.625" x2="9.375" y2="26.75" width="0.127" layer="1"/>
+<wire x1="10.5" y1="26.625" x2="9.5" y2="26.625" width="0.127" layer="1"/>
+<wire x1="10.875" y1="26.25" x2="10.5" y2="26.625" width="0.127" layer="1"/>
+<wire x1="9.375" y1="26.75" x2="9.35" y2="26.75" width="0.127" layer="1"/>
+<wire x1="10.875" y1="26.25" x2="10.9" y2="26.25" width="0.127" layer="1"/>
 </signal>
 <signal name="LOADER_OUT1">
 <contactref element="U5" pad="12"/>
@@ -1757,79 +1831,201 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <signal name="N$5">
 <contactref element="U5" pad="32"/>
 <contactref element="C16" pad="P$2"/>
-<wire x1="7.7" y1="33.55" x2="9.5" y2="34.6" width="0" layer="19" extent="1-1"/>
+<wire x1="8.625" y1="34.5" x2="7.75" y2="33.625" width="0.127" layer="1"/>
+<wire x1="9.5" y1="34.5" x2="8.625" y2="34.5" width="0.127" layer="1"/>
+<wire x1="7.75" y1="33.625" x2="7.7" y2="33.55" width="0.127" layer="1"/>
+<wire x1="9.5" y1="34.5" x2="9.5" y2="34.6" width="0.127" layer="1"/>
 </signal>
 <signal name="LOADER_PWM1">
 <contactref element="U5" pad="2"/>
 <contactref element="U3" pad="45"/>
-<wire x1="14.25" y1="18.55" x2="10.6" y2="33.5" width="0" layer="19" extent="1-1"/>
+<wire x1="14.25" y1="19.625" x2="14.25" y2="18.55" width="0.127" layer="1"/>
+<wire x1="14.375" y1="19.625" x2="14.25" y2="19.625" width="0.127" layer="1"/>
+<wire x1="14.375" y1="30.125" x2="14.375" y2="19.625" width="0.127" layer="16"/>
+<wire x1="14.875" y1="30.625" x2="14.375" y2="30.125" width="0.127" layer="16"/>
+<wire x1="14.875" y1="30.875" x2="14.875" y2="30.625" width="0.127" layer="16"/>
+<wire x1="14" y1="31.75" x2="14.875" y2="30.875" width="0.127" layer="16"/>
+<wire x1="11.625" y1="31.75" x2="14" y2="31.75" width="0.127" layer="16"/>
+<wire x1="10.625" y1="32.75" x2="11.625" y2="31.75" width="0.127" layer="1"/>
+<wire x1="10.625" y1="33.5" x2="10.625" y2="32.75" width="0.127" layer="1"/>
+<wire x1="10.625" y1="33.5" x2="10.6" y2="33.5" width="0.127" layer="1"/>
+<via x="14.375" y="19.625" extent="1-16" drill="0.1016"/>
+<via x="11.625" y="31.75" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="LOADER_PWM2">
 <contactref element="U5" pad="1"/>
 <contactref element="U3" pad="44"/>
-<wire x1="14.75" y1="18.55" x2="9.45" y2="33.45" width="0" layer="19" extent="1-1"/>
+<wire x1="14.75" y1="30.125" x2="14.75" y2="18.55" width="0.127" layer="1"/>
+<wire x1="12.125" y1="30.125" x2="14.75" y2="30.125" width="0.127" layer="1"/>
+<wire x1="9.5" y1="32.75" x2="12.125" y2="30.125" width="0.127" layer="1"/>
+<wire x1="9.5" y1="33.375" x2="9.5" y2="32.75" width="0.127" layer="1"/>
+<wire x1="9.5" y1="33.375" x2="9.45" y2="33.45" width="0.127" layer="1"/>
 </signal>
 <signal name="LOADER_SF">
 <contactref element="R3" pad="P$1"/>
 <contactref element="U5" pad="21"/>
 <contactref element="U3" pad="8"/>
-<wire x1="12.05" y1="14.35" x2="13" y2="40.5" width="0" layer="19" extent="1-1"/>
-<wire x1="9.2" y1="14.35" x2="12.05" y2="14.35" width="0" layer="19" extent="1-1"/>
+<wire x1="9.25" y1="14.375" x2="12" y2="14.375" width="0.127" layer="1"/>
+<wire x1="12" y1="14.375" x2="12.05" y2="14.35" width="0.127" layer="1"/>
+<wire x1="9.25" y1="14.375" x2="9.2" y2="14.35" width="0.127" layer="1"/>
+<wire x1="13" y1="41.375" x2="13" y2="40.5" width="0.127" layer="1"/>
+<wire x1="12.625" y1="41.375" x2="13" y2="41.375" width="0.127" layer="1"/>
+<wire x1="10.5" y1="41.375" x2="12.625" y2="41.375" width="0.127" layer="16"/>
+<wire x1="8.25" y1="39.125" x2="10.5" y2="41.375" width="0.127" layer="16"/>
+<wire x1="8.25" y1="25.375" x2="8.25" y2="39.125" width="0.127" layer="16"/>
+<wire x1="8" y1="25.125" x2="8.25" y2="25.375" width="0.127" layer="16"/>
+<wire x1="8" y1="14.5" x2="8" y2="25.125" width="0.127" layer="16"/>
+<wire x1="8.125" y1="14.375" x2="8" y2="14.5" width="0.127" layer="1"/>
+<wire x1="9.125" y1="14.375" x2="8.125" y2="14.375" width="0.127" layer="1"/>
+<wire x1="9.125" y1="14.375" x2="9.2" y2="14.35" width="0.127" layer="1"/>
+<via x="12.625" y="41.375" extent="1-16" drill="0.1016"/>
+<via x="8" y="14.5" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="LOADER_FB">
 <contactref element="U5" pad="8"/>
 <contactref element="R4" pad="P$2"/>
 <contactref element="U3" pad="9"/>
-<wire x1="15.55" y1="31.6" x2="15.4" y2="33.5" width="0" layer="19" extent="1-1"/>
-<wire x1="12.05" y1="13.85" x2="15.55" y2="31.6" width="0" layer="19" extent="1-1"/>
+<wire x1="11.875" y1="14" x2="12" y2="13.875" width="0.127" layer="1"/>
+<wire x1="10.25" y1="14" x2="11.875" y2="14" width="0.127" layer="1"/>
+<wire x1="10.25" y1="24.5" x2="10.25" y2="14" width="0.127" layer="16"/>
+<wire x1="14" y1="28.25" x2="10.25" y2="24.5" width="0.127" layer="16"/>
+<wire x1="14" y1="30.25" x2="14" y2="28.25" width="0.127" layer="16"/>
+<wire x1="14.5" y1="30.75" x2="14" y2="30.25" width="0.127" layer="16"/>
+<wire x1="15.35" y1="31.6" x2="14.5" y2="30.75" width="0.127" layer="1"/>
+<wire x1="12" y1="13.875" x2="12.05" y2="13.85" width="0.127" layer="1"/>
+<wire x1="15.375" y1="31.625" x2="15.375" y2="33.5" width="0.127" layer="1"/>
+<wire x1="15.375" y1="33.5" x2="15.4" y2="33.5" width="0.127" layer="1"/>
+<wire x1="15.375" y1="31.625" x2="15.35" y2="31.6" width="0.127" layer="1"/>
+<via x="10.25" y="14" extent="1-16" drill="0.1016"/>
+<via x="14.5" y="30.75" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="LOADER_D1">
 <contactref element="U5" pad="26"/>
 <contactref element="U3" pad="47"/>
-<wire x1="13.25" y1="18.55" x2="9.5" y2="39.4" width="0" layer="19" extent="1-1"/>
+<wire x1="13.25" y1="27.875" x2="13.25" y2="18.55" width="0.127" layer="1"/>
+<wire x1="12.125" y1="27.875" x2="13.25" y2="27.875" width="0.127" layer="1"/>
+<wire x1="9.25" y1="30.75" x2="12.125" y2="27.875" width="0.127" layer="1"/>
+<wire x1="9.25" y1="38.375" x2="9.25" y2="30.75" width="0.127" layer="16"/>
+<wire x1="8.625" y1="39" x2="9.25" y2="38.375" width="0.127" layer="16"/>
+<wire x1="9" y1="39.375" x2="8.625" y2="39" width="0.127" layer="1"/>
+<wire x1="9.5" y1="39.375" x2="9" y2="39.375" width="0.127" layer="1"/>
+<wire x1="9.5" y1="39.375" x2="9.5" y2="39.4" width="0.127" layer="1"/>
+<via x="9.25" y="30.75" extent="1-16" drill="0.1016"/>
+<via x="8.625" y="39" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="GLOBAL_EN">
 <contactref element="U5" pad="10"/>
 <contactref element="U6" pad="10"/>
 <contactref element="ARM" pad="2"/>
 <contactref element="U3" pad="25"/>
-<wire x1="16.5" y1="34.6" x2="31" y2="34.6" width="0" layer="19" extent="1-1"/>
-<wire x1="18.95" y1="12.35" x2="16.5" y2="34.6" width="0" layer="19" extent="1-1"/>
-<wire x1="25" y1="3.95" x2="18.95" y2="12.35" width="0" layer="19" extent="1-1"/>
+<wire x1="25" y1="6.25" x2="20.875" y2="10.375" width="0.127" layer="1"/>
+<wire x1="20.875" y1="10.375" x2="19" y2="12.25" width="0.127" layer="1"/>
+<wire x1="25" y1="3.95" x2="25" y2="6.25" width="0.127" layer="1"/>
+<wire x1="19" y1="12.25" x2="18.95" y2="12.35" width="0.127" layer="1"/>
+<wire x1="16.75" y1="34.25" x2="16.5" y2="34.5" width="0.127" layer="1"/>
+<wire x1="18" y1="34.25" x2="16.75" y2="34.25" width="0.127" layer="1"/>
+<wire x1="23.625" y1="34.25" x2="18" y2="34.25" width="0.127" layer="16"/>
+<wire x1="25.75" y1="32.125" x2="23.625" y2="34.25" width="0.127" layer="16"/>
+<wire x1="29.875" y1="32.125" x2="27.25" y2="32.125" width="0.127" layer="16"/>
+<wire x1="27.25" y1="32.125" x2="25.75" y2="32.125" width="0.127" layer="16"/>
+<wire x1="31.875" y1="34.125" x2="29.875" y2="32.125" width="0.127" layer="16"/>
+<wire x1="31.5" y1="34.5" x2="31.875" y2="34.125" width="0.127" layer="1"/>
+<wire x1="31" y1="34.5" x2="31.5" y2="34.5" width="0.127" layer="1"/>
+<wire x1="16.5" y1="34.5" x2="16.5" y2="34.6" width="0.127" layer="1"/>
+<wire x1="31" y1="34.5" x2="31" y2="34.6" width="0.127" layer="1"/>
+<wire x1="27.25" y1="16.75" x2="20.875" y2="10.375" width="0.127" layer="16"/>
+<wire x1="27.25" y1="32.125" x2="27.25" y2="16.75" width="0.127" layer="16"/>
+<via x="18" y="34.25" extent="1-16" drill="0.1016"/>
+<via x="31.875" y="34.125" extent="1-16" drill="0.1016"/>
+<via x="20.875" y="10.375" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="N$1">
 <contactref element="U6" pad="32"/>
 <contactref element="C20" pad="P$2"/>
-<wire x1="22.15" y1="33" x2="24" y2="34.6" width="0" layer="19" extent="1-1"/>
+<wire x1="22.25" y1="34.5" x2="22.25" y2="33" width="0.127" layer="1"/>
+<wire x1="24" y1="34.5" x2="22.25" y2="34.5" width="0.127" layer="1"/>
+<wire x1="22.25" y1="33" x2="22.15" y2="33" width="0.127" layer="1"/>
+<wire x1="24" y1="34.5" x2="24" y2="34.6" width="0.127" layer="1"/>
 </signal>
 <signal name="AEG_SF">
 <contactref element="R5" pad="P$1"/>
 <contactref element="U6" pad="21"/>
 <contactref element="U3" pad="31"/>
-<wire x1="18.95" y1="15.35" x2="27.5" y2="40.5" width="0" layer="19" extent="1-1"/>
-<wire x1="20.9" y1="14.55" x2="18.95" y2="15.35" width="0" layer="19" extent="1-1"/>
+<wire x1="20.125" y1="15.375" x2="19" y2="15.375" width="0.127" layer="1"/>
+<wire x1="20.875" y1="14.625" x2="20.375" y2="15.125" width="0.127" layer="1"/>
+<wire x1="20.375" y1="15.125" x2="20.125" y2="15.375" width="0.127" layer="1"/>
+<wire x1="19" y1="15.375" x2="18.95" y2="15.35" width="0.127" layer="1"/>
+<wire x1="20.875" y1="14.625" x2="20.9" y2="14.55" width="0.127" layer="1"/>
+<wire x1="27.5" y1="41.375" x2="27.5" y2="40.5" width="0.127" layer="1"/>
+<wire x1="27.125" y1="41.375" x2="27.5" y2="41.375" width="0.127" layer="1"/>
+<wire x1="18.875" y1="41.375" x2="27.125" y2="41.375" width="0.127" layer="16"/>
+<wire x1="15.75" y1="38.25" x2="18.875" y2="41.375" width="0.127" layer="16"/>
+<wire x1="15.75" y1="22.125" x2="15.75" y2="38.25" width="0.127" layer="16"/>
+<wire x1="19.375" y1="18.5" x2="15.75" y2="22.125" width="0.127" layer="16"/>
+<wire x1="19.375" y1="14.875" x2="19.375" y2="18.5" width="0.127" layer="16"/>
+<wire x1="19.75" y1="14.5" x2="19.375" y2="14.875" width="0.127" layer="16"/>
+<wire x1="20.375" y1="15.125" x2="19.75" y2="14.5" width="0.127" layer="1"/>
+<via x="27.125" y="41.375" extent="1-16" drill="0.1016"/>
+<via x="19.75" y="14.5" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="AEG_FB">
 <contactref element="U6" pad="8"/>
 <contactref element="R6" pad="P$2"/>
 <contactref element="U3" pad="30"/>
-<wire x1="29.85" y1="31.7" x2="29.9" y2="33.5" width="0" layer="19" extent="1-1"/>
-<wire x1="18.95" y1="14.85" x2="29.85" y2="31.7" width="0" layer="19" extent="1-1"/>
+<wire x1="19.125" y1="15" x2="19" y2="14.875" width="0.127" layer="1"/>
+<wire x1="19.75" y1="15" x2="19.125" y2="15" width="0.127" layer="1"/>
+<wire x1="19.75" y1="19" x2="19.75" y2="15" width="0.127" layer="16"/>
+<wire x1="25.75" y1="25" x2="19.75" y2="19" width="0.127" layer="16"/>
+<wire x1="29.75" y1="29" x2="25.75" y2="25" width="0.127" layer="1"/>
+<wire x1="29.75" y1="31.625" x2="29.75" y2="29" width="0.127" layer="1"/>
+<wire x1="19" y1="14.875" x2="18.95" y2="14.85" width="0.127" layer="1"/>
+<wire x1="29.75" y1="31.625" x2="29.85" y2="31.7" width="0.127" layer="1"/>
+<wire x1="29.875" y1="31.75" x2="29.875" y2="33.5" width="0.127" layer="1"/>
+<wire x1="29.875" y1="33.5" x2="29.9" y2="33.5" width="0.127" layer="1"/>
+<wire x1="29.875" y1="31.75" x2="29.85" y2="31.7" width="0.127" layer="1"/>
+<via x="19.75" y="15" extent="1-16" drill="0.1016"/>
+<via x="25.75" y="25" extent="1-16" drill="0.1016"/>
 </signal>
 <signal name="AEG_PWM">
 <contactref element="U6" pad="2"/>
 <contactref element="U3" pad="42"/>
-<wire x1="15.75" y1="18.55" x2="25.1" y2="33.5" width="0" layer="19" extent="1-1"/>
+<wire x1="15.75" y1="20.125" x2="15.75" y2="18.55" width="0.127" layer="1"/>
+<wire x1="17.875" y1="20.125" x2="15.75" y2="20.125" width="0.127" layer="1"/>
+<wire x1="21.375" y1="23.625" x2="17.875" y2="20.125" width="0.127" layer="1"/>
+<wire x1="21.375" y1="30.5" x2="21.375" y2="23.625" width="0.127" layer="1"/>
+<wire x1="23.5" y1="32.625" x2="21.375" y2="30.5" width="0.127" layer="1"/>
+<wire x1="24.5" y1="32.625" x2="23.5" y2="32.625" width="0.127" layer="1"/>
+<wire x1="25" y1="33.125" x2="24.5" y2="32.625" width="0.127" layer="1"/>
+<wire x1="25" y1="33.5" x2="25" y2="33.125" width="0.127" layer="1"/>
+<wire x1="25" y1="33.5" x2="25.1" y2="33.5" width="0.127" layer="1"/>
 </signal>
 <signal name="MISC_PWM">
 <contactref element="U6" pad="1"/>
 <contactref element="U3" pad="43"/>
-<wire x1="15.25" y1="18.55" x2="23.95" y2="33.45" width="0" layer="19" extent="1-1"/>
+<wire x1="15.25" y1="30.25" x2="15.25" y2="18.55" width="0.127" layer="1"/>
+<wire x1="20.75" y1="30.25" x2="15.25" y2="30.25" width="0.127" layer="1"/>
+<wire x1="23.95" y1="33.45" x2="20.75" y2="30.25" width="0.127" layer="1"/>
 </signal>
 <signal name="AEG_D1">
 <contactref element="U6" pad="26"/>
 <contactref element="U3" pad="41"/>
-<wire x1="16.25" y1="18.55" x2="24" y2="39.4" width="0" layer="19" extent="1-1"/>
+<wire x1="16.25" y1="19.75" x2="16.25" y2="18.55" width="0.127" layer="1"/>
+<wire x1="20.625" y1="19.75" x2="16.25" y2="19.75" width="0.127" layer="1"/>
+<wire x1="25.5" y1="24.625" x2="20.625" y2="19.75" width="0.127" layer="1"/>
+<wire x1="28" y1="24.625" x2="25.5" y2="24.625" width="0.127" layer="1"/>
+<wire x1="34.75" y1="31.375" x2="28" y2="24.625" width="0.127" layer="1"/>
+<wire x1="34.75" y1="43" x2="34.75" y2="31.375" width="0.127" layer="1"/>
+<wire x1="33.125" y1="43" x2="34.75" y2="43" width="0.127" layer="1"/>
+<wire x1="30.125" y1="46" x2="33.125" y2="43" width="0.127" layer="1"/>
+<wire x1="30.125" y1="46.75" x2="30.125" y2="46" width="0.127" layer="1"/>
+<wire x1="26.125" y1="46.75" x2="30.125" y2="46.75" width="0.127" layer="1"/>
+<wire x1="23.875" y1="44.5" x2="26.125" y2="46.75" width="0.127" layer="1"/>
+<wire x1="23.875" y1="41.375" x2="23.875" y2="44.5" width="0.127" layer="1"/>
+<wire x1="23.375" y1="41.375" x2="23.875" y2="41.375" width="0.127" layer="1"/>
+<wire x1="23.125" y1="41.125" x2="23.375" y2="41.375" width="0.127" layer="1"/>
+<wire x1="23.125" y1="39.5" x2="23.125" y2="41.125" width="0.127" layer="1"/>
+<wire x1="24" y1="39.5" x2="23.125" y2="39.5" width="0.127" layer="1"/>
+<wire x1="24" y1="39.5" x2="24" y2="39.4" width="0.127" layer="1"/>
 </signal>
 <signal name="AEG_OUT">
 <contactref element="U6" pad="12"/>
@@ -1856,9 +2052,9 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <contactref element="J3" pad="1"/>
 <wire x1="20.33" y1="45" x2="20.33" y2="40.5" width="1.016" layer="1"/>
 <wire x1="20.33" y1="40.5" x2="21.5" y2="40.5" width="1.016" layer="1"/>
-<wire x1="21.5" y1="40.5" x2="22.6318" y2="40.5" width="0.6096" layer="1"/>
-<wire x1="22.6318" y1="37.8" x2="24" y2="37.8" width="0.6096" layer="1"/>
-<wire x1="22.6318" y1="40.5" x2="22.6318" y2="37.8" width="0.6096" layer="1"/>
+<wire x1="21.5" y1="40.5" x2="22.4318" y2="40.5" width="0.6096" layer="1"/>
+<wire x1="22.4318" y1="37.8" x2="24" y2="37.8" width="0.6096" layer="1"/>
+<wire x1="22.4318" y1="40.5" x2="22.4318" y2="37.8" width="0.6096" layer="1"/>
 <polygon width="0.127" layer="1" thermals="no">
 <vertex x="23.4" y="38.8"/>
 <vertex x="24.6" y="38.8"/>
@@ -1869,12 +2065,24 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <signal name="LASER_EN">
 <contactref element="U1" pad="P$1"/>
 <contactref element="U3" pad="2"/>
-<wire x1="12.05" y1="17.35" x2="2.95" y2="37.8" width="0" layer="19" extent="1-1"/>
+<wire x1="9.125" y1="17.25" x2="12" y2="17.25" width="0.127" layer="1"/>
+<wire x1="7" y1="15.125" x2="9.125" y2="17.25" width="0.127" layer="1"/>
+<wire x1="7" y1="14.5" x2="7" y2="15.125" width="0.127" layer="1"/>
+<wire x1="2.625" y1="14.5" x2="7" y2="14.5" width="0.127" layer="1"/>
+<wire x1="1.625" y1="15.5" x2="2.625" y2="14.5" width="0.127" layer="1"/>
+<wire x1="1.625" y1="37.75" x2="1.625" y2="15.5" width="0.127" layer="1"/>
+<wire x1="2.875" y1="37.75" x2="1.625" y2="37.75" width="0.127" layer="1"/>
+<wire x1="12" y1="17.25" x2="12.05" y2="17.35" width="0.127" layer="1"/>
+<wire x1="2.875" y1="37.75" x2="2.95" y2="37.8" width="0.127" layer="1"/>
 </signal>
 <signal name="N$2">
 <contactref element="U1" pad="P$3"/>
 <contactref element="J1" pad="2"/>
-<wire x1="3.9" y1="39.8" x2="7.93" y2="45" width="0" layer="19" extent="1-1"/>
+<wire x1="4" y1="43.125" x2="4" y2="39.875" width="0.127" layer="1"/>
+<wire x1="6" y1="43.125" x2="4" y2="43.125" width="0.127" layer="1"/>
+<wire x1="7.875" y1="45" x2="6" y2="43.125" width="0.127" layer="1"/>
+<wire x1="4" y1="39.875" x2="3.9" y2="39.8" width="0.127" layer="1"/>
+<wire x1="7.875" y1="45" x2="7.93" y2="45" width="0.127" layer="1"/>
 </signal>
 <signal name="N$3">
 <contactref element="J5" pad="1"/>
@@ -1885,12 +2093,12 @@ This DRC check is for 4-Layer with 4 mil diameter drills to be manufactured thro
 <signal name="N$39">
 <contactref element="R1" pad="P$1"/>
 <contactref element="D1" pad="ANODE"/>
-<wire x1="8.5" y1="5.05" x2="8.5" y2="6.75" width="0" layer="19" extent="1-1"/>
+<wire x1="8.5" y1="5.05" x2="8.5" y2="6.75" width="0.127" layer="1"/>
 </signal>
 <signal name="N$40">
 <contactref element="R2" pad="P$1"/>
 <contactref element="D2" pad="ANODE"/>
-<wire x1="10.5" y1="5.05" x2="10.5" y2="6.75" width="0" layer="19" extent="1-1"/>
+<wire x1="10.5" y1="5.05" x2="10.5" y2="6.75" width="0.127" layer="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
