@@ -1,25 +1,27 @@
- * aeg_driver
-  * round part placement
-  * fine align parts
-  * route power
-  * route CAN
-  * route drives
-  * rough align silks and fix sizes
-  * autoroute
-  * fine align silks
-
  * Mech warfare
-   * rough design of turret
-     * lay out frame for right side
-     * rpi camera
-     * fpv camera
-     * lens guard
-     * outer shell /w power switch
+   * turret
+     * build power cables
+       * power -> aeg
+       * power -> fpv
+     * build data cables
+       * rpi -> pitch
+       * pitch -> yaw
+       * rpi -> power_dist
+     * top shell interferes with antenna
+     * top shell interferes with pi power cable, will even more with
+       3mm more space
+     * top shell top bolt pattern doesn't match right frame or back of
+       loader cap
+     * top shell needs more material behind lens inserts
+     * maybe could move entire pi closer to mid frame, just need to
+       re-print right frame, right pitch,  and pi bracket?
+     * bottom shell needs more material around lens inserts
+     * battery cover could use thicker detents on the tabs
 
-     * maybe make base larger, so that bolts mounting to top of robot
-       can be installed while the entire thing is assembled.
-     * maybe make a separate cover for yaw controller so it isn't
-       exposed.
+     * write application!
+     * get camera working on rpi in realtime w/ no X
+     * install 15mm spacers on rpi
+
 
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
@@ -154,6 +156,14 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-04-25
+ * Finished basic assembly of turret
+ * Verified CAN works to both moteus boards and the power distribution
+   board
+
+DONE 2020-04-16
+ * Ordered AEG board
 
 DONE 2020-04-15
  * Progress on turret... rough layout of aeg_driver done.  CAD for
