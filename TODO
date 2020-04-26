@@ -1,12 +1,24 @@
  * Mech warfare
    * turret
+     * write application!
+       * configure zero position on servos
+       * Support sign changes on servos
+       * integrate web control
+       * write simple web app
+       * make IMU orientation configurable
+       * set cpu affinity
+       * write control loop
+       * connect up RF control
+       * write client application for RF control (or make regular one do that)
+       * write starting script that copies start-robot.sh
+       * factor out code to parse data from servos from  UpdateStatus
+
+     * make magnet spacers get the magnets closer to the chips for
+       improved velocity estimates
+
      * build power cables
        * power -> aeg
        * power -> fpv
-     * build data cables
-       * rpi -> pitch
-       * pitch -> yaw
-       * rpi -> power_dist
      * top shell interferes with antenna
      * top shell interferes with pi power cable, will even more with
        3mm more space
@@ -18,7 +30,6 @@
      * bottom shell needs more material around lens inserts
      * battery cover could use thicker detents on the tabs
 
-     * write application!
      * get camera working on rpi in realtime w/ no X
      * install 15mm spacers on rpi
 
@@ -161,6 +172,10 @@ DONE 2020-04-25
  * Finished basic assembly of turret
  * Verified CAN works to both moteus boards and the power distribution
    board
+ * turret application
+  * stub application
+  * reports IMU and servo values in some form to log
+
 
 DONE 2020-04-16
  * Ordered AEG board
