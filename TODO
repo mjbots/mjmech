@@ -1,15 +1,10 @@
  * Mech warfare
    * turret
      * write application!
-       * configure zero position on servos
-       * Support sign changes on servos
-       * integrate web control
-       * write simple web app
-       * make IMU orientation configurable
-       * set cpu affinity
        * write control loop
        * connect up RF control
        * write client application for RF control (or make regular one do that)
+       * set cpu affinity
        * write starting script that copies start-robot.sh
        * factor out code to parse data from servos from  UpdateStatus
 
@@ -56,8 +51,6 @@
  * RF Control
    * With chip antenna nrf, I unexpectedly see more than 50 per second
      received on the robot side?
-   * RfControl reports useless velocity field, needs to report correct
-     one
    * The raspberry pi aux hat got into a state where either it, or the
      master was only sending slot 0 and 1 with the app going, and when
      the app was stopped it alternated between 0/1 and 8.
@@ -175,7 +168,10 @@ DONE 2020-04-25
  * turret application
   * stub application
   * reports IMU and servo values in some form to log
-
+  * configure zero position on servos
+  * Support sign changes on servos
+  * make IMU orientation configurable
+  * made a simple web app
 
 DONE 2020-04-16
  * Ordered AEG board
