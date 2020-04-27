@@ -1,11 +1,17 @@
  * Mech warfare
    * turret
      * write application!
-       * write control loop
-       * connect up RF control
+       * make nrfusb support two slaves
+       * update rf_command
        * write client application for RF control (or make regular one do that)
-       * set cpu affinity
        * write starting script that copies start-robot.sh
+       * hook up power_dist switch for soft shutdown
+       * auto-start application
+       * audible clicks when starting or stopping yaw
+         * maybe limit angular acceleration?
+       * also some amount of overshoot when moving very fast
+       * limit pitch based on absolute limits
+       * Running faster than 400Hz gives odd timing results
        * factor out code to parse data from servos from  UpdateStatus
 
      * make magnet spacers get the magnets closer to the chips for
@@ -160,6 +166,12 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-04-26
+ * turret app
+  * wrote control loop
+  * set cpu affinity
+  * wrote app side RF link
 
 DONE 2020-04-25
  * Finished basic assembly of turret
