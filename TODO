@@ -1,13 +1,25 @@
  * Mech warfare
    * turret
-     * write application!
-       * get captured frames into turret app
-       * test simpler fiducials... see at what range it can be
-         recognized at what resolution
-       * get online target tracking working at fixed resolution
-       * switch resolutions and cropping live to get higher frame rate
-         tracking at long distances
+     * tracking
+       * propagate position based on IMU
+         * need calibration of camera FOV vs IMU
+       * change base target position based on range
+       * better response when target drops in and out of view
+       * add D term
+       * report up size of detection in addition to location
+       * see how barrel interferes with detection
+       * add a way to tweak where relative to automatic track we are aiming
+         * maybe re-interpret rates as positions relative to target
+           size in tracking mode?
+       * switch to something more suitable than aruco
+         * works at longer range and is faster... maybe implementable on GPU?
+       * switch to searching a smaller region when actively tracking for fast frame
+         rate
+       * create performance tests for target tracker
+       * render target in rf_command somehow
+         * do I want to try and register it to the FPV camera
 
+     * write application!
        * make robot command be relative to turret, not robot
        * need more functional joystick rates, either expo or piecewise linear
 
@@ -21,6 +33,7 @@
 
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
+     * add physical switch for FPV camera, since it interferes with wifi
 
      * build power cables
        * power -> aeg
