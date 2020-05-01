@@ -1,11 +1,15 @@
  * Mech warfare
    * turret
      * write application!
+       * get captured frames into turret app
+       * test simpler fiducials... see at what range it can be
+         recognized at what resolution
+       * get online target tracking working at fixed resolution
+       * switch resolutions and cropping live to get higher frame rate
+         tracking at long distances
+
        * make robot command be relative to turret, not robot
        * need more functional joystick rates, either expo or piecewise linear
-
-       * get camera working on rpi in realtime w/ no X
-       * integrate target tracking
 
        * write starting script that copies start-robot.sh
        * hook up power_dist switch for soft shutdown
@@ -122,13 +126,8 @@
      * maybe update quadruped_control to command and query in one operation?
    * Make the CAN client runtime switchable so that quad A0 will work too
 
-
  * Set up rpi wifi to use a hostname with the MAC address encoded in
    it for uniqueness
-
-
- * setup-system.py didn't leave the camera in a configured state, I
-   had to runraspi-config manually
 
  * Make turret more rigid and smaller
    * Build AEG/laser/agitator only board w/ pass-through power-data
@@ -165,6 +164,9 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-05-01
+ * Verified camera works with raspivid
 
 DONE 2020-04-30
  * moved turret pi 3mm closer to bracket
