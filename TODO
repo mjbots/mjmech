@@ -1,43 +1,42 @@
  * Mech warfare
    * turret
      * write application!
-       * make nrfusb support two slaves
-       * update rf_command
-       * write client application for RF control (or make regular one do that)
+       * make robot command be relative to turret, not robot
+       * need more functional joystick rates, either expo or piecewise linear
+
+       * get camera working on rpi in realtime w/ no X
+       * integrate target tracking
+
        * write starting script that copies start-robot.sh
        * hook up power_dist switch for soft shutdown
        * auto-start application
        * audible clicks when starting or stopping yaw
          * maybe limit angular acceleration?
        * also some amount of overshoot when moving very fast
-       * limit pitch based on absolute limits
        * Running faster than 400Hz gives odd timing results
-       * factor out code to parse data from servos from  UpdateStatus
 
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
 
      * build power cables
        * power -> aeg
-       * power -> fpv
      * top shell interferes with antenna
      * top shell interferes with pi power cable, will even more with
        3mm more space
      * top shell top bolt pattern doesn't match right frame or back of
        loader cap
      * top shell needs more material behind lens inserts
-     * maybe could move entire pi closer to mid frame, just need to
-       re-print right frame, right pitch,  and pi bracket?
      * bottom shell needs more material around lens inserts
      * battery cover could use thicker detents on the tabs
-
-     * get camera working on rpi in realtime w/ no X
-     * install 15mm spacers on rpi
-
 
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
      motor joint and onto bare motor
+
+ * flip
+  * BLOCKED on new leg
+  * Need to update mass and moments for legs and chassis in sim
+  * Test with realistic speed limits for all joints
 
  * Further jump work
 
@@ -166,6 +165,15 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-04-30
+ * moved turret pi 3mm closer to bracket
+ * got rf_command receiving telemetry from both things simultaneously
+ * got rf_command sending commands to turret
+ * limit pitch based on absolute limits
+
+DONE 2020-04-27
+ * got flip to work in sim!
 
 DONE 2020-04-26
  * turret app
