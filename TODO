@@ -1,3 +1,15 @@
+ * voltage feedback over RF needs to be finer grained than volt, at
+   least 0.25 volt
+
+ * jumping stuttered at low forward speeds
+ * idle pose is unreachable on real robot, need realistic joint limits
+   in sim
+ * could use to have a separate pose for standing-up/sitting down so
+   that we aren't constrained by what is reachable from lying down
+   when walking
+
+
+
  * Mech warfare
    * turret
      * tracking
@@ -18,6 +30,7 @@
        * create performance tests for target tracker
        * render target in rf_command somehow
          * do I want to try and register it to the FPV camera
+       * optionally record a subset of images somewhere, maybe main log?
 
      * write application!
        * make robot command be relative to turret, not robot
@@ -33,22 +46,17 @@
 
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
-     * add physical switch for FPV camera, since it interferes with wifi
 
      * build power cables
        * power -> aeg
-     * top shell interferes with antenna
-     * top shell interferes with pi power cable, will even more with
-       3mm more space
-     * top shell top bolt pattern doesn't match right frame or back of
-       loader cap
-     * top shell needs more material behind lens inserts
-     * bottom shell needs more material around lens inserts
-     * battery cover could use thicker detents on the tabs
+     * build slide switch for fpv power
 
+   * somehow configure mass differently when running with the turret
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
      motor joint and onto bare motor
+   * make some control mechanism to squat or pitch/roll to aim at low
+     things
 
  * flip
   * BLOCKED on new leg
@@ -119,11 +127,6 @@
  * make "quad" sticker to go under the mjbots one
  * resolve all TODOs on pi3 hat
 
- * UI improvements
-   * update command UI to use shoulder+dpad to select gait, start to
-     control active, and one of the buttons to force motion even with
-     no analog stick
-
  * telemetry
    * make new telemetry log plotting tool
    * get 3d diagnostics rendering working
@@ -132,29 +135,11 @@
  * Just use "id" for all joint and leg ids
 
  * Fix setup
-   * Make setup-system.py setup isolcpus
    * Improve cycle time of fdcan query
      * remove can id high header bytes
      * optimize hold times
      * maybe update quadruped_control to command and query in one operation?
    * Make the CAN client runtime switchable so that quad A0 will work too
-
- * Set up rpi wifi to use a hostname with the MAC address encoded in
-   it for uniqueness
-
- * Make turret more rigid and smaller
-   * Build AEG/laser/agitator only board w/ pass-through power-data
-   * Design new AEG feeder mechanism with BB holder hard mounted to
-     the AEG and lower down out of 3D printed parts
-   * Design new gimbal with more generic mounting options... room for
-     1 or 2 AEGs and computers... maybe slip ring for 360 rotation?
-   * this would remove the need for the massive shroud by getting rid
-     of the dedicated AEG joining wire, and reduce the jiggles that
-     happen when walking
-
- * Switch to using a gear reduction for lower leg...
-   * It needs to supply nearly all the torque, so it is worth aiming
-     for a 2x reduction
 
  * Lifecycle
    * Provide means to change control board LED flash pattern over CAN
@@ -177,6 +162,22 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-05-02
+ * turret
+   * Got everything replaced so that real battery fits
+   * mid-plate needs cutout for battery terminal
+   * battery cover exit should line up with new battery's terminal
+   * battery cover could use thicker detents on the tabs
+   * top shell interferes with antenna
+   * top shell interferes with pi power cable, will even more with
+     3mm more space
+   * top/bottom shell needs space around power dist board power
+     plugs for wires to escape
+   * top shell needs more material behind lens inserts
+   * bottom shell needs more material around lens inserts
+   * top shell top bolt pattern doesn't match right frame or back of
+     loader cap
 
 DONE 2020-05-01
  * Verified camera works with raspivid
