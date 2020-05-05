@@ -1,17 +1,9 @@
- * voltage feedback over RF needs to be finer grained than volt, at
-   least 0.25 volt
-
- * jumping stuttered at low forward speeds
- * idle pose is unreachable on real robot, need realistic joint limits
-   in sim
- * could use to have a separate pose for standing-up/sitting down so
-   that we aren't constrained by what is reachable from lying down
-   when walking
-
-
-
  * Mech warfare
    * turret
+     * write application!
+       * make robot command be relative to turret, not robot
+       * Running faster than 400Hz gives odd timing results
+
      * tracking
        * propagate position based on IMU
          * need calibration of camera FOV vs IMU
@@ -32,18 +24,6 @@
          * do I want to try and register it to the FPV camera
        * optionally record a subset of images somewhere, maybe main log?
 
-     * write application!
-       * make robot command be relative to turret, not robot
-       * need more functional joystick rates, either expo or piecewise linear
-
-       * write starting script that copies start-robot.sh
-       * hook up power_dist switch for soft shutdown
-       * auto-start application
-       * audible clicks when starting or stopping yaw
-         * maybe limit angular acceleration?
-       * also some amount of overshoot when moving very fast
-       * Running faster than 400Hz gives odd timing results
-
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
 
@@ -52,18 +32,29 @@
      * build slide switch for fpv power
 
    * somehow configure mass differently when running with the turret
+   * Need cover for main power switch so a BB doesn't hit it
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
      motor joint and onto bare motor
    * make some control mechanism to squat or pitch/roll to aim at low
      things
 
+ * walking
+  * test of 2 leg level balance in isolation
+  * if that works, try integrating into walk gait
+
  * flip
-  * BLOCKED on new leg
+  * Get it to go again with reduced joint velocities
   * Need to update mass and moments for legs and chassis in sim
-  * Test with realistic speed limits for all joints
+  * not sure gains are increased after landing so that it can stand
+    again
 
  * Further jump work
+
+   * jump parameters are pretty twitchy... the "landing" phase doesn't
+     follow any controlled velocity trajectory very well.  Sometimes
+     landing is entered too early because retracting didn't follow
+     well.
 
    * legs need to move *past* idle when in retract phase to have maximum travel
      * need to somehow control gait cycle time to manage speed and not
@@ -95,14 +86,9 @@
  * simulator
    * get mass to be correct for each leg and the main body
    * measure moment of all the moveable parts
-   * get walking and pronking to roughly match reality
-   * flip coordinate system for viewing to fix mirroring
    * start in an appropriate position rather than falling
 
  * Add sheathing to remaining cables
-
- * make fixture to hold legs in absolute zero position for zeroing
-   operation
 
 
  * mjlib telemetry
@@ -162,6 +148,17 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-05-04
+ * turret
+   * need more functional joystick rates, either expo or piecewise linear
+   * limited angular acceleration
+
+DONE 2020-05-03
+ * voltage feedback over RF needs to be finer grained than volt, at
+   least 0.25 volt
+ * start turret SW at boot
+ * soft-shutdown
 
 DONE 2020-05-02
  * turret
