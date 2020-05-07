@@ -1,7 +1,15 @@
  * Mech warfare
+   * Need cover for main power switch so a BB doesn't hit it
+   * build "plugs" to cover and protect the cable entry points on
+     exterior motors... clamp around cables and somehow snap onto upper
+     motor joint and onto bare motor
+     * also for blank power switch
+     * and for cable exit points from chassis (maybe could double as
+       switch cover?
+
+
    * turret
      * write application!
-       * make robot command be relative to turret, not robot
        * Running faster than 400Hz gives odd timing results
 
      * tracking
@@ -29,19 +37,16 @@
 
      * build power cables
        * power -> aeg
-     * build slide switch for fpv power
 
-   * somehow configure mass differently when running with the turret
-   * Need cover for main power switch so a BB doesn't hit it
-   * build "plugs" to cover and protect the cable entry points on
-     exterior motors... clamp around cables and somehow snap onto upper
-     motor joint and onto bare motor
+   * render mech orientation graphically in rf_command in turret mode
    * make some control mechanism to squat or pitch/roll to aim at low
      things
 
  * walking
   * test of 2 leg level balance in isolation
   * if that works, try integrating into walk gait
+
+ * Had to power cycle master nrfusb to get reception working?
 
  * flip
   * Get it to go again with reduced joint velocities
@@ -148,6 +153,14 @@ Movement
 
 History
 ~~~~~~~
+
+DONE 2020-05-06
+ * Made movement relative to turret when present
+ * built slide switch for FPV power
+
+DONE 2020-05-05
+ * created a mechanism to have a slightly different configuration for
+   the mech warfare case
 
 DONE 2020-05-04
  * turret
