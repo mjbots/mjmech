@@ -6,7 +6,7 @@
      * also for blank power switch
      * and for cable exit points from chassis (maybe could double as
        switch cover?
-
+   * measure walking battery life
 
    * turret
      * write application!
@@ -32,6 +32,7 @@
          * do I want to try and register it to the FPV camera
        * optionally record a subset of images somewhere, maybe main log?
 
+     * get a shorter ffc cable for pi camera
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
 
