@@ -142,14 +142,6 @@
  * numerical turret angle isn't as handy as seeing a diagram of the
    robots current configuration relative to the turret
 
-Movement
-~~~~~~~~
-
- * tplot
-  * render mech in 3d
-  * render joint torques, feedforward torques, and difference
-  * integrate tplot and tview, so it can display live data as well as
-    logged data
 
 
 History
