@@ -1,4 +1,7 @@
 Ideas
 
+ * Make better silk labels for connectors to indicate which goes where
+   and with what polarity
+
  * Add some logic/debug outs
  * Add a vsense line
