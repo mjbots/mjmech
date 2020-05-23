@@ -1,4 +1,8 @@
  * Mech warfare
+   * add reticule and configurable camera offset
+   * control rates should be nerfed even more than zoom rate
+   * test shooting purely using FPV
+   * test FPV and control range
    * Need cover for main power switch so a BB doesn't hit it
    * build "plugs" to cover and protect the cable entry points on
      exterior motors... clamp around cables and somehow snap onto upper
@@ -9,10 +13,15 @@
    * measure walking battery life
 
    * turret
-     * write application!
-       * Running faster than 400Hz gives odd timing results
-
      * tracking
+       * Try a red/blue target
+       * Try a black/white target with white outer ring, black middle
+         ring, and white center
+       * record training corpus with green/red circle and aruco targets
+       * annotate
+       * measure detection and runtime performance of aruco
+       * try to come up with something better for other system
+
        * propagate position based on IMU
          * need calibration of camera FOV vs IMU
        * change base target position based on range
@@ -30,18 +39,18 @@
        * create performance tests for target tracker
        * render target in rf_command somehow
          * do I want to try and register it to the FPV camera
-       * optionally record a subset of images somewhere, maybe main log?
 
      * get a shorter ffc cable for pi camera
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
 
-     * build power cables
-       * power -> aeg
-
    * render mech orientation graphically in rf_command in turret mode
    * make some control mechanism to squat or pitch/roll to aim at low
      things
+   * test shooting BBs at the turret and chassis to make sure nothing breaks
+   * test walking, shooting, and accuracy with targets at range
+
+   * Running faster than 400Hz gives odd timing results
 
  * walking
   * test of 2 leg level balance in isolation
