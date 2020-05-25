@@ -1,16 +1,7 @@
  * Mech warfare
-   * add reticule and configurable camera offset
-   * control rates should be nerfed even more than zoom rate
    * test shooting purely using FPV
    * test FPV and control range
-   * Need cover for main power switch so a BB doesn't hit it
-   * build "plugs" to cover and protect the cable entry points on
-     exterior motors... clamp around cables and somehow snap onto upper
-     motor joint and onto bare motor
-     * also for blank power switch
-     * and for cable exit points from chassis (maybe could double as
-       switch cover?
-   * measure walking battery life
+   * test shooting BBs at the turret and chassis to make sure nothing breaks
 
    * turret
      * tracking
@@ -44,11 +35,23 @@
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
 
+   * Need cover for main power switch so a BB doesn't hit it
+   * build "plugs" to cover and protect the cable entry points on
+     exterior motors... clamp around cables and somehow snap onto upper
+     motor joint and onto bare motor
+     * also for blank power switch
+     * and for cable exit points from chassis (maybe could double as
+       switch cover?
+   * measure walking battery life
+
    * render mech orientation graphically in rf_command in turret mode
    * make some control mechanism to squat or pitch/roll to aim at low
      things
-   * test shooting BBs at the turret and chassis to make sure nothing breaks
    * test walking, shooting, and accuracy with targets at range
+   * build a single USB plug control fixture for the 3 USB/RF things
+     * nrfusb
+     * xbox controller
+     * fpv receiver
 
    * Running faster than 400Hz gives odd timing results
 
