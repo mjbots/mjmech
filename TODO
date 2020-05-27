@@ -109,17 +109,6 @@
  * Add sheathing to remaining cables
 
 
- * mjlib telemetry
-  * writing seek records
-  * writing/reading compression
-  * reader: index
-  * reader: seek
-
- * need a way to keep track of which videos go with which logs, and to
-   synchronize time within a video to that within a log
-    * Perhaps record audio on rpi and clap / say random words?
-    * Perhaps wack the side of the case and use the sound / accelerometer?
-
  * when turning in walking gait, the yaw motors didn't seem to be
    moving smoothly
 
@@ -130,10 +119,6 @@
 
  * make "quad" sticker to go under the mjbots one
  * resolve all TODOs on pi3 hat
-
- * telemetry
-   * make new telemetry log plotting tool
-   * get 3d diagnostics rendering working
 
  * switch everything from mm to m
  * Just use "id" for all joint and leg ids
