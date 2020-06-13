@@ -1,8 +1,4 @@
  * Mech warfare
-   * test shooting purely using FPV
-   * test FPV and control range
-   * test shooting BBs at the turret and chassis to make sure nothing breaks
-
    * turret
      * tracking
        * Try a red/blue target
@@ -54,10 +50,6 @@
      * fpv receiver
 
    * Running faster than 400Hz gives odd timing results
-
- * walking
-  * test of 2 leg level balance in isolation
-  * if that works, try integrating into walk gait
 
  * Had to power cycle master nrfusb to get reception working?
 
