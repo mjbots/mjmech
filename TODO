@@ -100,26 +100,17 @@
 
  * Add sheathing to remaining cables
 
-
- * when turning in walking gait, the yaw motors didn't seem to be
-   moving smoothly
-
  * legacy gait
    * need a "sit down" mode again
    * stop lowering when contact occurs, possibly go further than the
      lift height
 
  * make "quad" sticker to go under the mjbots one
- * resolve all TODOs on pi3 hat
 
  * switch everything from mm to m
  * Just use "id" for all joint and leg ids
 
  * Fix setup
-   * Improve cycle time of fdcan query
-     * remove can id high header bytes
-     * optimize hold times
-     * maybe update quadruped_control to command and query in one operation?
    * Make the CAN client runtime switchable so that quad A0 will work too
 
  * Lifecycle
