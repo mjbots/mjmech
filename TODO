@@ -27,6 +27,8 @@
        * render target in rf_command somehow
          * do I want to try and register it to the FPV camera
 
+     * numerical turret angle isn't as handy as seeing a diagram of the
+       robots current configuration relative to the turret
      * get a shorter ffc cable for pi camera
      * make magnet spacers get the magnets closer to the chips for
        improved velocity estimates
@@ -109,17 +111,11 @@
 
  * Just use "id" for all joint and leg ids
 
- * Fix setup
-   * Make the CAN client runtime switchable so that quad A0 will work too
-
  * Lifecycle
    * Provide means to change control board LED flash pattern over CAN
    * Start out in one flash pattern until host application starts
    * Set one flash pattern when rezeroing is needed, and solid green
      when good to go
-
- * numerical turret angle isn't as handy as seeing a diagram of the
-   robots current configuration relative to the turret
 
 
 
